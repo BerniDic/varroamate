@@ -193,7 +193,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .field-hive-header{text-align:center;padding:20px 16px 8px;background:var(--amber-dark);color:#fff;border-radius:var(--radius) var(--radius) 0 0;margin:-20px -20px 20px;}
 .field-hive-name{font-size:28px;font-weight:700;margin-bottom:4px;}
 .field-apiary-name{font-size:15px;opacity:0.85;}
-.field-count-display{text-align:center;margin:24px 0 8px;}
+.hs-btn{padding:8px 14px;border:2px solid var(--border);border-radius:20px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;}
+.hs-active{border-color:var(--amber);background:var(--amber-pale);color:var(--amber-dark);font-weight:600;}
+.disease-btn{padding:6px 12px;border:1px solid var(--border);border-radius:16px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;}
+.disease-active{border-color:var(--amber);background:var(--amber-pale);color:var(--amber-dark);font-weight:600;}
+
 .field-count-num{font-size:96px;font-weight:700;color:var(--amber-dark);line-height:1;font-family:'Playfair Display',serif;}
 .field-count-unit{font-size:14px;color:var(--text3);margin-top:4px;}
 .field-btn-row{display:flex;gap:16px;justify-content:center;margin:16px 0;}
@@ -495,6 +499,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <span class="nav-info-wrap"><button class="nav-btn" onclick="backupData()">💾 Backup</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-backup')" title="What is Backup?">?</button><div class="nav-info-popover" id="pop-backup"><strong style="color:var(--amber-dark);">💾 Backup your data</strong><br>Downloads a <code>.json</code> file containing all your apiaries, hives, mite counts, treatments and notes.<br><br>Keep this file somewhere safe — it's your complete data snapshot. Use it to restore if you change devices or browsers, or as a regular safety copy.</div></span>
       <span class="nav-info-wrap"><button class="nav-btn" onclick="document.getElementById('restore-input').click()">📂 Restore</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-restore')" title="What is Restore?">?</button><div class="nav-info-popover" id="pop-restore"><strong style="color:var(--amber-dark);">📂 Restore from backup</strong><br>Loads a previously saved <code>.json</code> backup file and replaces all current data with it.<br><br>⚠️ <strong>This will overwrite your current data.</strong> Only restore from a file you created with the Backup button.</div></span>
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
+      <span class="nav-info-wrap"><button class="nav-btn" onclick="exportBeeMAX()">🐝 BeeMAX</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-beemax')" title="About BeeMAX export">?</button><div class="nav-info-popover" id="pop-beemax"><strong style="color:var(--amber-dark);">🐝 BeeMAX Export</strong><br>Opens a printable summary of all your mite count records formatted for entry into BeeMAX — the Victorian government's compulsory varroa reporting system.<br><br>One page per mite count entry, showing all the fields BeeMAX requires: apiary, hive count, method, mite count, hive strength, and disease observations.<br><br>Victorian beekeepers must report positive varroa detections at <a href="https://bees.agriculture.vic.gov.au" target="_blank" style="color:var(--amber);">bees.agriculture.vic.gov.au</a></div></span>
       <span class="nav-info-wrap"><button class="nav-btn" onclick="printAllQR()">📱 QR Codes</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-qr')" title="About QR codes">?</button><div class="nav-info-popover" id="pop-qr"><strong style="color:var(--amber-dark);">📱 Hive QR Code Labels</strong><br>Generates a printable page of QR codes — one per hive, across all your apiaries.<br><br>Stick a label on each hive box. In the field, scan with your phone's camera app to jump straight to field entry for that hive — no navigation needed.<br><br><strong>Best results:</strong> Print on sticker paper and laminate, or cover with clear packing tape for weather resistance.</div></span>
       <button class="nav-btn" onclick="openModal('modal-add-apiary')">+ Apiary</button>
       <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
@@ -504,6 +509,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   </div></div>
   <!-- Mobile overflow dropdown -->
   <div class="nav-overflow-menu" id="nav-overflow-menu">
+    <div class="nav-overflow-item" onclick="closeNavOverflow();exportBeeMAX()">🐝 BeeMAX Export</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();printAllQR()">📱 Print All QR Codes</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();openModal('modal-add-apiary')">🏡 Add Apiary</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportAllCSV()">📥 Export CSV</div>
@@ -705,6 +711,25 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     </div>
     <div style="margin:10px 0 6px;font-size:13px;color:var(--text3);text-align:center;" id="field-notes-label">Optional: add a quick note</div>
     <input type="text" id="field-notes" placeholder="e.g. post-treatment check, queen seen…" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;">
+
+    <div style="margin:14px 0 6px;font-size:13px;color:var(--text3);text-align:center;">Hive Strength <span style="font-size:11px;">(for BeeMAX)</span></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;">
+      <button type="button" id="fhs-poor"  onclick="setFieldHiveStrength('Poor')"  class="hs-btn">😟 Poor</button>
+      <button type="button" id="fhs-fair"  onclick="setFieldHiveStrength('Fair')"  class="hs-btn">😐 Fair</button>
+      <button type="button" id="fhs-good"  onclick="setFieldHiveStrength('Good')"  class="hs-btn hs-active">😊 Good</button>
+    </div>
+    <input type="hidden" id="field-hive-strength" value="Good">
+
+    <div style="margin:10px 0 6px;font-size:13px;color:var(--text3);text-align:center;">Disease / Pest Observations <span style="font-size:11px;">(for BeeMAX)</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px;" id="field-disease-btns">
+      <button type="button" class="disease-btn disease-active" data-disease="No Disease Present" onclick="toggleFieldDisease(this)">✅ No Disease</button>
+      <button type="button" class="disease-btn" data-disease="Varroa"             onclick="toggleFieldDisease(this)">Varroa</button>
+      <button type="button" class="disease-btn" data-disease="American foulbrood" onclick="toggleFieldDisease(this)">AFB</button>
+      <button type="button" class="disease-btn" data-disease="Chalkbrood"         onclick="toggleFieldDisease(this)">Chalkbrood</button>
+      <button type="button" class="disease-btn" data-disease="European foulbrood" onclick="toggleFieldDisease(this)">EFB</button>
+      <button type="button" class="disease-btn" data-disease="Nosema"             onclick="toggleFieldDisease(this)">Nosema</button>
+      <button type="button" class="disease-btn" data-disease="Braula fly"         onclick="toggleFieldDisease(this)">Braula fly</button>
+    </div>
     <button class="field-save-btn" onclick="fieldSave()">💾 Save Count</button>
     <button class="field-voice-btn" id="field-voice-btn" onclick="fieldToggleVoice()">🎤 Tap to speak count</button>
     <div id="field-voice-status" style="text-align:center;font-size:13px;color:var(--text3);margin-top:6px;min-height:18px;"></div>
@@ -924,6 +949,27 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <p style="font-size:14px;color:var(--text3);margin-bottom:16px;">Alcohol wash in approximately 300 bees (½ cup)</p>
     <div class="field"><label>Date</label><input type="date" id="count-date"></div>
     <div class="field"><label>Mite Count</label><input type="number" id="count-value" placeholder="e.g. 4" min="0"></div>
+    <div class="field">
+      <label>Hive Strength <span style="font-size:12px;color:var(--text3);">— also logged for BeeMAX</span></label>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button type="button" id="hs-poor"  onclick="setHiveStrength('Poor')"  class="hs-btn">😟 Poor</button>
+        <button type="button" id="hs-fair"  onclick="setHiveStrength('Fair')"  class="hs-btn">😐 Fair</button>
+        <button type="button" id="hs-good"  onclick="setHiveStrength('Good')"  class="hs-btn hs-active">😊 Good</button>
+      </div>
+      <input type="hidden" id="count-hive-strength" value="Good">
+    </div>
+    <div class="field">
+      <label>Disease / Pest Observations <span style="font-size:12px;color:var(--text3);">— also logged for BeeMAX</span></label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="disease-btns">
+        <button type="button" class="disease-btn disease-active" data-disease="No Disease Present" onclick="toggleDisease(this)">✅ No Disease</button>
+        <button type="button" class="disease-btn" data-disease="Varroa"              onclick="toggleDisease(this)">Varroa</button>
+        <button type="button" class="disease-btn" data-disease="American foulbrood"  onclick="toggleDisease(this)">AFB</button>
+        <button type="button" class="disease-btn" data-disease="Chalkbrood"          onclick="toggleDisease(this)">Chalkbrood</button>
+        <button type="button" class="disease-btn" data-disease="European foulbrood"  onclick="toggleDisease(this)">EFB</button>
+        <button type="button" class="disease-btn" data-disease="Nosema"              onclick="toggleDisease(this)">Nosema</button>
+        <button type="button" class="disease-btn" data-disease="Braula fly"          onclick="toggleDisease(this)">Braula fly</button>
+      </div>
+    </div>
     <input type="hidden" id="count-edit-id">
     <button class="btn btn-primary btn-full" onclick="saveCount()">Save Count</button>
   </div>
@@ -1585,10 +1631,12 @@ function saveCount(){
   const date=document.getElementById('count-date').value;
   const value=parseInt(document.getElementById('count-value').value);
   const editId=document.getElementById('count-edit-id').value;
+  const hiveStrength=document.getElementById('count-hive-strength').value||'Good';
+  const diseases=getSelectedDiseases('disease-btns');
   if(!date||isNaN(value)||value<0){showToast('Please enter a valid date and count');return;}
   const arr=miteCountsByHive[currentHiveId];
-  if(editId){const i=arr.findIndex(c=>c.id===editId);if(i>=0)arr[i]={...arr[i],date,value};}
-  else arr.unshift({id:'c'+Date.now(),date,value});
+  if(editId){const i=arr.findIndex(c=>c.id===editId);if(i>=0)arr[i]={...arr[i],date,value,hiveStrength,diseases};}
+  else arr.unshift({id:'c'+Date.now(),date,value,hiveStrength,diseases});
   arr.sort((a,b)=>b.date.localeCompare(a.date));
   closeModal('modal-add-count');
   showToast(editId?'Count updated! 📊':'Count saved! 📊');
@@ -1601,6 +1649,8 @@ function editCount(id){
   document.getElementById('count-date').value=c.date;
   document.getElementById('count-value').value=c.value;
   document.getElementById('count-edit-id').value=c.id;
+  setHiveStrength(c.hiveStrength||'Good');
+  restoreSelectedDiseases('disease-btns', c.diseases||['No Disease Present']);
   openModal('modal-add-count');
 }
 function saveTreatment(){
@@ -2189,6 +2239,8 @@ function openModal(id){
     document.getElementById('count-modal-title').textContent='Add Mite Count';
     document.getElementById('count-date').value=new Date().toISOString().split('T')[0];
     document.getElementById('count-value').value='';
+    setHiveStrength('Good');
+    restoreSelectedDiseases('disease-btns',['No Disease Present']);
   }
   if(id==='modal-add-note'&&!document.getElementById('note-edit-id').value){
     document.getElementById('note-modal-title').textContent='Add Note';
@@ -2664,18 +2716,21 @@ function fieldSave(){
   const value=parseInt(document.getElementById('field-count-num').textContent||'0');
   const date=document.getElementById('field-date').value;
   const notes=document.getElementById('field-notes').value.trim();
+  const hiveStrength=document.getElementById('field-hive-strength').value||'Good';
+  const diseases=getSelectedDiseases('field-disease-btns');
   if(!date){showToast('Please set a date');return;}
   const arr=miteCountsByHive[currentHiveId];
   if(!arr){showToast('Hive not found');return;}
-  arr.unshift({id:'c'+Date.now(),date,value,notes});
+  arr.unshift({id:'c'+Date.now(),date,value,notes,hiveStrength,diseases});
   arr.sort((a,b)=>b.date.localeCompare(a.date));
   saveData();
   showToast(`Count ${value} saved! 📊`);
-  // Mark chart dirty — will redraw when user returns to hive detail
   window._chartDirty=true;
   // Reset for next hive
   document.getElementById('field-count-num').textContent='0';
   document.getElementById('field-notes').value='';
+  setFieldHiveStrength('Good');
+  restoreSelectedDiseases('field-disease-btns',['No Disease Present']);
   fieldUpdateThreshold();
 }
 
@@ -2924,6 +2979,188 @@ hiveData.forEach(({hive,apiary,code})=>{
     colorDark:'#2C1A00',colorLight:'#fff',
     correctLevel:QRCode.CorrectLevel.M
   });
+});
+<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+// ══ HIVE STRENGTH (modal) ══
+function setHiveStrength(val){
+  ['Poor','Fair','Good'].forEach(v=>{
+    const btn=document.getElementById('hs-'+v.toLowerCase());
+    if(btn)btn.classList.toggle('hs-active',v===val);
+  });
+  document.getElementById('count-hive-strength').value=val;
+}
+// ══ HIVE STRENGTH (field screen) ══
+function setFieldHiveStrength(val){
+  ['Poor','Fair','Good'].forEach(v=>{
+    const btn=document.getElementById('fhs-'+v.toLowerCase());
+    if(btn)btn.classList.toggle('hs-active',v===val);
+  });
+  document.getElementById('field-hive-strength').value=val;
+}
+// ══ DISEASE TOGGLES ══
+function toggleDisease(btn){
+  const disease=btn.dataset.disease;
+  const isNoDisease=disease==='No Disease Present';
+  const container=document.getElementById('disease-btns');
+  if(isNoDisease){
+    // clicking No Disease clears everything else
+    container.querySelectorAll('.disease-btn').forEach(b=>b.classList.remove('disease-active'));
+    btn.classList.add('disease-active');
+  } else {
+    // toggle this disease; clear No Disease
+    btn.classList.toggle('disease-active');
+    const noDisBtn=container.querySelector('[data-disease="No Disease Present"]');
+    if(noDisBtn)noDisBtn.classList.remove('disease-active');
+    // if nothing selected, re-select No Disease
+    const anySelected=[...container.querySelectorAll('.disease-btn')].some(b=>b!==noDisBtn&&b.classList.contains('disease-active'));
+    if(!anySelected&&noDisBtn)noDisBtn.classList.add('disease-active');
+  }
+}
+function toggleFieldDisease(btn){
+  const disease=btn.dataset.disease;
+  const isNoDisease=disease==='No Disease Present';
+  const container=document.getElementById('field-disease-btns');
+  if(isNoDisease){
+    container.querySelectorAll('.disease-btn').forEach(b=>b.classList.remove('disease-active'));
+    btn.classList.add('disease-active');
+  } else {
+    btn.classList.toggle('disease-active');
+    const noDisBtn=container.querySelector('[data-disease="No Disease Present"]');
+    if(noDisBtn)noDisBtn.classList.remove('disease-active');
+    const anySelected=[...container.querySelectorAll('.disease-btn')].some(b=>b!==noDisBtn&&b.classList.contains('disease-active'));
+    if(!anySelected&&noDisBtn)noDisBtn.classList.add('disease-active');
+  }
+}
+function getSelectedDiseases(containerId){
+  const container=document.getElementById(containerId);
+  if(!container)return['No Disease Present'];
+  return [...container.querySelectorAll('.disease-btn.disease-active')].map(b=>b.dataset.disease);
+}
+function restoreSelectedDiseases(containerId,diseases){
+  const container=document.getElementById(containerId);
+  if(!container)return;
+  const list=Array.isArray(diseases)&&diseases.length?diseases:['No Disease Present'];
+  container.querySelectorAll('.disease-btn').forEach(b=>{
+    b.classList.toggle('disease-active',list.includes(b.dataset.disease));
+  });
+}
+
+
+// ══ BEEMAX EXPORT ══
+function exportBeeMAX(){
+  // Collect all mite count entries across all apiaries and hives
+  const entries=[];
+  for(const a of apiaries){
+    const hvList=hives[a.id]||[];
+    const hiveCount=hvList.length;
+    for(const h of hvList){
+      const counts=miteCountsByHive[h.id]||[];
+      for(const c of counts){
+        entries.push({apiary:a,hive:h,count:c,hiveCount});
+      }
+    }
+  }
+  if(!entries.length){showToast('No mite count entries to export');return;}
+  // Sort by date desc
+  entries.sort((a,b)=>b.count.date.localeCompare(a.count.date));
+
+  const win=window.open('','_blank','width=860,height=700');
+  const generated=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+
+  win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — BeeMAX Export</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:system-ui,sans-serif;background:#fff;padding:20px;color:#111;font-size:14px;}
+  h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
+  .subtitle{font-size:13px;color:#9C7A4A;margin-bottom:16px;}
+  .instructions{background:#FFF3DC;border:1px solid #E8D5B0;border-radius:8px;padding:14px 18px;margin-bottom:22px;line-height:1.6;font-size:13px;color:#6B4C1E;}
+  .instructions h3{font-size:14px;font-weight:700;color:#8B5200;margin-bottom:6px;}
+  .instructions a{color:#8B5200;}
+  .entry{border:2px solid #2C1A00;border-radius:10px;padding:16px 18px;margin-bottom:16px;break-inside:avoid;}
+  .entry-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #E8D5B0;}
+  .entry-apiary{font-size:16px;font-weight:700;color:#2C1A00;}
+  .entry-date{font-size:13px;color:#9C7A4A;text-align:right;}
+  .entry-hive{font-size:13px;color:#6B4C1E;margin-top:2px;}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
+  .fld label{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#9C7A4A;display:block;margin-bottom:3px;}
+  .fld .val{font-size:14px;font-weight:600;color:#2C1A00;}
+  .fld .val.highlight{color:#8B5200;font-size:16px;}
+  .strength-poor{color:#e11d48;}
+  .strength-fair{color:#f59e0b;}
+  .strength-good{color:#16a34a;}
+  .disease-flag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:12px;font-weight:600;margin-right:4px;}
+  .disease-none{background:#dcfce7;color:#16a34a;}
+  .disease-present{background:#fee2e2;color:#dc2626;}
+  .no-print{margin-top:24px;text-align:center;}
+  button{padding:10px 24px;background:#8B5200;color:#fff;border:none;border-radius:20px;font-size:15px;font-weight:700;cursor:pointer;margin:0 6px;}
+  button.sec{background:#F5EDD8;color:#8B5200;border:1px solid #E8D5B0;}
+  .beemax-link{display:block;margin:12px 0;padding:10px 14px;background:#e8f4fd;border:1px solid #93c5fd;border-radius:8px;text-align:center;font-weight:600;color:#1d4ed8;text-decoration:none;font-size:13px;}
+  @media print{body{padding:8px;}.no-print,.instructions{display:none!important;}.entry{margin-bottom:10px;}}
+</style>
+</head><body>
+<h1>🐝 VarroaMate — BeeMAX Mite Check Export</h1>
+<div class="subtitle">${entries.length} mite count record${entries.length!==1?'s':''} · Generated ${generated}</div>
+
+<div class="instructions no-print">
+  <h3>📋 How to use this export with BeeMAX</h3>
+  <ol style="padding-left:18px;line-height:1.8;">
+    <li>Go to <a href="https://bees.agriculture.vic.gov.au/Dashboard" target="_blank">bees.agriculture.vic.gov.au</a> and sign in to BeeMAX</li>
+    <li>Select <strong>Add Diary Entry</strong> → choose <strong>Mite Check</strong></li>
+    <li>Use each record below to fill in the BeeMAX form fields — all required data is shown</li>
+    <li>Select the matching apiary from your BeeMAX registered list</li>
+    <li>Enter the mite count, hive strength, and disease observations as shown</li>
+  </ol>
+  <a href="https://bees.agriculture.vic.gov.au/Dashboard" target="_blank" class="beemax-link">🔗 Open BeeMAX Dashboard →</a>
+  <div style="margin-top:8px;font-size:12px;color:#9C7A4A;">Note: VarroaMate records alcohol wash counts. BeeMAX also accepts drone uncapping and sugar shake — enter 0 for those fields.</div>
+</div>
+
+<div id="entries-list"></div>
+
+<div class="no-print">
+  <button onclick="window.print()">🖨 Print Records</button>
+  <button class="sec" onclick="window.close()">Close</button>
+</div>
+<script>
+const entries=${JSON.stringify(entries)};
+const list=document.getElementById('entries-list');
+entries.forEach(({apiary,hive,count,hiveCount})=>{
+  const diseases=Array.isArray(count.diseases)&&count.diseases.length?count.diseases:['No Disease Present'];
+  const noDisease=diseases.length===1&&diseases[0]==='No Disease Present';
+  const strength=count.hiveStrength||'Good';
+  const strengthClass='strength-'+strength.toLowerCase();
+  const dateFormatted=count.date?new Date(count.date+'T12:00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
+  const diseaseHtml=diseases.map(d=>
+    \`<span class="disease-flag \${d==='No Disease Present'?'disease-none':'disease-present'}">\${d}</span>\`
+  ).join('');
+  list.innerHTML+=\`
+  <div class="entry">
+    <div class="entry-header">
+      <div>
+        <div class="entry-apiary">\${apiary.name}</div>
+        <div class="entry-hive">Hive: \${hive.name}</div>
+        <div class="entry-hive" style="margin-top:2px;color:#9C7A4A;">\${apiary.address||''}</div>
+      </div>
+      <div class="entry-date">
+        <div style="font-size:15px;font-weight:700;color:#2C1A00;">\${dateFormatted}</div>
+        <div style="margin-top:4px;">BeeMAX date field</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="fld"><label>BeeMAX Record Type</label><div class="val">Mite Check ✓</div></div>
+      <div class="fld"><label>Apiary (select in BeeMAX)</label><div class="val">\${apiary.name}</div></div>
+      <div class="fld"><label>Number of Hives in Apiary</label><div class="val highlight">\${hiveCount}</div></div>
+      <div class="fld"><label>Method: Alcohol Wash</label><div class="val highlight">\${count.value??0} mites / 300 bees</div></div>
+      <div class="fld"><label>Method: Drone Uncapping</label><div class="val" style="color:#9C7A4A;">0 (not used)</div></div>
+      <div class="fld"><label>Method: Sugar Shake</label><div class="val" style="color:#9C7A4A;">0 (not used)</div></div>
+      <div class="fld"><label>Hive Strength</label><div class="val \${strengthClass}">\${strength}</div></div>
+      <div class="fld" style="grid-column:1/-1;"><label>Disease / Pest Present</label><div style="margin-top:4px;">\${diseaseHtml}</div></div>
+      \${count.notes?'<div class="fld" style="grid-column:1/-1;"><label>Notes (copy to BeeMAX Notes)</label><div class="val">'+count.notes+'</div></div>':''}
+    </div>
+  </div>\`;
 });
 <\/script>
 </body></html>`);
