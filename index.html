@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
   --amber:#D4820A; --amber-light:#F5A623; --amber-pale:#FFF3DC; --amber-dark:#8B5200;
@@ -128,6 +129,17 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .trend-container{background:#fff;border-radius:var(--radius);padding:16px;border:1px solid var(--border);margin-bottom:14px;}
 .trend-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
 .trend-legend-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);}
+.chart-expand-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:13px;padding:3px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.chart-expand-btn:hover{background:var(--bg2);color:var(--amber-dark);border-color:var(--amber);}
+.chart-fs{display:none;position:fixed;inset:0;background:#fff;z-index:1500;flex-direction:column;padding:16px 20px;}
+.chart-fs.open{display:flex;}
+.chart-fs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-shrink:0;}
+.chart-fs-title{font-weight:700;font-size:17px;color:var(--amber-dark);}
+.chart-fs-close{background:var(--amber-dark);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chart-fs-body{flex:1;min-height:0;position:relative;}
+.chart-fs-body canvas{width:100%!important;height:100%!important;}
+.chart-fs-footer{flex-shrink:0;margin-top:10px;font-size:13px;color:var(--text2);}
+.trend-legend-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);}
 .guidance-section{background:#fff;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);}
 .guidance-section-header{padding:14px 18px;background:var(--amber-pale);border-bottom:1px solid var(--border);font-weight:700;font-size:17px;color:var(--amber-dark);}
 .guidance-section-body{padding:14px 18px;font-size:16px;color:var(--text2);line-height:1.75;}
@@ -177,6 +189,35 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .pag-btn{background:none;border:1px solid var(--border);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:15px;}
 .pag-btn:hover{background:var(--amber-pale);border-color:var(--amber);}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--amber-dark);color:#fff;padding:10px 22px;border-radius:20px;font-size:16px;z-index:500;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;}
+/* ── FIELD ENTRY SCREEN ── */
+.field-hive-header{text-align:center;padding:20px 16px 8px;background:var(--amber-dark);color:#fff;border-radius:var(--radius) var(--radius) 0 0;margin:-20px -20px 20px;}
+.field-hive-name{font-size:28px;font-weight:700;margin-bottom:4px;}
+.field-apiary-name{font-size:15px;opacity:0.85;}
+.field-count-display{text-align:center;margin:24px 0 8px;}
+.field-count-num{font-size:96px;font-weight:700;color:var(--amber-dark);line-height:1;font-family:'Playfair Display',serif;}
+.field-count-unit{font-size:14px;color:var(--text3);margin-top:4px;}
+.field-btn-row{display:flex;gap:16px;justify-content:center;margin:16px 0;}
+.field-btn{width:88px;height:88px;border-radius:50%;border:none;font-size:52px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:transparent;user-select:none;}
+.field-btn-minus{background:#FDECEA;color:var(--red);}
+.field-btn-minus:active{background:#E74C3C;color:#fff;transform:scale(0.93);}
+.field-btn-plus{background:var(--green-pale);color:var(--green);}
+.field-btn-plus:active{background:var(--green);color:#fff;transform:scale(0.93);}
+.field-date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0;font-size:15px;color:var(--text2);}
+.field-save-btn{width:100%;padding:18px;font-size:20px;font-weight:700;border-radius:var(--radius);border:none;background:var(--amber-dark);color:#fff;cursor:pointer;margin-top:8px;transition:all 0.15s;}
+.field-save-btn:active{background:var(--amber);transform:scale(0.98);}
+.field-voice-btn{width:100%;padding:14px;font-size:17px;border-radius:var(--radius);border:2px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-top:10px;transition:all 0.2s;}
+.field-voice-btn.listening{background:#FDECEA;border-color:var(--red);color:var(--red);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.field-threshold-bar{margin:16px 0;padding:10px 14px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;text-align:center;}
+/* ── QR CODE ── */
+.hive-code-badge{display:inline-block;font-family:monospace;font-size:12px;font-weight:700;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;margin-left:6px;letter-spacing:0.05em;cursor:pointer;}
+.qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1600;align-items:center;justify-content:center;}
+.qr-overlay.open{display:flex;}
+.qr-box{background:#fff;border-radius:var(--radius);padding:24px;text-align:center;max-width:320px;width:90%;}
+.qr-hive-name{font-size:20px;font-weight:700;color:var(--amber-dark);margin-bottom:4px;}
+.qr-code-text{font-family:monospace;font-size:13px;color:var(--text3);margin-bottom:14px;}
+.qr-print-btn{margin-top:14px;width:100%;padding:12px;background:var(--amber-dark);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;}
+.qr-close-btn{margin-top:8px;width:100%;padding:10px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;cursor:pointer;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .confirm-danger{background:var(--red-pale);border:1px solid var(--red);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:16px;color:var(--red);font-size:16px;}
 .addr-suggestion{padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:15px;line-height:1.4;}
@@ -387,6 +428,13 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <button class="back-btn" onclick="goto('s-apiaries')">← Apiaries</button>
     <h1 class="page-title" id="hives-title">Home Garden</h1>
     <p class="page-subtitle" id="hives-subtitle"></p>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:14px;color:var(--text2);flex:1;min-width:180px;">📱 <strong>Field entry:</strong> Scan a hive QR code with your camera app, or enter the 4-letter code below.</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="text" id="hive-code-input" maxlength="4" placeholder="e.g. HV3K" style="width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:monospace;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;background:var(--bg);color:var(--text);text-align:center;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')gotoFieldByCode()">
+        <button class="btn btn-primary btn-sm" onclick="gotoFieldByCode()">Go →</button>
+      </div>
+    </div>
     <div class="two-col" id="hive-list"></div>
   </div>
 </div>
@@ -408,7 +456,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <div class="two-col" style="align-items:start;">
         <div>
           <div class="trend-container">
-            <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:600;" id="chart-label">2025–2026 · Alcohol wash (~300 bees)</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <div style="font-size:12px;color:var(--text3);font-weight:600;" id="chart-label">2025–2026 · Alcohol wash (~300 bees)</div>
+              <button class="chart-expand-btn" onclick="expandMiteChart()" title="Expand chart">⛶ Expand</button>
+            </div>
             <canvas id="miteChart" height="260"></canvas>
             <div style="margin-top:10px;padding:0 4px;">
               <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:4px;">
@@ -439,6 +490,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         <div>
           <div class="card"><div class="card-title">⚡ Quick Actions</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-primary btn-full" onclick="gotoField()" style="background:var(--green);font-size:17px;">🔬 Field Entry (large buttons)</button>
               <button class="btn btn-primary btn-full" onclick="openModal('modal-add-count')">+ Add Mite Count</button>
               <button class="btn btn-outline btn-full" onclick="openModal('modal-add-treatment')">+ Add Treatment</button>
               <button class="btn btn-outline btn-full" onclick="goto('s-guidance')">🧭 Get Guidance</button>
@@ -514,7 +566,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <div>
         <div class="guidance-section"><div class="guidance-section-header">⚠️ Cautions</div><div class="guidance-section-body" id="guidance-cautions-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
-        <div class="guidance-section"><div class="guidance-section-header">🌡️ Temperature Outlook — 14 days</div>
+        <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;">🌡️ Temperature Outlook — 14 days<button class="chart-expand-btn" onclick="expandTempChart()" title="Expand chart" style="font-size:12px;">⛶ Expand</button></div>
           <div class="guidance-section-body" id="guidance-temp-body"><div style="color:var(--text3);font-style:italic;">Loading forecast…</div></div>
           <div style="padding:0 18px 14px;">
             <canvas id="tempChart" height="180" style="width:100%;display:none;"></canvas>
@@ -524,6 +576,61 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
     </div>
   </div>
+</div>
+
+<!-- FIELD ENTRY SCREEN -->
+<div id="s-field" class="screen">
+  <div class="topnav"><div class="topnav-inner"><div class="logo">Varroa<em>Mate</em></div><button class="nav-btn" onclick="goto('s-hive-detail')">← Detail</button></div></div>
+  <div class="page-body" style="max-width:420px;margin:0 auto;padding:20px;">
+    <div class="field-hive-header">
+      <div class="field-hive-name" id="field-hive-name">Hive</div>
+      <div class="field-apiary-name" id="field-apiary-name"></div>
+    </div>
+    <div class="field-count-display">
+      <div class="field-count-num" id="field-count-num">0</div>
+      <div class="field-count-unit">mites / ~300 bees (alcohol wash)</div>
+    </div>
+    <div id="field-threshold-bar" class="field-threshold-bar"></div>
+    <div class="field-btn-row">
+      <button class="field-btn field-btn-minus" onclick="fieldAdjust(-1)" ontouchstart="fieldStartRepeat(-1)" ontouchend="fieldStopRepeat()" onmousedown="fieldStartRepeat(-1)" onmouseup="fieldStopRepeat()">−</button>
+      <button class="field-btn field-btn-plus"  onclick="fieldAdjust(1)"  ontouchstart="fieldStartRepeat(1)"  ontouchend="fieldStopRepeat()" onmousedown="fieldStartRepeat(1)"  onmouseup="fieldStopRepeat()">+</button>
+    </div>
+    <div class="field-date-row">
+      <span>📅 Date:</span>
+      <input type="date" id="field-date" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);">
+    </div>
+    <div style="margin:10px 0 6px;font-size:13px;color:var(--text3);text-align:center;" id="field-notes-label">Optional: add a quick note</div>
+    <input type="text" id="field-notes" placeholder="e.g. post-treatment check, queen seen…" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;">
+    <button class="field-save-btn" onclick="fieldSave()">💾 Save Count</button>
+    <button class="field-voice-btn" id="field-voice-btn" onclick="fieldToggleVoice()">🎤 Tap to speak count</button>
+    <div id="field-voice-status" style="text-align:center;font-size:13px;color:var(--text3);margin-top:6px;min-height:18px;"></div>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn btn-outline btn-sm" onclick="goto('s-hives')" style="margin-right:8px;">All Hives</button>
+      <button class="btn btn-outline btn-sm" onclick="goto('s-guidance')">Get Guidance</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR CODE OVERLAY -->
+<div class="qr-overlay" id="qr-overlay" onclick="closeQR()">
+  <div class="qr-box" onclick="event.stopPropagation()">
+    <div class="qr-hive-name" id="qr-hive-name"></div>
+    <div class="qr-code-text" id="qr-code-text"></div>
+    <div id="qr-canvas" style="display:flex;justify-content:center;margin:10px 0;"></div>
+    <div style="font-size:13px;color:var(--text3);margin-top:8px;line-height:1.5;">Scan with your phone's <strong>camera app</strong> to jump straight to field entry for this hive.<br>Or type the code <strong id="qr-code-inline"></strong> on the Hives screen.<br><br>Print and attach to the hive box — laminate for weather resistance.</div>
+    <button class="qr-print-btn" onclick="printQR()">🖨 Print Label</button>
+    <button class="qr-close-btn" onclick="closeQR()">Close</button>
+  </div>
+</div>
+
+<!-- CHART FULLSCREEN OVERLAY -->
+<div class="chart-fs" id="chart-fs">
+  <div class="chart-fs-header">
+    <div class="chart-fs-title" id="chart-fs-title"></div>
+    <button class="chart-fs-close" onclick="closeChartFs()" title="Close (Esc)">✕</button>
+  </div>
+  <div class="chart-fs-body" id="chart-fs-body"></div>
+  <div class="chart-fs-footer" id="chart-fs-footer"></div>
 </div>
 
 <!-- FEEDBACK -->
@@ -895,8 +1002,8 @@ let countsPage = 0, treatmentsPage = 0, notesPage = 0;
 const PAGE_SIZE = 5;
 
 // ══ NAVIGATION ══
-const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-guidance','s-feedback','s-prefs','s-subscription'];
-const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription'};
+const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription'];
+const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription'};
 
 function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
@@ -920,7 +1027,11 @@ function goto(id,param){
   if(TAB_MAP[id]){const t=document.getElementById(TAB_MAP[id]);if(t)t.classList.add('active');}
   if(id==='s-apiaries')renderApiaries();
   if(id==='s-hives')renderHives();
-  if(id==='s-hive-detail'){renderHiveDetail();switchHiveTab('trend',document.getElementById('st-trend'));}
+  if(id==='s-hive-detail'){
+    renderHiveDetail();
+    switchHiveTab('trend',document.getElementById('st-trend'));
+    if(window._chartDirty){window._chartDirty=false;setTimeout(initChart,80);}
+  }
   if(id==='s-guidance'){syncApiKeyUI();loadGuidance();}
   if(id==='s-prefs'){restorePrefSelection();restoreStateSelection();}
   if(id==='s-signin'){switchSigninTab(param==='create'?'create':'signin');}
@@ -1022,12 +1133,29 @@ function selectPref(card){
   const name=card.querySelector('.pref-name')?.textContent||'';
   try{localStorage.setItem('varroamate_pref',name);}catch(e){}
 }
+function checkPendingHive(){
+  // After login, if a QR code was scanned before login, route to field entry
+  try{
+    const code=sessionStorage.getItem('varroamate_pending_hive');
+    if(!code)return false;
+    sessionStorage.removeItem('varroamate_pending_hive');
+    const h=getHiveByCode(code);
+    if(h){
+      currentHiveId=h.id;
+      for(const [aid,hvList] of Object.entries(hives)){
+        if(hvList.some(hv=>hv.id===h.id)){currentApiaryId=parseInt(aid);break;}
+      }
+      gotoField();
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
 function savePrefAndContinue(){
-  // Ensure whatever card is currently selected is persisted
   const card=document.querySelector('.pref-card.selected');
   if(card){const name=card.querySelector('.pref-name')?.textContent||'';try{localStorage.setItem('varroamate_pref',name);}catch(e){}}
   showToast('Preference saved! 🌿');
-  goto('s-apiaries');
+  if(!checkPendingHive())goto('s-apiaries');
 }
 function getSelectedPref(){
   // Try localStorage first, then fall back to the selected card in DOM
@@ -1188,6 +1316,19 @@ function getHiveBadge(hid){
 }
 
 // ══ RENDER HIVES ══
+function makeHiveCode(id){
+  // Generate a stable 4-char code from hive id
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let n=id,code='';
+  for(let i=0;i<4;i++){code+=chars[n%chars.length];n=Math.floor(n/chars.length)+7;}
+  return code;
+}
+function getHiveByCode(code){
+  for(const hvList of Object.values(hives)){
+    for(const h of hvList){if(makeHiveCode(h.id)===code.toUpperCase())return h;}
+  }
+  return null;
+}
 function renderHives(){
   const ap=apiaries.find(a=>a.id===currentApiaryId);if(!ap)return;
   document.getElementById('hives-title').textContent=ap.name;
@@ -1201,12 +1342,22 @@ function renderHives(){
     const t=(treatmentsByHive[h.id]||[]);
     const lastT=t[0]?` · Treated: ${(TREATMENTS[t[0].product]?.name||t[0].product).split(' ').slice(0,2).join(' ')} (${fmtDate(t[0].date)})`:'';
     const lastC=c[0]?`Last count: ${fmtDate(c[0].date)}${lastT}`:'No mite counts yet';
+    const code=makeHiveCode(h.id);
     const div=document.createElement('div');div.className='hive-row';
     div.onclick=()=>{currentHiveId=h.id;goto('s-hive-detail');};
     div.innerHTML=`<div style="font-size:28px;">🐝</div>
-      <div class="hive-info"><div class="hive-name">${h.name}</div><div class="hive-status">${lastC}</div>
-      <div style="margin-top:4px;"><span class="badge ${b.cls}">${b.label}</span></div></div>
-      <div class="hive-count"><span class="count-num" style="color:${b.color};">${b.num}</span><span class="count-label">mites/300</span></div>`;
+      <div class="hive-info">
+        <div class="hive-name">${h.name} <span style="font-family:monospace;font-size:11px;color:var(--text3);font-weight:400;">${code}</span></div>
+        <div class="hive-status">${lastC}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge ${b.cls}">${b.label}</span>
+          <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="hive-count"><span class="count-num" style="color:${b.color};">${b.num}</span><span class="count-label">mites/300</span></div>
+        <button class="btn btn-primary btn-sm" style="font-size:12px;padding:4px 10px;" onclick="event.stopPropagation();currentHiveId=${h.id};gotoField()">🔬 Count</button>
+      </div>`;
     list.appendChild(div);
   }
 }
@@ -1437,8 +1588,8 @@ function onChartRangeChange(val){
   initChart();
 }
 
-function initChart(){
-  const ctx=document.getElementById('miteChart');if(!ctx)return;
+function initChart(canvasEl,maintainAR){
+  const ctx=canvasEl||document.getElementById('miteChart');if(!ctx)return;
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
 
   const allCounts=miteCountsByHive[currentHiveId]||[];
@@ -1483,20 +1634,17 @@ function initChart(){
   const lbl=document.getElementById('chart-label');
   if(lbl&&hive)lbl.textContent=`${hive.name} · ${fmtY(fromDate)} – ${fmtY(toDate)} · Alcohol wash (~300 bees)`;
 
-  // Update slider label on first draw
-  const slider=document.getElementById('chart-range-slider');
-  if(slider){
-    const v=slider.value;
-    const lbl=parseInt(v)<=1?'1 month':parseInt(v)<12?v+' months':parseInt(v)===12?'1 year':Math.round(parseInt(v)/12*10)/10+' years';
-    document.getElementById('chart-range-label').textContent=lbl;
-  }
+  // Update slider label from chartMonths global
+  const rangeLabel=chartMonths<=1?'1 month':chartMonths<12?chartMonths+' months':chartMonths===12?'1 year':Math.round(chartMonths/12*10)/10+' years';
+  const rl=document.getElementById('chart-range-label');
+  if(rl)rl.textContent=rangeLabel;
 
   chartInstance=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[{label:'Mite Count',data:chartData,borderColor:'#2980B9',backgroundColor:'rgba(41,128,185,0.07)',
       pointBackgroundColor:chartData.map(v=>v===null?'transparent':v>=15?'#C0392B':v>=6?'#E74C3C':v>=3?'#F39C12':'#27AE60'),
       pointRadius:chartData.map(v=>v===null?0:7),pointHoverRadius:10,tension:0.3,fill:true,spanGaps:true}]},
-    options:{responsive:true,
+    options:{responsive:true,maintainAspectRatio:maintainAR!==false,
       plugins:{legend:{display:false},tooltip:{callbacks:{
         label:c=>{
           if(c.parsed.y===null)return'No data';
@@ -1514,8 +1662,8 @@ function initChart(){
         }
       }}},
       scales:{
-        y:{min:0,max:yMax,title:{display:true,text:'Mites (alcohol wash)',font:{size:12}},grid:{color:'rgba(0,0,0,0.05)'}},
-        x:{grid:{display:false},ticks:{maxTicksLimit:12,maxRotation:45}}
+        y:{min:0,max:yMax,title:{display:true,text:'Mites (alcohol wash)',font:{size:14}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:13}}},
+        x:{grid:{display:false},ticks:{maxTicksLimit:12,maxRotation:45,font:{size:13}}}
       }
     },
     plugins:[{id:'zones',beforeDraw(chart){
@@ -1524,6 +1672,9 @@ function initChart(){
       const nBuckets=buckets.length;
       if(!nBuckets)return;
       const colW=W/nBuckets;
+
+      // Responsive font size — scales with chart width for regular and fullscreen
+      const fs=Math.max(11,Math.round(chart.width*0.013));
 
       // Season shading per bucket + labels at season transitions
       const seasonColors={
@@ -1542,9 +1693,9 @@ function initChart(){
       let runStart=0,runSeason=buckets[0]?seasonNames[buckets[0].month]:'';
       const drawSeasonLabel=(startI,endI,label)=>{
         const sx=left+startI*colW,ex=left+(endI+1)*colW;
-        if(ex-sx<24)return; // too narrow
-        ctx.save();ctx.fillStyle='rgba(80,60,20,0.45)';ctx.font='bold 9px sans-serif';
-        ctx.textAlign='center';ctx.fillText(label,(sx+ex)/2,top+10);ctx.restore();
+        if(ex-sx<fs*3)return; // too narrow to fit label
+        ctx.save();ctx.fillStyle='rgba(80,60,20,0.50)';ctx.font=`bold ${fs}px sans-serif`;
+        ctx.textAlign='center';ctx.fillText(label,(sx+ex)/2,top+fs+2);ctx.restore();
       };
       buckets.forEach((b,i)=>{
         const sx=left+i*colW;
@@ -1559,15 +1710,13 @@ function initChart(){
       });
 
       // Seasonal action zone band — stepped per bucket
-      // Spring 3–5, Summer 5–7, Autumn 3–4, Winter 2–3
       if(y.getPixelForValue){
         const actionZone={
-          8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},   // Spring
-          11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},   // Summer
-          2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},    // Autumn
-          5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}     // Winter
+          8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},
+          11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},
+          2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},
+          5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}
         };
-        // Fill band column by column
         buckets.forEach((b,i)=>{
           const az=actionZone[b.month]||{lo:3,hi:6};
           const yHi=y.getPixelForValue(az.hi);
@@ -1576,20 +1725,17 @@ function initChart(){
           ctx.fillStyle='rgba(243,156,18,0.20)';
           ctx.fillRect(sx,yHi,colW,yLo-yHi);
         });
-        // Label: use first bucket to position the label near the top of that column's band
         const firstAz=actionZone[buckets[0]?.month]||{lo:3,hi:6};
-        ctx.save();ctx.fillStyle='rgba(180,100,0,0.55)';ctx.font='bold 9px sans-serif';ctx.textAlign='left';
+        ctx.save();ctx.fillStyle='rgba(180,100,0,0.60)';ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';
         ctx.fillText('Action zone',left+4,y.getPixelForValue(firstAz.hi)-3);ctx.restore();
 
-        // Seasonal colony loss threshold — stepped line per bucket
-        // Spring 10+, Summer 15+, Autumn 8+, Winter 5+
+        // Seasonal colony loss threshold — stepped line
         const seasonThreshold={
-          8:10,9:10,10:10,   // Spring
-          11:15,0:15,1:15,   // Summer
-          2:8,3:8,4:8,       // Autumn
-          5:5,6:5,7:5        // Winter
+          8:10,9:10,10:10,
+          11:15,0:15,1:15,
+          2:8,3:8,4:8,
+          5:5,6:5,7:5
         };
-        // Draw stepped threshold line across all buckets
         ctx.save();
         ctx.setLineDash([6,4]);ctx.strokeStyle='#C0392B';ctx.lineWidth=2;
         ctx.beginPath();
@@ -1599,7 +1745,6 @@ function initChart(){
           const sx=left+i*colW;
           const ex=left+(i+1)*colW;
           if(i===0){ctx.moveTo(sx,ty);}else{
-            // Vertical step if threshold changed
             const prevThresh=seasonThreshold[buckets[i-1].month]??15;
             if(thresh!==prevThresh){const prevY=y.getPixelForValue(prevThresh);ctx.lineTo(sx,prevY);ctx.lineTo(sx,ty);}
           }
@@ -1607,10 +1752,9 @@ function initChart(){
         });
         ctx.stroke();
         ctx.setLineDash([]);
-        // Label at the right edge using the last bucket's threshold
         const lastThresh=seasonThreshold[buckets[buckets.length-1]?.month]??15;
         const labelY=y.getPixelForValue(lastThresh);
-        ctx.fillStyle='rgba(192,57,43,0.75)';ctx.font='bold 9px sans-serif';
+        ctx.fillStyle='rgba(192,57,43,0.80)';ctx.font=`bold ${fs}px sans-serif`;
         ctx.textAlign='right';ctx.fillText('⚠ Colony loss risk',right-4,labelY-4);
         ctx.restore();
 
@@ -1623,7 +1767,7 @@ function initChart(){
           const dm=dur.includes('8 week')||dur.includes('6–8')?2:1;
           const tx=left+bi*colW,te=Math.min(right,left+(bi+dm)*colW);
           ctx.save();ctx.fillStyle='rgba(39,174,96,0.13)';ctx.fillRect(tx,top,te-tx,bottom-top);
-          ctx.fillStyle='rgba(30,130,60,0.7)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+          ctx.fillStyle='rgba(30,130,60,0.75)';ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='center';
           ctx.fillText((TREATMENTS[t.product]?.name||t.product).substring(0,8),(tx+te)/2,bottom-4);ctx.restore();
         }
       }
@@ -1657,8 +1801,29 @@ document.addEventListener('DOMContentLoaded',()=>{
   syncApiKeyUI();
   // Route to correct screen on load
   if(isLoggedIn()){
-    goto('s-apiaries');
+    // Check for QR deep-link: ?h=CODE
+    const urlParams=new URLSearchParams(window.location.search);
+    const hCode=urlParams.get('h');
+    if(hCode){
+      const h=getHiveByCode(hCode);
+      if(h){
+        currentHiveId=h.id;
+        for(const [aid,hvList] of Object.entries(hives)){
+          if(hvList.some(hv=>hv.id===h.id)){currentApiaryId=parseInt(aid);break;}
+        }
+        gotoField();
+      } else {
+        showToast('Hive code not found — check your data');
+        goto('s-apiaries');
+      }
+    } else {
+      goto('s-apiaries');
+    }
   } else {
+    // Not logged in — save any QR code for after login
+    const urlParams=new URLSearchParams(window.location.search);
+    const hCode=urlParams.get('h');
+    if(hCode)try{sessionStorage.setItem('varroamate_pending_hive',hCode);}catch(e){}
     document.getElementById('s-welcome').classList.add('active');
   }
 });
@@ -1788,32 +1953,30 @@ async function loadTempChart(ap){
         {label:'Min °C',data:minTemps,borderColor:'#2980B9',backgroundColor:'rgba(41,128,185,0.08)',tension:0.3,fill:false,pointRadius:4,pointHoverRadius:7}
       ]},
       options:{responsive:true,
-        plugins:{legend:{display:true,position:'top',labels:{font:{size:11},boxWidth:14}},
+        plugins:{legend:{display:true,position:'top',labels:{font:{size:13},boxWidth:14}},
           tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y}°C`}}},
         scales:{
-          y:{title:{display:true,text:'°C',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
-          x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}}
+          y:{title:{display:true,text:'°C',font:{size:13}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:12}}},
+          x:{ticks:{maxRotation:45,font:{size:12}},grid:{display:false}}
         }
       },
       plugins:[{id:'tempZones',beforeDraw(chart){
         const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=chart;
         const W=right-left,n=labels.length,cw=W/n;
+        const fs=Math.max(11,Math.round(chart.width*0.013));
         // Background shading per day
         goColors.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(left+i*cw,top,cw,bottom-top);});
-        // Reliability boundary: days 8–14 have lower forecast confidence
-        // Shade them with a subtle cross-hatch overlay
-        const reliableDay=7; // days 0–6 are reliable, 7+ are extended forecast
+        // Reliability boundary
+        const reliableDay=7;
         if(n>reliableDay){
           ctx.save();
           ctx.fillStyle='rgba(0,0,0,0.045)';
           ctx.fillRect(left+reliableDay*cw,top,(n-reliableDay)*cw,bottom-top);
-          // Vertical dashed boundary line
           ctx.setLineDash([4,3]);ctx.strokeStyle='rgba(100,100,100,0.4)';ctx.lineWidth=1.5;
           ctx.beginPath();ctx.moveTo(left+reliableDay*cw,top);ctx.lineTo(left+reliableDay*cw,bottom);ctx.stroke();
           ctx.setLineDash([]);
-          // Label
-          ctx.fillStyle='rgba(80,80,80,0.55)';ctx.font='bold 9px sans-serif';ctx.textAlign='left';
-          ctx.fillText('Extended forecast ▸',left+reliableDay*cw+4,top+10);
+          ctx.fillStyle='rgba(80,80,80,0.60)';ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';
+          ctx.fillText('Extended forecast ▸',left+reliableDay*cw+4,top+fs+2);
           ctx.restore();
         }
         // Treatment threshold lines
@@ -1829,7 +1992,7 @@ async function loadTempChart(ap){
           const py=y.getPixelForValue(t.val);
           ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=t.color;ctx.lineWidth=1.5;
           ctx.beginPath();ctx.moveTo(left,py);ctx.lineTo(right,py);ctx.stroke();
-          ctx.setLineDash([]);ctx.fillStyle=t.color;ctx.font='bold 9px sans-serif';ctx.textAlign='left';
+          ctx.setLineDash([]);ctx.fillStyle=t.color;ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';
           ctx.fillText(t.label,left+4,py-3);ctx.restore();
         });
       }}]
@@ -2320,6 +2483,236 @@ document.addEventListener('click',function(e){
   if(!e.target.closest('.nav-info-wrap'))
     document.querySelectorAll('.nav-info-popover.open').forEach(p=>p.classList.remove('open'));
 });
+// ══ FIELD ENTRY ══
+let fieldRepeatTimer=null;
+function gotoFieldByCode(){
+  const input=document.getElementById('hive-code-input');
+  const code=(input?.value||'').trim().toUpperCase();
+  if(code.length!==4){showToast('Enter the 4-letter hive code');return;}
+  const h=getHiveByCode(code);
+  if(!h){showToast(`Code "${code}" not found — check the label`);return;}
+  currentHiveId=h.id;
+  for(const [aid,hvList] of Object.entries(hives)){
+    if(hvList.some(hv=>hv.id===h.id)){currentApiaryId=parseInt(aid);break;}
+  }
+  if(input)input.value='';
+  gotoField();
+}
+function gotoField(){
+  const hive=Object.values(hives).flat().find(h=>h.id===currentHiveId);
+  const ap=apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===currentHiveId));
+  if(!hive)return;
+  document.getElementById('field-hive-name').textContent=hive.name;
+  document.getElementById('field-apiary-name').textContent=ap?.name||'';
+  document.getElementById('field-count-num').textContent='0';
+  document.getElementById('field-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('field-notes').value='';
+  document.getElementById('field-voice-status').textContent='';
+  fieldUpdateThreshold();
+  goto('s-field');
+}
+function fieldAdjust(delta){
+  const el=document.getElementById('field-count-num');
+  const v=Math.max(0,parseInt(el.textContent||'0')+delta);
+  el.textContent=v;
+  fieldUpdateThreshold();
+}
+function fieldStartRepeat(delta){
+  fieldStopRepeat();
+  fieldRepeatTimer=setInterval(()=>fieldAdjust(delta),120);
+}
+function fieldStopRepeat(){
+  if(fieldRepeatTimer){clearInterval(fieldRepeatTimer);fieldRepeatTimer=null;}
+}
+function fieldUpdateThreshold(){
+  const v=parseInt(document.getElementById('field-count-num').textContent||'0');
+  const bar=document.getElementById('field-threshold-bar');
+  const month=new Date().getMonth();
+  const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
+  const az={Summer:{lo:5,hi:7},Autumn:{lo:3,hi:4},Winter:{lo:2,hi:3},Spring:{lo:3,hi:5}}[season];
+  const thresh={Summer:15,Autumn:8,Winter:5,Spring:10}[season];
+  let msg='',bg='',color='';
+  if(v===0){msg=`${season} action zone: ${az.lo}–${az.hi} · Colony loss risk: ${thresh}+`;bg='var(--bg2)';color='var(--text3)';}
+  else if(v>=thresh){msg=`⚠ Colony loss risk! ${season} threshold: ${thresh}+`;bg='#FDECEA';color='var(--red)';}
+  else if(v>=az.lo){msg=`⚡ Action zone — consider treating (${season}: ${az.lo}–${az.hi})`;bg='#FEF9E7';color='#8B6914';}
+  else{msg=`✓ Below action zone (${season}: ${az.lo}–${az.hi})`;bg='var(--green-pale)';color='var(--green)';}
+  bar.textContent=msg;bar.style.background=bg;bar.style.color=color;
+}
+function fieldSave(){
+  const value=parseInt(document.getElementById('field-count-num').textContent||'0');
+  const date=document.getElementById('field-date').value;
+  const notes=document.getElementById('field-notes').value.trim();
+  if(!date){showToast('Please set a date');return;}
+  const arr=miteCountsByHive[currentHiveId];
+  if(!arr){showToast('Hive not found');return;}
+  arr.unshift({id:'c'+Date.now(),date,value,notes});
+  arr.sort((a,b)=>b.date.localeCompare(a.date));
+  saveData();
+  showToast(`Count ${value} saved! 📊`);
+  // Mark chart dirty — will redraw when user returns to hive detail
+  window._chartDirty=true;
+  // Reset for next hive
+  document.getElementById('field-count-num').textContent='0';
+  document.getElementById('field-notes').value='';
+  fieldUpdateThreshold();
+}
+
+// ── VOICE ENTRY ──
+let speechRec=null;let listeningActive=false;
+function fieldToggleVoice(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    showToast('Voice not supported in this browser');return;
+  }
+  if(listeningActive){fieldStopVoice();return;}
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  speechRec=new SpeechRecognition();
+  speechRec.lang='en-AU';speechRec.interimResults=false;speechRec.maxAlternatives=3;
+  speechRec.onstart=()=>{
+    listeningActive=true;
+    document.getElementById('field-voice-btn').textContent='🔴 Listening… tap to stop';
+    document.getElementById('field-voice-btn').classList.add('listening');
+    document.getElementById('field-voice-status').textContent='Say a number, e.g. "four" or "12"';
+  };
+  speechRec.onresult=(e)=>{
+    const alts=Array.from(e.results[0]).map(a=>a.transcript.trim().toLowerCase());
+    const wordNums={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20};
+    let found=null;
+    for(const alt of alts){
+      const num=parseInt(alt);
+      if(!isNaN(num)&&num>=0){found=num;break;}
+      for(const [w,n] of Object.entries(wordNums)){if(alt.includes(w)){found=n;break;}}
+      if(found!==null)break;
+    }
+    if(found!==null){
+      document.getElementById('field-count-num').textContent=found;
+      fieldUpdateThreshold();
+      document.getElementById('field-voice-status').textContent=`✓ Heard: "${alts[0]}" → ${found}`;
+    } else {
+      document.getElementById('field-voice-status').textContent=`Didn't catch that ("${alts[0]}") — try again`;
+    }
+  };
+  speechRec.onerror=(e)=>{
+    document.getElementById('field-voice-status').textContent=e.error==='not-allowed'?'Microphone permission denied':'Error: '+e.error;
+    fieldStopVoice();
+  };
+  speechRec.onend=()=>fieldStopVoice();
+  speechRec.start();
+}
+function fieldStopVoice(){
+  listeningActive=false;
+  if(speechRec){try{speechRec.stop();}catch(e){}speechRec=null;}
+  document.getElementById('field-voice-btn').textContent='🎤 Tap to speak count';
+  document.getElementById('field-voice-btn').classList.remove('listening');
+}
+
+// ── QR CODE ──
+let qrInstance=null;
+function showQR(hiveId){
+  const hive=Object.values(hives).flat().find(h=>h.id===hiveId);if(!hive)return;
+  const code=makeHiveCode(hiveId);
+  const url=`${window.location.origin}${window.location.pathname}?h=${code}`;
+  document.getElementById('qr-hive-name').textContent=hive.name;
+  document.getElementById('qr-code-text').textContent=`Code: ${code}`;
+  const inline=document.getElementById('qr-code-inline');
+  if(inline)inline.textContent=code;
+  const canvas=document.getElementById('qr-canvas');
+  canvas.innerHTML='';
+  if(typeof QRCode!=='undefined'){
+    new QRCode(canvas,{text:url,width:200,height:200,colorDark:'#2C1A00',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+  } else {
+    canvas.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:20px;">QR library loading… try again in a moment.</div>`;
+  }
+  document.getElementById('qr-overlay').classList.add('open');
+}
+function closeQR(){document.getElementById('qr-overlay').classList.remove('open');}
+function printQR(){
+  const hiveName=document.getElementById('qr-hive-name').textContent;
+  const code=document.getElementById('qr-code-text').textContent;
+  const qrImg=document.querySelector('#qr-canvas img');
+  const src=qrImg?qrImg.src:'';
+  const win=window.open('','_blank','width=400,height=500');
+  win.document.write(`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
+  <style>body{font-family:sans-serif;text-align:center;padding:30px;}
+  .label{border:2px solid #000;border-radius:12px;padding:20px;display:inline-block;}
+  h2{margin:0 0 4px;font-size:22px;}p{margin:4px 0;font-size:14px;color:#555;}
+  img{margin:12px 0;}@media print{button{display:none;}}</style></head>
+  <body><div class="label"><h2>🐝 ${hiveName}</h2><p>${code}</p>
+  ${src?`<br><img src="${src}" width="180" height="180">`:''}
+  <p style="font-size:11px;margin-top:12px;color:#888;">Scan to open field entry in VarroaMate</p></div>
+  <br><button onclick="window.print()">🖨 Print</button></body></html>`);
+  win.document.close();
+}
+
+// ══ CHART FULLSCREEN ══
+function openChartFs(title,bodyHTML,footerHTML,onOpen){
+  document.getElementById('chart-fs-title').textContent=title;
+  document.getElementById('chart-fs-body').innerHTML=bodyHTML;
+  document.getElementById('chart-fs-footer').innerHTML=footerHTML||'';
+  document.getElementById('chart-fs').classList.add('open');
+  document.body.style.overflow='hidden';
+  if(onOpen)setTimeout(onOpen,60);
+}
+function closeChartFs(){
+  document.getElementById('chart-fs').classList.remove('open');
+  document.body.style.overflow='';
+  if(chartInstance){chartInstance.destroy();chartInstance=null;}
+  setTimeout(initChart,60);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeChartFs();});
+
+function expandMiteChart(){
+  const sliderVal=document.getElementById('chart-range-slider').value;
+  const rangeLabel=document.getElementById('chart-range-label').textContent;
+  const title=document.getElementById('chart-label').textContent;
+  const legendHTML=document.querySelector('.trend-legend').outerHTML;
+  openChartFs(
+    title,
+    `<canvas id="miteChart-fs" style="width:100%;height:100%;"></canvas>`,
+    `<div style="padding:0 4px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text3);margin-bottom:4px;">
+        <span>View range</span>
+        <span style="font-weight:600;color:var(--amber-dark);" id="fs-range-label">${rangeLabel}</span>
+      </div>
+      <input type="range" id="fs-range-slider" min="1" max="36" value="${sliderVal}"
+        style="width:100%;accent-color:var(--amber);cursor:pointer;"
+        oninput="chartMonths=parseInt(this.value);const lb=parseInt(this.value)<=1?'1 month':parseInt(this.value)<12?this.value+' months':parseInt(this.value)===12?'1 year':Math.round(parseInt(this.value)/12*10)/10+' years';document.getElementById('fs-range-label').textContent=lb;if(chartInstance){chartInstance.destroy();chartInstance=null;}initChart(document.getElementById('miteChart-fs'),false);document.getElementById('chart-fs-title').textContent=document.getElementById('chart-label').textContent;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:2px;">
+        <span>1 mo</span><span>1 yr</span><span>3 yrs</span>
+      </div>
+    </div>
+    <div style="margin-top:8px;">${legendHTML}</div>`,
+    ()=>{
+      const fsCanvas=document.getElementById('miteChart-fs');
+      if(!fsCanvas)return;
+      if(chartInstance){chartInstance.destroy();chartInstance=null;}
+      initChart(fsCanvas,false);
+    }
+  );
+}
+function expandTempChart(){
+  const canvas=document.getElementById('tempChart');
+  if(!canvas||canvas.style.display==='none'){showToast('Load the forecast first');return;}
+  const legendHTML=document.getElementById('temp-treatment-legend').innerHTML||'';
+  const summaryHTML=document.getElementById('guidance-temp-body').innerHTML||'';
+  const ap=apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===currentHiveId));
+  openChartFs(
+    '🌡️ Temperature Outlook — 14 days',
+    `<canvas id="tempChart-fs" style="width:100%;height:100%;"></canvas>`,
+    `<div style="margin-bottom:6px;">${summaryHTML}</div><div style="font-size:12px;">${legendHTML}</div>`,
+    ()=>{
+      const fsCanvas=document.getElementById('tempChart-fs');
+      const origCanvas=document.getElementById('tempChart');
+      if(!fsCanvas||!tempChartInstance)return;
+      fsCanvas.id='tempChart';
+      origCanvas.id='tempChart-orig';
+      tempChartInstance.destroy();tempChartInstance=null;
+      loadTempChart(ap);
+      fsCanvas.id='tempChart-fs';
+      origCanvas.id='tempChart';
+    }
+  );
+}
+
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 // ══ CALENDAR EXPORT ══
 function icsDate(d){
