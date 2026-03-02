@@ -222,6 +222,80 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .confirm-danger{background:var(--red-pale);border:1px solid var(--red);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:16px;color:var(--red);font-size:16px;}
 .addr-suggestion{padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:15px;line-height:1.4;}
 .addr-suggestion:hover{background:var(--amber-pale);}
+
+/* ══ RESPONSIVE — TABLET (≤900px) ══ */
+@media(max-width:900px){
+  .page-body{padding:20px 20px 90px;}
+  .topnav{padding:0 20px;}
+}
+
+/* ══ RESPONSIVE — PHONE (≤600px) ══ */
+@media(max-width:600px){
+  body{font-size:16px;}
+  .topnav{padding:0 12px;height:54px;}
+  .topnav-inner{gap:8px;}
+  .logo{font-size:21px;}
+  .nav-btn{padding:6px 12px;font-size:13px;}
+  .page-body{padding:14px 12px 84px;}
+  .page-title{font-size:22px;}
+
+  /* Section tabs — tighter on phone */
+  .section-tab{font-size:12px;padding:10px 4px;}
+
+  /* Tabbar items — slightly smaller */
+  .tab-item{font-size:11px;padding:5px 10px;}
+  .tab-item .tab-icon{font-size:20px;}
+
+  /* Cards */
+  .card{padding:14px;}
+
+  /* Hive row — stack count below info on very narrow */
+  .hive-row{flex-wrap:wrap;gap:8px;}
+
+  /* Modal — full height on phone */
+  .modal-box{max-height:92vh;}
+
+  /* Buttons — full width stacking in action groups */
+  .btn-group-mobile{flex-direction:column;}
+
+  /* Entry rows — tighter */
+  .entry-row{padding:10px 10px;}
+  .entry-date{min-width:58px;font-size:12px;}
+  .entry-content{font-size:15px;}
+
+  /* Field entry — bigger buttons on phone */
+  .field-btn{width:96px;height:96px;font-size:58px;}
+  .field-count-num{font-size:108px;}
+
+  /* Chart expand button — smaller label */
+  .chart-expand-btn{font-size:12px;padding:2px 8px;}
+
+  /* Toast — don't let it overflow on narrow screens */
+  .toast{white-space:normal;text-align:center;width:calc(100vw - 40px);max-width:340px;}
+
+  /* Hive code entry bar — stack vertically */
+  #hive-code-bar{flex-direction:column;align-items:flex-start;gap:8px;}
+  #hive-code-bar .code-input-row{align-self:stretch;justify-content:flex-start;}
+}
+
+/* ══ OVERFLOW MENU — Apiaries topnav ══ */
+.nav-overflow-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;display:none;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;line-height:1;}
+.nav-overflow-btn:hover{background:rgba(255,255,255,0.30);}
+.nav-overflow-menu{display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--border);z-index:1200;min-width:190px;overflow:hidden;}
+.nav-overflow-menu.open{display:block;}
+.nav-overflow-item{display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.nav-overflow-item:last-child{border-bottom:none;}
+.nav-overflow-item:hover{background:var(--amber-pale);}
+.nav-overflow-item.danger{color:var(--red);}
+.nav-overflow-item.danger:hover{background:var(--red-pale);}
+@media(max-width:780px){
+  .nav-desktop-btns{display:none !important;}
+  .nav-overflow-btn{display:flex !important;}
+  .nav-overflow-menu{top:58px;}
+}
+@media(max-width:600px){
+  .nav-overflow-menu{top:54px;}
+}
 </style>
 </head>
 <body>
@@ -248,6 +322,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="welcome-btns">
     <button class="btn btn-white" onclick="goto('s-signin')">Sign In</button>
     <button class="btn btn-ghost" onclick="goto('s-signin','create')">Create Account</button>
+  </div>
+  <div id="add-to-home-hint" style="display:none;margin-top:20px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:var(--radius-sm);padding:12px 16px;max-width:340px;text-align:left;">
+    <div style="font-size:14px;color:#FFE082;font-weight:700;margin-bottom:4px;">📱 Tip: Add to Home Screen</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);" id="add-to-home-text">Tap the share button then "Add to Home Screen" for the best experience — works like an app, stays logged in.</div>
   </div>
 </div>
 
@@ -407,7 +485,33 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <!-- APIARIES -->
 <div id="s-apiaries" class="screen">
-  <div class="topnav"><div class="topnav-inner"><div class="logo">Varroa<em>Mate</em></div><span id="save-badge" style="font-size:12px;color:#FFE082;opacity:0;transition:opacity 0.4s;font-weight:600;">💾 saved</span><span class="nav-info-wrap"><button class="nav-btn" onclick="exportAllCSV()">📥 CSV</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-csv')" title="What is CSV export?">?</button><div class="nav-info-popover" id="pop-csv"><strong style="color:var(--amber-dark);">📥 Export to CSV</strong><br>Downloads all your mite count data as a spreadsheet-ready <code>.csv</code> file — one row per count entry, across all apiaries and hives.<br><br>Open in Excel, Numbers, or Google Sheets to analyse trends or keep your own records.</div></span><span class="nav-info-wrap"><button class="nav-btn" onclick="exportCalendar()">📅 Reminders</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-reminders')" title="What are Reminders?">?</button><div class="nav-info-popover" id="pop-reminders"><strong style="color:var(--amber-dark);">📅 Calendar Reminders</strong><br>Downloads an <code>.ics</code> calendar file you can import into Apple Calendar, Google Calendar, or Outlook.<br><br>Includes: 4-weekly alcohol wash reminders for each hive, and treatment removal deadlines for any active treatments.</div></span><span class="nav-info-wrap"><button class="nav-btn" onclick="backupData()">💾 Backup</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-backup')" title="What is Backup?">?</button><div class="nav-info-popover" id="pop-backup"><strong style="color:var(--amber-dark);">💾 Backup your data</strong><br>Downloads a <code>.json</code> file containing all your apiaries, hives, mite counts, treatments and notes.<br><br>Keep this file somewhere safe — it's your complete data snapshot. Use it to restore if you change devices or browsers, or as a regular safety copy.</div></span><span class="nav-info-wrap"><button class="nav-btn" onclick="document.getElementById('restore-input').click()">📂 Restore</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-restore')" title="What is Restore?">?</button><div class="nav-info-popover" id="pop-restore"><strong style="color:var(--amber-dark);">📂 Restore from backup</strong><br>Loads a previously saved <code>.json</code> backup file and replaces all current data with it.<br><br>⚠️ <strong>This will overwrite your current data.</strong> Only restore from a file you created with the Backup button.</div></span><input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)"><button class="nav-btn" onclick="openModal('modal-add-apiary')">+ Apiary</button><button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button></div></div>
+  <div class="topnav"><div class="topnav-inner">
+    <div class="logo">Varroa<em>Mate</em></div>
+    <span id="save-badge" style="font-size:12px;color:#FFE082;opacity:0;transition:opacity 0.4s;font-weight:600;">💾 saved</span>
+    <!-- Desktop buttons (hidden on ≤780px) -->
+    <span class="nav-desktop-btns" style="display:flex;align-items:center;gap:6px;">
+      <span class="nav-info-wrap"><button class="nav-btn" onclick="exportAllCSV()">📥 CSV</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-csv')" title="What is CSV export?">?</button><div class="nav-info-popover" id="pop-csv"><strong style="color:var(--amber-dark);">📥 Export to CSV</strong><br>Downloads all your mite count data as a spreadsheet-ready <code>.csv</code> file — one row per count entry, across all apiaries and hives.<br><br>Open in Excel, Numbers, or Google Sheets to analyse trends or keep your own records.</div></span>
+      <span class="nav-info-wrap"><button class="nav-btn" onclick="exportCalendar()">📅 Reminders</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-reminders')" title="What are Reminders?">?</button><div class="nav-info-popover" id="pop-reminders"><strong style="color:var(--amber-dark);">📅 Calendar Reminders</strong><br>Downloads an <code>.ics</code> calendar file you can import into Apple Calendar, Google Calendar, or Outlook.<br><br>Includes: 4-weekly alcohol wash reminders for each hive, and treatment removal deadlines for any active treatments.</div></span>
+      <span class="nav-info-wrap"><button class="nav-btn" onclick="backupData()">💾 Backup</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-backup')" title="What is Backup?">?</button><div class="nav-info-popover" id="pop-backup"><strong style="color:var(--amber-dark);">💾 Backup your data</strong><br>Downloads a <code>.json</code> file containing all your apiaries, hives, mite counts, treatments and notes.<br><br>Keep this file somewhere safe — it's your complete data snapshot. Use it to restore if you change devices or browsers, or as a regular safety copy.</div></span>
+      <span class="nav-info-wrap"><button class="nav-btn" onclick="document.getElementById('restore-input').click()">📂 Restore</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-restore')" title="What is Restore?">?</button><div class="nav-info-popover" id="pop-restore"><strong style="color:var(--amber-dark);">📂 Restore from backup</strong><br>Loads a previously saved <code>.json</code> backup file and replaces all current data with it.<br><br>⚠️ <strong>This will overwrite your current data.</strong> Only restore from a file you created with the Backup button.</div></span>
+      <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
+      <span class="nav-info-wrap"><button class="nav-btn" onclick="printAllQR()">📱 QR Codes</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-qr')" title="About QR codes">?</button><div class="nav-info-popover" id="pop-qr"><strong style="color:var(--amber-dark);">📱 Hive QR Code Labels</strong><br>Generates a printable page of QR codes — one per hive, across all your apiaries.<br><br>Stick a label on each hive box. In the field, scan with your phone's camera app to jump straight to field entry for that hive — no navigation needed.<br><br><strong>Best results:</strong> Print on sticker paper and laminate, or cover with clear packing tape for weather resistance.</div></span>
+      <button class="nav-btn" onclick="openModal('modal-add-apiary')">+ Apiary</button>
+      <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
+    </span>
+    <!-- Mobile overflow menu button (shown on ≤780px) -->
+    <button class="nav-overflow-btn" id="nav-overflow-btn" onclick="toggleNavOverflow()" title="Menu">⋮</button>
+  </div></div>
+  <!-- Mobile overflow dropdown -->
+  <div class="nav-overflow-menu" id="nav-overflow-menu">
+    <div class="nav-overflow-item" onclick="closeNavOverflow();printAllQR()">📱 Print All QR Codes</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();openModal('modal-add-apiary')">🏡 Add Apiary</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();exportAllCSV()">📥 Export CSV</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();exportCalendar()">📅 Calendar Reminders</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();backupData()">💾 Backup Data</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();document.getElementById('restore-input').click()">📂 Restore Data</div>
+    <div class="nav-overflow-item danger" onclick="closeNavOverflow();logout()">Sign Out</div>
+  </div>
   <div class="page-body">
     <h1 class="page-title">My Apiaries</h1>
     <p class="page-subtitle" id="apiary-subtitle">3 apiaries · 8 hives total</p>
@@ -428,9 +532,9 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <button class="back-btn" onclick="goto('s-apiaries')">← Apiaries</button>
     <h1 class="page-title" id="hives-title">Home Garden</h1>
     <p class="page-subtitle" id="hives-subtitle"></p>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div id="hive-code-bar" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <span style="font-size:14px;color:var(--text2);flex:1;min-width:180px;">📱 <strong>Field entry:</strong> Scan a hive QR code with your camera app, or enter the 4-letter code below.</span>
-      <div style="display:flex;gap:6px;align-items:center;">
+      <div class="code-input-row" style="display:flex;gap:6px;align-items:center;">
         <input type="text" id="hive-code-input" maxlength="4" placeholder="e.g. HV3K" style="width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:monospace;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;background:var(--bg);color:var(--text);text-align:center;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')gotoFieldByCode()">
         <button class="btn btn-primary btn-sm" onclick="gotoFieldByCode()">Go →</button>
       </div>
@@ -1799,7 +1903,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   // Sync API key UI state
   syncApiKeyUI();
-  // Route to correct screen on load
+  // Show "Add to Home Screen" hint on mobile browsers (not if already installed)
+  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+  if(isMobile&&!isStandalone){
+    const hint=document.getElementById('add-to-home-hint');
+    const txt=document.getElementById('add-to-home-text');
+    if(hint){hint.style.display='';}
+    if(txt&&/Android/i.test(navigator.userAgent))
+      txt.textContent='Tap ⋮ then "Add to Home screen" for the best experience — works like an app, stays logged in.';
+  }
   if(isLoggedIn()){
     // Check for QR deep-link: ?h=CODE
     const urlParams=new URLSearchParams(window.location.search);
@@ -2473,6 +2586,13 @@ function calcRemovalDate(startDate,product){
 
 // ══ MISC ══
 function fmtDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${d}/${m}/${y.slice(2)}`;}
+function toggleNavOverflow(){
+  const m=document.getElementById('nav-overflow-menu');
+  m.classList.toggle('open');
+}
+function closeNavOverflow(){
+  document.getElementById('nav-overflow-menu')?.classList.remove('open');
+}
 function toggleInfoPop(id){
   const pop=document.getElementById(id);if(!pop)return;
   const isOpen=pop.classList.contains('open');
@@ -2482,6 +2602,8 @@ function toggleInfoPop(id){
 document.addEventListener('click',function(e){
   if(!e.target.closest('.nav-info-wrap'))
     document.querySelectorAll('.nav-info-popover.open').forEach(p=>p.classList.remove('open'));
+  if(!e.target.closest('#nav-overflow-menu')&&!e.target.closest('#nav-overflow-btn'))
+    document.getElementById('nav-overflow-menu')?.classList.remove('open');
 });
 // ══ FIELD ENTRY ══
 let fieldRepeatTimer=null;
@@ -2711,6 +2833,101 @@ function expandTempChart(){
       origCanvas.id='tempChart';
     }
   );
+}
+
+// ══ PRINT ALL QR CODES ══
+function printAllQR(){
+  if(typeof QRCode==='undefined'){showToast('QR library not loaded yet — try again in a moment');return;}
+  // Collect all hives across all apiaries
+  const allHives=[];
+  for(const ap of apiaries){
+    for(const h of (hives[ap.id]||[])){
+      allHives.push({hive:h,apiary:ap,code:makeHiveCode(h.id)});
+    }
+  }
+  if(!allHives.length){showToast('No hives found — add some hives first');return;}
+
+  // Build the print window
+  const win=window.open('','_blank','width=900,height=700');
+  const base=window.location.origin+window.location.pathname;
+
+  win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — QR Labels</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:sans-serif;background:#fff;padding:20px;color:#2C1A00;}
+  h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
+  .subtitle{font-size:13px;color:#9C7A4A;margin-bottom:16px;}
+  .instructions{background:#FFF3DC;border:1px solid #E8D5B0;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:#6B4C1E;line-height:1.65;}
+  .instructions h3{font-size:14px;font-weight:700;color:#8B5200;margin-bottom:8px;}
+  .instructions ol{padding-left:18px;}
+  .instructions li{margin-bottom:5px;}
+  .instructions em{color:#8B5200;font-style:normal;font-weight:600;}
+  .tip{margin-top:10px;padding:9px 12px;background:#fff;border-radius:6px;border:1px solid #E8D5B0;font-size:12px;line-height:1.55;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;}
+  .label{border:2px solid #2C1A00;border-radius:10px;padding:14px 10px;text-align:center;break-inside:avoid;background:#fff;}
+  .label-apiary{font-size:10px;color:#9C7A4A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
+  .label-hive{font-size:16px;font-weight:700;color:#2C1A00;margin-bottom:8px;}
+  .label-qr{display:flex;justify-content:center;margin:6px 0;}
+  .label-code{font-family:monospace;font-size:14px;font-weight:700;color:#8B5200;letter-spacing:0.1em;margin-top:6px;}
+  .label-hint{font-size:10px;color:#9C7A4A;margin-top:3px;}
+  .no-print{margin-top:24px;text-align:center;}
+  button{padding:10px 24px;background:#8B5200;color:#fff;border:none;border-radius:20px;font-size:16px;font-weight:700;cursor:pointer;margin:0 6px;}
+  button.sec{background:#F5EDD8;color:#8B5200;border:1px solid #E8D5B0;}
+  @media print{
+    body{padding:8px;}
+    .no-print,.instructions{display:none;}
+    .grid{gap:8px;}
+  }
+</style>
+</head><body>
+<h1>🐝 VarroaMate — Hive QR Labels</h1>
+<div class="subtitle">${allHives.length} hive${allHives.length!==1?'s':''} across ${apiaries.length} apiar${apiaries.length!==1?'ies':'y'} · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}</div>
+
+<div class="instructions no-print">
+  <h3>📋 How to print and attach your hive labels</h3>
+  <ol>
+    <li><em>Print this page</em> — click the Print Labels button below. In your printer dialog, set margins to "Minimum" or "None" and enable "Background graphics" so the coloured borders print correctly. Select "Fit to page" if labels get clipped.</li>
+    <li><em>Cut out each label</em> — scissors along the outer edge. Leave a small margin around each border.</li>
+    <li><em>Make it weatherproof</em> — choose one of these:
+      <br>• <em>Quickest &amp; free:</em> Lay a strip of clear packing tape over the label before cutting out
+      <br>• <em>Best DIY:</em> Run through a home laminator ($20 at Officeworks) — lasts 2–3 seasons
+      <br>• <em>Professional:</em> Print on A4 sticker paper, laminate on top, then cut — peel and stick directly to hive
+      <br>• <em>Long-term outdoors:</em> Order vinyl weatherproof stickers from Sticker Mule or Vistaprint (~$1–2 each, UV-resistant, 5+ year lifespan)
+    </li>
+    <li><em>Attach to the hive box</em> — staple gun, weatherproof double-sided tape, or a small screw through a laminated corner. Position facing outward where you can easily point a phone at it without removing the lid.</li>
+  </ol>
+  <div class="tip">💡 <em>In the field:</em> Open your phone camera and point it at the QR code — a notification appears to open the link. Tap it and VarroaMate jumps straight to field entry for that hive. The 4-letter code (e.g. <strong>HV3K</strong>) below each QR is a manual fallback — type it in the Hives screen if the QR is damaged or too dirty to scan.</div>
+</div>
+
+<div class="grid" id="qr-grid"></div>
+<div class="no-print">
+  <button onclick="window.print()">🖨 Print Labels</button>
+  <button class="sec" onclick="window.close()">Close</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+<script>
+const hiveData=${JSON.stringify(allHives)};
+const base=${JSON.stringify(base)};
+const grid=document.getElementById('qr-grid');
+hiveData.forEach(({hive,apiary,code})=>{
+  const url=base+'?h='+code;
+  const div=document.createElement('div');
+  div.className='label';
+  div.innerHTML=\`<div class="label-apiary">\${apiary.name}</div>
+    <div class="label-hive">\${hive.name}</div>
+    <div class="label-qr" id="qr-\${code}"></div>
+    <div class="label-code">\${code}</div>
+    <div class="label-hint">Scan or type code to log mite count</div>\`;
+  grid.appendChild(div);
+  new QRCode(document.getElementById('qr-'+code),{
+    text:url,width:130,height:130,
+    colorDark:'#2C1A00',colorLight:'#fff',
+    correctLevel:QRCode.CorrectLevel.M
+  });
+});
+<\/script>
+</body></html>`);
+  win.document.close();
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
