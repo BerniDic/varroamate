@@ -28,9 +28,9 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .topnav-inner{display:flex;align-items:center;gap:14px;max-width:960px;width:100%;margin:0 auto;}
 .logo{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;flex:1;}
 .logo em{font-style:italic;color:var(--amber-light);}
-.nav-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;padding:7px 18px;border-radius:20px;cursor:pointer;font-size:15px;font-family:inherit;transition:background 0.2s;}
+.nav-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;padding:9px 18px;border-radius:20px;cursor:pointer;font-size:17px;font-family:inherit;transition:background 0.2s;}
 .nav-info-wrap{position:relative;display:inline-flex;align-items:center;}
-.nav-info-btn{background:rgba(255,255,255,0.18);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;font-family:inherit;font-weight:700;margin-left:-8px;vertical-align:middle;line-height:22px;text-align:center;padding:0;transition:background 0.2s;}
+.nav-info-btn{background:rgba(255,255,255,0.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700;margin-left:-6px;vertical-align:middle;line-height:26px;text-align:center;padding:0;transition:background 0.2s;}
 .nav-info-btn:hover{background:rgba(255,255,255,0.35);}
 .nav-info-popover{display:none;position:fixed;top:62px;right:12px;width:240px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--border);padding:12px 14px;font-size:13px;color:var(--text2);line-height:1.55;z-index:1200;}
 .nav-info-popover.open{display:block;}
@@ -39,8 +39,8 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--amber-dark);display:none;justify-content:center;align-items:center;height:64px;z-index:200;box-shadow:0 -2px 8px rgba(0,0,0,0.2);}
 .tabbar.visible{display:flex;}
 .tabbar-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:960px;padding:0 20px;}
-.tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);cursor:pointer;padding:6px 14px;border-radius:10px;transition:all 0.2s;font-size:12px;gap:2px;}
-.tab-item .tab-icon{font-size:23px;}
+.tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);cursor:pointer;padding:8px 14px;border-radius:10px;transition:all 0.2s;font-size:14px;gap:3px;}
+.tab-item .tab-icon{font-size:28px;}
 .tab-item.active{color:var(--amber-light);}
 .tab-item:hover{color:#fff;}
 .page-body{flex:1;padding:28px 32px 90px;max-width:960px;width:100%;margin:0 auto;}
@@ -65,7 +65,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--amber);}
 .dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex-shrink:0;}
 .dot-red{background:var(--red);}.dot-yellow{background:var(--yellow);}.dot-blue{background:var(--blue);}.dot-green{background:var(--green);}
-.badge{display:inline-block;padding:4px 11px;border-radius:12px;font-size:13px;font-weight:600;}
+.badge{display:inline-block;padding:5px 13px;border-radius:12px;font-size:15px;font-weight:600;}
 .badge-red{background:var(--red-pale);color:var(--red);}.badge-yellow{background:var(--yellow-pale);color:#8B6914;}
 .badge-blue{background:var(--blue-pale);color:var(--blue);}.badge-green{background:var(--green-pale);color:#1A7A42;}
 #s-welcome{background:linear-gradient(160deg,#8B5200 0%,#D4820A 50%,#F5A623 100%);justify-content:center;align-items:center;text-align:center;padding:40px 30px;}
@@ -102,7 +102,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .pref-name{font-weight:700;font-size:17px;color:var(--amber-dark);}
 .pref-desc{font-size:15px;color:var(--text2);margin-bottom:8px;}
 .pref-tags{display:flex;flex-wrap:wrap;gap:6px;}
-.pref-tag{font-size:13px;padding:3px 8px;border-radius:10px;background:var(--bg2);color:var(--text3);font-weight:600;}
+.pref-tag{font-size:15px;padding:5px 10px;border-radius:10px;background:var(--bg2);color:var(--text3);font-weight:600;}
 .pref-tag.pro{background:var(--green-pale);color:#1A7A42;}
 .pref-tag.con{background:var(--red-pale);color:var(--red);}
 #leaflet-map{width:100%;height:440px;border-radius:var(--radius);border:1px solid var(--border);}
@@ -110,25 +110,25 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .apiary-row,.hive-row{display:flex;align-items:center;gap:12px;padding:15px 16px;background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow);}
 .apiary-row:hover,.hive-row:hover{border-color:var(--amber);transform:translateX(2px);}
 .apiary-info,.hive-info{flex:1;}
-.apiary-name,.hive-name{font-weight:700;font-size:17px;}
-.apiary-addr,.hive-status{font-size:14px;color:var(--text3);}
-.apiary-hives{font-size:14px;color:var(--text2);margin-top:2px;}
+.apiary-name,.hive-name{font-weight:700;font-size:19px;}
+.apiary-addr,.hive-status{font-size:16px;color:var(--text3);}
+.apiary-hives{font-size:16px;color:var(--text2);margin-top:2px;}
 .hive-count{text-align:right;}
 .hive-count .count-num{font-size:26px;font-weight:700;}
-.hive-count .count-label{font-size:12px;color:var(--text3);display:block;}
+.hive-count .count-label{font-size:15px;color:var(--text3);display:block;}
 .section-tabs{display:flex;margin-bottom:16px;border-radius:var(--radius-sm);overflow:hidden;border:2px solid var(--border);background:var(--bg2);}
-.section-tab{flex:1;padding:11px 6px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:var(--text2);transition:all 0.2s;}
+.section-tab{flex:1;padding:13px 6px;text-align:center;font-size:16px;font-weight:600;cursor:pointer;color:var(--text2);transition:all 0.2s;}
 .section-tab.active{background:var(--amber);color:#fff;}
 .entry-row{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;border:1px solid var(--border);}
-.entry-date{font-size:13px;color:var(--text3);min-width:68px;padding-top:2px;}
-.entry-content{flex:1;font-size:16px;}
+.entry-date{font-size:16px;color:var(--text3);min-width:76px;padding-top:2px;}
+.entry-content{flex:1;font-size:17px;}
 .entry-actions{display:flex;gap:4px;flex-shrink:0;}
-.icon-btn{background:none;border:none;cursor:pointer;font-size:17px;padding:4px 6px;color:var(--text3);border-radius:6px;transition:all 0.2s;}
+.icon-btn{background:none;border:none;cursor:pointer;font-size:22px;padding:6px 8px;color:var(--text3);border-radius:6px;transition:all 0.2s;}
 .icon-btn:hover{background:var(--bg2);color:var(--text);}
 .icon-btn.danger:hover{background:var(--red-pale);color:var(--red);}
 .trend-container{background:#fff;border-radius:var(--radius);padding:16px;border:1px solid var(--border);margin-bottom:14px;}
 .trend-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
-.trend-legend-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);}
+.trend-legend-item{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--text2);}
 .chart-expand-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:13px;padding:3px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .chart-expand-btn:hover{background:var(--bg2);color:var(--amber-dark);border-color:var(--amber);}
 .chart-fs{display:none;position:fixed;inset:0;background:#fff;z-index:1500;flex-direction:column;padding:16px 20px;}
@@ -139,7 +139,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .chart-fs-body{flex:1;min-height:0;position:relative;}
 .chart-fs-body canvas{width:100%!important;height:100%!important;}
 .chart-fs-footer{flex-shrink:0;margin-top:10px;font-size:13px;color:var(--text2);}
-.trend-legend-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);}
+.trend-legend-item{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--text2);}
 .guidance-section{background:#fff;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);}
 .guidance-section-header{padding:14px 18px;background:var(--amber-pale);border-bottom:1px solid var(--border);font-weight:700;font-size:17px;color:var(--amber-dark);}
 .guidance-section-body{padding:14px 18px;font-size:16px;color:var(--text2);line-height:1.75;}
@@ -193,33 +193,42 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .field-hive-header{text-align:center;padding:20px 16px 8px;background:var(--amber-dark);color:#fff;border-radius:var(--radius) var(--radius) 0 0;margin:-20px -20px 20px;}
 .field-hive-name{font-size:28px;font-weight:700;margin-bottom:4px;}
 .field-apiary-name{font-size:15px;opacity:0.85;}
-.hs-btn{padding:8px 14px;border:2px solid var(--border);border-radius:20px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;}
+.detection-method{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--bg2);}
+.detection-method-primary{border-color:var(--amber);background:var(--amber-pale);}
+.detection-method-header{font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.detection-method-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
+.detection-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--bg);color:var(--text3);border:1px solid var(--border);}
+.detection-badge-primary{background:var(--amber-dark);color:#fff;border-color:var(--amber-dark);}
+.detection-videos{display:flex;flex-wrap:wrap;gap:6px;}
+.detection-video-link{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:#fff;border:1px solid var(--border);border-radius:14px;font-size:13px;color:var(--amber-dark);text-decoration:none;font-weight:600;transition:background 0.15s;}
+.detection-video-link:hover{background:var(--amber-pale);}
+.hs-btn{padding:10px 18px;border:2px solid var(--border);border-radius:20px;font-size:17px;font-family:inherit;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;}
 .hs-active{border-color:var(--amber);background:var(--amber-pale);color:var(--amber-dark);font-weight:600;}
-.disease-btn{padding:6px 12px;border:1px solid var(--border);border-radius:16px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;}
+.disease-btn{padding:9px 15px;border:1px solid var(--border);border-radius:16px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;}
 .disease-active{border-color:var(--amber);background:var(--amber-pale);color:var(--amber-dark);font-weight:600;}
 
 .field-count-num{font-size:96px;font-weight:700;color:var(--amber-dark);line-height:1;font-family:'Playfair Display',serif;}
-.field-count-unit{font-size:14px;color:var(--text3);margin-top:4px;}
+.field-count-unit{font-size:17px;color:var(--text3);margin-top:6px;}
 .field-btn-row{display:flex;gap:16px;justify-content:center;margin:16px 0;}
 .field-btn{width:88px;height:88px;border-radius:50%;border:none;font-size:52px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:transparent;user-select:none;}
 .field-btn-minus{background:#FDECEA;color:var(--red);}
 .field-btn-minus:active{background:#E74C3C;color:#fff;transform:scale(0.93);}
 .field-btn-plus{background:var(--green-pale);color:var(--green);}
 .field-btn-plus:active{background:var(--green);color:#fff;transform:scale(0.93);}
-.field-date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0;font-size:15px;color:var(--text2);}
+.field-date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0;font-size:17px;color:var(--text2);}
 .field-save-btn{width:100%;padding:18px;font-size:20px;font-weight:700;border-radius:var(--radius);border:none;background:var(--amber-dark);color:#fff;cursor:pointer;margin-top:8px;transition:all 0.15s;}
 .field-save-btn:active{background:var(--amber);transform:scale(0.98);}
 .field-voice-btn{width:100%;padding:14px;font-size:17px;border-radius:var(--radius);border:2px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-top:10px;transition:all 0.2s;}
 .field-voice-btn.listening{background:#FDECEA;border-color:var(--red);color:var(--red);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
-.field-threshold-bar{margin:16px 0;padding:10px 14px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;text-align:center;}
+.field-threshold-bar{margin:16px 0;padding:12px 16px;border-radius:var(--radius-sm);font-size:16px;font-weight:600;text-align:center;}
 /* ── QR CODE ── */
-.hive-code-badge{display:inline-block;font-family:monospace;font-size:12px;font-weight:700;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;margin-left:6px;letter-spacing:0.05em;cursor:pointer;}
+.hive-code-badge{display:inline-block;font-family:monospace;font-size:16px;font-weight:700;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:5px 11px;margin-left:6px;letter-spacing:0.05em;cursor:pointer;}
 .qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1600;align-items:center;justify-content:center;}
 .qr-overlay.open{display:flex;}
 .qr-box{background:#fff;border-radius:var(--radius);padding:24px;text-align:center;max-width:320px;width:90%;}
 .qr-hive-name{font-size:20px;font-weight:700;color:var(--amber-dark);margin-bottom:4px;}
-.qr-code-text{font-family:monospace;font-size:13px;color:var(--text3);margin-bottom:14px;}
+.qr-code-text{font-family:monospace;font-size:16px;color:var(--text3);margin-bottom:14px;}
 .qr-print-btn{margin-top:14px;width:100%;padding:12px;background:var(--amber-dark);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;}
 .qr-close-btn{margin-top:8px;width:100%;padding:10px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;cursor:pointer;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -244,11 +253,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   .page-title{font-size:22px;}
 
   /* Section tabs — tighter on phone */
-  .section-tab{font-size:12px;padding:10px 4px;}
+  .section-tab{font-size:15px;padding:12px 4px;}
 
   /* Tabbar items — slightly smaller */
-  .tab-item{font-size:11px;padding:5px 10px;}
-  .tab-item .tab-icon{font-size:20px;}
+  .tab-item{font-size:13px;padding:7px 10px;}
+  .tab-item .tab-icon{font-size:26px;}
 
   /* Cards */
   .card{padding:14px;}
@@ -264,7 +273,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
   /* Entry rows — tighter */
   .entry-row{padding:10px 10px;}
-  .entry-date{min-width:58px;font-size:12px;}
+  .entry-date{min-width:70px;font-size:15px;}
   .entry-content{font-size:15px;}
 
   /* Field entry — bigger buttons on phone */
@@ -318,8 +327,9 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="welcome-card">
     <h3>Recommended Resources</h3>
     <ul>
-      <li>National info: <a href="https://www.varroa.org.au/" target="_blank" style="color:#FFE082;">varroa.org.au</a></li>
-      <li>Victorian beekeepers: <a href="https://bees.agriculture.vic.gov.au/" target="_blank" style="color:#FFE082;">BeeMAX</a></li>
+      <li>National program: <a href="https://www.varroa.org.au/" target="_blank" style="color:#FFE082;">varroa.org.au</a></li>
+      <li>AHBIC treatment guidance: <a href="https://honeybee.org.au/varroa/" target="_blank" style="color:#FFE082;">honeybee.org.au</a></li>
+      <li>Report Varroa to your state agriculture authority</li>
       <li>Join your local bee club</li>
     </ul>
   </div>
@@ -347,8 +357,8 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <p>No liability is accepted for accuracy of information or recommendations. All recommendations represent one of several possible paths of action. Beekeepers are solely responsible for treatment decisions. No liability for damage to hives, bees, honey, or loss of data.</p>
       <h4>No Guarantee of Accuracy</h4>
       <p>Information is provided in good faith but accuracy cannot be guaranteed. Data may be used for research and marketing purposes.</p>
-      <h4>Notifiable Pest — All Australian States</h4>
-      <p>Varroa is a notifiable pest in all Australian states. All positive detections must be reported to your state authority. Victorian beekeepers: report via <a href="https://bees.agriculture.vic.gov.au/" target="_blank">BeeMAX</a> or <a href="https://agriculture.vic.gov.au/" target="_blank">Agriculture Victoria</a>.</p>
+      <h4>Notifiable Pest — All Australian States &amp; Territories</h4>
+      <p>Varroa is a notifiable pest across all Australian states and territories. All positive detections must be reported promptly to your state or territory agriculture authority. Contact details and reporting requirements are available from your state authority's website — VarroaMate's Guidance tab provides a direct link for your registered state.</p>
       <h4>Recommended Resources</h4>
       <p>Visit your state agriculture department for current treatment and reporting requirements. The National Varroa Mite Management Program (<a href="https://www.varroa.org.au/" target="_blank">varroa.org.au</a>) has archived resources from the national response.</p>
       <h4>Join Your Local Bee Club</h4>
@@ -607,6 +617,45 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
             </div>
           </div>
           <div class="card"><div class="card-title">📊 Status</div><div id="hive-status-card" style="font-size:15px;color:var(--text2);line-height:1.9;"></div></div>
+          <div class="card">
+            <div class="card-title" style="cursor:pointer;user-select:none;" onclick="toggleDetectionCard()">
+              🔬 Mite Detection Methods
+              <span id="detection-card-chevron" style="margin-left:auto;font-size:14px;color:var(--text3);font-family:sans-serif;">▼</span>
+            </div>
+            <div id="detection-card-body">
+              <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:12px;">There are three main methods for detecting Varroa mites. <strong style="color:var(--amber-dark);">VarroaMate records alcohol wash only</strong> — it gives the most accurate and consistent mite count and is the gold standard for monitoring and reporting.</p>
+
+              <div class="detection-method detection-method-primary">
+                <div class="detection-method-header">🧪 Alcohol Wash <span class="detection-badge detection-badge-primary">Used by VarroaMate</span></div>
+                <p class="detection-method-desc">Wash approximately 300 bees (½ cup) in alcohol — kills bees but dislodges and counts mites accurately. The only method accepted for biosecurity reporting in most states. Results are expressed as mites per 300 bees.</p>
+                <div class="detection-videos">
+                  <a href="https://www.varroa.org.au/monitoring" target="_blank" class="detection-video-link">▶ Alcohol Wash video — varroa.org.au</a>
+                  <a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/honey-bee-pests-and-diseases/alcohol-wash-test-to-detect-honey-bee-parasites" target="_blank" class="detection-video-link">▶ Alcohol Wash — Agriculture Vic</a>
+                </div>
+              </div>
+
+              <div class="detection-method">
+                <div class="detection-method-header">🍬 Sugar Shake <span class="detection-badge">Accepted for surveillance</span></div>
+                <p class="detection-method-desc">Coat bees in icing sugar and shake over a white surface. Non-lethal but less accurate — mites cling to bees and not all are dislodged. Useful for a quick field check but undercounts by up to 40–60% compared to alcohol wash. Not used for VarroaMate counts.</p>
+                <div class="detection-videos">
+                  <a href="https://www.varroa.org.au/monitoring" target="_blank" class="detection-video-link">▶ Sugar Shake video — varroa.org.au</a>
+                </div>
+              </div>
+
+              <div class="detection-method">
+                <div class="detection-method-header">🐝 Drone Uncapping <span class="detection-badge">Accepted for surveillance</span></div>
+                <p class="detection-method-desc">Uncap drone brood and inspect for mites in cells. Mites preferentially reproduce in drone brood so this can detect early infestations, but cannot be expressed as a standardised count per 300 bees. Not used for VarroaMate counts.</p>
+                <div class="detection-videos">
+                  <a href="https://www.varroa.org.au/monitoring" target="_blank" class="detection-video-link">▶ Drone Uncapping video — varroa.org.au</a>
+                  <a href="https://beeaware.org.au/biosecurity/keeping-honey-bees-healthy/surveillance-for-exotic-pests/" target="_blank" class="detection-video-link">▶ All methods — Bee Aware</a>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;padding:10px 12px;background:var(--amber-pale);border-radius:var(--radius-sm);border-left:3px solid var(--amber);font-size:13px;color:var(--text2);line-height:1.6;">
+                💡 <strong>Why alcohol wash only?</strong> Consistent, standardised counts across time and between beekeepers. Sugar shake can undercount by 40–60%. Alcohol wash is what the national varroa program, AHBIC, and state authorities use as the reference method.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -771,7 +820,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="two-col">
       <div>
         <div class="card"><div class="card-title">⭐ Rate the App</div><p style="font-size:14px;color:var(--text3);margin-bottom:12px;">Your rating is private.</p><div class="stars" id="stars"><span class="star inactive" onclick="rateStar(1)">★</span><span class="star inactive" onclick="rateStar(2)">★</span><span class="star inactive" onclick="rateStar(3)">★</span><span class="star inactive" onclick="rateStar(4)">★</span><span class="star inactive" onclick="rateStar(5)">★</span></div></div>
-        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><button class="btn btn-outline btn-sm">Facebook</button><button class="btn btn-outline btn-sm">Instagram</button><button class="btn btn-outline btn-sm">Email Us</button></div></div>
+        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><button class="btn btn-outline btn-sm">Instagram</button><button class="btn btn-outline btn-sm">Email Us</button></div></div>
       </div>
       <div>
         <div class="card"><div class="card-title">💬 Share Your Thoughts</div>
@@ -806,6 +855,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ Notes &amp; trend chart</li>
           <li>✅ Treatment info library</li>
           <li>✅ CSV export</li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
           <li>⬜ AI guidance &amp; chat</li>
         </ul>
         <button class="btn btn-outline btn-full btn-sm" onclick="showToast('You are on the Free plan 🐝')">Current Plan</button>
@@ -822,6 +872,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ Everything in Free</li>
           <li>✅ <strong>AI guidance panels</strong></li>
           <li>✅ <strong>AI chat assistant</strong></li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
         <div style="background:var(--amber-pale);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--text2);">
           <strong>What does AI add?</strong> Instead of fixed rules, the AI reads your actual hive data — counts, trends, treatment history, season — and gives personalised, nuanced advice. It can also answer free-form questions like "can I treat during a honey flow?"
@@ -839,7 +890,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ Up to <strong>15 hives</strong></li>
           <li>✅ Everything in Free</li>
           <li>✅ <strong>AI guidance &amp; chat</strong></li>
-          <li>✅ Priority support</li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
         <button class="btn btn-outline btn-full btn-sm" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
       </div>
@@ -854,8 +905,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ Up to <strong>50 hives</strong></li>
           <li>✅ Everything in Hobbyist</li>
           <li>✅ <strong>AI guidance &amp; chat</strong></li>
-          <li>✅ Bulk data import</li>
-          <li>✅ Priority support</li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
         <button class="btn btn-outline btn-full btn-sm" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
       </div>
@@ -871,14 +921,22 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ <strong>Unlimited hives</strong></li>
           <li>✅ Everything in Beekeeper</li>
           <li>✅ AI included</li>
-          <li>✅ Multi-user access</li>
-          <li>✅ Dedicated support</li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
+          <li>✅ Direct email support</li>
         </ul>
         <button class="btn btn-primary btn-full btn-sm" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
       </div>
 
     </div>
 
+    <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
+      <div class="card-title">🚧 Coming Soon</div>
+      <p style="font-size:15px;color:var(--text2);line-height:1.8;">Two features are in development and will be added to paid plans when ready:</p>
+      <ul style="font-size:15px;color:var(--text2);line-height:2;margin-top:8px;padding-left:18px;">
+        <li><strong>Bulk data import</strong> — load historical mite count data from a CSV file into VarroaMate, coming to the Beekeeper plan.</li>
+        <li><strong>Multi-user access</strong> — invite a second beekeeper (e.g. a field hand or business partner) to log counts and treatments on shared apiaries, coming to the Professional plan.</li>
+      </ul>
+    </div>
     <div class="card" style="background:var(--amber-pale);border-color:var(--amber);">
       <div class="card-title">🤖 What does AI guidance actually do?</div>
       <p style="font-size:15px;color:var(--text2);line-height:1.8;">The AI reads your real hive data — mite counts, treatment history, the season, your apiary location — and generates personalised, nuanced advice rather than fixed rules. It can answer free-form questions through the chat (e.g. "can I treat during a honey flow?" or "what does pyrethroid resistance mean for my situation?"), and it adjusts its recommendations based on your treatment preference profile. Free users get rule-based guidance which covers thresholds and basic treatment suggestions — AI takes that further with context and judgment.</p>
@@ -1749,88 +1807,92 @@ function initChart(canvasEl,maintainAR){
   const allCounts=miteCountsByHive[currentHiveId]||[];
   const treatments=treatmentsByHive[currentHiveId]||[];
 
-  // Build date range: from (today - chartMonths months) to latest count date (may be future)
+  // Build date range
   const now=new Date();
-  const allCountDates=allCounts.map(c=>new Date(c.date));
+  const allCountDates=allCounts.map(c=>new Date(c.date+'T12:00:00'));
   const latestCount=allCountDates.length?new Date(Math.max(...allCountDates)):now;
-  const toDate=latestCount>now?latestCount:now; // extend forward if future counts exist
+  // Also extend right edge to show full treatment window + 2 week buffer after last treatment end
+  const treatmentEndDates=treatments
+    .map(t=>{const d=TREATMENTS[t.product]?.durationDays;return d?new Date(t.date+'T12:00:00').getTime()+d*24*3600*1000:null;})
+    .filter(Boolean);
+  const latestTreatEnd=treatmentEndDates.length?new Date(Math.max(...treatmentEndDates)+14*24*3600*1000):now;
+  // Always extend right edge by 3 weeks so latest point is never at the boundary
+  const bufferMs=21*24*3600*1000;
+  const toDate=new Date(Math.max(latestCount.getTime(),now.getTime(),latestTreatEnd.getTime())+bufferMs);
   const fromDate=new Date(toDate);
   fromDate.setMonth(fromDate.getMonth()-chartMonths);
+  const fromMs=fromDate.getTime(), toMs=toDate.getTime();
 
-  // Build monthly buckets across the range
+  // Each count becomes a {x,y} point — exact date, no bucketing
+  const points=allCounts
+    .map(c=>({x:new Date(c.date+'T12:00:00').getTime(),y:c.value,date:c.date}))
+    .filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=fromMs&&p.x<=toMs)
+    .sort((a,b)=>a.x-b.x);
+
+  // Build monthly buckets for zone drawing only (season bands, action zone, threshold line)
   const buckets=[];
-  const d=new Date(fromDate.getFullYear(),fromDate.getMonth(),1);
-  while(d<=toDate){
-    buckets.push({year:d.getFullYear(),month:d.getMonth(),label:d.toLocaleDateString('en-AU',{month:'short',year:'2-digit'})});
-    d.setMonth(d.getMonth()+1);
+  const bd=new Date(fromDate.getFullYear(),fromDate.getMonth(),1);
+  while(bd<=toDate){
+    buckets.push({year:bd.getFullYear(),month:bd.getMonth(),
+      startMs:new Date(bd.getFullYear(),bd.getMonth(),1).getTime(),
+      endMs:new Date(bd.getFullYear(),bd.getMonth()+1,0,23,59,59).getTime()});
+    bd.setMonth(bd.getMonth()+1);
   }
 
-  // Fill buckets with max mite count per month
-  const chartData=buckets.map(b=>{
-    const vals=allCounts.filter(c=>{
-      const cd=new Date(c.date);
-      return cd.getFullYear()===b.year&&cd.getMonth()===b.month;
-    }).map(c=>c.value);
-    return vals.length?Math.max(...vals):null;
-  });
-
-  // Dynamic y-max: at least the highest seasonal threshold in view + headroom
-  const seasonThresholdForYMax={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5};
-  const maxThreshInView=buckets.length?Math.max(...buckets.map(b=>seasonThresholdForYMax[b.month]??15)):15;
-  const maxVal=Math.max(maxThreshInView,...chartData.filter(v=>v!==null));
+  const maxVal=Math.max(15,...points.map(p=>p.y));
   const yMax=Math.max(20,Math.ceil((maxVal+2)/5)*5);
 
-  const labels=buckets.map(b=>b.label);
-
-  // Update chart heading with actual date range
+  // Chart heading
   const hive=Object.values(hives).flat().find(h=>h.id===currentHiveId);
   const fmtY=(d)=>d.toLocaleDateString('en-AU',{month:'short',year:'numeric'});
   const lbl=document.getElementById('chart-label');
   if(lbl&&hive)lbl.textContent=`${hive.name} · ${fmtY(fromDate)} – ${fmtY(toDate)} · Alcohol wash (~300 bees)`;
-
-  // Update slider label from chartMonths global
   const rangeLabel=chartMonths<=1?'1 month':chartMonths<12?chartMonths+' months':chartMonths===12?'1 year':Math.round(chartMonths/12*10)/10+' years';
-  const rl=document.getElementById('chart-range-label');
-  if(rl)rl.textContent=rangeLabel;
+  const rl=document.getElementById('chart-range-label');if(rl)rl.textContent=rangeLabel;
 
   chartInstance=new Chart(ctx,{
     type:'line',
-    data:{labels,datasets:[{label:'Mite Count',data:chartData,borderColor:'#2980B9',backgroundColor:'rgba(41,128,185,0.07)',
-      pointBackgroundColor:chartData.map(v=>v===null?'transparent':v>=15?'#C0392B':v>=6?'#E74C3C':v>=3?'#F39C12':'#27AE60'),
-      pointRadius:chartData.map(v=>v===null?0:7),pointHoverRadius:10,tension:0.3,fill:true,spanGaps:true}]},
+    data:{datasets:[{label:'Mite Count',data:points,
+      borderColor:'#2980B9',backgroundColor:'rgba(41,128,185,0.07)',
+      pointBackgroundColor:points.map(p=>p.y>=15?'#C0392B':p.y>=6?'#E74C3C':p.y>=3?'#F39C12':'#27AE60'),
+      pointRadius:points.map(()=>7),pointHoverRadius:10,tension:0.3,fill:true,
+      parsing:{xAxisKey:'x',yAxisKey:'y'}}]},
     options:{responsive:true,maintainAspectRatio:maintainAR!==false,
       plugins:{legend:{display:false},tooltip:{callbacks:{
+        title:items=>{
+          const ms=items[0]?.raw?.x;
+          if(!ms)return'';
+          return new Date(ms).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+        },
         label:c=>{
-          if(c.parsed.y===null)return'No data';
-          const b=buckets[c.dataIndex];
-          const thresh={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5}[b?.month]??15;
-          const risk=c.parsed.y>=thresh?' ⚠ colony loss risk':'';
-          return`${c.parsed.y} mites/300 bees${risk}`;
+          const y=c.raw?.y;if(y==null)return'No data';
+          const m=new Date(c.raw?.x).getMonth();
+          const thresh={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5}[m]??15;
+          const risk=y>=thresh?' ⚠ colony loss risk':'';
+          return`${y} mites/300 bees${risk}`;
         },
         afterLabel:c=>{
-          const b=buckets[c.dataIndex];
-          const thresh={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5}[b?.month]??15;
-          const az={8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}}[b?.month]||{lo:3,hi:6};
-          const sName={8:'Spring',9:'Spring',10:'Spring',11:'Summer',0:'Summer',1:'Summer',2:'Autumn',3:'Autumn',4:'Autumn',5:'Winter',6:'Winter',7:'Winter'}[b?.month]||'';
+          const m=new Date(c.raw?.x).getMonth();
+          const thresh={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5}[m]??15;
+          const az={8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}}[m]||{lo:3,hi:6};
+          const sName={8:'Spring',9:'Spring',10:'Spring',11:'Summer',0:'Summer',1:'Summer',2:'Autumn',3:'Autumn',4:'Autumn',5:'Winter',6:'Winter',7:'Winter'}[m]||'';
           return[`${sName} action zone: ${az.lo}–${az.hi}`,`${sName} colony loss risk: ${thresh}+`];
         }
       }}},
       scales:{
-        y:{min:0,max:yMax,title:{display:true,text:'Mites (alcohol wash)',font:{size:14}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:13}}},
-        x:{grid:{display:false},ticks:{maxTicksLimit:12,maxRotation:45,font:{size:13}}}
+        x:{type:'linear',min:fromMs,max:toMs,
+          ticks:{maxTicksLimit:12,maxRotation:45,font:{size:13},
+            callback:v=>new Date(v).toLocaleDateString('en-AU',{day:'2-digit',month:'short'})},
+          title:{display:true,text:'Date',font:{size:13}}},
+        y:{min:0,max:yMax,title:{display:true,text:'Mites (alcohol wash)',font:{size:14}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:13}}}
       }
     },
     plugins:[{id:'zones',beforeDraw(chart){
-      const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=chart;
-      const W=right-left;
-      const nBuckets=buckets.length;
-      if(!nBuckets)return;
-      const colW=W/nBuckets;
+      const{ctx:c2,chartArea:{left,right,top,bottom},scales:{x,y}}=chart;
+      if(!x?.getPixelForValue||!y?.getPixelForValue)return;
 
-      // Responsive font size — scales with chart width for regular and fullscreen
       const fs=Math.max(11,Math.round(chart.width*0.013));
 
-      // Season shading per bucket + labels at season transitions
       const seasonColors={
         11:'rgba(255,200,50,0.10)',0:'rgba(255,200,50,0.10)',1:'rgba(255,200,50,0.10)',
         2:'rgba(200,130,60,0.10)',3:'rgba(200,130,60,0.10)',4:'rgba(200,130,60,0.10)',
@@ -1843,87 +1905,71 @@ function initChart(canvasEl,maintainAR){
         5:'❄ Winter',6:'❄ Winter',7:'❄ Winter',
         8:'🌸 Spring',9:'🌸 Spring',10:'🌸 Spring'
       };
-      // Track season runs to draw labels once per run
-      let runStart=0,runSeason=buckets[0]?seasonNames[buckets[0].month]:'';
-      const drawSeasonLabel=(startI,endI,label)=>{
-        const sx=left+startI*colW,ex=left+(endI+1)*colW;
-        if(ex-sx<fs*3)return; // too narrow to fit label
-        ctx.save();ctx.fillStyle='rgba(80,60,20,0.50)';ctx.font=`bold ${fs}px sans-serif`;
-        ctx.textAlign='center';ctx.fillText(label,(sx+ex)/2,top+fs+2);ctx.restore();
-      };
+
+      // Season bands using bucket pixel positions
+      let runStart=null,runSeason=null;
+      const drawSeasonLabel=(sx,ex,label)=>{if(ex-sx<fs*3)return;c2.save();c2.fillStyle='rgba(80,60,20,0.50)';c2.font=`bold ${fs}px sans-serif`;c2.textAlign='center';c2.fillText(label,(sx+ex)/2,top+fs+2);c2.restore();};
       buckets.forEach((b,i)=>{
-        const sx=left+i*colW;
-        ctx.fillStyle=seasonColors[b.month]||'transparent';
-        ctx.fillRect(sx,top,colW,bottom-top);
+        const sx=Math.max(left,x.getPixelForValue(b.startMs));
+        const ex=Math.min(right,x.getPixelForValue(b.endMs));
+        if(ex<=left||sx>=right)return;
+        c2.fillStyle=seasonColors[b.month]||'transparent';
+        c2.fillRect(sx,top,ex-sx,bottom-top);
         const thisSeason=seasonNames[b.month]||'';
-        if(i>0&&thisSeason!==runSeason){
-          drawSeasonLabel(runStart,i-1,runSeason);
-          runStart=i;runSeason=thisSeason;
-        }
-        if(i===buckets.length-1)drawSeasonLabel(runStart,i,runSeason);
+        if(runSeason===null){runStart=sx;runSeason=thisSeason;}
+        else if(thisSeason!==runSeason){drawSeasonLabel(runStart,sx,runSeason);runStart=sx;runSeason=thisSeason;}
+        if(i===buckets.length-1)drawSeasonLabel(runStart,ex,runSeason);
       });
 
-      // Seasonal action zone band — stepped per bucket
-      if(y.getPixelForValue){
-        const actionZone={
-          8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},
-          11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},
-          2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},
-          5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}
-        };
-        buckets.forEach((b,i)=>{
-          const az=actionZone[b.month]||{lo:3,hi:6};
-          const yHi=y.getPixelForValue(az.hi);
-          const yLo=y.getPixelForValue(az.lo);
-          const sx=left+i*colW;
-          ctx.fillStyle='rgba(243,156,18,0.20)';
-          ctx.fillRect(sx,yHi,colW,yLo-yHi);
-        });
-        const firstAz=actionZone[buckets[0]?.month]||{lo:3,hi:6};
-        ctx.save();ctx.fillStyle='rgba(180,100,0,0.60)';ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';
-        ctx.fillText('Action zone',left+4,y.getPixelForValue(firstAz.hi)-3);ctx.restore();
+      // Seasonal action zone band
+      const actionZone={8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}};
+      buckets.forEach(b=>{
+        const sx=Math.max(left,x.getPixelForValue(b.startMs));
+        const ex=Math.min(right,x.getPixelForValue(b.endMs));
+        if(ex<=left||sx>=right)return;
+        const az=actionZone[b.month]||{lo:3,hi:6};
+        const yHi=y.getPixelForValue(az.hi),yLo=y.getPixelForValue(az.lo);
+        c2.fillStyle='rgba(243,156,18,0.20)';c2.fillRect(sx,yHi,ex-sx,yLo-yHi);
+      });
+      const firstAz=actionZone[buckets[0]?.month]||{lo:3,hi:6};
+      c2.save();c2.fillStyle='rgba(180,100,0,0.60)';c2.font=`bold ${fs}px sans-serif`;c2.textAlign='left';
+      c2.fillText('Action zone',left+4,y.getPixelForValue(firstAz.hi)-3);c2.restore();
 
-        // Seasonal colony loss threshold — stepped line
-        const seasonThreshold={
-          8:10,9:10,10:10,
-          11:15,0:15,1:15,
-          2:8,3:8,4:8,
-          5:5,6:5,7:5
-        };
-        ctx.save();
-        ctx.setLineDash([6,4]);ctx.strokeStyle='#C0392B';ctx.lineWidth=2;
-        ctx.beginPath();
-        buckets.forEach((b,i)=>{
-          const thresh=seasonThreshold[b.month]??15;
-          const ty=y.getPixelForValue(thresh);
-          const sx=left+i*colW;
-          const ex=left+(i+1)*colW;
-          if(i===0){ctx.moveTo(sx,ty);}else{
-            const prevThresh=seasonThreshold[buckets[i-1].month]??15;
-            if(thresh!==prevThresh){const prevY=y.getPixelForValue(prevThresh);ctx.lineTo(sx,prevY);ctx.lineTo(sx,ty);}
-          }
-          ctx.lineTo(ex,ty);
-        });
-        ctx.stroke();
-        ctx.setLineDash([]);
-        const lastThresh=seasonThreshold[buckets[buckets.length-1]?.month]??15;
-        const labelY=y.getPixelForValue(lastThresh);
-        ctx.fillStyle='rgba(192,57,43,0.80)';ctx.font=`bold ${fs}px sans-serif`;
-        ctx.textAlign='right';ctx.fillText('⚠ Colony loss risk',right-4,labelY-4);
-        ctx.restore();
-
-        // Treatment period shading
-        for(const t of treatments){
-          const td=new Date(t.date);
-          const bi=buckets.findIndex(b=>b.year===td.getFullYear()&&b.month===td.getMonth());
-          if(bi<0)continue;
-          const dur=TREATMENTS[t.product]?.duration||'';
-          const dm=dur.includes('8 week')||dur.includes('6–8')?2:1;
-          const tx=left+bi*colW,te=Math.min(right,left+(bi+dm)*colW);
-          ctx.save();ctx.fillStyle='rgba(39,174,96,0.13)';ctx.fillRect(tx,top,te-tx,bottom-top);
-          ctx.fillStyle='rgba(30,130,60,0.75)';ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='center';
-          ctx.fillText((TREATMENTS[t.product]?.name||t.product).substring(0,8),(tx+te)/2,bottom-4);ctx.restore();
+      // Seasonal colony loss threshold — stepped line
+      const seasonThreshold={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5};
+      c2.save();c2.setLineDash([6,4]);c2.strokeStyle='#C0392B';c2.lineWidth=2;c2.beginPath();
+      let firstPt=true;
+      buckets.forEach((b,i)=>{
+        const sx=Math.max(left,x.getPixelForValue(b.startMs));
+        const ex=Math.min(right,x.getPixelForValue(b.endMs));
+        if(ex<=left||sx>=right)return;
+        const thresh=seasonThreshold[b.month]??15;
+        const ty=y.getPixelForValue(thresh);
+        if(firstPt){c2.moveTo(sx,ty);firstPt=false;}
+        else{
+          const prevThresh=seasonThreshold[buckets[i-1]?.month]??15;
+          if(thresh!==prevThresh){const prevY=y.getPixelForValue(prevThresh);c2.lineTo(sx,prevY);c2.lineTo(sx,ty);}
         }
+        c2.lineTo(ex,ty);
+      });
+      c2.stroke();c2.setLineDash([]);
+      const lastThresh=seasonThreshold[buckets[buckets.length-1]?.month]??15;
+      c2.fillStyle='rgba(192,57,43,0.80)';c2.font=`bold ${fs}px sans-serif`;
+      c2.textAlign='right';c2.fillText('⚠ Colony loss risk',right-4,y.getPixelForValue(lastThresh)-4);
+      c2.restore();
+
+      // Treatment period shading
+      for(const t of treatments){
+        const tMs=new Date(t.date+'T12:00:00').getTime();
+        if(tMs<fromMs||tMs>toMs)continue;
+        const durDays=TREATMENTS[t.product]?.durationDays||42;
+        const endMs=tMs+durDays*24*3600*1000;
+        const tx=Math.max(left,x.getPixelForValue(tMs));
+        const te=Math.min(right,x.getPixelForValue(endMs));
+        if(te<=left||tx>=right)continue;
+        c2.save();c2.fillStyle='rgba(39,174,96,0.13)';c2.fillRect(tx,top,te-tx,bottom-top);
+        c2.fillStyle='rgba(30,130,60,0.75)';c2.font=`bold ${fs}px sans-serif`;c2.textAlign='center';
+        c2.fillText((TREATMENTS[t.product]?.name||t.product).substring(0,10),(tx+te)/2,bottom-4);c2.restore();
       }
     }}]
   });
@@ -2821,7 +2867,9 @@ function printQR(){
 }
 
 // ══ CHART FULLSCREEN ══
-function openChartFs(title,bodyHTML,footerHTML,onOpen){
+let _fsOnClose=null;
+function openChartFs(title,bodyHTML,footerHTML,onOpen,onClose){
+  _fsOnClose=onClose||null;
   document.getElementById('chart-fs-title').textContent=title;
   document.getElementById('chart-fs-body').innerHTML=bodyHTML;
   document.getElementById('chart-fs-footer').innerHTML=footerHTML||'';
@@ -2832,8 +2880,19 @@ function openChartFs(title,bodyHTML,footerHTML,onOpen){
 function closeChartFs(){
   document.getElementById('chart-fs').classList.remove('open');
   document.body.style.overflow='';
-  if(chartInstance){chartInstance.destroy();chartInstance=null;}
-  setTimeout(initChart,60);
+  const cb=_fsOnClose;_fsOnClose=null;
+  if(cb){
+    // Custom close handler (e.g. temp chart)
+    setTimeout(cb,60);
+  } else {
+    // Default: reinit the mite chart, cleaning up any stale instance first
+    if(chartInstance){chartInstance.destroy();chartInstance=null;}
+    setTimeout(()=>{
+      const mc=document.getElementById('miteChart');
+      if(mc){const ex=Chart.getChart(mc);if(ex)ex.destroy();}
+      initChart();
+    },80);
+  }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeChartFs();});
 
@@ -2877,15 +2936,27 @@ function expandTempChart(){
     `<canvas id="tempChart-fs" style="width:100%;height:100%;"></canvas>`,
     `<div style="margin-bottom:6px;">${summaryHTML}</div><div style="font-size:12px;">${legendHTML}</div>`,
     ()=>{
+      // onOpen: draw temp chart into the fullscreen canvas
       const fsCanvas=document.getElementById('tempChart-fs');
+      if(!fsCanvas)return;
+      if(tempChartInstance){tempChartInstance.destroy();tempChartInstance=null;}
+      // Temporarily give fs canvas the real id so loadTempChart targets it
       const origCanvas=document.getElementById('tempChart');
-      if(!fsCanvas||!tempChartInstance)return;
-      fsCanvas.id='tempChart';
       origCanvas.id='tempChart-orig';
-      tempChartInstance.destroy();tempChartInstance=null;
+      fsCanvas.id='tempChart';
       loadTempChart(ap);
       fsCanvas.id='tempChart-fs';
       origCanvas.id='tempChart';
+    },
+    ()=>{
+      // onClose: destroy fs chart instance, redraw onto original canvas
+      if(tempChartInstance){tempChartInstance.destroy();tempChartInstance=null;}
+      const origCanvas=document.getElementById('tempChart');
+      if(origCanvas){
+        const ex=Chart.getChart(origCanvas);if(ex)ex.destroy();
+        origCanvas.style.display='block';
+        loadTempChart(ap);
+      }
     }
   );
 }
@@ -3167,6 +3238,14 @@ entries.forEach(({apiary,hive,count,hiveCount})=>{
   win.document.close();
 }
 
+function toggleDetectionCard(){
+  const body=document.getElementById('detection-card-body');
+  const chev=document.getElementById('detection-card-chevron');
+  if(!body)return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'';
+  if(chev)chev.textContent=isOpen?'▶':'▼';
+}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 // ══ CALENDAR EXPORT ══
 function icsDate(d){
