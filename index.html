@@ -40,10 +40,15 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--amber-dark);display:none;justify-content:center;align-items:center;height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);z-index:2000;box-shadow:0 -2px 8px rgba(0,0,0,0.2);}
 .tabbar.visible{display:flex;}
 .tabbar-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:960px;padding:0 20px;height:64px;}
-.tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);cursor:pointer;padding:8px 14px;border-radius:10px;transition:all 0.2s;font-size:14px;gap:3px;}
+.tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);cursor:pointer;padding:8px 10px;border-radius:10px;transition:all 0.2s;font-size:14px;gap:3px;}
 .tab-item .tab-icon{font-size:28px;}
 .tab-item.active{color:var(--amber-light);}
 .tab-item:hover{color:#fff;}
+@media(max-width:420px){
+  .tab-item{padding:6px 4px;font-size:11px;}
+  .tab-item .tab-icon{font-size:22px;}
+  .tabbar-inner{padding:0 4px;}
+}
 .page-body{flex:1;padding:28px 32px calc(90px + env(safe-area-inset-bottom));max-width:960px;width:100%;margin:0 auto;}
 @media(max-width:600px){.page-body{padding:16px 14px calc(88px + env(safe-area-inset-bottom));}}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
@@ -173,9 +178,9 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .chat-send:hover{background:var(--amber-dark);}
 @media(max-width:480px){.chat-panel{width:calc(100vw - 20px);right:10px;bottom:150px;}}
 /* MODALS */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2100;display:none;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:540px;box-shadow:0 -4px 24px rgba(0,0,0,0.15);animation:slideUp 0.3s ease;max-height:88vh;overflow-y:auto;}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px calc(32px + env(safe-area-inset-bottom));width:100%;max-width:540px;box-shadow:0 -4px 24px rgba(0,0,0,0.15);animation:slideUp 0.3s ease;max-height:88vh;overflow-y:auto;}
 @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
 .modal-title{font-family:'Playfair Display',serif;font-size:21px;color:var(--amber-dark);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
 .modal-close{margin-left:auto;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text3);padding:0;line-height:1;}
@@ -2055,7 +2060,9 @@ function initChart(canvasEl,maintainAR){
         if(te<=left||tx>=right)continue;
         c2.save();c2.fillStyle='rgba(39,174,96,0.13)';c2.fillRect(tx,top,te-tx,bottom-top);
         c2.fillStyle='rgba(30,130,60,0.75)';c2.font=`bold ${fs}px sans-serif`;c2.textAlign='center';
-        c2.fillText((TREATMENTS[t.product]?.name||t.product).substring(0,10),(tx+te)/2,bottom-4);c2.restore();
+        const tName=TREATMENTS[t.product]?.name||t.product;
+        const tLabel=isExpanded?tName:(tName.length>14?tName.substring(0,13)+'…':tName);
+        c2.fillText(tLabel,(tx+te)/2,bottom-4);c2.restore();
       }
     }}]
   });
@@ -2203,13 +2210,13 @@ async function loadGuidance(){
   const sections=[
     {id:'guidance-summary-body',prompt:`Varroa status: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 2–3 sentences. Specific about count, trend, season, and state context.`},
     {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
-    {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 1) rotation given ${prevT} was used, 2) honey supers, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise.`}
+    {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic Acid (MAQS) also allows supers on. Supers must be removed for: Apivar, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
   ];
   for(const s of sections)loadSection(s.id,s.prompt,pref);
 }
 
 let tempChartInstance=null;
-async function loadTempChart(ap){
+async function loadTempChart(ap, isExpanded=false){
   const tempBody=document.getElementById('guidance-temp-body');
   const canvas=document.getElementById('tempChart');
   const legend=document.getElementById('temp-treatment-legend');
@@ -2241,6 +2248,8 @@ async function loadTempChart(ap){
 
     if(tempChartInstance){tempChartInstance.destroy();tempChartInstance=null;}
     canvas.style.display='';
+    const axisFs = isExpanded ? 16 : 13;
+    const tickFs  = isExpanded ? 14 : 12;
     tempChartInstance=new Chart(canvas,{
       type:'line',
       data:{labels,datasets:[
@@ -2248,17 +2257,17 @@ async function loadTempChart(ap){
         {label:'Min °C',data:minTemps,borderColor:'#2980B9',backgroundColor:'rgba(41,128,185,0.08)',tension:0.3,fill:false,pointRadius:4,pointHoverRadius:7}
       ]},
       options:{responsive:true,
-        plugins:{legend:{display:true,position:'top',labels:{font:{size:13},boxWidth:14}},
+        plugins:{legend:{display:true,position:'top',labels:{font:{size:axisFs},boxWidth:14}},
           tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y}°C`}}},
         scales:{
-          y:{title:{display:true,text:'°C',font:{size:13}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:12}}},
-          x:{ticks:{maxRotation:45,font:{size:12}},grid:{display:false}}
+          y:{title:{display:true,text:'Temperature (°C)',font:{size:axisFs,weight:'bold'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:tickFs}}},
+          x:{ticks:{maxRotation:45,font:{size:tickFs}},grid:{display:false}}
         }
       },
       plugins:[{id:'tempZones',beforeDraw(chart){
         const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=chart;
         const W=right-left,n=labels.length,cw=W/n;
-        const fs=Math.max(9,Math.round(chart.width*0.011));
+        const fs=isExpanded ? Math.max(13,Math.round(chart.width*0.014)) : Math.max(9,Math.round(chart.width*0.011));
         // Background shading per day
         goColors.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(left+i*cw,top,cw,bottom-top);});
         // Reliability boundary
@@ -2274,13 +2283,13 @@ async function loadTempChart(ap){
           ctx.fillText('Extended forecast ▸',left+reliableDay*cw+4,top+fs+2);
           ctx.restore();
         }
-        // Treatment threshold lines
+        // Treatment threshold lines — full names, no abbreviations
         const thresholds=[
-          {val:25,color:'rgba(243,156,18,0.8)',label:'25°C — OA limit'},
-          {val:30,color:'rgba(192,57,43,0.8)',label:'30°C — Thymol limit'},
-          {val:10,color:'rgba(41,128,185,0.6)',label:'10°C — MAQS min'},
-          {val:3, color:'rgba(100,140,200,0.5)',label:'3°C — OA min'},
-          {val:15,color:'rgba(39,174,96,0.6)',label:'15°C — Thymol min'},
+          {val:25,color:'rgba(243,156,18,0.8)',label:'25°C — Oxalic Acid upper limit'},
+          {val:30,color:'rgba(192,57,43,0.8)',label:'30°C — Thymol upper limit'},
+          {val:10,color:'rgba(41,128,185,0.6)',label:'10°C — MAQS minimum'},
+          {val:3, color:'rgba(100,140,200,0.5)',label:'3°C — Oxalic Acid minimum'},
+          {val:15,color:'rgba(39,174,96,0.6)',label:'15°C — Thymol minimum'},
         ];
         thresholds.forEach(t=>{
           if(t.val<chart.scales.y.min||t.val>chart.scales.y.max)return;
@@ -3033,7 +3042,7 @@ function expandTempChart(){
       const origCanvas=document.getElementById('tempChart');
       origCanvas.id='tempChart-orig';
       fsCanvas.id='tempChart';
-      loadTempChart(ap);
+      loadTempChart(ap, true);  // isExpanded=true → larger fonts, full labels
       fsCanvas.id='tempChart-fs';
       origCanvas.id='tempChart';
     },
