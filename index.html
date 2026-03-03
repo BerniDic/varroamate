@@ -137,7 +137,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .trend-legend-item{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--text2);}
 .chart-expand-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:13px;padding:3px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .chart-expand-btn:hover{background:var(--bg2);color:var(--amber-dark);border-color:var(--amber);}
-.chart-fs{display:none;position:fixed;inset:0;background:#fff;z-index:1500;flex-direction:column;padding:16px 20px;}
+.chart-fs{display:none;position:fixed;inset:0;background:#fff;z-index:1500;flex-direction:column;padding:16px 20px calc(16px + env(safe-area-inset-bottom)) 20px;}
 .chart-fs.open{display:flex;}
 .chart-fs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-shrink:0;}
 .chart-fs-title{font-weight:700;font-size:17px;color:var(--amber-dark);}
@@ -1242,7 +1242,8 @@ function goto(id,param){
   if(id==='s-hive-detail'){
     renderHiveDetail();
     switchHiveTab('trend',document.getElementById('st-trend'));
-    if(window._chartDirty){window._chartDirty=false;setTimeout(initChart,80);}
+    window._chartDirty=false;
+    setTimeout(initChart,120);
   }
   if(id==='s-guidance'){syncApiKeyUI();loadGuidance();}
   if(id==='s-prefs'){restorePrefSelection();restoreStateSelection();}
@@ -1649,7 +1650,7 @@ function renderHiveDetail(){
     <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>`;
   countsPage=0;treatmentsPage=0;notesPage=0;
   renderCountsList();renderTreatmentsList();renderNotesList();
-  initChart();
+  // initChart is called by goto() after the screen is visible — do not call it here
 }
 
 // ══ PAGINATED LISTS ══
@@ -1755,7 +1756,7 @@ async function saveCount(){
   showSaveSpinner(false);
   closeModal('modal-add-count');
   showToast(editId?'Count updated! 📊':'Count saved! 📊');
-  renderCountsList();renderHiveDetail();initChart();
+  renderCountsList();renderHiveDetail();setTimeout(initChart,120);
 }
 function editCount(id){
   const c=(miteCountsByHive[currentHiveId]||[]).find(x=>x.id===id);if(!c)return;
@@ -1789,7 +1790,7 @@ async function saveTreatment(){
   showSaveSpinner(false);
   closeModal('modal-add-treatment');resetTreatmentModal();
   showToast(editId?'Treatment updated!':'Treatment saved! 💊');
-  renderTreatmentsList();renderHiveDetail();initChart();
+  renderTreatmentsList();renderHiveDetail();setTimeout(initChart,120);
 }
 function editTreatment(id){
   const t=(treatmentsByHive[currentHiveId]||[]).find(x=>x.id===id);if(!t)return;
@@ -1855,12 +1856,12 @@ async function confirmDelete(){
     const {error}=await _sb.from('mite_counts').delete().eq('id',numId).eq('user_id',_sbUser.id);
     if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
     miteCountsByHive[currentHiveId]=(miteCountsByHive[currentHiveId]||[]).filter(x=>String(x.id)!==strId);
-    renderCountsList();initChart();
+    renderCountsList();setTimeout(initChart,120);
   } else if(deleteType==='treatment'){
     const {error}=await _sb.from('treatments').delete().eq('id',numId).eq('user_id',_sbUser.id);
     if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
     treatmentsByHive[currentHiveId]=(treatmentsByHive[currentHiveId]||[]).filter(x=>String(x.id)!==strId);
-    renderTreatmentsList();initChart();
+    renderTreatmentsList();setTimeout(initChart,120);
   } else if(deleteType==='note'){
     const {error}=await _sb.from('notes').delete().eq('id',numId).eq('user_id',_sbUser.id);
     if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
@@ -1877,7 +1878,7 @@ async function confirmDelete(){
     }
     showSaveSpinner(false);closeModal('modal-confirm-delete');showToast('Apiary deleted.');renderApiaries();return;
   }
-  showSaveSpinner(false);renderHiveDetail();closeModal('modal-confirm-delete');showToast('Deleted.');
+  showSaveSpinner(false);renderHiveDetail();closeModal('modal-confirm-delete');showToast('Deleted.');setTimeout(initChart,120);
 }
 
 // ══ CHART ══
@@ -2073,7 +2074,8 @@ function switchHiveTab(tab,el){
   ['trend','treatments','counts','notes'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display=t===tab?'':'none';});
   document.querySelectorAll('.section-tab').forEach(t=>t.classList.remove('active'));
   if(el)el.classList.add('active');
-  if(tab==='trend')setTimeout(initChart,50);
+  // Only re-init chart when user explicitly taps the Trend tab (not during initial screen load)
+  if(tab==='trend'&&el)setTimeout(initChart,60);
 }
 
 // ══ GUIDANCE ══
@@ -2870,7 +2872,6 @@ async function fieldSave(){
   arr.sort((a,b)=>b.date.localeCompare(a.date));
   showSaveSpinner(false);
   showToast(`Count ${value} saved! 📊`);
-  window._chartDirty=true;
   document.getElementById('field-count-num').textContent='0';
   document.getElementById('field-notes').value='';
   setFieldHiveStrength('Good');
@@ -2881,11 +2882,13 @@ async function fieldSave(){
 // ── VOICE ENTRY ──
 let speechRec=null;let listeningActive=false;
 function fieldToggleVoice(){
+  if(listeningActive){fieldStopVoice();return;}
   const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition||window.mozSpeechRecognition||window.msSpeechRecognition;
   if(!SpeechRecognition){
-    showToast('Voice entry requires Chrome or Safari — try updating your browser');return;
+    showToast('Voice entry is not supported in this browser');
+    document.getElementById('field-voice-status').textContent='Try Chrome on Android or Safari on iOS 14.5+';
+    return;
   }
-  if(listeningActive){fieldStopVoice();return;}
   speechRec=new SpeechRecognition();
   speechRec.lang='en-AU';speechRec.interimResults=false;speechRec.maxAlternatives=3;
   speechRec.onstart=()=>{
@@ -2913,7 +2916,14 @@ function fieldToggleVoice(){
     }
   };
   speechRec.onerror=(e)=>{
-    document.getElementById('field-voice-status').textContent=e.error==='not-allowed'?'Microphone permission denied':'Error: '+e.error;
+    const msgs={
+      'not-allowed':'Microphone access denied — go to Settings → Safari → Microphone and allow access',
+      'service-not-allowed':'Microphone access denied — check Safari microphone permissions in Settings',
+      'no-speech':'No speech detected — tap and try again',
+      'network':'Network error — check your connection and try again',
+      'aborted':'Stopped.',
+    };
+    document.getElementById('field-voice-status').textContent=msgs[e.error]||('Error: '+e.error);
     fieldStopVoice();
   };
   speechRec.onend=()=>fieldStopVoice();
