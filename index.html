@@ -37,15 +37,15 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .nav-info-popover.open{display:block;}
 .nav-info-popover::before{content:'';position:absolute;top:-7px;right:14px;width:13px;height:13px;background:#fff;border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg);}
 .nav-btn:hover{background:rgba(255,255,255,0.28);}
-.tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--amber-dark);display:none;justify-content:center;align-items:center;height:64px;z-index:200;box-shadow:0 -2px 8px rgba(0,0,0,0.2);}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--amber-dark);display:none;justify-content:center;align-items:center;height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);z-index:2000;box-shadow:0 -2px 8px rgba(0,0,0,0.2);}
 .tabbar.visible{display:flex;}
-.tabbar-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:960px;padding:0 20px;}
+.tabbar-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:960px;padding:0 20px;height:64px;}
 .tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);cursor:pointer;padding:8px 14px;border-radius:10px;transition:all 0.2s;font-size:14px;gap:3px;}
 .tab-item .tab-icon{font-size:28px;}
 .tab-item.active{color:var(--amber-light);}
 .tab-item:hover{color:#fff;}
-.page-body{flex:1;padding:28px 32px 90px;max-width:960px;width:100%;margin:0 auto;}
-@media(max-width:600px){.page-body{padding:16px 14px 80px;}}
+.page-body{flex:1;padding:28px 32px calc(90px + env(safe-area-inset-bottom));max-width:960px;width:100%;margin:0 auto;}
+@media(max-width:600px){.page-body{padding:16px 14px calc(88px + env(safe-area-inset-bottom));}}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
 @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);}
@@ -151,8 +151,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .star{transition:transform 0.15s;}.star:hover{transform:scale(1.2);}
 .star.active{color:var(--amber-light);}.star.inactive{color:var(--border);}
 /* CHAT */
-.chat-fab{position:fixed;bottom:76px;right:22px;width:56px;height:56px;border-radius:50%;background:var(--amber-dark);color:#fff;font-size:26px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);z-index:300;border:none;transition:all 0.2s;}
-@media(max-width:600px){.chat-fab{bottom:80px;right:14px;}}
+.chat-fab{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));right:16px;width:56px;height:56px;border-radius:50%;background:var(--amber-dark);color:#fff;font-size:26px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);z-index:1999;border:none;transition:all 0.2s;}
 
 .chat-fab.visible{display:flex;}
 .chat-fab:hover{background:var(--amber);transform:scale(1.08);}
@@ -402,7 +401,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
       <!-- SIGN IN FORM — wrapped in <form> so password managers recognise the fields -->
       <div id="form-signin">
-        <form id="signin-form" action="#" onsubmit="doSignIn(event)" autocomplete="on">
+        <form id="signin-form" action="javascript:void(0)" onsubmit="doSignIn(event)" autocomplete="on" method="post">
           <div class="field">
             <label for="signin-email">Email</label>
             <input type="email" id="signin-email" name="email" placeholder="your@email.com" autocomplete="username" required>
@@ -763,7 +762,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <!-- FIELD ENTRY SCREEN -->
 <div id="s-field" class="screen">
   <div class="topnav"><div class="topnav-inner"><div class="logo">Varroa<em>Mate</em></div><button class="nav-btn" onclick="goto('s-hive-detail')">← Detail</button></div></div>
-  <div class="page-body" style="max-width:420px;margin:0 auto;padding:20px;">
+  <div class="page-body" style="max-width:420px;margin:0 auto;padding:20px 20px calc(90px + env(safe-area-inset-bottom)) 20px;">
     <div class="field-hive-header">
       <div class="field-hive-name" id="field-hive-name">Hive</div>
       <div class="field-apiary-name" id="field-apiary-name"></div>
@@ -1242,7 +1241,18 @@ function goto(id,param){
   }
   if(id==='s-guidance'){syncApiKeyUI();loadGuidance();}
   if(id==='s-prefs'){restorePrefSelection();restoreStateSelection();}
-  if(id==='s-signin'){switchSigninTab(param==='create'?'create':'signin');}
+  if(id==='s-signin'){
+    switchSigninTab(param==='create'?'create':'signin');
+    // Ask browser/password manager to prefill credentials
+    if(window.PasswordCredential && navigator.credentials){
+      navigator.credentials.get({password:true,mediation:'optional'}).then(cred=>{
+        if(cred&&cred.type==='password'){
+          document.getElementById('signin-email').value=cred.id||'';
+          document.getElementById('signin-password').value=cred.password||'';
+        }
+      }).catch(()=>{});
+    }
+  }
   window.scrollTo(0,0);
 }
 
@@ -1269,6 +1279,13 @@ async function doSignIn(e){
   if(btn){btn.disabled=false;btn.textContent='Sign In';}
   if(error){err.style.display='';err.textContent=error.message;return;}
   _sbUser=data.user;
+  // Notify the browser Credential Manager so password managers can save / offer biometric autofill
+  if(window.PasswordCredential){
+    try{
+      const cred=new PasswordCredential({id:email,password:pw,name:email});
+      await navigator.credentials.store(cred);
+    }catch(ex){/* non-fatal */}
+  }
   showToast('Welcome back! Loading your data…');
   await loadDataFromSupabase();
   currentApiaryId=apiaries[0]?.id??0;
@@ -3332,11 +3349,16 @@ function stripHtml(html){
 
 function speakText(text, btnEl){
   if(!_speechSynth){ showToast('Text-to-speech not supported in this browser'); return; }
+  // Capture which button was active BEFORE cancel (cancel may fire onend synchronously)
+  const prevBtn = _activeSpeakBtn;
+  const isSameBtn = (btnEl && btnEl === prevBtn);
+  // Stop any ongoing speech and reset previous button state
+  if(prevBtn){ prevBtn.classList.remove('speaking'); prevBtn.textContent='🔊'; prevBtn.title='Read aloud'; }
+  _activeSpeakBtn = null;
   _speechSynth.cancel();
-  if(_activeSpeakBtn){ _activeSpeakBtn.classList.remove('speaking'); _activeSpeakBtn.textContent='🔊'; }
-  if(btnEl === _activeSpeakBtn){ _activeSpeakBtn=null; return; } // toggle off
+  // If user clicked the same button that was speaking — just stop, don't restart
+  if(isSameBtn){ return; }
   const utt = new SpeechSynthesisUtterance(text);
-  // Try to get Australian voice; if voices not loaded yet wait briefly
   const tryVoice = () => {
     const v = getAuVoice();
     if(v) utt.voice = v;
@@ -3347,8 +3369,8 @@ function speakText(text, btnEl){
   if(_speechSynth.getVoices().length){ tryVoice(); }
   else { _speechSynth.onvoiceschanged = () => { tryVoice(); _speechSynth.onvoiceschanged=null; }; }
   if(btnEl){ btnEl.classList.add('speaking'); btnEl.textContent='⏹'; btnEl.title='Click to stop'; _activeSpeakBtn=btnEl; }
-  utt.onend = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; btnEl.title='Read aloud'; } _activeSpeakBtn=null; };
-  utt.onerror = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; btnEl.title='Read aloud'; } _activeSpeakBtn=null; };
+  utt.onend = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; btnEl.title='Read aloud'; } if(_activeSpeakBtn===btnEl)_activeSpeakBtn=null; };
+  utt.onerror = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; btnEl.title='Read aloud'; } if(_activeSpeakBtn===btnEl)_activeSpeakBtn=null; };
   _speechSynth.speak(utt);
 }
 
@@ -3551,10 +3573,12 @@ function exportAllCSV(){
 
 // ══ BOOT ══
 document.addEventListener('DOMContentLoaded', async function(){
-  // Hide voice button if speech recognition is genuinely unavailable
-  if(!window.SpeechRecognition && !window.webkitSpeechRecognition && !window.mozSpeechRecognition && !window.msSpeechRecognition){
+  // Only hide voice button on browsers that definitively lack speech recognition
+  // (Do NOT hide on iOS Safari - webkitSpeechRecognition exists but requires a user gesture to confirm)
+  const hasSpeech = !!(window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition);
+  if(!hasSpeech){
     const vb=document.getElementById('field-voice-btn');
-    if(vb){vb.style.display='none';}
+    if(vb){vb.title='Voice entry not available in this browser';}
   }
   const ls=document.getElementById('s-loading');
   if(ls)ls.classList.add('active');
