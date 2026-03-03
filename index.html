@@ -152,6 +152,8 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .star.active{color:var(--amber-light);}.star.inactive{color:var(--border);}
 /* CHAT */
 .chat-fab{position:fixed;bottom:76px;right:22px;width:56px;height:56px;border-radius:50%;background:var(--amber-dark);color:#fff;font-size:26px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);z-index:300;border:none;transition:all 0.2s;}
+@media(max-width:600px){.chat-fab{bottom:80px;right:14px;}}
+
 .chat-fab.visible{display:flex;}
 .chat-fab:hover{background:var(--amber);transform:scale(1.08);}
 .chat-panel{position:fixed;bottom:148px;right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border);z-index:299;display:none;flex-direction:column;max-height:420px;overflow:hidden;}
@@ -170,7 +172,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .chat-input:focus{outline:none;border-color:var(--amber);}
 .chat-send{background:var(--amber);color:#fff;border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:16px;flex-shrink:0;}
 .chat-send:hover{background:var(--amber-dark);}
-@media(max-width:480px){.chat-panel{width:calc(100vw - 20px);right:10px;bottom:140px;}}
+@media(max-width:480px){.chat-panel{width:calc(100vw - 20px);right:10px;bottom:150px;}}
 /* MODALS */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:none;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
@@ -2659,14 +2661,14 @@ function updateTreatmentStateIndicators(){
 }
 
 const TREATMENTS={
-  'oxalic':{name:'Oxalic Acid Vaporisation',moa:'Organic Acid',active:'Oxalic acid dihydrate',tempRange:'3°C–25°C (optimal 5–20°C)',tempSensitive:true,honeySupers:'Must be removed',withBrood:'Best broodless. Repeat applications cover emerging bees.',resistance:'Low risk. Safe to use regularly.',dosage:'1–2 g per hive per vaporisation. 3 weekly treatments typical.',duration:'3–5 weeks (3 weekly vaporisations)',durationDays:21,removal:'Remove vaporiser equipment immediately after each treatment session. No strips to remove — each vaporisation is a single event. Course complete after 3rd weekly treatment.',regulatory:'Registered in Australia. APVMA label. PPE required: respirator, gloves, eye protection.',notes:'Highly effective broodless. Temperature critical — do not treat below 3°C or above 25°C.'},
-  'oxalic-dribble':{name:'Oxalic Acid Dribble',moa:'Organic Acid',active:'Oxalic acid in sugar syrup',tempRange:'Above 5°C',tempSensitive:true,honeySupers:'Must be removed',withBrood:'Ineffective against capped brood mites. Single application per season.',resistance:'Low risk.',dosage:'5 mL of 3.2% solution per seam of bees',duration:'Single application',durationDays:0,removal:'No materials to remove — single dribble application. Do not repeat within the same season.',regulatory:'Registered Australia. APVMA label.',notes:'Best winter broodless periods. Less effective than vaporisation for heavy infestations.'},
-  'aluen-cap':{name:'Aluen CAP',moa:'Organic Acid — Slow Release',active:'Oxalic acid dihydrate + Lactic acid (slow-release polymer cap)',tempRange:'5°C–40°C. Effective across a wide range — no vapour temperature sensitivity.',tempSensitive:false,honeySupers:'Must be removed for entire treatment period',withBrood:'Effective with brood present — slow release reaches mites under capped cells over time.',resistance:'Low risk. Organic acid mechanism — no resistance reported.',dosage:'1 cap per hive, placed centrally on top of frames in the brood box.',duration:'6–8 weeks',durationDays:56,removal:'Remove Aluen CAP after 6–8 weeks (maximum 56 days). Discard used cap — do not reuse. Replace honey supers only after removal.',regulatory:'Registered in Australia. APVMA approved. No PPE required for placement (unlike OA vaporisation). Check APVMA label for current withholding period.',notes:'Key advantage over OA vaporisation: effective with brood present and no heat/PPE equipment needed for placement. Slow-release matrix means a single cap replaces 3 weekly vaporisations. Ideal for beekeepers who cannot vaporise regularly.'},
+  'oxalic':{name:'Oxalic Acid Vaporisation',moa:'Organic Acid',active:'Oxalic acid dihydrate',tempRange:'3°C–25°C (optimal 5–20°C)',tempSensitive:true,honeySupers:'Honey supers CAN remain on — oxalic acid does not taint honey at label dose rates (APVMA approved for use with supers on)',withBrood:'Best broodless. Repeat applications cover emerging bees.',resistance:'Low risk. Safe to use regularly.',dosage:'1–2 g per hive per vaporisation. 3 weekly treatments typical.',duration:'3–5 weeks (3 weekly vaporisations)',durationDays:21,removal:'Remove vaporiser equipment immediately after each treatment session. No strips to remove — each vaporisation is a single event. Course complete after 3rd weekly treatment.',regulatory:'Registered in Australia. APVMA approved for use with honey supers on. PPE required: respirator (P2 minimum), gloves, eye protection. Do not enter hive for 10 minutes after vaporisation.',notes:'Highly effective broodless. Temperature critical — do not treat below 3°C or above 25°C. Key advantage: honey supers can remain on, unlike most synthetic treatments.'},
+  'oxalic-dribble':{name:'Oxalic Acid Dribble',moa:'Organic Acid',active:'Oxalic acid in sugar syrup',tempRange:'Above 5°C',tempSensitive:true,honeySupers:'Honey supers CAN remain on — APVMA approved for use with supers on at label dose rates',withBrood:'Ineffective against capped brood mites. Single application per season.',resistance:'Low risk.',dosage:'5 mL of 3.2% solution per seam of bees',duration:'Single application',durationDays:0,removal:'No materials to remove — single dribble application. Do not repeat within the same season.',regulatory:'Registered Australia. APVMA approved for use with honey supers on. Wear gloves — oxalic acid solution is corrosive to skin.',notes:'Best used during winter broodless periods when supers are typically off anyway. Less effective than vaporisation for heavy infestations. Single treatment only per season.'},
+  'aluen-cap':{name:'Aluen CAP',moa:'Organic Acid — Slow Release',active:'Oxalic acid dihydrate + Lactic acid (slow-release polymer cap)',tempRange:'5°C–40°C. Effective across a wide range — no vapour temperature sensitivity.',tempSensitive:false,honeySupers:'Honey supers CAN remain on — approved for use with supers present at label dose. Remove only if retreatment is needed.',withBrood:'Effective with brood present — slow release reaches mites under capped cells over time.',resistance:'Low risk. Organic acid mechanism — no resistance reported.',dosage:'1 cap per hive, placed centrally on top of frames in the brood box.',duration:'6–8 weeks',durationDays:56,removal:'Remove Aluen CAP after 6–8 weeks (maximum 56 days). Discard used cap — do not reuse.',regulatory:'Registered in Australia. APVMA approved. No PPE required for placement (unlike OA vaporisation). Check APVMA label for current withholding period.',notes:'Key advantages: effective with brood present, honey supers can stay on, and no heat/PPE equipment needed for placement. Slow-release matrix means a single cap replaces 3 weekly vaporisations. Ideal for beekeepers who cannot vaporise regularly.'},
   'formic':{name:'Formic Acid (MAQS)',moa:'Organic Acid',active:'Formic acid',tempRange:'10°C–29°C. Do NOT use above 29°C.',tempSensitive:true,honeySupers:'Honey supers CAN remain on (unique advantage)',withBrood:'Effective against mites under capped brood.',resistance:'Low risk.',dosage:'2 strips per hive on bottom bars.',duration:'7 days',durationDays:7,removal:'⚠ Remove MAQS strips after exactly 7 days. Do not leave longer — prolonged exposure harms bees and queens.',regulatory:'Registered Australia. APVMA. Temperature limits critical for bee safety.',notes:'One of few treatments effective against brood mites. Honey supers can stay. Temperature must be strictly followed.'},
   'apilife':{name:'ApiLife Var (Thymol)',moa:'Essential oil / Thymol',active:'Thymol, eucalyptol, menthol, camphor',tempRange:'15°C–30°C. Ineffective outside this range.',tempSensitive:true,honeySupers:'Must be removed during and 2 weeks after',withBrood:'Moderate efficacy with brood.',resistance:'Low risk.',dosage:'Half a tablet on top bars at two corners of brood box.',duration:'3 applications × 10 days (30 days total)',durationDays:30,removal:'Replace tablet every 10 days for 3 rounds. Remove final tablet and any residue after day 30. Honey supers must stay off for a further 2 weeks after removal.',regulatory:'Registered Australia. Store below 25°C.',notes:'Temperature critical. Below 15°C thymol does not volatilise. Above 30°C causes brood/queen damage. Check 14-day forecast first.'},
   'apiguard':{name:'Apiguard (Thymol gel)',moa:'Essential oil / Thymol',active:'Thymol slow-release gel',tempRange:'Above 15°C for efficacy',tempSensitive:true,honeySupers:'Must be removed',withBrood:'Best in low-brood periods.',resistance:'Low risk.',dosage:'50 g tray on top frames. Replace after 10–14 days.',duration:'2 trays 10–14 days apart (3–6 weeks)',durationDays:42,removal:'Replace first tray after 10–14 days with a fresh 50 g tray. Remove second tray after a further 10–14 days. Remove all residue. Honey supers can return 2 weeks after final removal.',regulatory:'Registered Australia.',notes:'Temperature dependent. Most effective in warm conditions.'},
   'apivar':{name:'Apivar (Amitraz strips)',moa:'Synthetic — Amitraz (Formamidine)',active:'Amitraz',tempRange:'Wide range (above 10°C preferred)',tempSensitive:false,honeySupers:'Must be removed for entire treatment',withBrood:'Effective with brood.',resistance:'Resistance reported in some regions. Rotate MoA.',dosage:'2 strips per brood box between brood frames.',duration:'6–8 weeks',durationDays:56,removal:'⚠ Remove Apivar strips after 6–8 weeks (no later than 56 days). Leaving strips in longer encourages amitraz resistance and increases wax residue accumulation. Record removal date.',regulatory:'Registered Australia. Prescription in some states. Residues accumulate in wax.',notes:'Highly effective. Wax residue concern with repeated use. Rotate MoA after each course.'},
-  'bayvarol':{name:'Bayvarol (Flumethrin)',moa:'Synthetic — Pyrethroid',active:'Flumethrin',tempRange:'Wide range',tempSensitive:false,honeySupers:'Must be removed',withBrood:'Less effective against brood mites.',resistance:'Pyrethroid resistance common. Use with caution.',dosage:'4 strips per hive in brood nest.',duration:'6–8 weeks',durationDays:56,removal:'Remove all 4 Bayvarol strips after 6–8 weeks. Do not exceed 8 weeks — prolonged exposure accelerates pyrethroid resistance.',regulatory:'Registered Australia. APVMA label.',notes:'Pyrethroid resistance well documented globally. Efficacy may be reduced. Rotate MoA.'},
+  'bayvarol':{name:'Bayvarol (Flumethrin)',moa:'Synthetic — Pyrethroid',active:'Flumethrin',tempRange:'Wide range',tempSensitive:false,honeySupers:'Honey supers CAN remain on — Bayvarol (flumethrin) is approved for use with supers present on the APVMA label',withBrood:'Less effective against mites in capped brood cells.',resistance:'Pyrethroid resistance is documented globally. Test efficacy with post-treatment alcohol wash. Rotate mechanism of action.',dosage:'4 strips per hive, hung in the brood nest between frames.',duration:'6–8 weeks',durationDays:56,removal:'Remove all 4 Bayvarol strips after 6–8 weeks. Do not exceed 8 weeks — prolonged exposure accelerates pyrethroid resistance. Record removal date.',regulatory:'Registered Australia. APVMA label. Approved for use with honey supers on.',notes:'Pyrethroid resistance is well documented globally — efficacy may be reduced. Confirm with post-treatment mite wash. Rotate mechanism of action after each course.'},
   'apistan':{name:'Apistan (Tau-fluvalinate)',moa:'Synthetic — Pyrethroid',active:'Tau-fluvalinate',tempRange:'Wide range',tempSensitive:false,honeySupers:'Must be removed',withBrood:'Reduced brood mite efficacy.',resistance:'⚠️ High risk. Pyrethroid resistance widespread.',dosage:'2 strips per brood box.',duration:'6–8 weeks',durationDays:56,removal:'Remove Apistan strips after 6–8 weeks. Given widespread pyrethroid resistance, confirm treatment efficacy with a post-treatment alcohol wash. Do not re-use strips.',regulatory:'Registered Australia.',notes:'Pyrethroid resistance widespread. Confirm mite susceptibility before use.'},
   'drone-comb':{name:'Drone Comb Removal',moa:'Mechanical / Cultural',active:'N/A',tempRange:'Any season with drone brood',tempSensitive:false,honeySupers:'No restriction',withBrood:'Targets drone brood where Varroa preferentially reproduce.',resistance:'No resistance possible.',dosage:'Remove and freeze drone comb when ~80% capped.',duration:'Ongoing',durationDays:null,removal:'Remove capped drone comb from hive and freeze for 48 hours to kill mites. Comb can be returned or melted down. Repeat every brood cycle during high-risk periods.',regulatory:'No requirements. No chemicals.',notes:'Effective supplementary tool. Labour intensive but zero residue.'},
   'brood-int':{name:'Brood Interruption',moa:'Mechanical / Cultural',active:'N/A',tempRange:'Any',tempSensitive:false,honeySupers:'No restriction',withBrood:'Creates broodless period, enhancing oxalic acid efficacy.',resistance:'No resistance possible.',dosage:'Cage queen 25 days or remove temporarily.',duration:'One broodless cycle (~25 days)',durationDays:25,removal:'Release caged queen after 25 days once all capped brood has emerged. Ideally follow immediately with oxalic acid vaporisation while colony is fully broodless.',regulatory:'No requirements.',notes:'Very effective combined with oxalic acid vaporisation. Requires skill and timing.'},
@@ -2701,7 +2703,7 @@ function showTreatmentInfo(key){
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
       <span class="badge badge-blue">${t.moa}</span>
       ${t.tempSensitive?'<span class="badge badge-yellow">🌡️ Temperature sensitive</span>':'<span class="badge badge-green">Wide temp range</span>'}
-      ${t.honeySupers.includes('removed')?'<span class="badge badge-red">Supers off</span>':'<span class="badge badge-green">Supers can stay</span>'}
+      ${t.honeySupers.toLowerCase().includes('must be removed')||t.honeySupers.toLowerCase().startsWith('remove')?'<span class="badge badge-red">Supers off</span>':'<span class="badge badge-green">Supers can stay</span>'}
     </div>
     ${statePanel}
     <div style="background:#FFF3CD;border:2px solid #F39C12;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;">
@@ -2853,11 +2855,11 @@ async function fieldSave(){
 // ── VOICE ENTRY ──
 let speechRec=null;let listeningActive=false;
 function fieldToggleVoice(){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    showToast('Voice not supported in this browser');return;
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition||window.mozSpeechRecognition||window.msSpeechRecognition;
+  if(!SpeechRecognition){
+    showToast('Voice entry requires Chrome or Safari — try updating your browser');return;
   }
   if(listeningActive){fieldStopVoice();return;}
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   speechRec=new SpeechRecognition();
   speechRec.lang='en-AU';speechRec.interimResults=false;speechRec.maxAlternatives=3;
   speechRec.onstart=()=>{
@@ -3344,9 +3346,9 @@ function speakText(text, btnEl){
   };
   if(_speechSynth.getVoices().length){ tryVoice(); }
   else { _speechSynth.onvoiceschanged = () => { tryVoice(); _speechSynth.onvoiceschanged=null; }; }
-  if(btnEl){ btnEl.classList.add('speaking'); btnEl.textContent='⏹'; _activeSpeakBtn=btnEl; }
-  utt.onend = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; } _activeSpeakBtn=null; };
-  utt.onerror = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; } _activeSpeakBtn=null; };
+  if(btnEl){ btnEl.classList.add('speaking'); btnEl.textContent='⏹'; btnEl.title='Click to stop'; _activeSpeakBtn=btnEl; }
+  utt.onend = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; btnEl.title='Read aloud'; } _activeSpeakBtn=null; };
+  utt.onerror = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; btnEl.title='Read aloud'; } _activeSpeakBtn=null; };
   _speechSynth.speak(utt);
 }
 
@@ -3355,8 +3357,9 @@ function speakSection(sectionId){
   if(!el){ showToast('Content not yet loaded'); return; }
   const text = stripHtml(el.innerHTML).replace(/\s+/g,' ').trim();
   if(!text || text.includes('Enter API key')){ showToast('Load guidance first'); return; }
-  // Find the speak button in the same guidance-section
-  const btn = el.closest('.guidance-section').querySelector('.speak-btn');
+  // Find the speak button in the same guidance-section header
+  const btn = el.closest('.guidance-section')?.querySelector('.speak-btn') || null;
+  // If this button is already active, speakText will cancel (toggle off)
   speakText(text, btn);
 }
 
@@ -3548,6 +3551,11 @@ function exportAllCSV(){
 
 // ══ BOOT ══
 document.addEventListener('DOMContentLoaded', async function(){
+  // Hide voice button if speech recognition is genuinely unavailable
+  if(!window.SpeechRecognition && !window.webkitSpeechRecognition && !window.mozSpeechRecognition && !window.msSpeechRecognition){
+    const vb=document.getElementById('field-voice-btn');
+    if(vb){vb.style.display='none';}
+  }
   const ls=document.getElementById('s-loading');
   if(ls)ls.classList.add('active');
   try{
@@ -3570,6 +3578,50 @@ document.addEventListener('DOMContentLoaded', async function(){
 });
 
 function rateStar(n){document.querySelectorAll('.star').forEach((s,i)=>{s.classList.toggle('active',i<n);s.classList.toggle('inactive',i>=n);});showToast('Thanks for rating VarroaMate! 🐝');}
+
+// ══ PULL-TO-REFRESH (mobile) ══
+(function(){
+  let startY=0, pulling=false, indicator=null;
+  const THRESHOLD=72;
+
+  function createIndicator(){
+    indicator=document.createElement('div');
+    indicator.id='ptr-indicator';
+    indicator.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;background:var(--amber-dark);color:#fff;font-size:15px;font-weight:600;transition:height 0.15s;pointer-events:none;';
+    indicator.textContent='↓ Pull to refresh';
+    document.body.appendChild(indicator);
+  }
+
+  document.addEventListener('touchstart',function(e){
+    // Only activate when scrolled to very top
+    if(window.scrollY===0 && e.touches.length===1){
+      startY=e.touches[0].clientY;
+      pulling=true;
+      if(!indicator)createIndicator();
+    }
+  },{passive:true});
+
+  document.addEventListener('touchmove',function(e){
+    if(!pulling)return;
+    const dy=e.touches[0].clientY-startY;
+    if(dy>0&&dy<THRESHOLD*1.5){
+      const pct=Math.min(dy/THRESHOLD,1);
+      indicator.style.height=Math.min(dy*0.5,40)+'px';
+      indicator.textContent=pct>=1?'↺ Release to refresh':'↓ Pull to refresh';
+    }
+  },{passive:true});
+
+  document.addEventListener('touchend',function(e){
+    if(!pulling)return;
+    const dy=(e.changedTouches[0]?.clientY||startY)-startY;
+    indicator.style.height='0';
+    if(dy>=THRESHOLD){
+      indicator.textContent='↺ Refreshing…';
+      setTimeout(()=>{ window.location.reload(); },300);
+    }
+    pulling=false;startY=0;
+  },{passive:true});
+})();
 </script>
 </body>
 </html>
