@@ -9,6 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --amber:#D4820A; --amber-light:#F5A623; --amber-pale:#FFF3DC; --amber-dark:#8B5200;
@@ -193,6 +194,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .field-hive-header{text-align:center;padding:20px 16px 8px;background:var(--amber-dark);color:#fff;border-radius:var(--radius) var(--radius) 0 0;margin:-20px -20px 20px;}
 .field-hive-name{font-size:28px;font-weight:700;margin-bottom:4px;}
 .field-apiary-name{font-size:15px;opacity:0.85;}
+@keyframes loading-bar{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+.speak-btn{background:none;border:1px solid var(--border);border-radius:14px;padding:3px 10px;font-size:13px;cursor:pointer;color:var(--text2);transition:all 0.15s;flex-shrink:0;}
+.speak-btn:hover{background:var(--amber-pale);border-color:var(--amber);color:var(--amber-dark);}
+.speak-btn.speaking{background:var(--amber-pale);border-color:var(--amber);color:var(--amber-dark);animation:pulse-speak 1.2s ease-in-out infinite;}
+@keyframes pulse-speak{0%,100%{opacity:1;}50%{opacity:0.5;}}
 .detection-method{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--bg2);}
 .detection-method-primary{border-color:var(--amber);background:var(--amber-pale);}
 .detection-method-header{font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -313,6 +319,14 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="s-loading" class="screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);">
+  <div style="font-size:52px;margin-bottom:16px;">🐝</div>
+  <div style="font-size:24px;font-weight:700;color:var(--amber-dark);font-family:'Playfair Display',serif;">VarroaMate</div>
+  <div style="margin-top:14px;font-size:15px;color:var(--text3);">Loading your apiaries…</div>
+  <div style="margin-top:20px;width:52px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;"><div style="width:100%;height:100%;background:var(--amber);animation:loading-bar 1.1s ease-in-out infinite;"></div></div>
+</div>
+
 <!-- WELCOME -->
 <div id="s-welcome" class="screen">
   <div style="font-size:80px;margin-bottom:20px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))">🐝</div>
@@ -320,7 +334,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div style="color:rgba(255,255,255,0.85);font-size:18px;margin-bottom:40px;">Smart Varroa management for Australian beekeepers</div>
   <div class="welcome-card">
     <h3>About VarroaMate</h3>
-    <p>Varroa<em>Mate</em> supports beekeepers with Varroa mite management. It is not a replacement for professional advice or other support avenues.</p>
+    <p>Varroa<em>Mate</em> is designed to complement and strengthen national and state Varroa management strategies — supporting the Australian beekeeping community in doing their part to protect colonies, reduce mite loads, and maintain healthy apiaries across the country.</p>
     <p style="margin-top:8px;">Australian beekeepers now face one of their greatest challenges — Varroa is established and spreading, and the decisions made in the next few years will shape the future of beekeeping across the country. VarroaMate's mission is to give every beekeeper the best possible tools, information, and guidance to protect their colonies, manage mite loads effectively, and help save Australia's bees.</p>
     <p style="margin-top:8px;">VarroaMate is under ongoing development and welcomes your feedback.</p>
   </div>
@@ -351,7 +365,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <p class="page-subtitle">Please read carefully before continuing</p>
     <div class="disclaimer-text">
       <h4>Mission Statement</h4>
-      <p>VarroaMate supports beekeepers in managing Varroa mite. It is not intended to replace professional advice.</p>
+      <p>VarroaMate is designed to complement and support national and state Varroa management strategies — helping beekeepers monitor mite loads, time treatments, and contribute to a coordinated national response.</p>
       <p style="margin-top:8px;">Australian beekeepers now face one of their greatest challenges. Varroa is established and spreading, threatening both managed hives and wild bee populations. VarroaMate's mission is to support beekeepers as effectively as possible — with timely guidance, treatment information, and mite tracking tools — to help them protect their colonies and do their part in saving Australia's bees.</p>
       <h4>Disclaimer</h4>
       <p>No liability is accepted for accuracy of information or recommendations. All recommendations represent one of several possible paths of action. Beekeepers are solely responsible for treatment decisions. No liability for damage to hives, bees, honey, or loss of data.</p>
@@ -463,13 +477,16 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <div id="s-prefs" class="screen">
   <div class="topnav"><div class="topnav-inner"><div class="logo">Varroa<em>Mate</em></div><button class="nav-btn" onclick="goto('s-apiaries')">Skip →</button></div></div>
   <div class="page-body">
-    <h1 class="page-title">Treatment Preferences</h1>
-    <p class="page-subtitle">Select your state and management approach — this guides all recommendations. You can change this at any time.</p>
+    <h1 class="page-title">Your Preferences</h1>
+    <p class="page-subtitle">These two settings personalise every recommendation VarroaMate gives you. You can change them at any time.</p>
 
     <!-- STATE SELECTOR -->
-    <div class="card" style="margin-bottom:18px;">
-      <div class="card-title">📍 Your State or Territory</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:12px;">Used to show state-specific treatment registration and regulatory notes. Data current as of January 2026 — always verify with your state authority.</p>
+    <div style="margin-bottom:6px;">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;">📍 1. Your State or Territory</div>
+      <p style="font-size:15px;color:var(--text2);margin-bottom:12px;line-height:1.65;">Treatment products registered for use with Varroa vary by state and territory — a product available in NSW may not be registered in WA. Your state also determines which biosecurity reporting requirements apply to you. Selecting the correct state ensures VarroaMate shows only treatments you can legally use, and links you to the right reporting authority.</p>
+    </div>
+    <div class="card" style="margin-bottom:24px;">
+      <p style="font-size:14px;color:var(--text2);margin-bottom:12px;">Data current as of January 2026 — always verify with your state authority.</p>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="state-selector">
         <div class="state-btn" onclick="selectState(this,'NSW')" data-state="NSW">NSW</div>
         <div class="state-btn" onclick="selectState(this,'ACT')" data-state="ACT">ACT</div>
@@ -481,6 +498,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         <div class="state-btn" onclick="selectState(this,'NT')" data-state="NT">NT</div>
       </div>
       <div id="state-varroa-status" style="margin-top:12px;display:none;font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);border-left:4px solid;"></div>
+    </div>
+    <div style="margin-bottom:6px;margin-top:8px;">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;">🧪 2. Your Treatment Philosophy</div>
+      <p style="font-size:15px;color:var(--text2);margin-bottom:12px;line-height:1.65;">Beekeepers take different approaches to Varroa treatment — from integrated chemical programmes to entirely organic or mechanical methods. Selecting your philosophy means the AI guidance, treatment suggestions, and seasonal alerts are tailored to your approach, not just generic advice. There is no single right answer — the best strategy is the one you will consistently apply.</p>
     </div>
     <div class="two-col">
       <div>
@@ -720,11 +741,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     </div>
     <div class="two-col">
       <div>
-        <div class="guidance-section"><div class="guidance-section-header">📊 Varroa Status</div><div class="guidance-section-body" id="guidance-summary-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
-        <div class="guidance-section"><div class="guidance-section-header">⚡ Next Steps</div><div class="guidance-section-body" id="guidance-nextsteps-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
+        <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;">📊 Varroa Status<button class="speak-btn" onclick="speakSection('guidance-summary-body')" title="Read aloud">🔊</button></div><div class="guidance-section-body" id="guidance-summary-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
+        <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;">⚡ Next Steps<button class="speak-btn" onclick="speakSection('guidance-nextsteps-body')" title="Read aloud">🔊</button></div><div class="guidance-section-body" id="guidance-nextsteps-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
       </div>
       <div>
-        <div class="guidance-section"><div class="guidance-section-header">⚠️ Cautions</div><div class="guidance-section-body" id="guidance-cautions-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
+        <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;">⚠️ Cautions<button class="speak-btn" onclick="speakSection('guidance-cautions-body')" title="Read aloud">🔊</button></div><div class="guidance-section-body" id="guidance-cautions-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
         <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;">🌡️ Temperature Outlook — 14 days<button class="chart-expand-btn" onclick="expandTempChart()" title="Expand chart" style="font-size:12px;">⛶ Expand</button></div>
           <div class="guidance-section-body" id="guidance-temp-body"><div style="color:var(--text3);font-style:italic;">Loading forecast…</div></div>
           <div style="padding:0 18px 14px;">
@@ -1122,85 +1143,64 @@ const SEED = {
   }
 };
 
-// ══ LOCALSTORAGE PERSISTENCE ══
-// Uses two keys so any data saved under the old key is automatically migrated.
-const _SK = 'varroamate_v3';
+// ══════════════════════════════════════════════════════════════════
+// SUPABASE CONFIG — replace these two values with yours
+// Supabase Dashboard → Settings → API
+// ══════════════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let _sbUser = null;
 
-function _lsOK(){
-  // Quick test: can we actually read and write localStorage?
-  try{ localStorage.setItem('_vmtest','1'); localStorage.removeItem('_vmtest'); return true; }
-  catch(e){ return false; }
+let apiaries = [];
+let hives = {};
+let miteCountsByHive = {};
+let treatmentsByHive = {};
+let notesByHive = {};
+let _dataLoaded = false;
+
+function showSaveSpinner(on){
+  const badge=document.getElementById('save-badge');if(!badge)return;
+  if(on){badge.textContent='⏳ saving';badge.style.opacity='1';}
+  else{badge.textContent='💾 saved';badge.style.opacity='1';clearTimeout(badge._t);badge._t=setTimeout(()=>badge.style.opacity='0',1200);}
 }
+function saveData(){ /* no-op: saves happen inline via Supabase */ }
 
-function saveData(){
-  if(!_lsOK()){
-    // localStorage not available (private mode, file:// restriction, etc.)
-    console.warn('localStorage unavailable — data cannot be persisted');
-    // showToast may not exist yet if called very early, guard it
-    if(typeof showToast === 'function') showToast('⚠ Browser storage unavailable — data will not persist after reload.');
-    return;
-  }
+async function loadDataFromSupabase(){
+  if(!_sbUser)return;
+  const uid=_sbUser.id;
   try{
-    const payload = JSON.stringify({
-      v:3, savedAt: Date.now(),
-      apiaries,
-      hives,
-      miteCountsByHive,
-      treatmentsByHive,
-      notesByHive
-    });
-    localStorage.setItem(_SK, payload);
-    // Immediately verify the write actually stuck
-    if(!localStorage.getItem(_SK)) throw new Error('Verification read returned null');
-    // Brief visible confirmation (only when in app screens)
-    const badge = document.getElementById('save-badge');
-    if(badge){ badge.style.opacity='1'; clearTimeout(badge._t); badge._t=setTimeout(()=>badge.style.opacity='0',1200); }
-  }catch(e){
-    console.error('saveData error:', e);
-    if(typeof showToast === 'function') showToast('⚠ Save failed: ' + e.message);
-  }
+    const [apRes,hvRes,cntRes,trtRes,noteRes]=await Promise.all([
+      _sb.from('apiaries').select('*').eq('user_id',uid).order('created_at'),
+      _sb.from('hives').select('*').eq('user_id',uid).order('created_at'),
+      _sb.from('mite_counts').select('*').eq('user_id',uid).order('date',{ascending:false}),
+      _sb.from('treatments').select('*').eq('user_id',uid).order('date',{ascending:false}),
+      _sb.from('notes').select('*').eq('user_id',uid).order('date',{ascending:false}),
+    ]);
+    if(apRes.error)throw apRes.error;
+    if(hvRes.error)throw hvRes.error;
+    if(cntRes.error)throw cntRes.error;
+    if(trtRes.error)throw trtRes.error;
+    if(noteRes.error)throw noteRes.error;
+    apiaries=apRes.data.map(a=>({id:a.id,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0}));
+    hives={};
+    hvRes.data.forEach(h=>{if(!hives[h.apiary_id])hives[h.apiary_id]=[];hives[h.apiary_id].push({id:h.id,name:h.name});});
+    miteCountsByHive={};
+    cntRes.data.forEach(c=>{if(!miteCountsByHive[c.hive_id])miteCountsByHive[c.hive_id]=[];miteCountsByHive[c.hive_id].push({id:String(c.id),date:c.date,value:c.value,hiveStrength:c.hive_strength||'Good',diseases:c.diseases||['No Disease Present']});});
+    treatmentsByHive={};
+    trtRes.data.forEach(t=>{if(!treatmentsByHive[t.hive_id])treatmentsByHive[t.hive_id]=[];treatmentsByHive[t.hive_id].push({id:String(t.id),date:t.date,product:t.product,notes:t.notes||''});});
+    notesByHive={};
+    noteRes.data.forEach(n=>{if(!notesByHive[n.hive_id])notesByHive[n.hive_id]=[];notesByHive[n.hive_id].push({id:String(n.id),date:n.date,text:n.text});});
+    _dataLoaded=true;
+    const {data:prof}=await _sb.from('profiles').select('state,treatment_pref').eq('id',uid).single();
+    if(prof){
+      if(prof.state)try{localStorage.setItem('varroamate_state',prof.state);}catch(e){}
+      if(prof.treatment_pref)try{localStorage.setItem('varroamate_pref',prof.treatment_pref);}catch(e){}
+    }
+  }catch(e){console.error('loadDataFromSupabase:',e);showToast('⚠ Could not load data: '+(e.message||e));}
 }
 
-function loadData(){
-  const empty = {
-    apiaries: JSON.parse(JSON.stringify(SEED.apiaries)),
-    hives:    JSON.parse(JSON.stringify(SEED.hives)),
-    miteCountsByHive:  JSON.parse(JSON.stringify(SEED.miteCountsByHive)),
-    treatmentsByHive:  JSON.parse(JSON.stringify(SEED.treatmentsByHive)),
-    notesByHive:       JSON.parse(JSON.stringify(SEED.notesByHive))
-  };
-  if(!_lsOK()) return empty;
-  try{
-    // Try current key, then legacy keys in order
-    const raw = localStorage.getItem(_SK)
-             || localStorage.getItem('varroamate_data_v2')
-             || localStorage.getItem('varroamate_data');
-    if(!raw) return empty;
-    const d = JSON.parse(raw);
-    // Migrate: write to current key so future saves use it
-    if(!localStorage.getItem(_SK)) localStorage.setItem(_SK, raw);
-    return {
-      apiaries:         Array.isArray(d.apiaries) ? d.apiaries : empty.apiaries,
-      hives:            (d.hives && typeof d.hives==='object') ? d.hives : empty.hives,
-      miteCountsByHive: (d.miteCountsByHive && typeof d.miteCountsByHive==='object') ? d.miteCountsByHive : empty.miteCountsByHive,
-      treatmentsByHive: (d.treatmentsByHive && typeof d.treatmentsByHive==='object') ? d.treatmentsByHive : empty.treatmentsByHive,
-      notesByHive:      (d.notesByHive && typeof d.notesByHive==='object') ? d.notesByHive : empty.notesByHive
-    };
-  }catch(e){
-    console.warn('loadData parse error:', e);
-    return empty;
-  }
-}
-
-const loaded=loadData();
-let apiaries=loaded.apiaries;
-// Convert object keys to numbers (JSON stringify/parse turns numeric keys to strings)
-let hives={}; Object.entries(loaded.hives).forEach(([k,v])=>hives[Number(k)]=v);
-let miteCountsByHive={}; Object.entries(loaded.miteCountsByHive).forEach(([k,v])=>miteCountsByHive[Number(k)]=v);
-let treatmentsByHive={}; Object.entries(loaded.treatmentsByHive).forEach(([k,v])=>treatmentsByHive[Number(k)]=v);
-let notesByHive={}; Object.entries(loaded.notesByHive).forEach(([k,v])=>notesByHive[Number(k)]=v);
-
-let currentApiaryId = apiaries[0]?.id ?? 1000;
+let currentApiaryId = 0;
 let currentHiveId = 0;
 let deleteType, deleteId;
 let mapInstance = null;
@@ -1213,15 +1213,13 @@ const PAGE_SIZE = 5;
 const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription'];
 const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription'};
 
-function logout(){
+async function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
-  storedApiKey='';
-  try{
-    localStorage.removeItem('varroamate_apikey');
-    localStorage.removeItem('varroamate_loggedin');
-    localStorage.removeItem('varroamate_email');
-  }catch(e){}
-  chatHistory=[];
+  storedApiKey='';chatHistory=[];
+  await _sb.auth.signOut();
+  _sbUser=null;
+  apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
+  _dataLoaded=false;
   goto('s-welcome');
 }
 function goto(id,param){
@@ -1254,35 +1252,44 @@ function switchSigninTab(tab){
 }
 
 // ══ LOGIN STATE ══
-function isLoggedIn(){return localStorage.getItem('varroamate_loggedin')==='1';}
-function setLoggedIn(email){
-  localStorage.setItem('varroamate_loggedin','1');
-  if(email)localStorage.setItem('varroamate_email',email);
-}
-function doSignIn(e){
+function isLoggedIn(){ return !!_sbUser; }
+function setLoggedIn(email){ /* handled by Supabase */ }
+async function doSignIn(e){
   e.preventDefault();
   const email=document.getElementById('signin-email').value.trim();
   const pw=document.getElementById('signin-password').value;
   const err=document.getElementById('signin-error');
-  // In this local-only build, any non-empty credentials are accepted
-  // (real auth would validate against a backend here)
+  const btn=document.getElementById('signin-btn');
   if(!email||!pw){err.style.display='';err.textContent='Please enter your email and password.';return;}
   err.style.display='none';
-  setLoggedIn(email);
+  if(btn){btn.disabled=true;btn.textContent='Signing in…';}
+  const {data,error}=await _sb.auth.signInWithPassword({email,password:pw});
+  if(btn){btn.disabled=false;btn.textContent='Sign In';}
+  if(error){err.style.display='';err.textContent=error.message;return;}
+  _sbUser=data.user;
+  showToast('Welcome back! Loading your data…');
+  await loadDataFromSupabase();
+  currentApiaryId=apiaries[0]?.id??0;
   goto('s-disclaimer');
 }
-function doCreateAccount(e){
+async function doCreateAccount(e){
   e.preventDefault();
   const pw=document.getElementById('create-password')?.value||'';
   const cf=document.getElementById('create-password-confirm')?.value||'';
   const email=document.getElementById('create-email')?.value.trim();
   const err=document.getElementById('create-error');
+  const btn=document.getElementById('create-btn');
   const ok=pw.length>=10&&/[A-Z]/.test(pw)&&/[0-9]/.test(pw)&&/[^A-Za-z0-9]/.test(pw);
   if(!email||!email.includes('@')){err.style.display='';err.textContent='Please enter a valid email address.';return;}
   if(!ok){err.style.display='';err.textContent='Please meet all password requirements.';return;}
   if(pw!==cf){err.style.display='';err.textContent='Passwords do not match.';return;}
   err.style.display='none';
-  setLoggedIn(email);
+  if(btn){btn.disabled=true;btn.textContent='Creating account…';}
+  const {data,error}=await _sb.auth.signUp({email,password:pw});
+  if(btn){btn.disabled=false;btn.textContent='Create Account';}
+  if(error){err.style.display='';err.textContent=error.message;return;}
+  _sbUser=data.user;
+  showToast('Account created! Welcome to VarroaMate 🐝');
   goto('s-disclaimer');
 }
 
@@ -1359,9 +1366,14 @@ function checkPendingHive(){
   }catch(e){}
   return false;
 }
-function savePrefAndContinue(){
+async function savePrefAndContinue(){
   const card=document.querySelector('.pref-card.selected');
-  if(card){const name=card.querySelector('.pref-name')?.textContent||'';try{localStorage.setItem('varroamate_pref',name);}catch(e){}}
+  const prefName=card?.querySelector('.pref-name')?.textContent||'';
+  const state=document.querySelector('.state-btn.selected')?.dataset?.state||'';
+  try{localStorage.setItem('varroamate_pref',prefName);}catch(e){}
+  if(_sbUser){
+    await _sb.from('profiles').update({treatment_pref:prefName,state}).eq('id',_sbUser.id);
+  }
   showToast('Preference saved! 🌿');
   if(!checkPendingHive())goto('s-apiaries');
 }
@@ -1474,25 +1486,31 @@ function selectAddr(lat,lon,name){
   p.style.display='';
   p.innerHTML=`📍 ${name.split(',').slice(0,3).join(',')}<br><small style="opacity:0.7;">Lat ${parseFloat(lat).toFixed(4)}, Lon ${parseFloat(lon).toFixed(4)}</small>`;
 }
-function saveNewApiary(){
+async function saveNewApiary(){
   const name=document.getElementById('new-apiary-name').value.trim();
   if(!name){showToast('Please enter an apiary name');return;}
-  // Capture these BEFORE closeModal() which resets pendingApiary
-  const lat=pendingApiary?pendingApiary.lat:-37.0+Math.random()*0.4;
-  const lon=pendingApiary?pendingApiary.lon:144.0+Math.random()*0.8;
+  const lat=pendingApiary?pendingApiary.lat:0;
+  const lon=pendingApiary?pendingApiary.lon:0;
   const addr=pendingApiary?pendingApiary.name.split(',').slice(0,3).join(','):'Location not set';
   const editId=document.getElementById('apiary-edit-id').value;
-  closeModal('modal-add-apiary');
+  showSaveSpinner(true);
   if(editId!==''){
-    const i=apiaries.findIndex(a=>a.id===parseInt(editId));
+    const aid=parseInt(editId);
+    const {error}=await _sb.from('apiaries').update({name,address:addr,lat,lon}).eq('id',aid).eq('user_id',_sbUser.id);
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    const i=apiaries.findIndex(a=>a.id===aid);
     if(i>=0){apiaries[i]={...apiaries[i],name,address:addr,lat,lon};}
-    saveData();showToast(`"${name}" updated! 🏡`);
+    showToast('"'+name+'" updated! 🏡');
   } else {
-    const nid=Date.now();
+    const {data,error}=await _sb.from('apiaries').insert({user_id:_sbUser.id,name,address:addr,lat,lon}).select().single();
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    const nid=data.id;
     apiaries.push({id:nid,name,address:addr,lat,lon});
     hives[nid]=[];miteCountsByHive[nid]=[];treatmentsByHive[nid]=[];notesByHive[nid]=[];
-    saveData();showToast(`"${name}" added! 🏡`);
+    showToast('"'+name+'" added! 🏡');
   }
+  showSaveSpinner(false);
+  closeModal('modal-add-apiary');
   renderApiaries();
 }
 function editApiary(id){
@@ -1560,6 +1578,7 @@ function renderHives(){
         <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
           <span class="badge ${b.cls}">${b.label}</span>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
+          <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();speakHiveSummary(${h.id},this)">🔊 Summary</button>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
@@ -1569,17 +1588,20 @@ function renderHives(){
     list.appendChild(div);
   }
 }
-function saveNewHive(){
+async function saveNewHive(){
   const name=document.getElementById('new-hive-name').value.trim();
   if(!name){showToast('Please enter a hive name');return;}
-  const id=Date.now();
+  showSaveSpinner(true);
+  const {data,error}=await _sb.from('hives').insert({user_id:_sbUser.id,apiary_id:currentApiaryId,name}).select().single();
+  if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+  const nid=data.id;
   if(!hives[currentApiaryId])hives[currentApiaryId]=[];
-  hives[currentApiaryId].push({id,name});
-  miteCountsByHive[id]=[];treatmentsByHive[id]=[];notesByHive[id]=[];
+  hives[currentApiaryId].push({id:nid,name});
+  miteCountsByHive[nid]=[];treatmentsByHive[nid]=[];notesByHive[nid]=[];
   document.getElementById('new-hive-name').value='';
   document.getElementById('new-hive-notes').value='';
-  saveData();
-  closeModal('modal-add-hive');showToast(`"${name}" added! 🐝`);renderHives();
+  showSaveSpinner(false);
+  closeModal('modal-add-hive');showToast('"'+name+'" added! 🐝');renderHives();
 }
 
 // ══ HIVE DETAIL ══
@@ -1685,20 +1707,29 @@ function renderNotesList(){
 }
 
 // ══ SAVE/EDIT/DELETE ══
-function saveCount(){
+async function saveCount(){
   const date=document.getElementById('count-date').value;
   const value=parseInt(document.getElementById('count-value').value);
   const editId=document.getElementById('count-edit-id').value;
   const hiveStrength=document.getElementById('count-hive-strength').value||'Good';
   const diseases=getSelectedDiseases('disease-btns');
   if(!date||isNaN(value)||value<0){showToast('Please enter a valid date and count');return;}
-  const arr=miteCountsByHive[currentHiveId];
-  if(editId){const i=arr.findIndex(c=>c.id===editId);if(i>=0)arr[i]={...arr[i],date,value,hiveStrength,diseases};}
-  else arr.unshift({id:'c'+Date.now(),date,value,hiveStrength,diseases});
+  showSaveSpinner(true);
+  const arr=miteCountsByHive[currentHiveId]||(miteCountsByHive[currentHiveId]=[]);
+  if(editId){
+    const {error}=await _sb.from('mite_counts').update({date,value,hive_strength:hiveStrength,diseases}).eq('id',parseInt(editId)).eq('user_id',_sbUser.id);
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    const i=arr.findIndex(c=>c.id===editId);
+    if(i>=0)arr[i]={...arr[i],date,value,hiveStrength,diseases};
+  } else {
+    const {data,error}=await _sb.from('mite_counts').insert({user_id:_sbUser.id,hive_id:currentHiveId,date,value,hive_strength:hiveStrength,diseases}).select().single();
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    arr.unshift({id:String(data.id),date,value,hiveStrength,diseases});
+  }
   arr.sort((a,b)=>b.date.localeCompare(a.date));
+  showSaveSpinner(false);
   closeModal('modal-add-count');
   showToast(editId?'Count updated! 📊':'Count saved! 📊');
-  saveData();
   renderCountsList();renderHiveDetail();initChart();
 }
 function editCount(id){
@@ -1711,19 +1742,28 @@ function editCount(id){
   restoreSelectedDiseases('disease-btns', c.diseases||['No Disease Present']);
   openModal('modal-add-count');
 }
-function saveTreatment(){
+async function saveTreatment(){
   const product=document.getElementById('treatment-select').value;
   const date=document.getElementById('treatment-date').value;
   const notes=document.getElementById('treatment-notes').value;
   const editId=document.getElementById('treatment-edit-id').value;
   if(!product||!date){showToast('Please select a product and date');return;}
-  const arr=treatmentsByHive[currentHiveId];
-  if(editId){const i=arr.findIndex(t=>t.id===editId);if(i>=0)arr[i]={...arr[i],product,date,notes};}
-  else arr.unshift({id:'t'+Date.now(),product,date,notes});
+  showSaveSpinner(true);
+  const arr=treatmentsByHive[currentHiveId]||(treatmentsByHive[currentHiveId]=[]);
+  if(editId){
+    const {error}=await _sb.from('treatments').update({product,date,notes}).eq('id',parseInt(editId)).eq('user_id',_sbUser.id);
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    const i=arr.findIndex(t=>t.id===editId);
+    if(i>=0)arr[i]={...arr[i],product,date,notes};
+  } else {
+    const {data,error}=await _sb.from('treatments').insert({user_id:_sbUser.id,hive_id:currentHiveId,product,date,notes}).select().single();
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    arr.unshift({id:String(data.id),product,date,notes});
+  }
   arr.sort((a,b)=>b.date.localeCompare(a.date));
+  showSaveSpinner(false);
   closeModal('modal-add-treatment');resetTreatmentModal();
   showToast(editId?'Treatment updated!':'Treatment saved! 💊');
-  saveData();
   renderTreatmentsList();renderHiveDetail();initChart();
 }
 function editTreatment(id){
@@ -1746,18 +1786,27 @@ function resetTreatmentModal(){
   document.getElementById('modal-treatment-preview').style.display='none';
   document.getElementById('modal-info-btn').style.display='none';
 }
-function saveNote(){
+async function saveNote(){
   const date=document.getElementById('note-date').value;
   const text=document.getElementById('note-text').value.trim();
   const editId=document.getElementById('note-edit-id').value;
   if(!date||!text){showToast('Please enter a date and note');return;}
-  const arr=notesByHive[currentHiveId];
-  if(editId){const i=arr.findIndex(n=>n.id===editId);if(i>=0)arr[i]={...arr[i],date,text};}
-  else arr.unshift({id:'n'+Date.now(),date,text});
+  showSaveSpinner(true);
+  const arr=notesByHive[currentHiveId]||(notesByHive[currentHiveId]=[]);
+  if(editId){
+    const {error}=await _sb.from('notes').update({date,text}).eq('id',parseInt(editId)).eq('user_id',_sbUser.id);
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    const i=arr.findIndex(n=>n.id===editId);
+    if(i>=0)arr[i]={...arr[i],date,text};
+  } else {
+    const {data,error}=await _sb.from('notes').insert({user_id:_sbUser.id,hive_id:currentHiveId,date,text}).select().single();
+    if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+    arr.unshift({id:String(data.id),date,text});
+  }
   arr.sort((a,b)=>b.date.localeCompare(a.date));
+  showSaveSpinner(false);
   closeModal('modal-add-note');
   showToast(editId?'Note updated! 📝':'Note saved! 📝');
-  saveData();
   renderNotesList();
 }
 function editNote(id){
@@ -1773,20 +1822,37 @@ function deleteItem(type,id,label){
   document.getElementById('delete-confirm-msg').textContent=`Delete: "${label}"?\nThis cannot be undone.`;
   openModal('modal-confirm-delete');
 }
-function confirmDelete(){
-  if(deleteType==='count'){miteCountsByHive[currentHiveId]=(miteCountsByHive[currentHiveId]||[]).filter(x=>x.id!==deleteId);renderCountsList();initChart();}
-  else if(deleteType==='treatment'){treatmentsByHive[currentHiveId]=(treatmentsByHive[currentHiveId]||[]).filter(x=>x.id!==deleteId);renderTreatmentsList();initChart();}
-  else if(deleteType==='note'){notesByHive[currentHiveId]=(notesByHive[currentHiveId]||[]).filter(x=>x.id!==deleteId);renderNotesList();}
-  else if(deleteType==='apiary'){
-    const idx=apiaries.findIndex(a=>a.id===deleteId);
+async function confirmDelete(){
+  showSaveSpinner(true);
+  const numId=parseInt(deleteId);
+  const strId=String(deleteId);
+  if(deleteType==='count'){
+    const {error}=await _sb.from('mite_counts').delete().eq('id',numId).eq('user_id',_sbUser.id);
+    if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
+    miteCountsByHive[currentHiveId]=(miteCountsByHive[currentHiveId]||[]).filter(x=>String(x.id)!==strId);
+    renderCountsList();initChart();
+  } else if(deleteType==='treatment'){
+    const {error}=await _sb.from('treatments').delete().eq('id',numId).eq('user_id',_sbUser.id);
+    if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
+    treatmentsByHive[currentHiveId]=(treatmentsByHive[currentHiveId]||[]).filter(x=>String(x.id)!==strId);
+    renderTreatmentsList();initChart();
+  } else if(deleteType==='note'){
+    const {error}=await _sb.from('notes').delete().eq('id',numId).eq('user_id',_sbUser.id);
+    if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
+    notesByHive[currentHiveId]=(notesByHive[currentHiveId]||[]).filter(x=>String(x.id)!==strId);
+    renderNotesList();
+  } else if(deleteType==='apiary'){
+    const {error}=await _sb.from('apiaries').delete().eq('id',numId).eq('user_id',_sbUser.id);
+    if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
+    const idx=apiaries.findIndex(a=>a.id===numId);
     if(idx>=0){
       const aid=apiaries[idx].id;
       (hives[aid]||[]).forEach(h=>{delete miteCountsByHive[h.id];delete treatmentsByHive[h.id];delete notesByHive[h.id];});
       delete hives[aid];apiaries.splice(idx,1);
     }
-    saveData();closeModal('modal-confirm-delete');showToast('Apiary deleted.');renderApiaries();return;
+    showSaveSpinner(false);closeModal('modal-confirm-delete');showToast('Apiary deleted.');renderApiaries();return;
   }
-  saveData();renderHiveDetail();closeModal('modal-confirm-delete');showToast('Deleted.');
+  showSaveSpinner(false);renderHiveDetail();closeModal('modal-confirm-delete');showToast('Deleted.');
 }
 
 // ══ CHART ══
@@ -2758,21 +2824,22 @@ function fieldUpdateThreshold(){
   else{msg=`✓ Below action zone (${season}: ${az.lo}–${az.hi})`;bg='var(--green-pale)';color='var(--green)';}
   bar.textContent=msg;bar.style.background=bg;bar.style.color=color;
 }
-function fieldSave(){
+async function fieldSave(){
   const value=parseInt(document.getElementById('field-count-num').textContent||'0');
   const date=document.getElementById('field-date').value;
   const notes=document.getElementById('field-notes').value.trim();
   const hiveStrength=document.getElementById('field-hive-strength').value||'Good';
   const diseases=getSelectedDiseases('field-disease-btns');
   if(!date){showToast('Please set a date');return;}
-  const arr=miteCountsByHive[currentHiveId];
-  if(!arr){showToast('Hive not found');return;}
-  arr.unshift({id:'c'+Date.now(),date,value,notes,hiveStrength,diseases});
+  const arr=miteCountsByHive[currentHiveId]||(miteCountsByHive[currentHiveId]=[]);
+  showSaveSpinner(true);
+  const {data,error}=await _sb.from('mite_counts').insert({user_id:_sbUser.id,hive_id:currentHiveId,date,value,hive_strength:hiveStrength,diseases,notes}).select().single();
+  if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
+  arr.unshift({id:String(data.id),date,value,notes,hiveStrength,diseases});
   arr.sort((a,b)=>b.date.localeCompare(a.date));
-  saveData();
+  showSaveSpinner(false);
   showToast(`Count ${value} saved! 📊`);
   window._chartDirty=true;
-  // Reset for next hive
   document.getElementById('field-count-num').textContent='0';
   document.getElementById('field-notes').value='';
   setFieldHiveStrength('Good');
@@ -3238,6 +3305,77 @@ entries.forEach(({apiary,hive,count,hiveCount})=>{
   win.document.close();
 }
 
+// ══ TEXT-TO-SPEECH ══
+let _speechSynth = window.speechSynthesis;
+let _activeSpeakBtn = null;
+
+function getAuVoice(){
+  const voices = _speechSynth.getVoices();
+  // Prefer Australian English voices, then British English (closer accent than US), then any English
+  const au = voices.find(v => v.lang === 'en-AU');
+  if(au) return au;
+  const gb = voices.find(v => v.lang === 'en-GB');
+  if(gb) return gb;
+  return voices.find(v => v.lang.startsWith('en')) || null;
+}
+
+function stripHtml(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+function speakText(text, btnEl){
+  if(!_speechSynth){ showToast('Text-to-speech not supported in this browser'); return; }
+  _speechSynth.cancel();
+  if(_activeSpeakBtn){ _activeSpeakBtn.classList.remove('speaking'); _activeSpeakBtn.textContent='🔊'; }
+  if(btnEl === _activeSpeakBtn){ _activeSpeakBtn=null; return; } // toggle off
+  const utt = new SpeechSynthesisUtterance(text);
+  // Try to get Australian voice; if voices not loaded yet wait briefly
+  const tryVoice = () => {
+    const v = getAuVoice();
+    if(v) utt.voice = v;
+    utt.lang = (v && v.lang) || 'en-AU';
+    utt.rate = 0.92;
+    utt.pitch = 1.0;
+  };
+  if(_speechSynth.getVoices().length){ tryVoice(); }
+  else { _speechSynth.onvoiceschanged = () => { tryVoice(); _speechSynth.onvoiceschanged=null; }; }
+  if(btnEl){ btnEl.classList.add('speaking'); btnEl.textContent='⏹'; _activeSpeakBtn=btnEl; }
+  utt.onend = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; } _activeSpeakBtn=null; };
+  utt.onerror = () => { if(btnEl){ btnEl.classList.remove('speaking'); btnEl.textContent='🔊'; } _activeSpeakBtn=null; };
+  _speechSynth.speak(utt);
+}
+
+function speakSection(sectionId){
+  const el = document.getElementById(sectionId);
+  if(!el){ showToast('Content not yet loaded'); return; }
+  const text = stripHtml(el.innerHTML).replace(/\s+/g,' ').trim();
+  if(!text || text.includes('Enter API key')){ showToast('Load guidance first'); return; }
+  // Find the speak button in the same guidance-section
+  const btn = el.closest('.guidance-section').querySelector('.speak-btn');
+  speakText(text, btn);
+}
+
+function speakHiveSummary(hiveId, btn){
+  const hive = Object.values(hives).flat().find(h=>h.id===hiveId);
+  const counts = miteCountsByHive[hiveId] || [];
+  const treatments = treatmentsByHive[hiveId] || [];
+  const ap = apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===hiveId));
+  const apName = ap ? ap.name : 'unknown apiary';
+  const hiveName = hive ? hive.name : 'Unknown hive';
+  const b = getHiveBadge(hiveId);
+  let trend = 'no trend data';
+  if(counts[0]&&counts[1]){
+    trend = counts[0].value > counts[1].value ? 'increasing' : counts[0].value < counts[1].value ? 'decreasing' : 'stable';
+  }
+  const lastCount = counts[0] ? counts[0].value + ' mites per 300 bees on ' + fmtDate(counts[0].date) : 'no mite counts recorded';
+  const lastTreat = treatments[0] ? 'Last treatment was ' + ((TREATMENTS[treatments[0].product]&&TREATMENTS[treatments[0].product].name)||treatments[0].product).split('(')[0].trim() + ', started ' + fmtDate(treatments[0].date) + '.' : 'No treatments recorded.';
+  const cleanRisk = b.label.replace(/[^\w\s\-]/g,'').trim();
+  const text = hiveName + ', in ' + apName + '. Latest mite count: ' + lastCount + '. Trend: ' + trend + '. Risk level: ' + cleanRisk + '. ' + lastTreat;
+  speakText(text, btn);
+}
+
 function toggleDetectionCard(){
   const body=document.getElementById('detection-card-body');
   const chev=document.getElementById('detection-card-chevron');
@@ -3338,26 +3476,36 @@ function backupData(){
   }catch(e){ showToast('Backup failed: ' + e.message); }
 }
 function restoreData(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
     try{
-      const d = JSON.parse(e.target.result);
-      if(!Array.isArray(d.apiaries)) throw new Error('Invalid backup file — no apiaries found.');
-      if(!confirm(`Restore ${d.apiaries.length} apiaries from backup dated ${d.exportedAt?.slice(0,10)||'unknown'}?\n\nThis will replace your current data.`)) return;
-      // Apply restored data
-      apiaries = d.apiaries;
-      hives = {}; Object.entries(d.hives||{}).forEach(([k,v])=>hives[Number(k)]=v);
-      miteCountsByHive = {}; Object.entries(d.miteCountsByHive||{}).forEach(([k,v])=>miteCountsByHive[Number(k)]=v);
-      treatmentsByHive = {}; Object.entries(d.treatmentsByHive||{}).forEach(([k,v])=>treatmentsByHive[Number(k)]=v);
-      notesByHive = {}; Object.entries(d.notesByHive||{}).forEach(([k,v])=>notesByHive[Number(k)]=v);
-      saveData();
+      const d=JSON.parse(e.target.result);
+      if(!Array.isArray(d.apiaries))throw new Error('Invalid backup file.');
+      if(!confirm('Restore '+d.apiaries.length+' apiaries from backup dated '+(d.exportedAt?.slice(0,10)||'unknown')+'?\n\nData will be uploaded to your cloud account.'))return;
+      showToast('Uploading to cloud…');
+      const uid=_sbUser.id;
+      for(const a of d.apiaries){
+        const {data:ap,error:apErr}=await _sb.from('apiaries').insert({user_id:uid,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0}).select().single();
+        if(apErr){showToast('Restore error: '+apErr.message);return;}
+        const hvList=(d.hives||{})[a.id]||[];
+        for(const h of hvList){
+          const {data:hv,error:hvErr}=await _sb.from('hives').insert({user_id:uid,apiary_id:ap.id,name:h.name}).select().single();
+          if(hvErr){showToast('Restore error: '+hvErr.message);return;}
+          for(const c of (d.miteCountsByHive||{})[h.id]||[])
+            await _sb.from('mite_counts').insert({user_id:uid,hive_id:hv.id,date:c.date,value:c.value,hive_strength:c.hiveStrength||'Good',diseases:c.diseases||[]});
+          for(const t of (d.treatmentsByHive||{})[h.id]||[])
+            await _sb.from('treatments').insert({user_id:uid,hive_id:hv.id,product:t.product,date:t.date,notes:t.notes||''});
+          for(const n of (d.notesByHive||{})[h.id]||[])
+            await _sb.from('notes').insert({user_id:uid,hive_id:hv.id,date:n.date,text:n.text});
+        }
+      }
+      await loadDataFromSupabase();
+      currentApiaryId=apiaries[0]?.id??0;
       renderApiaries();
-      showToast(`✅ Restored ${apiaries.length} apiaries!`);
-    }catch(err){ showToast('Restore failed: ' + err.message); }
-    // Reset input so same file can be re-selected
-    event.target.value = '';
+      showToast('✅ Restored '+d.apiaries.length+' apiaries!');
+    }catch(err){showToast('Restore failed: '+err.message);}
+    event.target.value='';
   };
   reader.readAsText(file);
 }
@@ -3393,6 +3541,31 @@ function exportAllCSV(){
   a.click();URL.revokeObjectURL(url);
   showToast('All data exported! 📥');
 }
+
+
+// ══ BOOT ══
+document.addEventListener('DOMContentLoaded', async function(){
+  const ls=document.getElementById('s-loading');
+  if(ls)ls.classList.add('active');
+  try{
+    const {data:{session}}=await _sb.auth.getSession();
+    if(session){
+      _sbUser=session.user;
+      await loadDataFromSupabase();
+      currentApiaryId=apiaries[0]?.id??0;
+      if(ls)ls.classList.remove('active');
+      goto('s-apiaries');
+    } else {
+      if(ls)ls.classList.remove('active');
+      goto('s-welcome');
+    }
+  }catch(e){
+    console.error('Boot error:',e);
+    if(ls)ls.classList.remove('active');
+    goto('s-welcome');
+  }
+});
+
 function rateStar(n){document.querySelectorAll('.star').forEach((s,i)=>{s.classList.toggle('active',i<n);s.classList.toggle('inactive',i>=n);});showToast('Thanks for rating VarroaMate! 🐝');}
 </script>
 </body>
