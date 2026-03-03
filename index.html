@@ -2832,6 +2832,8 @@ async function fieldSave(){
   const hiveStrength=document.getElementById('field-hive-strength').value||'Good';
   const diseases=getSelectedDiseases('field-disease-btns');
   if(!date){showToast('Please set a date');return;}
+  if(!currentHiveId){showToast('No hive selected — navigate to a hive first');return;}
+  if(!_sbUser){showToast('Please sign in first');return;}
   const arr=miteCountsByHive[currentHiveId]||(miteCountsByHive[currentHiveId]=[]);
   showSaveSpinner(true);
   const {data,error}=await _sb.from('mite_counts').insert({user_id:_sbUser.id,hive_id:currentHiveId,date,value,hive_strength:hiveStrength,diseases,notes}).select().single();
