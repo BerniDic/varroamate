@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>VarroaMate</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -144,7 +147,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .chart-fs-close{background:var(--amber-dark);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .chart-fs-body{flex:1;min-height:0;position:relative;}
 .chart-fs-body canvas{width:100%!important;height:100%!important;}
-.chart-fs-footer{flex-shrink:0;margin-top:10px;padding-bottom:calc(16px + env(safe-area-inset-bottom));font-size:13px;color:var(--text2);overflow-y:auto;max-height:30vh;}
+.chart-fs-footer{flex-shrink:0;margin-top:8px;padding:8px 0 calc(20px + env(safe-area-inset-bottom));font-size:13px;color:var(--text2);overflow-y:auto;max-height:28vh;}
 .trend-legend-item{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--text2);}
 .guidance-section{background:#fff;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);}
 .guidance-section-header{padding:12px 16px;background:var(--amber-pale);border-bottom:1px solid var(--border);font-weight:700;font-size:16px;color:var(--amber-dark);display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -406,7 +409,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
       <!-- SIGN IN FORM — wrapped in <form> so password managers recognise the fields -->
       <div id="form-signin">
-        <form id="signin-form" action="javascript:void(0)" onsubmit="doSignIn(event)" autocomplete="on" method="post">
+        <form id="signin-form" action="" onsubmit="doSignIn(event)" autocomplete="on" method="post">
           <div class="field">
             <label for="signin-email">Email</label>
             <input type="email" id="signin-email" name="email" placeholder="your@email.com" autocomplete="username" required>
@@ -416,7 +419,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
             <input type="password" id="signin-password" name="password" placeholder="••••••••" autocomplete="current-password" required>
           </div>
           <div id="signin-error" style="display:none;color:var(--red);font-size:14px;margin-bottom:12px;background:var(--red-pale);padding:8px 12px;border-radius:var(--radius-sm);"></div>
-          <button type="submit" class="btn btn-primary btn-full">Sign In →</button>
+          <button type="submit" id="signin-btn" class="btn btn-primary btn-full">Sign In →</button>
         </form>
       </div>
 
@@ -2065,7 +2068,7 @@ function initChart(canvasEl,maintainAR){
         c2.save();c2.fillStyle='rgba(39,174,96,0.13)';c2.fillRect(tx,top,te-tx,bottom-top);
         c2.fillStyle='rgba(30,130,60,0.75)';c2.font=`bold ${fs}px sans-serif`;c2.textAlign='center';
         const tName=TREATMENTS[t.product]?.name||t.product;
-        const tLabel=isExpanded?tName:(tName.length>14?tName.substring(0,13)+'…':tName);
+        const tLabel=tName.length>16?tName.substring(0,15)+'…':tName;
         c2.fillText(tLabel,(tx+te)/2,bottom-4);c2.restore();
       }
     }}]
@@ -2225,8 +2228,11 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
   const tempBody=document.getElementById('guidance-temp-body');
   const canvas=targetCanvas||document.getElementById('tempChart');
   const legend=document.getElementById('temp-treatment-legend');
-  if(!tempBody||!canvas)return;
-  tempBody.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Fetching forecast…</div>';
+  // When called for fullscreen, canvas is provided directly; tempBody absence is fine
+  if(!canvas)return;
+  if(tempBody&&!targetCanvas){
+    tempBody.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Fetching forecast…</div>';
+  }
 
   // Use apiary coords or fall back to Bendigo
   const lat=ap?.lat??-36.758, lon=ap?.lon??144.282;
@@ -2307,27 +2313,28 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
       }}]
     });
 
-    // Summary text
-    const avgMax=(maxTemps.reduce((a,b)=>a+b,0)/maxTemps.length).toFixed(1);
-    const avgMin=(minTemps.reduce((a,b)=>a+b,0)/minTemps.length).toFixed(1);
-    const hotDays=maxTemps.filter(t=>t>25).length;
-    const coldNights=minTemps.filter(t=>t<10).length;
-    let summary=`Avg max ${avgMax}°C · Avg min ${avgMin}°C over 14 days. `;
-    if(hotDays>5)summary+=`<strong style="color:var(--red);">${hotDays} days above 25°C</strong> — OA Vaporisation window limited. `;
-    else if(hotDays>0)summary+=`${hotDays} day${hotDays>1?'s':''} above 25°C — check timing for OA. `;
-    else summary+=`<strong style="color:var(--green);">All days within OA range.</strong> `;
-    if(coldNights>0)summary+=`${coldNights} night${coldNights>1?'s':''} below 10°C — treat during warmer part of day. `;
-    summary+=`<span style="color:var(--text3);font-size:13px;">Source: <a href="https://open-meteo.com" target="_blank" style="color:var(--amber);">Open-Meteo</a>. Days 1–7 are reliable; the shaded extended forecast (days 8–14) has lower accuracy — use for planning only.</span>`;
-    tempBody.innerHTML=summary;
-
-    if(legend){
-      legend.style.display='';
-      legend.innerHTML=`<span style="background:rgba(39,174,96,0.2);padding:1px 7px;border-radius:4px;">🟢 Good for all treatments</span>&nbsp;
-        <span style="background:rgba(243,156,18,0.2);padding:1px 7px;border-radius:4px;">🟡 OA caution (>25°C)</span>&nbsp;
-        <span style="background:rgba(192,57,43,0.2);padding:1px 7px;border-radius:4px;">🔴 Avoid thymol (>30°C)</span>`;
+    // Only update the guidance-screen text/legend when not in fullscreen mode
+    if(tempBody && !targetCanvas){
+      const avgMax=(maxTemps.reduce((a,b)=>a+b,0)/maxTemps.length).toFixed(1);
+      const avgMin=(minTemps.reduce((a,b)=>a+b,0)/minTemps.length).toFixed(1);
+      const hotDays=maxTemps.filter(t=>t>25).length;
+      const coldNights=minTemps.filter(t=>t<10).length;
+      let summary=`Avg max ${avgMax}°C · Avg min ${avgMin}°C over 14 days. `;
+      if(hotDays>5)summary+=`<strong style="color:var(--red);">${hotDays} days above 25°C</strong> — OA Vaporisation window limited. `;
+      else if(hotDays>0)summary+=`${hotDays} day${hotDays>1?'s':''} above 25°C — check timing for OA. `;
+      else summary+=`<strong style="color:var(--green);">All days within OA range.</strong> `;
+      if(coldNights>0)summary+=`${coldNights} night${coldNights>1?'s':''} below 10°C — treat during warmer part of day. `;
+      summary+=`<span style="color:var(--text3);font-size:13px;">Source: <a href="https://open-meteo.com" target="_blank" style="color:var(--amber);">Open-Meteo</a>. Days 1–7 are reliable; the shaded extended forecast (days 8–14) has lower accuracy — use for planning only.</span>`;
+      tempBody.innerHTML=summary;
+      if(legend){
+        legend.style.display='';
+        legend.innerHTML=`<span style="background:rgba(39,174,96,0.2);padding:1px 7px;border-radius:4px;">🟢 Good for all treatments</span>&nbsp;
+          <span style="background:rgba(243,156,18,0.2);padding:1px 7px;border-radius:4px;">🟡 OA caution (>25°C)</span>&nbsp;
+          <span style="background:rgba(192,57,43,0.2);padding:1px 7px;border-radius:4px;">🔴 Avoid thymol (>30°C)</span>`;
+      }
     }
   }catch(e){
-    tempBody.innerHTML='<span style="color:var(--text3);">Could not load forecast. Check internet connection.</span>';
+    if(tempBody&&!targetCanvas) tempBody.innerHTML='<span style="color:var(--text3);">Could not load forecast. Check internet connection.</span>';
   }
 }
 async function loadSection(elId,prompt,prefProfile){
