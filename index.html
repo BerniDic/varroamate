@@ -137,14 +137,14 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .trend-legend-item{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--text2);}
 .chart-expand-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:13px;padding:3px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .chart-expand-btn:hover{background:var(--bg2);color:var(--amber-dark);border-color:var(--amber);}
-.chart-fs{display:none;position:fixed;inset:0;background:#fff;z-index:1500;flex-direction:column;padding:16px 20px calc(16px + env(safe-area-inset-bottom)) 20px;}
+.chart-fs{display:none;position:fixed;inset:0;background:#fff;z-index:1500;flex-direction:column;padding:16px 20px 0 20px;}
 .chart-fs.open{display:flex;}
 .chart-fs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-shrink:0;}
 .chart-fs-title{font-weight:700;font-size:17px;color:var(--amber-dark);}
 .chart-fs-close{background:var(--amber-dark);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .chart-fs-body{flex:1;min-height:0;position:relative;}
 .chart-fs-body canvas{width:100%!important;height:100%!important;}
-.chart-fs-footer{flex-shrink:0;margin-top:10px;font-size:13px;color:var(--text2);}
+.chart-fs-footer{flex-shrink:0;margin-top:10px;padding-bottom:calc(16px + env(safe-area-inset-bottom));font-size:13px;color:var(--text2);overflow-y:auto;max-height:30vh;}
 .trend-legend-item{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--text2);}
 .guidance-section{background:#fff;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);}
 .guidance-section-header{padding:12px 16px;background:var(--amber-pale);border-bottom:1px solid var(--border);font-weight:700;font-size:16px;color:var(--amber-dark);display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -1208,6 +1208,7 @@ async function loadDataFromSupabase(){
 
 let currentApiaryId = 0;
 let currentHiveId = 0;
+let _hiveDetailLoading = false; // prevents switchHiveTab from double-firing initChart during goto
 let deleteType, deleteId;
 let mapInstance = null;
 let pendingApiary = null;
@@ -1241,7 +1242,9 @@ function goto(id,param){
   if(id==='s-hives')renderHives();
   if(id==='s-hive-detail'){
     renderHiveDetail();
+    _hiveDetailLoading=true;
     switchHiveTab('trend',document.getElementById('st-trend'));
+    _hiveDetailLoading=false;
     window._chartDirty=false;
     setTimeout(initChart,120);
   }
@@ -2074,8 +2077,8 @@ function switchHiveTab(tab,el){
   ['trend','treatments','counts','notes'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display=t===tab?'':'none';});
   document.querySelectorAll('.section-tab').forEach(t=>t.classList.remove('active'));
   if(el)el.classList.add('active');
-  // Only re-init chart when user explicitly taps the Trend tab (not during initial screen load)
-  if(tab==='trend'&&el)setTimeout(initChart,60);
+  // Only reinit chart on explicit user tab-tap, not during goto's initial setup
+  if(tab==='trend' && !_hiveDetailLoading) setTimeout(initChart,80);
 }
 
 // ══ GUIDANCE ══
@@ -2218,9 +2221,9 @@ async function loadGuidance(){
 }
 
 let tempChartInstance=null;
-async function loadTempChart(ap, isExpanded=false){
+async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
   const tempBody=document.getElementById('guidance-temp-body');
-  const canvas=document.getElementById('tempChart');
+  const canvas=targetCanvas||document.getElementById('tempChart');
   const legend=document.getElementById('temp-treatment-legend');
   if(!tempBody||!canvas)return;
   tempBody.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Fetching forecast…</div>';
@@ -3044,17 +3047,11 @@ function expandTempChart(){
     `<canvas id="tempChart-fs" style="width:100%;height:100%;"></canvas>`,
     `<div style="margin-bottom:6px;">${summaryHTML}</div><div style="font-size:12px;">${legendHTML}</div>`,
     ()=>{
-      // onOpen: draw temp chart into the fullscreen canvas
+      // onOpen: pass the fullscreen canvas element directly — no id swapping
       const fsCanvas=document.getElementById('tempChart-fs');
       if(!fsCanvas)return;
       if(tempChartInstance){tempChartInstance.destroy();tempChartInstance=null;}
-      // Temporarily give fs canvas the real id so loadTempChart targets it
-      const origCanvas=document.getElementById('tempChart');
-      origCanvas.id='tempChart-orig';
-      fsCanvas.id='tempChart';
-      loadTempChart(ap, true);  // isExpanded=true → larger fonts, full labels
-      fsCanvas.id='tempChart-fs';
-      origCanvas.id='tempChart';
+      loadTempChart(ap, true, fsCanvas);
     },
     ()=>{
       // onClose: destroy fs chart instance, redraw onto original canvas
@@ -3063,7 +3060,7 @@ function expandTempChart(){
       if(origCanvas){
         const ex=Chart.getChart(origCanvas);if(ex)ex.destroy();
         origCanvas.style.display='block';
-        loadTempChart(ap);
+        loadTempChart(ap, false, origCanvas);
       }
     }
   );
