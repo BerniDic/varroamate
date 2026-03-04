@@ -3113,22 +3113,26 @@ function closeQR(){document.getElementById('qr-overlay').classList.remove('open'
 function printQR(){
   const hiveName=document.getElementById('qr-hive-name').textContent;
   const code=document.getElementById('qr-code-text').textContent;
+  // QRCode lib renders either a <canvas> or <img> depending on browser — handle both
+  const qrCanvas=document.querySelector('#qr-canvas canvas');
   const qrImg=document.querySelector('#qr-canvas img');
-  const src=qrImg?qrImg.src:'';
-  const win=window.open('','_blank','width=400,height=500');
+  const src=qrCanvas?qrCanvas.toDataURL('image/png'):(qrImg?qrImg.src:'');
+  const win=window.open('','_blank','width=400,height=520');
   win.document.write(`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
   <style>body{font-family:sans-serif;text-align:center;padding:30px;}
   .label{border:2px solid #2C1A00;border-radius:12px;padding:20px;display:inline-block;min-width:200px;}
-  .brand{font-size:13px;font-weight:700;color:#8B5200;letter-spacing:0.04em;margin-bottom:8px;}
-  h2{margin:0 0 4px;font-size:22px;}p{margin:4px 0;font-size:14px;color:#555;}
-  img{margin:12px 0;}
+  .brand{font-size:15px;font-weight:700;color:#8B5200;letter-spacing:0.04em;margin-bottom:6px;}
+  h2{margin:0 0 4px;font-size:22px;color:#2C1A00;}p{margin:4px 0;font-size:14px;color:#555;}
+  img{margin:10px 0;display:block;margin-left:auto;margin-right:auto;}
   .hint{font-size:11px;margin-top:10px;color:#888;}
   @media print{button{display:none;}}</style></head>
   <body><div class="label">
   <div class="brand">🐝 VarroaMate</div>
-  <h2>${hiveName}</h2><p>${code}</p>
-  ${src?`<br><img src="${src}" width="180" height="180">`:''}
-  <p class="hint">Scan to open field entry in VarroaMate</p></div>
+  <h2>${hiveName}</h2>
+  <p>${code}</p>
+  ${src?`<img src="${src}" width="180" height="180">`:'<p style="color:#c00;font-size:12px;">QR image not available — try closing and reopening the QR modal</p>'}
+  <p class="hint">Scan to open field entry in VarroaMate</p>
+  </div>
   <br><button onclick="window.print()">🖨 Print</button></body></html>`);
   win.document.close();
 }
