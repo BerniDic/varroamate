@@ -2927,60 +2927,167 @@ async function fieldSave(){
 }
 
 // ── VOICE ENTRY ──
-let speechRec=null;let listeningActive=false;
+let speechRec=null;
+let listeningActive=false;
+let _voiceTimeout=null;
+
+function _voiceSetStatus(msg){
+  const el=document.getElementById('field-voice-status');
+  if(el)el.textContent=msg;
+}
+function _voiceSetBtn(listening){
+  const btn=document.getElementById('field-voice-btn');
+  if(!btn)return;
+  btn.textContent=listening?'🔴 Listening… tap to stop':'🎤 Tap to speak count';
+  btn.classList.toggle('listening',listening);
+}
+function _voiceCleanup(){
+  // Cancel any pending timeout
+  if(_voiceTimeout){clearTimeout(_voiceTimeout);_voiceTimeout=null;}
+  // Destroy recognition instance safely
+  if(speechRec){
+    speechRec.onstart=null;
+    speechRec.onresult=null;
+    speechRec.onerror=null;
+    speechRec.onend=null;
+    try{speechRec.abort();}catch(e){}
+    speechRec=null;
+  }
+  listeningActive=false;
+  _voiceSetBtn(false);
+}
+
+function _parseSpokenNumber(transcript){
+  const t=transcript.trim().toLowerCase()
+    .replace(/\boh\b/g,'0')          // "oh" → 0 (common in numbers)
+    .replace(/[-–]/g,' ');           // "twenty-three" → "twenty three"
+
+  // Try direct integer parse first
+  const direct=parseInt(t);
+  if(!isNaN(direct)&&direct>=0&&direct<=999)return direct;
+
+  // Word → digit map including teens, tens, and composites
+  const ones={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,
+    ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,
+    sixteen:16,seventeen:17,eighteen:18,nineteen:19};
+  const tens={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+
+  // Try single word
+  if(ones[t]!==undefined)return ones[t];
+  if(tens[t]!==undefined)return tens[t];
+
+  // Try "twenty three", "forty two" etc.
+  for(const [tw,tv] of Object.entries(tens)){
+    if(t.startsWith(tw)){
+      const rest=t.slice(tw.length).trim();
+      if(!rest)return tv;
+      if(ones[rest]!==undefined)return tv+ones[rest];
+    }
+  }
+
+  // Try scanning transcript for any number word
+  const words=t.split(/\s+/);
+  for(const w of words){
+    if(ones[w]!==undefined)return ones[w];
+    if(tens[w]!==undefined)return tens[w];
+    const n=parseInt(w);
+    if(!isNaN(n)&&n>=0)return n;
+  }
+  return null;
+}
+
 function fieldToggleVoice(){
-  if(listeningActive){fieldStopVoice();return;}
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition||window.mozSpeechRecognition||window.msSpeechRecognition;
-  if(!SpeechRecognition){
-    showToast('Voice entry is not supported in this browser');
-    document.getElementById('field-voice-status').textContent='Try Chrome on Android or Safari on iOS 14.5+';
+  if(listeningActive){_voiceCleanup();_voiceSetStatus('Stopped.');return;}
+
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition||
+           window.mozSpeechRecognition||window.msSpeechRecognition;
+  if(!SR){
+    showToast('Voice entry not supported in this browser');
+    _voiceSetStatus('Try Chrome on Android or Safari on iOS 14.5+');
     return;
   }
-  speechRec=new SpeechRecognition();
-  speechRec.lang='en-AU';speechRec.interimResults=false;speechRec.maxAlternatives=3;
+
+  // Ensure any previous instance is fully gone before creating a new one
+  _voiceCleanup();
+
+  try{
+    speechRec=new SR();
+  }catch(e){
+    _voiceSetStatus('Could not start voice — try again');
+    return;
+  }
+
+  speechRec.lang='en-AU';
+  speechRec.continuous=false;
+  speechRec.interimResults=false;
+  speechRec.maxAlternatives=5;
+
+  let _resultHandled=false; // prevent onend firing after result already processed
+
   speechRec.onstart=()=>{
     listeningActive=true;
-    document.getElementById('field-voice-btn').textContent='🔴 Listening… tap to stop';
-    document.getElementById('field-voice-btn').classList.add('listening');
-    document.getElementById('field-voice-status').textContent='Say a number, e.g. "four" or "12"';
+    _voiceSetBtn(true);
+    _voiceSetStatus('Say a number — e.g. "fourteen" or "23"');
+    // Safety timeout — iOS Safari can hang without firing onend
+    _voiceTimeout=setTimeout(()=>{
+      if(listeningActive){
+        _voiceSetStatus('Timed out — tap to try again');
+        _voiceCleanup();
+      }
+    },8000);
   };
+
   speechRec.onresult=(e)=>{
-    const alts=Array.from(e.results[0]).map(a=>a.transcript.trim().toLowerCase());
-    const wordNums={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20};
+    _resultHandled=true;
+    if(_voiceTimeout){clearTimeout(_voiceTimeout);_voiceTimeout=null;}
+    // Try all alternatives in order of confidence
+    const alts=Array.from(e.results[0]).map(a=>a.transcript);
     let found=null;
     for(const alt of alts){
-      const num=parseInt(alt);
-      if(!isNaN(num)&&num>=0){found=num;break;}
-      for(const [w,n] of Object.entries(wordNums)){if(alt.includes(w)){found=n;break;}}
+      found=_parseSpokenNumber(alt);
       if(found!==null)break;
     }
     if(found!==null){
       document.getElementById('field-count-num').textContent=found;
       fieldUpdateThreshold();
-      document.getElementById('field-voice-status').textContent=`✓ Heard: "${alts[0]}" → ${found}`;
+      _voiceSetStatus(`✓ Heard "${alts[0]}" → ${found} mites`);
     } else {
-      document.getElementById('field-voice-status').textContent=`Didn't catch that ("${alts[0]}") — try again`;
+      _voiceSetStatus(`Didn't catch a number from "${alts[0]}" — tap to try again`);
     }
+    _voiceCleanup();
   };
+
   speechRec.onerror=(e)=>{
+    if(_voiceTimeout){clearTimeout(_voiceTimeout);_voiceTimeout=null;}
     const msgs={
-      'not-allowed':'Microphone access denied — go to Settings → Safari → Microphone and allow access',
-      'service-not-allowed':'Microphone access denied — check Safari microphone permissions in Settings',
-      'no-speech':'No speech detected — tap and try again',
-      'network':'Network error — check your connection and try again',
-      'aborted':'Stopped.',
+      'not-allowed':         'Microphone blocked — Settings → Safari → Microphone → Allow',
+      'service-not-allowed': 'Microphone blocked — check Safari microphone permissions',
+      'no-speech':           'Nothing heard — tap and try again',
+      'network':             'Network error — check connection and try again',
+      'aborted':             '',
+      'audio-capture':       'No microphone found on this device',
     };
-    document.getElementById('field-voice-status').textContent=msgs[e.error]||('Error: '+e.error);
-    fieldStopVoice();
+    const msg=msgs[e.error];
+    if(msg!==undefined)_voiceSetStatus(msg);
+    else _voiceSetStatus('Voice error: '+e.error+' — tap to try again');
+    _voiceCleanup();
   };
-  speechRec.onend=()=>fieldStopVoice();
-  speechRec.start();
+
+  speechRec.onend=()=>{
+    // Only clean up if result handler didn't already do it
+    if(!_resultHandled)_voiceCleanup();
+  };
+
+  try{
+    speechRec.start();
+  }catch(e){
+    _voiceSetStatus('Could not start microphone — tap to try again');
+    _voiceCleanup();
+  }
 }
+
 function fieldStopVoice(){
-  listeningActive=false;
-  if(speechRec){try{speechRec.stop();}catch(e){}speechRec=null;}
-  document.getElementById('field-voice-btn').textContent='🎤 Tap to speak count';
-  document.getElementById('field-voice-btn').classList.remove('listening');
+  _voiceCleanup();
 }
 
 // ── QR CODE ──
