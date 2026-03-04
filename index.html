@@ -871,18 +871,27 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <h1 class="page-title">Plans &amp; Pricing</h1>
     <p class="page-subtitle">Choose the plan that fits your apiary</p>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px;">
+    <!-- BILLING TOGGLE -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;">
+      <span id="lbl-monthly" style="font-size:15px;font-weight:700;color:var(--amber-dark);">Monthly</span>
+      <div onclick="toggleBilling()" id="billing-toggle" style="width:52px;height:28px;border-radius:14px;background:var(--amber);cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;">
+        <div id="billing-knob" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left 0.2s;"></div>
+      </div>
+      <span id="lbl-annual" style="font-size:15px;font-weight:400;color:var(--text2);">Annual <span style="background:var(--green);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:3px;">Save ~30%</span></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px;">
 
       <!-- FREE -->
       <div class="card" style="border:2px solid var(--border);position:relative;">
-        <div style="font-size:28px;margin-bottom:6px;">🐝</div>
-        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);font-weight:700;">Free</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text);margin:8px 0 4px;">$0<span style="font-size:14px;font-weight:400;color:var(--text3);">/mo</span></div>
-        <div style="font-size:13px;color:var(--text3);margin-bottom:16px;">Perfect for backyard beekeepers</div>
-        <ul style="list-style:none;font-size:14px;color:var(--text2);line-height:2;margin-bottom:20px;">
+        <div style="font-size:26px;margin-bottom:4px;">🐝</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--amber-dark);font-weight:700;">Free</div>
+        <div style="font-size:26px;font-weight:700;color:var(--text);margin:6px 0 2px;">$0</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Always free</div>
+        <ul style="list-style:none;font-size:13px;color:var(--text2);line-height:2;margin-bottom:18px;">
           <li>✅ Up to <strong>3 hives</strong></li>
           <li>✅ Mite counts &amp; treatments</li>
-          <li>✅ Notes &amp; trend chart</li>
+          <li>✅ Notes &amp; trend charts</li>
           <li>✅ Treatment info library</li>
           <li>✅ CSV export</li>
           <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
@@ -891,72 +900,100 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         <button class="btn btn-outline btn-full btn-sm" onclick="showToast('You are on the Free plan 🐝')">Current Plan</button>
       </div>
 
-      <!-- LIFETIME CORE -->
-      <div class="card" style="border:2px solid var(--amber-dark);position:relative;">
-        <div style="position:absolute;top:12px;right:12px;background:var(--amber-dark);color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;">ONE-TIME</div>
-        <div style="font-size:28px;margin-bottom:6px;">🏠</div>
-        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);font-weight:700;">Lifetime Core</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text);margin:8px 0 4px;">$29<span style="font-size:14px;font-weight:400;color:var(--text3);"> once</span></div>
-        <div style="font-size:13px;color:var(--text3);margin-bottom:16px;">Pay once, use forever</div>
-        <ul style="list-style:none;font-size:14px;color:var(--text2);line-height:2;margin-bottom:20px;">
-          <li>✅ <strong>Unlimited hives</strong></li>
-          <li>✅ Everything in Free</li>
-          <li>✅ No ongoing subscription</li>
-          <li>✅ All future core updates</li>
-          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
-          <li>⬜ AI guidance &amp; chat</li>
-        </ul>
-        <button class="btn btn-primary btn-full btn-sm" onclick="showToast('Lifetime purchase coming soon! 🐝')">Buy Lifetime — $29</button>
-      </div>
-
       <!-- FREE + AI -->
       <div class="card" style="border:2px solid var(--amber);position:relative;">
-        <div style="font-size:28px;margin-bottom:6px;">🤖</div>
-        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);font-weight:700;">Free + AI</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text);margin:8px 0 4px;">$2.99<span style="font-size:14px;font-weight:400;color:var(--text3);">/mo</span></div>
-        <div style="font-size:13px;color:var(--text3);margin-bottom:16px;">AI guidance for growing apiaries</div>
-        <ul style="list-style:none;font-size:14px;color:var(--text2);line-height:2;margin-bottom:20px;">
-          <li>✅ <strong>Unlimited hives</strong></li>
+        <div style="font-size:26px;margin-bottom:4px;">🤖</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--amber-dark);font-weight:700;">Free + AI</div>
+        <div style="font-size:26px;font-weight:700;color:var(--text);margin:6px 0 2px;">
+          <span class="price-mo">$2.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/mo</span></span>
+          <span class="price-yr" style="display:none;">$24.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/yr</span></span>
+        </div>
+        <div class="price-yr-note" style="display:none;font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px;">= $2.08/mo · save $10.89</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">AI on 3 hives</div>
+        <ul style="list-style:none;font-size:13px;color:var(--text2);line-height:2;margin-bottom:18px;">
+          <li>✅ Up to <strong>3 hives</strong></li>
           <li>✅ Everything in Free</li>
           <li>✅ <strong>AI guidance panels</strong></li>
           <li>✅ <strong>AI chat assistant</strong></li>
           <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
-        <div style="background:var(--amber-pale);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--text2);">
-          <strong>What does AI add?</strong> Instead of fixed rules, the AI reads your actual hive data — counts, trends, treatment history, season — and gives personalised, nuanced advice. It can also answer free-form questions like "can I treat during a honey flow?"
+        <button class="btn btn-primary btn-full btn-sm sub-btn" data-mo="$2.99/mo" data-yr="$24.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
+      </div>
+
+      <!-- HOBBYIST -->
+      <div class="card" style="border:2px solid var(--border);position:relative;">
+        <div style="font-size:26px;margin-bottom:4px;">🏡</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--amber-dark);font-weight:700;">Hobbyist</div>
+        <div style="font-size:26px;font-weight:700;color:var(--text);margin:6px 0 2px;">
+          <span class="price-mo">$5.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/mo</span></span>
+          <span class="price-yr" style="display:none;">$49.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/yr</span></span>
         </div>
-        <button class="btn btn-primary btn-full btn-sm" onclick="showToast('Subscription coming soon! 🐝')">Subscribe — $2.99/mo</button>
+        <div class="price-yr-note" style="display:none;font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px;">= $4.17/mo · save $21.89</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Growing apiaries</div>
+        <ul style="list-style:none;font-size:13px;color:var(--text2);line-height:2;margin-bottom:18px;">
+          <li>✅ Up to <strong>15 hives</strong></li>
+          <li>✅ Everything in Free</li>
+          <li>✅ <strong>AI guidance &amp; chat</strong></li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
+        </ul>
+        <button class="btn btn-outline btn-full btn-sm sub-btn" data-mo="$5.99/mo" data-yr="$49.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
+      </div>
+
+      <!-- BEEKEEPER -->
+      <div class="card" style="border:2px solid var(--amber-dark);position:relative;">
+        <div style="position:absolute;top:10px;right:10px;background:var(--amber-dark);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;">POPULAR</div>
+        <div style="font-size:26px;margin-bottom:4px;">🌿</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--amber-dark);font-weight:700;">Beekeeper</div>
+        <div style="font-size:26px;font-weight:700;color:var(--text);margin:6px 0 2px;">
+          <span class="price-mo">$9.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/mo</span></span>
+          <span class="price-yr" style="display:none;">$84.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/yr</span></span>
+        </div>
+        <div class="price-yr-note" style="display:none;font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px;">= $7.08/mo · save $34.89</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Serious hobbyists &amp; semi-commercial</div>
+        <ul style="list-style:none;font-size:13px;color:var(--text2);line-height:2;margin-bottom:18px;">
+          <li>✅ Up to <strong>200 hives</strong></li>
+          <li>✅ Everything in Hobbyist</li>
+          <li>✅ <strong>AI guidance &amp; chat</strong></li>
+          <li>✅ Bulk data import <span style="font-size:11px;color:var(--text3);">coming soon</span></li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
+        </ul>
+        <button class="btn btn-primary btn-full btn-sm sub-btn" data-mo="$9.99/mo" data-yr="$84.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
       </div>
 
       <!-- PROFESSIONAL -->
       <div class="card" style="border:2px solid var(--border);position:relative;">
-        <div style="font-size:28px;margin-bottom:6px;">🏆</div>
-        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);font-weight:700;">Professional</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text);margin:8px 0 4px;">$19.99<span style="font-size:14px;font-weight:400;color:var(--text3);">/mo</span></div>
-        <div style="font-size:13px;color:var(--text3);margin-bottom:16px;">Unlimited — commercial beekeepers</div>
-        <ul style="list-style:none;font-size:14px;color:var(--text2);line-height:2;margin-bottom:20px;">
+        <div style="font-size:26px;margin-bottom:4px;">🏆</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--amber-dark);font-weight:700;">Professional</div>
+        <div style="font-size:26px;font-weight:700;color:var(--text);margin:6px 0 2px;">
+          <span class="price-mo">$19.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/mo</span></span>
+          <span class="price-yr" style="display:none;">$169.99<span style="font-size:13px;font-weight:400;color:var(--text3);">/yr</span></span>
+        </div>
+        <div class="price-yr-note" style="display:none;font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px;">= $14.17/mo · save $69.89</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Commercial beekeepers</div>
+        <ul style="list-style:none;font-size:13px;color:var(--text2);line-height:2;margin-bottom:18px;">
           <li>✅ <strong>Unlimited hives</strong></li>
-          <li>✅ Everything in Free + AI</li>
-          <li>✅ Priority support</li>
-          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
+          <li>✅ Everything in Beekeeper</li>
+          <li>✅ <strong>AI guidance &amp; chat</strong></li>
+          <li>✅ Multi-user access <span style="font-size:11px;color:var(--text3);">coming soon</span></li>
           <li>✅ Direct email support</li>
+          <li>✅ <a href="https://www.facebook.com/varroamate" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
-        <button class="btn btn-outline btn-full btn-sm" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
+        <button class="btn btn-outline btn-full btn-sm sub-btn" data-mo="$19.99/mo" data-yr="$169.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
       </div>
 
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
       <div class="card-title">🚧 Coming Soon</div>
-      <p style="font-size:15px;color:var(--text2);line-height:1.8;">Two features are in development and will be added to paid plans when ready:</p>
+      <p style="font-size:15px;color:var(--text2);line-height:1.8;">Two features in development:</p>
       <ul style="font-size:15px;color:var(--text2);line-height:2;margin-top:8px;padding-left:18px;">
-        <li><strong>Bulk data import</strong> — load historical mite count data from a CSV file into VarroaMate, coming to the Beekeeper plan.</li>
-        <li><strong>Multi-user access</strong> — invite a second beekeeper (e.g. a field hand or business partner) to log counts and treatments on shared apiaries, coming to the Professional plan.</li>
+        <li><strong>Bulk data import</strong> — load historical mite count data from CSV, coming to Beekeeper+.</li>
+        <li><strong>Multi-user access</strong> — invite a field hand or business partner to log counts on shared apiaries, coming to Professional.</li>
       </ul>
     </div>
     <div class="card" style="background:var(--amber-pale);border-color:var(--amber);">
       <div class="card-title">🤖 What does AI guidance actually do?</div>
-      <p style="font-size:15px;color:var(--text2);line-height:1.8;">The AI reads your real hive data — mite counts, treatment history, the season, your apiary location — and generates personalised, nuanced advice rather than fixed rules. It can answer free-form questions through the chat (e.g. "can I treat during a honey flow?" or "what does pyrethroid resistance mean for my situation?"), and it adjusts its recommendations based on your treatment preference profile. Free users get rule-based guidance which covers thresholds and basic treatment suggestions — AI takes that further with context and judgment.</p>
+      <p style="font-size:15px;color:var(--text2);line-height:1.8;">The AI reads your real hive data — mite counts, treatment history, season, apiary location — and generates personalised advice rather than fixed rules. It answers free-form questions through the chat (e.g. "can I treat during a honey flow?") and adjusts recommendations based on your treatment preference profile.</p>
     </div>
   </div>
 </div>
@@ -1219,6 +1256,20 @@ async function logout(){
   _dataLoaded=false;
   goto('s-welcome');
 }
+// ══ BILLING TOGGLE ══
+let _billingAnnual=false;
+function toggleBilling(){
+  _billingAnnual=!_billingAnnual;
+  document.getElementById('billing-knob').style.left=_billingAnnual?'27px':'3px';
+  document.getElementById('lbl-monthly').style.fontWeight=_billingAnnual?'400':'700';
+  document.getElementById('lbl-monthly').style.color=_billingAnnual?'var(--text2)':'var(--amber-dark)';
+  document.getElementById('lbl-annual').style.fontWeight=_billingAnnual?'700':'400';
+  document.getElementById('lbl-annual').style.color=_billingAnnual?'var(--amber-dark)':'var(--text2)';
+  document.querySelectorAll('.price-mo').forEach(el=>el.style.display=_billingAnnual?'none':'');
+  document.querySelectorAll('.price-yr').forEach(el=>el.style.display=_billingAnnual?'':'none');
+  document.querySelectorAll('.price-yr-note').forEach(el=>el.style.display=_billingAnnual?'':'none');
+}
+
 function goto(id,param){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -2112,32 +2163,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(txt&&/Android/i.test(navigator.userAgent))
       txt.textContent='Tap ⋮ then "Add to Home screen" for the best experience — works like an app, stays logged in.';
   }
-  if(isLoggedIn()){
-    // Check for QR deep-link: ?h=CODE
-    const urlParams=new URLSearchParams(window.location.search);
-    const hCode=urlParams.get('h');
-    if(hCode){
-      const h=getHiveByCode(hCode);
-      if(h){
-        currentHiveId=h.id;
-        for(const [aid,hvList] of Object.entries(hives)){
-          if(hvList.some(hv=>hv.id===h.id)){currentApiaryId=parseInt(aid);break;}
-        }
-        gotoField();
-      } else {
-        showToast('Hive code not found — check your data');
-        goto('s-apiaries');
-      }
-    } else {
-      goto('s-apiaries');
-    }
-  } else {
-    // Not logged in — save any QR code for after login
-    const urlParams=new URLSearchParams(window.location.search);
-    const hCode=urlParams.get('h');
-    if(hCode)try{sessionStorage.setItem('varroamate_pending_hive',hCode);}catch(e){}
-    document.getElementById('s-welcome').classList.add('active');
-  }
+  // Navigation is handled by the async BOOT handler below — do not navigate here
 });
 function syncApiKeyUI(){
   const has=!!storedApiKey;
@@ -3597,6 +3623,45 @@ function exportAllCSV(){
 
 
 // ══ BOOT ══
+
+// Fast-path boot for QR deep-links: fetch only the target hive first,
+// navigate immediately, then load everything else in the background.
+async function loadHiveForQR(uid, hCode){
+  // 1. Find the hive by its 4-char code via a DB query (no need to load all hives first)
+  //    makeHiveCode(id) = base36 of id, zero-padded to 4 chars — reverse it to find the id range
+  //    Simpler: fetch all hive ids+names, find match — still much faster than all counts/treatments
+  const {data:hvData,error:hvErr}=await _sb.from('hives').select('id,name,apiary_id').eq('user_id',uid);
+  if(hvErr||!hvData)return false;
+  // Rebuild minimal hives map so getHiveByCode works
+  hives={};
+  hvData.forEach(h=>{if(!hives[h.apiary_id])hives[h.apiary_id]=[];hives[h.apiary_id].push({id:h.id,name:h.name});});
+  const h=getHiveByCode(hCode);
+  if(!h)return false;
+  // 2. Fetch apiaries (lightweight) so apiary context is available
+  const {data:apData}=await _sb.from('apiaries').select('*').eq('user_id',uid).order('created_at');
+  if(apData) apiaries=apData.map(a=>({id:a.id,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0}));
+  // 3. Fetch only this hive's counts, treatments, notes
+  const hid=h.id;
+  const [cntRes,trtRes,noteRes]=await Promise.all([
+    _sb.from('mite_counts').select('*').eq('hive_id',hid).eq('user_id',uid).order('date',{ascending:false}),
+    _sb.from('treatments').select('*').eq('hive_id',hid).eq('user_id',uid).order('date',{ascending:false}),
+    _sb.from('notes').select('*').eq('hive_id',hid).eq('user_id',uid).order('date',{ascending:false}),
+  ]);
+  miteCountsByHive={};treatmentsByHive={};notesByHive={};
+  if(cntRes.data) miteCountsByHive[hid]=cntRes.data.map(c=>({id:String(c.id),date:c.date,value:c.value,hiveStrength:c.hive_strength||'Good',diseases:c.diseases||['No Disease Present']}));
+  if(trtRes.data) treatmentsByHive[hid]=trtRes.data.map(t=>({id:String(t.id),date:t.date,product:t.product,notes:t.notes||''}));
+  if(noteRes.data) notesByHive[hid]=noteRes.data.map(n=>({id:String(n.id),date:n.date,text:n.text}));
+  // 4. Navigate straight to field entry
+  currentHiveId=hid;
+  for(const [aid,hvList] of Object.entries(hives)){
+    if(hvList.some(hv=>hv.id===hid)){currentApiaryId=parseInt(aid);break;}
+  }
+  gotoField();
+  // 5. Load remaining data silently in background (don't await)
+  loadDataFromSupabase();
+  return true;
+}
+
 document.addEventListener('DOMContentLoaded', async function(){
   // Only hide voice button on browsers that definitively lack speech recognition
   // (Do NOT hide on iOS Safari - webkitSpeechRecognition exists but requires a user gesture to confirm)
@@ -3611,12 +3676,33 @@ document.addEventListener('DOMContentLoaded', async function(){
     const {data:{session}}=await _sb.auth.getSession();
     if(session){
       _sbUser=session.user;
-      await loadDataFromSupabase();
-      currentApiaryId=apiaries[0]?.id??0;
-      if(ls)ls.classList.remove('active');
-      goto('s-apiaries');
+      const urlParams=new URLSearchParams(window.location.search);
+      const hCode=urlParams.get('h');
+      if(hCode){
+        // QR deep-link — fast path: load only this hive first
+        showToast('Loading hive… 🐝');
+        const found=await loadHiveForQR(session.user.id, hCode);
+        if(ls)ls.classList.remove('active');
+        if(!found){
+          showToast('Hive not found — check your QR label');
+          await loadDataFromSupabase();
+          currentApiaryId=apiaries[0]?.id??0;
+          goto('s-apiaries');
+        }
+        // If found, loadHiveForQR already called gotoField() and started background load
+      } else {
+        // Normal boot — load everything then navigate
+        await loadDataFromSupabase();
+        currentApiaryId=apiaries[0]?.id??0;
+        if(ls)ls.classList.remove('active');
+        goto('s-apiaries');
+      }
     } else {
+      // Not logged in — save QR code for after login
       if(ls)ls.classList.remove('active');
+      const urlParams=new URLSearchParams(window.location.search);
+      const hCode=urlParams.get('h');
+      if(hCode)try{sessionStorage.setItem('varroamate_pending_hive',hCode);}catch(e){}
       goto('s-welcome');
     }
   }catch(e){
@@ -3678,13 +3764,10 @@ function rateStar(n){document.querySelectorAll('.star').forEach((s,i)=>{s.classL
   <div class="modal-box" style="text-align:center;">
     <div style="font-size:48px;margin-bottom:8px;">🐝</div>
     <div class="modal-title" style="justify-content:center;border:none;padding-bottom:0;">You've reached your 3-hive limit</div>
-    <p style="font-size:15px;color:var(--text2);line-height:1.75;margin:12px 0 20px;">The free plan includes up to <strong>3 hives</strong> — enough for most backyard beekeepers. To add more, upgrade to <strong>Lifetime Core</strong> for a one-time payment, or get <strong>AI guidance + unlimited hives</strong> with a monthly plan.</p>
+    <p style="font-size:15px;color:var(--text2);line-height:1.75;margin:12px 0 20px;">The free plan includes up to <strong>3 hives</strong> — enough for most backyard beekeepers. To add more hives, upgrade to a paid plan. All paid plans include <strong>AI guidance</strong> and start from $2.99/mo.</p>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
       <button class="btn btn-primary btn-full" onclick="closeModal('modal-hive-limit');goto('s-subscription')" style="font-size:17px;padding:14px;">
-        🏠 Lifetime Core — $29 <span style="font-size:13px;font-weight:400;opacity:0.85;">one-time · unlimited hives</span>
-      </button>
-      <button class="btn btn-outline btn-full" onclick="closeModal('modal-hive-limit');goto('s-subscription')" style="font-size:16px;">
-        🤖 Free + AI — $2.99/mo <span style="font-size:13px;font-weight:400;opacity:0.75;">unlimited hives + AI guidance</span>
+        🌿 See Plans &amp; Pricing
       </button>
     </div>
     <button class="back-btn" onclick="closeModal('modal-hive-limit')">Not now</button>
