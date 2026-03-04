@@ -516,11 +516,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <div>
         <div class="pref-card" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Integrated Chemical &amp; Non-Chemical</div></div><div class="pref-desc">Full spectrum: synthetic chemicals, organic acids, and mechanical/heat with rotation.</div><div class="pref-tags"><span class="pref-tag pro">Best control</span><span class="pref-tag pro">Resistance management</span><span class="pref-tag con">Supers off during treatment</span></div></div>
         <div class="pref-card" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Organic-First with Emergency Synthetic</div></div><div class="pref-desc">Organic acids as primary; synthetics only if infestation becomes critical.</div><div class="pref-tags"><span class="pref-tag pro">Lower residue burden</span><span class="pref-tag pro">Emergency backup available</span><span class="pref-tag con">Temperature dependent</span></div></div>
-        <div class="pref-card selected" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Organic-Only Strategy</div></div><div class="pref-desc">Organic acids exclusively. No synthetic chemicals.</div><div class="pref-tags"><span class="pref-tag pro">Reduced residues</span><span class="pref-tag pro">Low-chemical philosophy</span><span class="pref-tag con">Higher resistance risk</span><span class="pref-tag con">Temperature sensitive</span></div></div>
+        <div class="pref-card selected" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Organic-Only Strategy</div></div><div class="pref-desc">Organic acids exclusively. No synthetic chemicals.</div><div class="pref-tags"><span class="pref-tag pro">Reduced residues</span><span class="pref-tag pro">Low-chemical philosophy</span><span class="pref-tag pro">Low resistance risk</span><span class="pref-tag con">Temperature sensitive</span></div></div>
       </div>
       <div>
         <div class="pref-card" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Mechanical + Organic Strategy</div></div><div class="pref-desc">Mechanical/heat combined with organic acids. No synthetics.</div><div class="pref-tags"><span class="pref-tag pro">Minimal residues</span><span class="pref-tag con">Labour intensive</span><span class="pref-tag con">Equipment dependent</span></div></div>
-        <div class="pref-card" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Mechanical Strategy Only</div></div><div class="pref-desc">Mechanical/heat only. Zero chemicals of any kind.</div><div class="pref-tags"><span class="pref-tag pro">Zero chemical residues</span><span class="pref-tag pro">Continuous honey production</span><span class="pref-tag con">High colony loss risk</span><span class="pref-tag con">Frequent monitoring essential</span></div></div>
+        <div class="pref-card" onclick="selectPref(this)"><div class="pref-header"><div class="pref-radio"></div><div class="pref-name">Mechanical Strategy Only</div></div><div class="pref-desc">Mechanical/heat only. Zero chemicals of any kind.</div><div class="pref-tags"><span class="pref-tag pro">Zero chemical residues</span><span class="pref-tag pro">Continuous honey production</span><span class="pref-tag con">High colony loss risk</span><span class="pref-tag con">Highest monitoring frequency required</span></div></div>
       </div>
     </div>
     <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="savePrefAndContinue()">Save Preference &amp; Continue →</button>
@@ -3113,28 +3113,49 @@ function closeQR(){document.getElementById('qr-overlay').classList.remove('open'
 function printQR(){
   const hiveName=document.getElementById('qr-hive-name').textContent;
   const code=document.getElementById('qr-code-text').textContent;
-  // QRCode lib renders either a <canvas> or <img> depending on browser — handle both
-  const qrCanvas=document.querySelector('#qr-canvas canvas');
-  const qrImg=document.querySelector('#qr-canvas img');
-  const src=qrCanvas?qrCanvas.toDataURL('image/png'):(qrImg?qrImg.src:'');
-  const win=window.open('','_blank','width=400,height=520');
-  win.document.write(`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
-  <style>body{font-family:sans-serif;text-align:center;padding:30px;}
-  .label{border:2px solid #2C1A00;border-radius:12px;padding:20px;display:inline-block;min-width:200px;}
-  .brand{font-size:15px;font-weight:700;color:#8B5200;letter-spacing:0.04em;margin-bottom:6px;}
-  h2{margin:0 0 4px;font-size:22px;color:#2C1A00;}p{margin:4px 0;font-size:14px;color:#555;}
-  img{margin:10px 0;display:block;margin-left:auto;margin-right:auto;}
-  .hint{font-size:11px;margin-top:10px;color:#888;}
-  @media print{button{display:none;}}</style></head>
-  <body><div class="label">
-  <div class="brand">🐝 VarroaMate</div>
-  <h2>${hiveName}</h2>
-  <p>${code}</p>
-  ${src?`<img src="${src}" width="180" height="180">`:'<p style="color:#c00;font-size:12px;">QR image not available — try closing and reopening the QR modal</p>'}
-  <p class="hint">Scan to open field entry in VarroaMate</p>
-  </div>
-  <br><button onclick="window.print()">🖨 Print</button></body></html>`);
-  win.document.close();
+  // Get QR image — canvas (most browsers) or img fallback
+  let src='';
+  try{
+    const qrCanvas=document.querySelector('#qr-canvas canvas');
+    if(qrCanvas)src=qrCanvas.toDataURL('image/png');
+  }catch(e){}
+  if(!src){
+    const qrImg=document.querySelector('#qr-canvas img');
+    if(qrImg)src=qrImg.src;
+  }
+  const html=`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:sans-serif;text-align:center;padding:40px;background:#fff;}
+    .label{border:2.5px solid #2C1A00;border-radius:14px;padding:22px 24px;display:inline-block;min-width:220px;}
+    .brand{font-size:16px;font-weight:700;color:#8B5200;letter-spacing:0.05em;margin-bottom:10px;}
+    .hive{font-size:24px;font-weight:700;color:#2C1A00;margin-bottom:4px;}
+    .code{font-family:monospace;font-size:15px;color:#9C7A4A;margin-bottom:10px;}
+    img{display:block;margin:10px auto;}
+    .hint{font-size:11px;color:#9C7A4A;margin-top:10px;}
+    button{margin-top:24px;padding:10px 28px;background:#8B5200;color:#fff;border:none;border-radius:20px;font-size:16px;font-weight:700;cursor:pointer;}
+    @media print{button{display:none;}}
+  </style></head>
+  <body>
+    <div class="label">
+      <div class="brand">🐝 VarroaMate</div>
+      <div class="hive">${hiveName}</div>
+      <div class="code">${code}</div>
+      ${src?`<img src="${src}" width="180" height="180" alt="QR code">`:'<p style="color:#c00;font-size:12px;padding:10px;">QR image unavailable — close and reopen the QR modal then try again</p>'}
+      <div class="hint">Scan to open field entry in VarroaMate</div>
+    </div>
+    <br><button onclick="window.print()">🖨 Print</button>
+  </body></html>`;
+  // Use blob URL to avoid popup blockers
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(!win){
+    // Popup blocked — fallback: open as data URI
+    window.location.href='data:text/html;charset=utf-8,'+encodeURIComponent(html);
+  }
+  // Revoke after a delay to allow the page to load
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
 
 // ══ CHART FULLSCREEN ══
