@@ -1337,6 +1337,15 @@ async function doSignIn(e){
     }catch(ex){/* non-fatal */}
   }
   showToast('Welcome back! Loading your data…');
+  // If a QR code was scanned before login, use the fast hive-first path
+  let pendingCode=null;
+  try{pendingCode=sessionStorage.getItem('varroamate_pending_hive');}catch(e){}
+  if(pendingCode){
+    try{sessionStorage.removeItem('varroamate_pending_hive');}catch(e){}
+    const found=await loadHiveForQR(data.user.id, pendingCode);
+    if(found){currentApiaryId=apiaries[0]?.id??0;return;}
+    // Code not found — fall through to normal load
+  }
   await loadDataFromSupabase();
   currentApiaryId=apiaries[0]?.id??0;
   goto('s-disclaimer');
