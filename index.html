@@ -1151,7 +1151,6 @@ const SEED = {
 // ══════════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
-const ANTHROPIC_KEY = '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';
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 let _sbUser = null;
 
@@ -1219,7 +1218,7 @@ const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hiv
 
 async function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
-  storedApiKey='';chatHistory=[];
+  chatHistory=[];
   await _sb.auth.signOut();
   _sbUser=null;
   apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
@@ -2117,7 +2116,7 @@ function switchHiveTab(tab,el){
 }
 
 // ══ GUIDANCE ══
-let storedApiKey=ANTHROPIC_KEY;
+const storedApiKey=true; // API key handled server-side via Supabase Edge Function
 // Restore saved preference selection and initialise app state on load
 document.addEventListener('DOMContentLoaded',()=>{
   restorePrefSelection();
@@ -2292,8 +2291,8 @@ async function loadSection(elId,prompt,prefProfile){
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
 CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.`;
   try{
-    const headers={'Content-Type':'application/json','x-api-key':storedApiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,
+    const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
+    const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
         system:systemPrompt,
         messages:[{role:'user',content:prompt}]})});
@@ -2317,8 +2316,8 @@ async function sendChat(){
   const loading=addChatMsg('…','bot');
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
-    const headers={'Content-Type':'application/json','x-api-key':storedApiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,
+    const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
+    const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
         system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical.',
         messages:chatHistory})});
