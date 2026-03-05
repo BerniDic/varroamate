@@ -1259,7 +1259,7 @@ function goto(id,param){
     window._chartDirty=false;
     setTimeout(initChart,120);
   }
-  if(id==='s-guidance'){syncApiKeyUI();loadGuidance();}
+  if(id==='s-guidance'){loadGuidance();}
   if(id==='s-prefs'){restorePrefSelection();restoreStateSelection();}
   if(id==='s-signin'){
     switchSigninTab(param==='create'?'create':'signin');
