@@ -723,39 +723,6 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <h1 class="page-title">Guidance</h1>
     <p class="page-subtitle">AI-powered varroa management advice</p>
     <div class="info-row" id="guidance-chips"></div>
-    <div id="guidance-api-key-section" style="margin-bottom:16px;">
-      <div class="card" style="padding:14px 16px;">
-        <div style="font-weight:700;color:var(--amber-dark);margin-bottom:10px;font-size:15px;">🔑 Anthropic API Key</div>
-
-        <!-- SAVED STATE: shown when key is already stored -->
-        <div id="apikey-saved-ui" style="display:none;">
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--green-pale);border:1px solid #A9DFBF;border-radius:var(--radius-sm);">
-            <span style="font-size:22px;">✅</span>
-            <div style="flex:1;">
-              <div style="font-weight:700;color:#1A7A42;font-size:14px;">API key saved on this device</div>
-              <div id="apikey-hint" style="font-size:12px;color:#1A7A42;font-family:monospace;margin-top:2px;opacity:0.8;"></div>
-            </div>
-            <button class="btn btn-sm" style="background:#fff;color:var(--red);border:1px solid #E74C3C;flex-shrink:0;" onclick="clearApiKey()">Remove</button>
-          </div>
-          <div id="apikey-file-warn" style="display:none;margin-top:8px;padding:8px 12px;background:#FEF9E7;border:1px solid #F9E79F;border-radius:var(--radius-sm);font-size:12px;color:#7D6608;">
-            ⚠️ <strong>Running as a local file.</strong> Your API key is saved but may not survive if you open a freshly downloaded copy of this file. To keep the key across sessions: always open <em>the same saved file</em>, or bookmark/pin it in your browser. Re-enter if the key disappears.
-          </div>
-          <button class="btn btn-outline btn-sm btn-full" style="margin-top:8px;" onclick="loadGuidance()">↺ Reload AI guidance</button>
-        </div>
-
-        <!-- ENTRY STATE: shown when no key stored -->
-        <div id="apikey-entry-ui">
-          <div style="font-size:13px;color:var(--text3);margin-bottom:10px;">Required for AI guidance. Stored only on this device — never shared. Get a key at <a href="https://console.anthropic.com/" target="_blank" style="color:var(--amber);">console.anthropic.com</a> → API Keys.</div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input type="password" id="guidance-api-key" placeholder="sk-ant-api03-…" autocomplete="off"
-              style="flex:1;padding:10px 12px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:monospace;font-size:14px;background:var(--bg);"
-              onkeydown="if(event.key==='Enter')saveApiKey()">
-            <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save Key</button>
-          </div>
-          <div id="api-key-status" style="font-size:13px;margin-top:6px;display:none;"></div>
-        </div>
-      </div>
-    </div>
     <div class="two-col">
       <div>
         <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;">📊 Varroa Status<button class="speak-btn" onclick="speakSection('guidance-summary-body')" title="Read aloud">🔊</button></div><div class="guidance-section-body" id="guidance-summary-body"><div style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</div></div></div>
@@ -1184,6 +1151,7 @@ const SEED = {
 // ══════════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
+const ANTHROPIC_KEY = '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';
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 let _sbUser = null;
 
@@ -2149,10 +2117,7 @@ function switchHiveTab(tab,el){
 }
 
 // ══ GUIDANCE ══
-let storedApiKey='';
-// Load API key — try localStorage first, then sessionStorage fallback
-try{storedApiKey=localStorage.getItem('varroamate_apikey')||'';}catch(e){}
-if(!storedApiKey){try{storedApiKey=sessionStorage.getItem('varroamate_apikey')||'';}catch(e){}}
+let storedApiKey=ANTHROPIC_KEY;
 // Restore saved preference selection and initialise app state on load
 document.addEventListener('DOMContentLoaded',()=>{
   restorePrefSelection();
@@ -2176,54 +2141,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   // Navigation is handled by the async BOOT handler below — do not navigate here
 });
-function syncApiKeyUI(){
-  const has=!!storedApiKey;
-  const savedUI=document.getElementById('apikey-saved-ui');
-  const entryUI=document.getElementById('apikey-entry-ui');
-  if(savedUI)savedUI.style.display=has?'':'none';
-  if(entryUI)entryUI.style.display=has?'none':'';
-  if(has){
-    const hint=document.getElementById('apikey-hint');
-    if(hint&&storedApiKey.length>12)
-      hint.textContent=storedApiKey.slice(0,12)+'••••••••'+storedApiKey.slice(-4);
-    // Warn if running as file:// — localStorage may not persist across re-downloads
-    const fileWarn=document.getElementById('apikey-file-warn');
-    if(fileWarn)fileWarn.style.display=window.location.protocol==='file:'?'':'none';
-  }
-}
-function saveApiKey(){
-  const k=document.getElementById('guidance-api-key').value.trim();
-  const st=document.getElementById('api-key-status');
-  if(!k.startsWith('sk-ant-')){
-    st.style.display='';st.style.color='var(--red)';
-    st.textContent='⚠ Key should start with sk-ant-…';return;
-  }
-  storedApiKey=k;
-  let lsOk=false,ssOk=false;
-  try{localStorage.setItem('varroamate_apikey',k);lsOk=(localStorage.getItem('varroamate_apikey')===k);}catch(e){}
-  try{sessionStorage.setItem('varroamate_apikey',k);ssOk=(sessionStorage.getItem('varroamate_apikey')===k);}catch(e){}
-  if(!lsOk&&!ssOk){
-    st.style.display='';st.style.color='var(--yellow)';
-    st.textContent='⚠ Storage unavailable — key is in memory only and will be lost on close. Try a non-private window.';
-  } else {
-    st.style.display='none';
-  }
-  document.getElementById('guidance-api-key').value='';
-  syncApiKeyUI();
-  loadGuidance();
-}
-function clearApiKey(){
-  storedApiKey='';
-  try{localStorage.removeItem('varroamate_apikey');}catch(e){}
-  try{sessionStorage.removeItem('varroamate_apikey');}catch(e){}
-  syncApiKeyUI();
-  document.getElementById('api-key-status').style.display='none';
-  ['guidance-summary-body','guidance-nextsteps-body','guidance-cautions-body'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.innerHTML='<span style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</span>';
-  });
-  showToast('API key removed.');
-}
 async function loadGuidance(){
   const hive=Object.values(hives).flat().find(h=>h.id===currentHiveId);
   const ap=apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===currentHiveId));
@@ -2238,16 +2155,8 @@ async function loadGuidance(){
   const varroaPresent=sd?.varroaPresent??true;
   if(chips)chips.innerHTML=`<div class="info-chip">🐝 ${hive?.name||'Hive'}</div><div class="info-chip">📍 ${ap?.name||''}</div><div class="info-chip">🌿 ${pref}</div>${state?`<div class="info-chip" style="background:${sd?.varroaPresent?'rgba(231,76,60,0.12)':'rgba(39,174,96,0.12)'};">🗺️ ${state}</div>`:''}`;
 
-  // Always load the temperature chart regardless of API key
+  // Always load the temperature chart
   loadTempChart(ap);
-
-  if(!storedApiKey){
-    ['guidance-summary-body','guidance-nextsteps-body','guidance-cautions-body'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el)el.innerHTML='<span style="color:var(--text3);font-style:italic;">Enter API key above to load guidance.</span>';
-    });
-    return;
-  }
 
   const month=new Date().getMonth(); // 0=Jan
   const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
@@ -2379,7 +2288,7 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
 async function loadSection(elId,prompt,prefProfile){
   const el=document.getElementById(elId);if(!el)return;
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
-  if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">Enter your Anthropic API key above to load guidance.</span>';return;}
+  if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
 CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.`;
   try{
@@ -2406,7 +2315,7 @@ async function sendChat(){
   input.value='';
   addChatMsg(msg,'user');chatHistory.push({role:'user',content:msg});
   const loading=addChatMsg('…','bot');
-  if(!storedApiKey){loading.textContent='Please enter your Anthropic API key in the Guidance tab first.';return;}
+  if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const headers={'Content-Type':'application/json','x-api-key':storedApiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,
