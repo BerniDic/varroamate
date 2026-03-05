@@ -395,8 +395,8 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <h4>Join Your Local Bee Club</h4>
       <p>Beekeeping is best done in community. Your local bee club is one of the most valuable resources available — for mentorship, shared experience, and staying up to date with the Varroa situation in your area. If you are not already a member, we strongly encourage you to join a bee club near you.</p>
     </div>
-    <div class="checkbox-row" onclick="toggleAccept()">
-      <input type="checkbox" id="accept-chk">
+    <div class="checkbox-row" onclick="document.getElementById('accept-chk').click()">
+      <input type="checkbox" id="accept-chk" onclick="event.stopPropagation()" onchange="document.getElementById('enter-btn').disabled=!this.checked">
       <label for="accept-chk">I have read and accept the terms and disclaimer</label>
     </div>
     <button class="btn btn-primary btn-full" id="enter-btn" disabled onclick="goto('s-prefs')">Enter VarroaMate →</button>
@@ -1503,8 +1503,9 @@ function initMap(){
         mapInstance.setView([-27.5,133.5],4); // All-Australia default when no apiaries
       }
     }
-  },120);
-}
+  },300);
+  // Second invalidateSize for mobile where rendering is slower
+  setTimeout(()=>{if(mapInstance)mapInstance.invalidateSize();},600);
 
 // ══ ADDRESS SEARCH ══
 function onAddressInput(){clearTimeout(addrTimer);addrTimer=setTimeout(searchAddr,500);}
