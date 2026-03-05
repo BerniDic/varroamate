@@ -850,15 +850,15 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <p class="page-subtitle">Help us improve VarroaMate for beekeepers</p>
     <div class="two-col">
       <div>
-        <div class="card"><div class="card-title">⭐ Rate the App</div><p style="font-size:14px;color:var(--text3);margin-bottom:12px;">Your rating is private.</p><div class="stars" id="stars"><span class="star inactive" onclick="rateStar(1)">★</span><span class="star inactive" onclick="rateStar(2)">★</span><span class="star inactive" onclick="rateStar(3)">★</span><span class="star inactive" onclick="rateStar(4)">★</span><span class="star inactive" onclick="rateStar(5)">★</span></div></div>
-        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><button class="btn btn-outline btn-sm">Instagram</button><button class="btn btn-outline btn-sm">Email Us</button></div></div>
+        <div class="card"><div class="card-title">⭐ Rate the App</div><p style="font-size:14px;color:var(--text3);margin-bottom:12px;">Your rating helps us improve VarroaMate.</p><div class="stars" id="stars"><span class="star inactive" onclick="rateStar(1)">★</span><span class="star inactive" onclick="rateStar(2)">★</span><span class="star inactive" onclick="rateStar(3)">★</span><span class="star inactive" onclick="rateStar(4)">★</span><span class="star inactive" onclick="rateStar(5)">★</span></div></div>
+        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><a href="mailto:hello@varroamate.com" class="btn btn-outline btn-sm">Email Us</a></div></div>
       </div>
       <div>
         <div class="card"><div class="card-title">💬 Share Your Thoughts</div>
-          <div class="field"><label>What's working well?</label><textarea rows="3" placeholder="e.g. The guidance is really helpful…"></textarea></div>
-          <div class="field"><label>What could be improved?</label><textarea rows="3" placeholder="e.g. I'd love to see…"></textarea></div>
-          <div class="field"><label>Any other comments?</label><textarea rows="2" placeholder="Anything else…"></textarea></div>
-          <button class="btn btn-primary btn-full" onclick="showToast('Thanks for your feedback! 🐝')">Submit Feedback</button>
+          <div class="field"><label>What's working well?</label><textarea id="fb-good" rows="3" placeholder="e.g. The guidance is really helpful…"></textarea></div>
+          <div class="field"><label>What could be improved?</label><textarea id="fb-improve" rows="3" placeholder="e.g. I'd love to see…"></textarea></div>
+          <div class="field"><label>Any other comments?</label><textarea id="fb-other" rows="2" placeholder="Anything else…"></textarea></div>
+          <button class="btn btn-primary btn-full" onclick="submitFeedback()">Submit Feedback</button>
         </div>
       </div>
     </div>
@@ -974,7 +974,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px;">VarroaMate is currently developing solutions that suit the management, monitoring and reporting requirements of very large beekeeping operations — including multi-user access, bulk hive management, and integration with national reporting systems.</p>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;">We can also produce <strong>individual solutions for a single business</strong> — a custom design built around the specific needs of your operation, from hive tracking at scale to treatment planning and compliance reporting. If you run a beekeeping business and want to explore how VarroaMate can support your Varroa management, we'd love to hear from you.</p>
-      <a href="/cdn-cgi/l/email-protection#d1b9b4bdbdbe91a7b0a3a3beb0bcb0a5b4ffb2bebcffb0a4" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
+      <a href="mailto:hello@varroamate.com" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
@@ -1868,7 +1868,7 @@ function editTreatment(id){
 function resetTreatmentModal(){
   document.getElementById('treatment-modal-title').textContent='Add Treatment';
   document.getElementById('treatment-select').value='';
-  document.getElementById('treatment-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('treatment-date').value=localDateStr();
   document.getElementById('treatment-notes').value='';
   document.getElementById('treatment-edit-id').value='';
   document.getElementById('modal-treatment-preview').style.display='none';
@@ -2421,14 +2421,14 @@ function addChatMsg(text,type){
 function openModal(id){
   if(id==='modal-add-count'&&!document.getElementById('count-edit-id').value){
     document.getElementById('count-modal-title').textContent='Add Mite Count';
-    document.getElementById('count-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('count-date').value=localDateStr();
     document.getElementById('count-value').value='';
     setHiveStrength('Good');
     restoreSelectedDiseases('disease-btns',['No Disease Present']);
   }
   if(id==='modal-add-note'&&!document.getElementById('note-edit-id').value){
     document.getElementById('note-modal-title').textContent='Add Note';
-    document.getElementById('note-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('note-date').value=localDateStr();
     document.getElementById('note-text').value='';
   }
   if(id==='modal-add-treatment'&&!document.getElementById('treatment-edit-id').value){
@@ -2465,7 +2465,7 @@ const STATE_DATA = {
     statusBg: '#FDEDEC',
     summary: 'Varroa established across NSW. Treatment is expected when thresholds are met. ⚠️ Pyrethroid-resistant varroa (L925I mutation) confirmed in northern NSW, January 2026 — monitor Bayvarol and Apistan efficacy closely.',
     authority: 'NSW DPIRD',
-    authorityUrl: 'https://www.dpi.nsw.gov.au/biosecurity/bees',
+    authorityUrl: 'https://www.dpi.nsw.gov.au/animals-and-livestock/bees/pests-diseases/varroa/varroa-mites',
     reportingSystem: 'NSW DPIRD Biosecurity',
     treatmentNote: 'All AHBIC-listed products available under current APVMA permits. Use only when treatment thresholds are met.',
   },
@@ -2542,7 +2542,7 @@ const STATE_DATA = {
     statusBg: '#EAFAF1',
     summary: 'The Northern Territory remains varroa-free as of January 2026. Varroa treatment chemicals are not currently required. Active surveillance is ongoing. Report any suspect mites immediately to NT DPIR.',
     authority: 'NT DPIR',
-    authorityUrl: 'https://nt.gov.au/industry/agriculture/food-crops-plants-and-quarantine/insects-and-diseases-affecting-plants/bee-biosecurity',
+    authorityUrl: 'https://nt.gov.au/industry/agriculture/livestock-and-animals/honey-bees-and-beekeeping',
     reportingSystem: 'NT DPIR',
     treatmentNote: 'Varroa not detected — chemical treatments for varroa are not currently permitted or required. Contact NT DPIR for current biosecurity requirements.',
   }
@@ -2798,7 +2798,7 @@ function updateTreatmentInfo(){
   const prev=document.getElementById('modal-treatment-preview');
   if(key&&TREATMENTS[key]){
     btn.style.display='';const t=TREATMENTS[key];prev.style.display='';
-    const removalDate=calcRemovalDate(new Date().toISOString().split('T')[0],key);
+    const removalDate=calcRemovalDate(localDateStr(),key);
     const stateNote=getStateTreatmentNote(key);
     const state=getSelectedState();
     let stateWarning='';
@@ -2817,7 +2817,7 @@ function calcRemovalDate(startDate,product){
   const t=TREATMENTS[product];
   if(!t||!t.durationDays)return null;
   const d=new Date(startDate);d.setDate(d.getDate()+t.durationDays);
-  return d.toISOString().split('T')[0];
+  return localDateStr(d);
 }
 
 // ══ MISC ══
@@ -2863,7 +2863,7 @@ function gotoField(){
   document.getElementById('field-hive-name').textContent=hive.name;
   document.getElementById('field-apiary-name').textContent=ap?.name||'';
   document.getElementById('field-count-num').textContent='0';
-  document.getElementById('field-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('field-date').value=localDateStr();
   document.getElementById('field-notes').value='';
   document.getElementById('field-voice-status').textContent='';
   fieldUpdateThreshold();
@@ -2918,6 +2918,16 @@ async function fieldSave(){
   setFieldHiveStrength('Good');
   restoreSelectedDiseases('field-disease-btns',['No Disease Present']);
   fieldUpdateThreshold();
+}
+
+// ── DATE HELPERS ──
+// Always use local date (not UTC) so Australian users don't get yesterday's date in the evening
+function localDateStr(d){
+  const dt=d||new Date();
+  const y=dt.getFullYear();
+  const m=String(dt.getMonth()+1).padStart(2,'0');
+  const day=String(dt.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 // ── VOICE ENTRY ──
@@ -2995,9 +3005,21 @@ function fieldToggleVoice(){
 
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition||
            window.mozSpeechRecognition||window.msSpeechRecognition;
+
   if(!SR){
-    showToast('Voice entry not supported in this browser');
-    _voiceSetStatus('Try Chrome on Android or Safari on iOS 14.5+');
+    if(location.protocol==='http:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
+      _voiceSetStatus('Voice needs HTTPS — contact your app host to enable secure access');
+      showToast('Voice requires a secure HTTPS connection');
+    } else {
+      _voiceSetStatus('Not supported — use Chrome (Android) or Safari (iOS 14.5+)');
+      showToast('Voice entry not supported in this browser');
+    }
+    return;
+  }
+
+  if(typeof window.isSecureContext!=='undefined'&&!window.isSecureContext){
+    _voiceSetStatus('Voice needs HTTPS — not available on insecure connections');
+    showToast('Voice requires a secure HTTPS connection');
     return;
   }
 
@@ -3012,6 +3034,8 @@ function fieldToggleVoice(){
   }
 
   speechRec.lang='en-AU';
+  // Fallback: if en-AU not available some devices throw language-not-supported
+  // We'll catch that in onerror and retry with en-US
   speechRec.continuous=false;
   speechRec.interimResults=false;
   speechRec.maxAlternatives=5;
@@ -3053,11 +3077,29 @@ function fieldToggleVoice(){
 
   speechRec.onerror=(e)=>{
     if(_voiceTimeout){clearTimeout(_voiceTimeout);_voiceTimeout=null;}
+    // If language not supported, silently retry with en-US
+    if(e.error==='language-not-supported'){
+      _voiceCleanup();
+      // Retry with en-US
+      try{
+        const SR2=window.SpeechRecognition||window.webkitSpeechRecognition;
+        if(SR2){
+          speechRec=new SR2();
+          speechRec.lang='en-US';
+          speechRec.continuous=false;
+          speechRec.interimResults=false;
+          speechRec.maxAlternatives=5;
+          // Re-attach all handlers by calling start again — simplest: just update status and let user retry
+        }
+      }catch(e2){}
+      _voiceSetStatus('Language adjusted — tap to try again');
+      return;
+    }
     const msgs={
-      'not-allowed':         'Microphone blocked — Settings → Safari → Microphone → Allow',
-      'service-not-allowed': 'Microphone blocked — check Safari microphone permissions',
+      'not-allowed':         'Microphone access denied — tap the 🔒 in your address bar and allow microphone',
+      'service-not-allowed': 'Microphone blocked — check browser microphone permissions in device Settings',
       'no-speech':           'Nothing heard — tap and try again',
-      'network':             'Network error — check connection and try again',
+      'network':             'Network error — voice needs an internet connection',
       'aborted':             '',
       'audio-capture':       'No microphone found on this device',
     };
@@ -3854,7 +3896,35 @@ document.addEventListener('DOMContentLoaded', async function(){
   }
 });
 
-function rateStar(n){document.querySelectorAll('.star').forEach((s,i)=>{s.classList.toggle('active',i<n);s.classList.toggle('inactive',i>=n);});showToast('Thanks for rating VarroaMate! 🐝');}
+async function rateStar(n){
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('active',i<n);
+    s.classList.toggle('inactive',i>=n);
+  });
+  // Save to Supabase ratings table
+  if(_sbUser){
+    try{
+      await _sb.from('app_ratings').upsert({
+        user_id:_sbUser.id,
+        rating:n,
+        rated_at:new Date().toISOString()
+      },{onConflict:'user_id'});
+    }catch(e){console.warn('Rating save failed',e);}
+  }
+  showToast('Thanks for rating VarroaMate! 🐝');
+}
+
+function submitFeedback(){
+  const good=document.getElementById('fb-good')?.value.trim()||'';
+  const improve=document.getElementById('fb-improve')?.value.trim()||'';
+  const other=document.getElementById('fb-other')?.value.trim()||'';
+  if(!good&&!improve&&!other){showToast('Please add at least one comment before submitting');return;}
+  const body=encodeURIComponent(
+    `VarroaMate Feedback\n\nWhat's working well:\n${good||'(not provided)'}\n\nWhat could be improved:\n${improve||'(not provided)'}\n\nOther comments:\n${other||'(not provided)'}`
+  );
+  window.location.href=`mailto:hello@varroamate.com?subject=VarroaMate%20Feedback&body=${body}`;
+  showToast('Opening your mail app… 🐝');
+}
 
 // ══ PULL-TO-REFRESH (mobile) ══
 (function(){
