@@ -1386,7 +1386,7 @@ function togglePwVisibility(){
   if(eye)eye.textContent=inp.type==='password'?'👁':'🙈';
 }
 function toggleAccept(){
-  const c=document.getElementById('accept-chk');c.checked=!c.checked;
+  const c=document.getElementById('accept-chk');
   document.getElementById('enter-btn').disabled=!c.checked;
 }
 function selectPref(card){
@@ -2127,8 +2127,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     const sd=STATE_DATA[b.dataset.state];
     if(sd)b.classList.add(sd.varroaPresent?'varroa-present':'varroa-free');
   });
-  // Sync API key UI state
-  syncApiKeyUI();
   // Show "Add to Home Screen" hint on mobile browsers (not if already installed)
   const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
