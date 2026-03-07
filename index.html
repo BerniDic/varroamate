@@ -826,7 +826,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="two-col">
       <div>
         <div class="card"><div class="card-title">⭐ Rate the App</div><p style="font-size:14px;color:var(--text3);margin-bottom:12px;">Your rating helps us improve VarroaMate.</p><div class="stars" id="stars"><span class="star inactive" onclick="rateStar(1)">★</span><span class="star inactive" onclick="rateStar(2)">★</span><span class="star inactive" onclick="rateStar(3)">★</span><span class="star inactive" onclick="rateStar(4)">★</span><span class="star inactive" onclick="rateStar(5)">★</span></div></div>
-        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><a href="mailto:hello@varroamate.com" class="btn btn-outline btn-sm">Email Us</a></div></div>
+        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><a href="/cdn-cgi/l/email-protection#4a222f2626250a3c2b3838252b272b3e2f64292527" class="btn btn-outline btn-sm">Email Us</a></div></div>
       </div>
       <div>
         <div class="card"><div class="card-title">💬 Share Your Thoughts</div>
@@ -949,7 +949,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px;">VarroaMate is currently developing solutions that suit the management, monitoring and reporting requirements of very large beekeeping operations — including multi-user access, bulk hive management, and integration with national reporting systems.</p>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;">We can also produce <strong>individual solutions for a single business</strong> — a custom design built around the specific needs of your operation, from hive tracking at scale to treatment planning and compliance reporting. If you run a beekeeping business and want to explore how VarroaMate can support your Varroa management, we'd love to hear from you.</p>
-      <a href="mailto:hello@varroamate.com" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
+      <a href="/cdn-cgi/l/email-protection#39515c555556794f584b4b565854584d5c175a5654" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
@@ -1067,7 +1067,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <option value="">— Select treatment —</option>
           <optgroup label="Organic Acids"><option value="oxalic">Oxalic Acid Vaporisation</option><option value="oxalic-dribble">Oxalic Acid Dribble</option><option value="formic">Formic Acid (MAQS)</option><option value="aluen-cap">Aluen CAP (Oxalic + Lactic acid)</option></optgroup>
           <optgroup label="Thymol-based"><option value="apilife">ApiLife Var (Thymol)</option><option value="apiguard">Apiguard (Thymol gel)</option></optgroup>
-          <optgroup label="Synthetic Acaricides"><option value="apivar">Apivar (Amitraz)</option><option value="bayvarol">Bayvarol (Flumethrin)</option><option value="apistan">Apistan (Tau-fluvalinate)</option></optgroup>
+          <optgroup label="Synthetic Acaricides"><option value="apivar">Apivar (Amitraz)</option><option value="apitraz">Apitraz (Amitraz)</option><option value="bayvarol">Bayvarol (Flumethrin)</option><option value="apistan">Apistan (Tau-fluvalinate)</option></optgroup>
           <optgroup label="Mechanical"><option value="drone-comb">Drone comb removal</option><option value="brood-int">Brood interruption</option><option value="heat">Heat treatment</option></optgroup>
         </select>
         <button class="icon-btn" id="modal-info-btn" style="font-size:22px;display:none;" onclick="showTreatmentInfoFromSelect()">ℹ️</button>
@@ -1116,7 +1116,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══ DATA — seed IDs use fixed large numbers to avoid collisions with Date.now() new entries ══
 const SEED = {
   apiaries:[
@@ -2165,7 +2165,7 @@ async function loadGuidance(){
   const sections=[
     {id:'guidance-summary-body',prompt:`Varroa status: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 2–3 sentences. Specific about count, trend, season, and state context.`},
     {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
-    {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic Acid (MAQS) also allows supers on. Supers must be removed for: Apivar, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
+    {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic Acid (MAQS) also allows supers on. Supers must be removed for: Apivar, Apitraz, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
   ];
   for(const s of sections)loadSection(s.id,s.prompt,pref);
 }
@@ -2283,7 +2283,7 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
             <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 Aluen CAP: 5–40°C</span>
             <span style="background:rgba(41,128,185,0.15);padding:2px 8px;border-radius:4px;">🔵 MAQS: 10–29°C</span>
             <span style="background:rgba(39,174,96,0.15);padding:2px 8px;border-radius:4px;">🟢 ApiLife Var / Apiguard: 15–30°C</span>
-            <span style="background:rgba(180,180,180,0.15);padding:2px 8px;border-radius:4px;">⚪ Apivar / Bayvarol / Apistan: &gt;10°C preferred, no upper limit</span>
+            <span style="background:rgba(180,180,180,0.15);padding:2px 8px;border-radius:4px;">⚪ Apivar / Apitraz / Bayvarol / Apistan: &gt;10°C preferred, no upper limit</span>
           </div>`;
       }
     }
@@ -2296,7 +2296,7 @@ async function loadSection(elId,prompt,prefProfile){
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
-CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.`;
+CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.`;
   try{
     const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
     const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
@@ -2544,6 +2544,16 @@ const TREATMENT_STATE_NOTES = {
     TAS: {ok:false, note:'Varroa not detected in Tasmania — not currently required or permitted.'},
     NT:  {ok:false, note:'Varroa not detected in NT — not currently required or permitted.'},
   },
+  'apitraz': {
+    NSW: {ok:true,  note:'Available under emergency use permit PER95905 (Label P88615). Supers must be removed. Use once per year only. Full registration progressing — check AHBIC table for current status.'},
+    ACT: {ok:true,  note:'Available under emergency use permit PER95905. Supers off. Once per year maximum.'},
+    VIC: {ok:true,  note:'Available under emergency use permit PER95905. Report positive detections via BeeMAX.'},
+    QLD: {ok:true,  note:'Available under general use emergency permit PER95905. Use once per year only.'},
+    SA:  {ok:true,  note:'Available. All AHBIC-listed products available. Contact PIRSA Biosecurity with questions.'},
+    WA:  {ok:false, note:'Varroa not detected in WA — not currently required or permitted. Contact DPIRD WA before use.'},
+    TAS: {ok:false, note:'Varroa not detected in Tasmania — not currently required or permitted.'},
+    NT:  {ok:false, note:'Varroa not detected in NT — not currently required or permitted.'},
+  },
   'bayvarol': {
     NSW: {ok:true,  note:'⚠️ Pyrethroid-resistant varroa (L925I) confirmed in northern NSW (January 2026). Monitor treatment efficacy closely. If poor knock-down is observed, contact NSW DPIRD immediately and switch to a different mode of action. Available under permit PER95037.'},
     ACT: {ok:true,  note:'Available under permit PER95037. Monitor efficacy — pyrethroid resistance confirmed nearby in NSW.'},
@@ -2660,6 +2670,7 @@ const TREATMENTS={
   'apilife':{name:'ApiLife Var (Thymol)',moa:'Essential oil / Thymol',active:'Thymol, eucalyptol, menthol, camphor',tempRange:'15°C–30°C. Ineffective outside this range.',tempSensitive:true,honeySupers:'Must be removed during and 2 weeks after',withBrood:'Moderate efficacy with brood.',resistance:'Low risk.',dosage:'Half a tablet on top bars at two corners of brood box.',duration:'3 applications × 10 days (30 days total)',durationDays:30,removal:'Replace tablet every 10 days for 3 rounds. Remove final tablet and any residue after day 30. Honey supers must stay off for a further 2 weeks after removal.',regulatory:'Registered Australia. Store below 25°C.',notes:'Temperature critical. Below 15°C thymol does not volatilise. Above 30°C causes brood/queen damage. Check 14-day forecast first.'},
   'apiguard':{name:'Apiguard (Thymol gel)',moa:'Essential oil / Thymol',active:'Thymol slow-release gel',tempRange:'Above 15°C for efficacy',tempSensitive:true,honeySupers:'Must be removed',withBrood:'Best in low-brood periods.',resistance:'Low risk.',dosage:'50 g tray on top frames. Replace after 10–14 days.',duration:'2 trays 10–14 days apart (3–6 weeks)',durationDays:42,removal:'Replace first tray after 10–14 days with a fresh 50 g tray. Remove second tray after a further 10–14 days. Remove all residue. Honey supers can return 2 weeks after final removal.',regulatory:'Registered Australia.',notes:'Temperature dependent. Most effective in warm conditions.'},
   'apivar':{name:'Apivar (Amitraz strips)',moa:'Synthetic — Amitraz (Formamidine)',active:'Amitraz',tempRange:'Wide range (above 10°C preferred)',tempSensitive:false,honeySupers:'Must be removed for entire treatment',withBrood:'Effective with brood.',resistance:'Resistance reported in some regions. Rotate MoA.',dosage:'2 strips per brood box between brood frames.',duration:'6–8 weeks',durationDays:56,removal:'⚠ Remove Apivar strips after 6–8 weeks (no later than 56 days). Leaving strips in longer encourages amitraz resistance and increases wax residue accumulation. Record removal date.',regulatory:'Registered Australia. Prescription in some states. Residues accumulate in wax.',notes:'Highly effective. Wax residue concern with repeated use. Rotate MoA after each course.'},
+  'apitraz':{name:'Apitraz (Amitraz strips)',moa:'Synthetic — Amitraz (Formamidine)',active:'Amitraz',tempRange:'Wide range (above 10°C preferred)',tempSensitive:false,honeySupers:'Must be removed for entire treatment. Do not have supers on when strips are in.',withBrood:'Effective with brood present.',resistance:'Resistance reported in some regions. Rotate MoA after each course.',dosage:'2 strips per brood box between brood frames.',duration:'6 weeks',durationDays:42,removal:'⚠ Remove Apitraz strips after 6 weeks (42 days maximum). Do not exceed 42 days — leaving strips longer encourages amitraz resistance and increases wax residue. Record removal date.',regulatory:'Emergency use permit PER95905 active. Listed on AHBIC Varroa Chemical Treatment Table (28 Jan 2026). Label P88615. Full registration progressing. Supers must be removed. Use once per year only.',notes:'Same active ingredient (amitraz) as Apivar — do not use Apitraz and Apivar in the same season. Wax residue concern with repeated use. Rotate MoA after each course. Emergency permit — check AHBIC table for current status.'},
   'bayvarol':{name:'Bayvarol (Flumethrin)',moa:'Synthetic — Pyrethroid',active:'Flumethrin',tempRange:'Wide range',tempSensitive:false,honeySupers:'Must be removed during treatment — check your current APVMA label for withholding period before returning supers',withBrood:'Less effective against mites in capped brood cells.',resistance:'Pyrethroid resistance is documented globally. Test efficacy with post-treatment alcohol wash. Rotate mechanism of action.',dosage:'4 strips per hive, hung in the brood nest between frames.',duration:'6–8 weeks',durationDays:56,removal:'Remove all 4 Bayvarol strips after 6–8 weeks. Do not exceed 8 weeks — prolonged exposure accelerates pyrethroid resistance. Record removal date.',regulatory:'Registered Australia. APVMA label. Check current label for honey super withholding period requirements.',notes:'Pyrethroid resistance is well documented globally — efficacy may be reduced. Confirm with post-treatment mite wash. Rotate mechanism of action after each course. Always read the current APVMA label for honey super requirements before treating.'},
   'apistan':{name:'Apistan (Tau-fluvalinate)',moa:'Synthetic — Pyrethroid',active:'Tau-fluvalinate',tempRange:'Wide range',tempSensitive:false,honeySupers:'Must be removed',withBrood:'Reduced brood mite efficacy.',resistance:'⚠️ High risk. Pyrethroid resistance widespread.',dosage:'2 strips per brood box.',duration:'6–8 weeks',durationDays:56,removal:'Remove Apistan strips after 6–8 weeks. Given widespread pyrethroid resistance, confirm treatment efficacy with a post-treatment alcohol wash. Do not re-use strips.',regulatory:'Registered Australia.',notes:'Pyrethroid resistance widespread. Confirm mite susceptibility before use.'},
   'drone-comb':{name:'Drone Comb Removal',moa:'Mechanical / Cultural',active:'N/A',tempRange:'Any season with drone brood',tempSensitive:false,honeySupers:'No restriction',withBrood:'Targets drone brood where Varroa preferentially reproduce.',resistance:'No resistance possible.',dosage:'Remove and freeze drone comb when ~80% capped.',duration:'Ongoing',durationDays:null,removal:'Remove capped drone comb from hive and freeze for 48 hours to kill mites. Comb can be returned or melted down. Repeat every brood cycle during high-risk periods.',regulatory:'No requirements. No chemicals.',notes:'Effective supplementary tool. Labour intensive but zero residue.'},
@@ -3908,16 +3919,10 @@ function submitFeedback(){
     <div style="background:var(--amber-pale);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
       <div style="font-weight:700;color:var(--amber-dark);font-size:15px;margin-bottom:6px;">✨ Upgrade to manage more hives</div>
       <ul style="font-size:14px;color:var(--text2);line-height:1.8;margin:0;padding-left:18px;">
-        <li>Up to <strong>15 hives</strong> on Hobbyist</li>
-        <li>Up to <strong>100 hives</strong> on Beekeeper</li>
+        <li>Up to <strong>15 hives</strong> on Essential</li>
+        <li>Unlimited hives on Professional &amp; Enterprise</li>
         <li>Full mite tracking, treatment history &amp; AI guidance</li>
         <li>BeeMAX export &amp; calendar reminders</li>
       </ul>
     </div>
-    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans &amp; Pricing</button>
-    <button class="btn btn-outline btn-full" onclick="closeModal('modal-hive-limit')">Maybe Later</button>
-  </div>
-</div>
-
-</body>
-</html>
+    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="closeModal('modal-hive-limit');got
