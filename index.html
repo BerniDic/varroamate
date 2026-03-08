@@ -365,7 +365,6 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <li>National program: <a href="https://www.varroa.org.au/" target="_blank" style="color:#FFE082;">varroa.org.au</a></li>
       <li>AHBIC treatment guidance: <a href="https://honeybee.org.au/varroa/" target="_blank" style="color:#FFE082;">honeybee.org.au</a></li>
       <li>Report Varroa to your state agriculture authority</li>
-      <li>Join your local bee club</li>
     </ul>
   </div>
   <div class="welcome-btns">
@@ -1645,12 +1644,47 @@ function renderHives(){
   }
 }
 const FREE_HIVE_LIMIT = 3;
+const HOBBYIST_HIVE_LIMIT = 15;
+const BEEKEEPER_HIVE_LIMIT = 100;
+
 function getUserPlan(){ return 'free'; } // TODO: replace with real plan lookup from Supabase
+
+function showHiveLimitModal(){
+  const plan = getUserPlan();
+  let intro = '';
+  let bullets = '';
+  if(plan === 'free'){
+    intro = 'Your <strong>Free</strong> plan includes up to <strong>3 hives</strong>. You\'ve reached that limit.';
+    bullets = `<li>Up to <strong>15 hives</strong> on Hobbyist</li>
+        <li>Up to <strong>100 hives</strong> on Beekeeper</li>
+        <li>Full mite tracking, treatment history &amp; AI guidance</li>`;
+  } else if(plan === 'free-ai'){
+    intro = 'Your <strong>Free + AI</strong> plan includes up to <strong>3 hives</strong>. You\'ve reached that limit.';
+    bullets = `<li>Up to <strong>15 hives</strong> on Hobbyist</li>
+        <li>Up to <strong>100 hives</strong> on Beekeeper</li>
+        <li>Full mite tracking, treatment history &amp; AI guidance</li>`;
+  } else if(plan === 'hobbyist'){
+    intro = 'Your <strong>Hobbyist</strong> plan includes up to <strong>15 hives</strong>. You\'ve reached that limit.';
+    bullets = `<li>Up to <strong>100 hives</strong> on Beekeeper</li>
+        <li>Full mite tracking, treatment history &amp; AI guidance</li>`;
+  }
+  const body = document.getElementById('hive-limit-body');
+  if(body) body.innerHTML = `
+    <p style="font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:16px;">${intro}</p>
+    <div style="background:var(--amber-pale);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+      <div style="font-weight:700;color:var(--amber-dark);font-size:15px;margin-bottom:6px;">✨ Upgrade to manage more hives</div>
+      <ul style="font-size:14px;color:var(--text2);line-height:1.8;margin:0;padding-left:18px;">${bullets}</ul>
+    </div>`;
+  openModal('modal-hive-limit');
+}
+
 function tryAddHive(){
   const plan = getUserPlan();
-  if(plan === 'free'){
-    const totalHives = Object.values(hives).flat().length;
-    if(totalHives >= FREE_HIVE_LIMIT){ openModal('modal-hive-limit'); return; }
+  const totalHives = Object.values(hives).flat().length;
+  if(plan === 'free' || plan === 'free-ai'){
+    if(totalHives >= FREE_HIVE_LIMIT){ showHiveLimitModal(); return; }
+  } else if(plan === 'hobbyist'){
+    if(totalHives >= HOBBYIST_HIVE_LIMIT){ showHiveLimitModal(); return; }
   }
   openModal('modal-add-hive');
 }
@@ -1659,8 +1693,11 @@ async function saveNewHive(){
   const name=document.getElementById('new-hive-name').value.trim();
   if(!name){showToast('Please enter a hive name');return;}
   // Safety guard — enforce limit even if modal was opened directly
-  if(getUserPlan()==='free' && Object.values(hives).flat().length >= FREE_HIVE_LIMIT){
-    closeModal('modal-add-hive'); openModal('modal-hive-limit'); return;
+  if((getUserPlan()==='free'||getUserPlan()==='free-ai') && Object.values(hives).flat().length >= FREE_HIVE_LIMIT){
+    closeModal('modal-add-hive'); showHiveLimitModal(); return;
+  }
+  if(getUserPlan()==='hobbyist' && Object.values(hives).flat().length >= HOBBYIST_HIVE_LIMIT){
+    closeModal('modal-add-hive'); showHiveLimitModal(); return;
   }
   showSaveSpinner(true);
   const {data,error}=await _sb.from('hives').insert({user_id:_sbUser.id,apiary_id:currentApiaryId,name}).select().single();
@@ -3919,12 +3956,8 @@ function submitFeedback(){
 <div class="modal-overlay" id="modal-hive-limit" onclick="closeModalOutside(event,'modal-hive-limit')">
   <div class="modal-box">
     <div class="modal-title">🐝 Hive Limit Reached <button class="modal-close" onclick="closeModal('modal-hive-limit')">✕</button></div>
-    <p style="font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:16px;">
-      Your free plan includes up to <strong>3 hives</strong>. You've reached that limit.
-    </p>
-    <div style="background:var(--amber-pale);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
-      <div style="font-weight:700;color:var(--amber-dark);font-size:15px;margin-bottom:6px;">✨ Upgrade to manage more hives</div>
-      <ul style="font-size:14px;color:var(--text2);line-height:1.8;margin:0;padding-left:18px;">
-        <li>Up to <strong>15 hives</strong> on Essential</li>
-        <li>Unlimited hives on Professional &amp; Enterprise</li>
-        <li>Full mite tracking, 
+    <div id="hive-limit-body"></div>
+    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans →</button>
+    <button class="btn btn-outline btn-full btn-sm" onclick="closeModal('modal-hive-limit')">Maybe Later</button>
+  </div>
+</div>
