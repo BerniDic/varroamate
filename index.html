@@ -356,6 +356,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <p style="margin-top:8px;">VarroaMate is under ongoing development and welcomes your feedback.</p>
   </div>
   <div class="welcome-card">
+    <h3>🐝 Join Your Local Bee Club</h3>
+    <p>Beekeeping is best done in community. Your local bee club is one of the most valuable resources available — for mentorship, shared experience, and staying up to date with the Varroa situation in your area. If you are not already a member, we strongly encourage you to join a bee club near you.</p>
+  </div>
+  <div class="welcome-card">
     <h3>Recommended Resources</h3>
     <ul>
       <li>National program: <a href="https://www.varroa.org.au/" target="_blank" style="color:#FFE082;">varroa.org.au</a></li>
@@ -381,13 +385,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <h1 class="page-title">Terms &amp; Disclaimer</h1>
     <p class="page-subtitle">Please read carefully before continuing</p>
     <div class="disclaimer-text">
-      <h4>Mission Statement</h4>
-      <p>VarroaMate is designed to complement and support national and state Varroa management strategies — helping beekeepers monitor mite loads, time treatments, and contribute to a coordinated national response.</p>
-      <p style="margin-top:8px;">Australian beekeepers now face one of their greatest challenges. Varroa is established and spreading, threatening both managed hives and wild bee populations. VarroaMate's mission is to support beekeepers as effectively as possible — with timely guidance, treatment information, and mite tracking tools — to help them protect their colonies and do their part in saving Australia's bees.</p>
       <h4>Disclaimer</h4>
-      <p>No liability is accepted for accuracy of information or recommendations. All recommendations represent one of several possible paths of action. Beekeepers are solely responsible for treatment decisions. No liability for damage to hives, bees, honey, or loss of data.</p>
+      <p>VarroaMate provides information and guidance tools to assist beekeepers in managing Varroa mite. No liability is accepted for the accuracy of information or recommendations provided. All recommendations represent one of several possible paths of action and are not a substitute for professional veterinary or biosecurity advice. Beekeepers are solely responsible for all treatment decisions made. No liability is accepted for any damage to hives, bees, or honey, loss of colonies, loss of data, or any other loss arising from use of this application.</p>
       <h4>No Guarantee of Accuracy</h4>
-      <p>Information is provided in good faith but accuracy cannot be guaranteed. Data may be used for research and marketing purposes.</p>
+      <p>Information is provided in good faith but accuracy cannot be guaranteed. Treatment regulations, permit conditions, and biosecurity requirements change frequently — always verify current requirements with your state agriculture authority before treating. Data entered into VarroaMate may be used for aggregated research and marketing purposes.</p>
       <h4>Notifiable Pest — All Australian States &amp; Territories</h4>
       <p>Varroa is a notifiable pest across all Australian states and territories. All positive detections must be reported promptly to your state or territory agriculture authority. Contact details and reporting requirements are available from your state authority's website — VarroaMate's Guidance tab provides a direct link for your registered state.</p>
       <h4>Recommended Resources</h4>
@@ -399,7 +400,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <input type="checkbox" id="accept-chk" onclick="event.stopPropagation()" onchange="document.getElementById('enter-btn').disabled=!this.checked">
       <label for="accept-chk" onclick="event.stopPropagation()">I have read and accept the terms and disclaimer</label>
     </div>
-    <button class="btn btn-primary btn-full" id="enter-btn" disabled onclick="goto('s-prefs')">Enter VarroaMate →</button>
+    <button class="btn btn-primary btn-full" id="enter-btn" disabled onclick="acceptDisclaimer()">Enter VarroaMate →</button>
   </div>
 </div>
 
@@ -826,7 +827,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="two-col">
       <div>
         <div class="card"><div class="card-title">⭐ Rate the App</div><p style="font-size:14px;color:var(--text3);margin-bottom:12px;">Your rating helps us improve VarroaMate.</p><div class="stars" id="stars"><span class="star inactive" onclick="rateStar(1)">★</span><span class="star inactive" onclick="rateStar(2)">★</span><span class="star inactive" onclick="rateStar(3)">★</span><span class="star inactive" onclick="rateStar(4)">★</span><span class="star inactive" onclick="rateStar(5)">★</span></div></div>
-        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><a href="mailto:hello@varroamate.com" class="btn btn-outline btn-sm">Email Us</a></div></div>
+        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/varroamate" target="_blank" class="btn btn-outline btn-sm">Facebook</a><a href="/cdn-cgi/l/email-protection#d2bab7bebebd92a4b3a0a0bdb3bfb3a6b7fcb1bdbf" class="btn btn-outline btn-sm">Email Us</a></div></div>
       </div>
       <div>
         <div class="card"><div class="card-title">💬 Share Your Thoughts</div>
@@ -949,7 +950,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px;">VarroaMate is currently developing solutions that suit the management, monitoring and reporting requirements of very large beekeeping operations — including multi-user access, bulk hive management, and integration with national reporting systems.</p>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;">We can also produce <strong>individual solutions for a single business</strong> — a custom design built around the specific needs of your operation, from hive tracking at scale to treatment planning and compliance reporting. If you run a beekeeping business and want to explore how VarroaMate can support your Varroa management, we'd love to hear from you.</p>
-      <a href="mailto:hello@varroamate.com?subject=VarroaMate%20Enterprise%20Enquiry" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
+      <a href="/cdn-cgi/l/email-protection#b4dcd1d8d8dbf4c2d5c6c6dbd5d9d5c0d19ad7dbd98bc7c1d6ded1d7c089e2d5c6c6dbd5f9d5c0d1918684f1dac0d1c6c4c6ddc7d1918684f1dac5c1ddc6cd" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
@@ -1116,7 +1117,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══ DATA — seed IDs use fixed large numbers to avoid collisions with Date.now() new entries ══
 const SEED = {
   apiaries:[
@@ -1318,7 +1319,7 @@ async function doSignIn(e){
   }
   await loadDataFromSupabase();
   currentApiaryId=apiaries[0]?.id??0;
-  goto('s-disclaimer');
+  if(hasAcceptedDisclaimer()){goto('s-apiaries');}else{goto('s-disclaimer');}
 }
 async function doCreateAccount(e){
   e.preventDefault();
@@ -1338,7 +1339,7 @@ async function doCreateAccount(e){
   if(error){err.style.display='';err.textContent=error.message;return;}
   _sbUser=data.user;
   showToast('Account created! Welcome to VarroaMate 🐝');
-  goto('s-disclaimer');
+  if(hasAcceptedDisclaimer()){goto('s-prefs');}else{goto('s-disclaimer');}
 }
 
 // ══ PASSWORD VALIDATION ══
@@ -1385,6 +1386,13 @@ function togglePwVisibility(){
   if(!inp)return;
   inp.type=inp.type==='password'?'text':'password';
   if(eye)eye.textContent=inp.type==='password'?'👁':'🙈';
+}
+function acceptDisclaimer(){
+  try{localStorage.setItem('varroamate_disclaimer_accepted','1');}catch(e){}
+  goto('s-prefs');
+}
+function hasAcceptedDisclaimer(){
+  try{return localStorage.getItem('varroamate_disclaimer_accepted')==='1';}catch(e){return false;}
 }
 function toggleAccept(){
   const c=document.getElementById('accept-chk');
@@ -3921,8 +3929,4 @@ function submitFeedback(){
       <ul style="font-size:14px;color:var(--text2);line-height:1.8;margin:0;padding-left:18px;">
         <li>Up to <strong>15 hives</strong> on Essential</li>
         <li>Unlimited hives on Professional &amp; Enterprise</li>
-        <li>Full mite tracking, treatment history &amp; AI guidance</li>
-        <li>BeeMAX export &amp; calendar reminders</li>
-      </ul>
-    </div>
-    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="closeModal('modal-hive-limit');got
+        <li>Full mite tracking, 
