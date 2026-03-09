@@ -827,7 +827,12 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="two-col">
       <div>
         <div class="card"><div class="card-title">⭐ Rate the App</div><p style="font-size:14px;color:var(--text3);margin-bottom:12px;">Your rating helps us improve VarroaMate.</p><div class="stars" id="stars"><span class="star inactive" onclick="rateStar(1)">★</span><span class="star inactive" onclick="rateStar(2)">★</span><span class="star inactive" onclick="rateStar(3)">★</span><span class="star inactive" onclick="rateStar(4)">★</span><span class="star inactive" onclick="rateStar(5)">★</span></div></div>
-        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/profile.php?id=61587815465422" target="_blank" class="btn btn-outline btn-sm">Facebook</a><a href="mailto:hello@varroamate.com" class="btn btn-outline btn-sm">Email Us</a></div></div>
+        <div class="card"><div class="card-title">📱 Connect</div><p style="font-size:15px;color:var(--text2);">Follow VarroaMate for updates and community support.</p><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;"><a href="https://www.facebook.com/profile.php?id=61587815465422" target="_blank" class="btn btn-outline btn-sm">Facebook</a><button class="btn btn-outline btn-sm" onclick="toggleContactForm()">✉️ Contact Us</button></div>
+          <div id="contact-form" style="display:none;margin-top:14px;">
+            <div class="field"><label>Your message</label><textarea id="contact-message" rows="4" placeholder="Questions, suggestions, or just want to say hi…"></textarea></div>
+            <button class="btn btn-primary btn-full" onclick="submitContact()">Send Message</button>
+          </div>
+        </div>
       </div>
       <div>
         <div class="card"><div class="card-title">💬 Share Your Thoughts</div>
@@ -4013,6 +4018,30 @@ async function rateStar(n){
   showToast('Thanks for rating VarroaMate! 🐝');
 }
 
+function toggleContactForm(){
+  const f=document.getElementById('contact-form');
+  f.style.display=f.style.display==='none'?'':'none';
+}
+async function submitContact(){
+  const msg=document.getElementById('contact-message')?.value.trim();
+  if(!msg){showToast('Please enter a message before sending');return;}
+  const btn=document.querySelector('#contact-form .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    await _sb.from('feedback').insert({
+      user_id:_sbUser?.id||null,
+      other:msg,
+      submitted_at:new Date().toISOString()
+    });
+    if(btn){btn.disabled=false;btn.textContent='Send Message';}
+    document.getElementById('contact-message').value='';
+    document.getElementById('contact-form').style.display='none';
+    showToast('Message sent! We\'ll be in touch 🐝');
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Send Message';}
+    showToast('Could not send message — please try again.');
+  }
+}
 async function submitFeedback(){
   const good=document.getElementById('fb-good')?.value.trim()||'';
   const improve=document.getElementById('fb-improve')?.value.trim()||'';
@@ -4092,6 +4121,10 @@ async function submitFeedback(){
     <div class="modal-title">🐝 Hive Limit Reached <button class="modal-close" onclick="closeModal('modal-hive-limit')">✕</button></div>
     <div id="hive-limit-body"></div>
     <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans →</button>
+    <button class="btn btn-outline btn-full btn-sm" onclick="closeModal('modal-hive-limit')">Maybe Later</button>
+  </div>
+</div>
+gin-bottom:10px;" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans →</button>
     <button class="btn btn-outline btn-full btn-sm" onclick="closeModal('modal-hive-limit')">Maybe Later</button>
   </div>
 </div>
