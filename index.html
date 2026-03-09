@@ -122,6 +122,9 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .pref-tag.pro{background:var(--green-pale);color:#1A7A42;}
 .pref-tag.con{background:var(--red-pale);color:var(--red);}
 #leaflet-map{width:100%;height:440px;border-radius:var(--radius);border:1px solid var(--border);}
+#apiary-mini-map{width:100%;height:200px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-top:8px;cursor:crosshair;}
+.latlon-row{display:flex;gap:8px;margin-top:8px;}
+.latlon-row input{flex:1;}
 @media(min-width:721px){.apiary-layout{grid-template-columns:3fr 2fr;}}
 @media(max-width:720px){#leaflet-map{height:260px;}}
 .apiary-row,.hive-row{display:flex;align-items:center;gap:12px;padding:15px 16px;background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow);}
@@ -547,7 +550,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
       <span class="nav-info-wrap"><button class="nav-btn" onclick="exportBeeMAX()">🐝 BeeMAX</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-beemax')" title="About BeeMAX export">?</button><div class="nav-info-popover" id="pop-beemax"><strong style="color:var(--amber-dark);">🐝 BeeMAX Export</strong><br>Opens a printable summary of all your mite count records formatted for entry into BeeMAX — the Victorian government's compulsory varroa reporting system.<br><br>One page per mite count entry, showing all the fields BeeMAX requires: apiary, hive count, method, mite count, hive strength, and disease observations.<br><br>Victorian beekeepers must report positive varroa detections at <a href="https://bees.agriculture.vic.gov.au" target="_blank" style="color:var(--amber);">bees.agriculture.vic.gov.au</a></div></span>
       <span class="nav-info-wrap"><button class="nav-btn" onclick="printAllQR()">📱 QR Codes</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-qr')" title="About QR codes">?</button><div class="nav-info-popover" id="pop-qr"><strong style="color:var(--amber-dark);">📱 Hive QR Code Labels</strong><br>Generates a printable page of QR codes — one per hive, across all your apiaries.<br><br>Stick a label on each hive box. In the field, scan with your phone's camera app to jump straight to field entry for that hive — no navigation needed.<br><br><strong>Best results:</strong> Print on sticker paper and laminate, or cover with clear packing tape for weather resistance.</div></span>
-      <button class="nav-btn" onclick="openModal('modal-add-apiary')">+ Apiary</button>
+      <button class="nav-btn" onclick="pendingApiary=null;openModal('modal-add-apiary');setTimeout(initMiniMap,100)">+ Apiary</button>
       <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
     </span>
     <!-- Mobile overflow menu button (shown on ≤780px) -->
@@ -557,7 +560,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="nav-overflow-menu" id="nav-overflow-menu">
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportBeeMAX()">🐝 BeeMAX Export</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();printAllQR()">📱 Print All QR Codes</div>
-    <div class="nav-overflow-item" onclick="closeNavOverflow();openModal('modal-add-apiary')">🏡 Add Apiary</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();pendingApiary=null;openModal('modal-add-apiary');setTimeout(initMiniMap,100)">🏡 Add Apiary</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportAllCSV()">📥 Export CSV</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportCalendar()">📅 Calendar Reminders</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();backupData()">💾 Backup Data</div>
@@ -999,11 +1002,22 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <div class="modal-overlay" id="modal-add-apiary" onclick="closeModalOutside(event,'modal-add-apiary')">
   <div class="modal-box">
     <div class="modal-title">🏡 <span id="modal-add-apiary-title">New Apiary</span> <button class="modal-close" onclick="closeModal('modal-add-apiary')">✕</button></div>
-    <div class="field"><label>Apiary Name</label><input type="text" id="new-apiary-name" placeholder="e.g. Home Garden"></div>
+    <div class="field"><label>Apiary Name</label><input type="text" id="new-apiary-name" placeholder="e.g. Home Garden, Creek Block"></div>
     <div class="field">
-      <label>Search Address (Australia)</label>
-      <input type="text" id="apiary-address-input" placeholder="Start typing an address…" oninput="onAddressInput()">
-      <div id="address-suggestions" style="border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:4px;background:#fff;display:none;max-height:160px;overflow-y:auto;"></div>
+      <label>Search Address <span style="font-weight:400;color:var(--text3);font-size:13px;">— or drop a pin / enter coordinates below</span></label>
+      <input type="text" id="apiary-address-input" placeholder="Start typing an address…" oninput="onAddressInput()" autocomplete="off">
+      <div id="address-suggestions" style="border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:4px;background:#fff;display:none;max-height:160px;overflow-y:auto;z-index:9999;position:relative;"></div>
+    </div>
+    <div class="field" style="margin-bottom:4px;">
+      <label>Drop a Pin <span style="font-weight:400;color:var(--text3);font-size:13px;">— tap or drag the marker to set location</span></label>
+      <div id="apiary-mini-map"></div>
+    </div>
+    <div class="field">
+      <label>Lat / Lon <span style="font-weight:400;color:var(--text3);font-size:13px;">— enter manually for remote sites</span></label>
+      <div class="latlon-row">
+        <input type="number" id="apiary-lat-input" placeholder="Latitude e.g. -27.4698" step="0.0001" oninput="onLatLonInput()">
+        <input type="number" id="apiary-lon-input" placeholder="Longitude e.g. 153.0251" step="0.0001" oninput="onLatLonInput()">
+      </div>
     </div>
     <div id="apiary-coords-preview" style="display:none;background:var(--green-pale);border-radius:var(--radius-sm);padding:8px 12px;font-size:14px;color:#1A7A42;margin-bottom:12px;"></div>
     <input type="hidden" id="apiary-edit-id" value="">
@@ -1516,37 +1530,133 @@ function initMap(){
 // ══ ADDRESS SEARCH ══
 function onAddressInput(){clearTimeout(addrTimer);addrTimer=setTimeout(searchAddr,500);}
 let addrResults=[];
+let miniMap=null, miniMarker=null;
+
+function initMiniMap(){
+  if(miniMap){miniMap.remove();miniMap=null;miniMarker=null;}
+  const el=document.getElementById('apiary-mini-map');
+  if(!el)return;
+  // Centre on Australia, or on existing pending location
+  const centre=pendingApiary&&pendingApiary.lat?[pendingApiary.lat,pendingApiary.lon]:[-27.5,133.5];
+  const zoom=pendingApiary&&pendingApiary.lat?13:4;
+  miniMap=L.map('apiary-mini-map',{zoomControl:true}).setView(centre,zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(miniMap);
+  if(pendingApiary&&pendingApiary.lat){
+    miniMarker=L.marker([pendingApiary.lat,pendingApiary.lon],{draggable:true}).addTo(miniMap);
+    miniMarker.on('dragend',onMarkerDrag);
+  }
+  miniMap.on('click',onMapClick);
+  setTimeout(()=>{if(miniMap)miniMap.invalidateSize();},200);
+}
+
+function onMapClick(e){
+  const {lat,lng}=e.latlng;
+  setMiniMapPin(lat,lng);
+  reverseGeocode(lat,lng);
+}
+
+function onMarkerDrag(e){
+  const {lat,lng}=e.target.getLatLng();
+  setMiniMapPin(lat,lng);
+  reverseGeocode(lat,lng);
+}
+
+function setMiniMapPin(lat,lon){
+  if(!miniMap)return;
+  if(miniMarker){miniMarker.setLatLng([lat,lon]);}
+  else{miniMarker=L.marker([lat,lon],{draggable:true}).addTo(miniMap);miniMarker.on('dragend',onMarkerDrag);}
+  document.getElementById('apiary-lat-input').value=lat.toFixed(6);
+  document.getElementById('apiary-lon-input').value=lon.toFixed(6);
+  pendingApiary={lat,lon,name:pendingApiary?.name||''};
+  updateCoordsPreview(lat,lon,pendingApiary.name);
+}
+
+async function reverseGeocode(lat,lon){
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=16&addressdetails=1`,{headers:{'Accept-Language':'en'}});
+    const d=await r.json();
+    if(d&&d.display_name){
+      const label=d.display_name.split(',').slice(0,4).join(',');
+      pendingApiary={lat,lon,name:label};
+      document.getElementById('apiary-address-input').value=label;
+      updateCoordsPreview(lat,lon,label);
+    }
+  }catch(e){}
+}
+
+function onLatLonInput(){
+  const lat=parseFloat(document.getElementById('apiary-lat-input').value);
+  const lon=parseFloat(document.getElementById('apiary-lon-input').value);
+  if(isNaN(lat)||isNaN(lon))return;
+  if(lat<-90||lat>90||lon<-180||lon>180){showToast('Invalid coordinates');return;}
+  pendingApiary={lat,lon,name:pendingApiary?.name||`${lat.toFixed(4)}, ${lon.toFixed(4)}`};
+  updateCoordsPreview(lat,lon,pendingApiary.name);
+  if(miniMap){
+    miniMap.setView([lat,lon],13);
+    if(miniMarker){miniMarker.setLatLng([lat,lon]);}
+    else{miniMarker=L.marker([lat,lon],{draggable:true}).addTo(miniMap);miniMarker.on('dragend',onMarkerDrag);}
+  }
+}
+
+function updateCoordsPreview(lat,lon,label){
+  const p=document.getElementById('apiary-coords-preview');
+  if(!p)return;
+  p.style.display='';
+  p.innerHTML=`📍 ${label?label.split(',').slice(0,3).join(','):'Pin set'}<br><small style="opacity:0.7;">Lat ${parseFloat(lat).toFixed(5)}, Lon ${parseFloat(lon).toFixed(5)}</small>`;
+}
+
 async function searchAddr(){
   const q=document.getElementById('apiary-address-input').value.trim();
   const box=document.getElementById('address-suggestions');
   if(q.length<4){box.style.display='none';return;}
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=au&limit=5`,{headers:{'Accept-Language':'en'}});
+    // Photon geocoder — much better Australian address resolution than Nominatim
+    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&bbox=112,-44,154,-10&limit=6&lang=en`);
     const data=await r.json();
-    if(!data.length){box.style.display='none';return;}
-    addrResults=data;
+    const features=data.features||[];
+    if(!features.length){box.style.display='none';return;}
+    addrResults=features;
     box.style.display='';
-    box.innerHTML=data.map((d,i)=>`<div class="addr-suggestion" onclick="selectAddrByIndex(${i})">📍 ${d.display_name}</div>`).join('');
+    box.innerHTML=features.map((f,i)=>{
+      const p=f.properties;
+      const parts=[p.name,p.street&&p.housenumber?`${p.housenumber} ${p.street}`:p.street,p.city||p.town||p.village,p.state].filter(Boolean);
+      const label=[...new Set(parts)].join(', ');
+      return `<div class="addr-suggestion" onclick="selectAddrByIndex(${i})">📍 ${label}</div>`;
+    }).join('');
   }catch(e){box.style.display='none';}
 }
+
 function selectAddrByIndex(i){
-  const d=addrResults[i];if(!d)return;
-  selectAddr(d.lat,d.lon,d.display_name);
+  const f=addrResults[i];if(!f)return;
+  const p=f.properties;
+  const parts=[p.name,p.street&&p.housenumber?`${p.housenumber} ${p.street}`:p.street,p.city||p.town||p.village,p.state].filter(Boolean);
+  const label=[...new Set(parts)].join(', ');
+  const lon=f.geometry.coordinates[0];
+  const lat=f.geometry.coordinates[1];
+  selectAddr(lat,lon,label);
 }
+
 function selectAddr(lat,lon,name){
-  pendingApiary={lat:parseFloat(lat),lon:parseFloat(lon),name};
-  document.getElementById('apiary-address-input').value=name.split(',').slice(0,3).join(',');
+  lat=parseFloat(lat);lon=parseFloat(lon);
+  pendingApiary={lat,lon,name};
+  document.getElementById('apiary-address-input').value=name.split(',').slice(0,4).join(',');
   document.getElementById('address-suggestions').style.display='none';
-  const p=document.getElementById('apiary-coords-preview');
-  p.style.display='';
-  p.innerHTML=`📍 ${name.split(',').slice(0,3).join(',')}<br><small style="opacity:0.7;">Lat ${parseFloat(lat).toFixed(4)}, Lon ${parseFloat(lon).toFixed(4)}</small>`;
+  document.getElementById('apiary-lat-input').value=lat.toFixed(6);
+  document.getElementById('apiary-lon-input').value=lon.toFixed(6);
+  updateCoordsPreview(lat,lon,name);
+  if(miniMap){
+    miniMap.setView([lat,lon],15);
+    if(miniMarker){miniMarker.setLatLng([lat,lon]);}
+    else{miniMarker=L.marker([lat,lon],{draggable:true}).addTo(miniMap);miniMarker.on('dragend',onMarkerDrag);}
+  }
 }
 async function saveNewApiary(){
   const name=document.getElementById('new-apiary-name').value.trim();
   if(!name){showToast('Please enter an apiary name');return;}
-  const lat=pendingApiary?pendingApiary.lat:0;
-  const lon=pendingApiary?pendingApiary.lon:0;
-  const addr=pendingApiary?pendingApiary.name.split(',').slice(0,3).join(','):'Location not set';
+  // Resolve coordinates — pendingApiary takes priority, then manual lat/lon fields
+  let lat=pendingApiary?pendingApiary.lat:parseFloat(document.getElementById('apiary-lat-input').value)||0;
+  let lon=pendingApiary?pendingApiary.lon:parseFloat(document.getElementById('apiary-lon-input').value)||0;
+  let addr=pendingApiary?pendingApiary.name.split(',').slice(0,4).join(','):(lat&&lon?`${lat.toFixed(5)}, ${lon.toFixed(5)}`:'Location not set');
   const editId=document.getElementById('apiary-edit-id').value;
   showSaveSpinner(true);
   if(editId!==''){
@@ -1574,10 +1684,13 @@ function editApiary(id){
   document.getElementById('new-apiary-name').value=a.name;
   document.getElementById('apiary-address-input').value=a.address;
   document.getElementById('apiary-edit-id').value=id;
+  document.getElementById('apiary-lat-input').value=a.lat?a.lat.toFixed(6):'';
+  document.getElementById('apiary-lon-input').value=a.lon?a.lon.toFixed(6):'';
   pendingApiary={lat:a.lat,lon:a.lon,name:a.address};
   const p=document.getElementById('apiary-coords-preview');
-  p.style.display='';p.innerHTML=`📍 ${a.address}<br><small style="opacity:0.7;">Lat ${a.lat.toFixed(4)}, Lon ${a.lon.toFixed(4)}</small>`;
+  p.style.display='';p.innerHTML=`📍 ${a.address}<br><small style="opacity:0.7;">Lat ${a.lat.toFixed(5)}, Lon ${a.lon.toFixed(5)}</small>`;
   openModal('modal-add-apiary');
+  setTimeout(initMiniMap,100);
 }
 function deleteApiary(id,name){
   deleteType='apiary';deleteId=id;
@@ -2188,8 +2301,10 @@ async function loadGuidance(){
   const ap=apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===currentHiveId));
   const counts=miteCountsByHive[currentHiveId]||[];
   const trmts=treatmentsByHive[currentHiveId]||[];
-  const lastT=trmts[0]?(TREATMENTS[trmts[0].product]?.name||trmts[0].product)+' ('+fmtDate(trmts[0].date)+')':'None';
-  const prevT=trmts[1]?(TREATMENTS[trmts[1].product]?.name||trmts[1].product):'None';
+  const lastTreatObj=trmts[0]?TREATMENTS[trmts[0].product]:null;
+  const prevTreatObj=trmts[1]?TREATMENTS[trmts[1].product]:null;
+  const lastT=lastTreatObj?`${lastTreatObj.name} — active: ${lastTreatObj.active}, MoA: ${lastTreatObj.moa} (${fmtDate(trmts[0].date)})`:(trmts[0]?trmts[0].product+' ('+fmtDate(trmts[0].date)+')':'None');
+  const prevT=prevTreatObj?`${prevTreatObj.name} — active: ${prevTreatObj.active}, MoA: ${prevTreatObj.moa}`:(trmts[1]?trmts[1].product:'None');
   const chips=document.getElementById('guidance-chips');
   const pref=getSelectedPref();
   const state=getSelectedState();
@@ -2415,6 +2530,9 @@ function closeModal(id){
     document.getElementById('apiary-address-input').value='';
     document.getElementById('apiary-coords-preview').style.display='none';
     document.getElementById('address-suggestions').style.display='none';
+    document.getElementById('apiary-lat-input').value='';
+    document.getElementById('apiary-lon-input').value='';
+    if(miniMap){miniMap.remove();miniMap=null;miniMarker=null;}
     pendingApiary=null;
   }
 }
@@ -3894,16 +4012,31 @@ async function rateStar(n){
   showToast('Thanks for rating VarroaMate! 🐝');
 }
 
-function submitFeedback(){
+async function submitFeedback(){
   const good=document.getElementById('fb-good')?.value.trim()||'';
   const improve=document.getElementById('fb-improve')?.value.trim()||'';
   const other=document.getElementById('fb-other')?.value.trim()||'';
   if(!good&&!improve&&!other){showToast('Please add at least one comment before submitting');return;}
-  const body=encodeURIComponent(
-    `Thank you for taking the time to share your feedback — we really appreciate it! 🐝\n\nHere's what you shared:\n\nWhat's working well:\n${good||'(not provided)'}\n\nWhat could be improved:\n${improve||'(not provided)'}\n\nOther comments:\n${other||'(not provided)'}\n\n— The VarroaMate Team`
-  );
-  window.location.href=`mailto:hello@varroamate.com?subject=VarroaMate%20Feedback&body=${body}`;
-  showToast('Opening your mail app… 🐝');
+  const btn=document.querySelector('#s-feedback .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    await _sb.from('feedback').insert({
+      user_id:_sbUser?.id||null,
+      working_well:good||null,
+      to_improve:improve||null,
+      other:other||null,
+      submitted_at:new Date().toISOString()
+    });
+    if(btn){btn.disabled=false;btn.textContent='Submit Feedback';}
+    document.getElementById('fb-good').value='';
+    document.getElementById('fb-improve').value='';
+    document.getElementById('fb-other').value='';
+    showToast('Thank you for your feedback! 🐝');
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Submit Feedback';}
+    showToast('Feedback could not be sent — please try again.');
+    console.error('Feedback error:',e);
+  }
 }
 
 // ══ PULL-TO-REFRESH (mobile) ══
