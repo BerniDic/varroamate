@@ -2454,7 +2454,8 @@ async function loadSection(elId,prompt,prefProfile){
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
-CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.`;
+CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.
+PRODUCT NAMES: Always use "Formic PRO" — never use the outdated name "MAQS". Formic PRO is the current registered product name for formic acid strips in Australia.`;
   try{
     const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
     const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
@@ -2484,7 +2485,7 @@ async function sendChat(){
     const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
     const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
-        system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical.',
+        system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS".',
         messages:chatHistory})});
     const data=await r.json();
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
