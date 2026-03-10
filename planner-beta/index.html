@@ -1,1 +1,630 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VarroaMate Smart Planner — Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --forest:      #1C3829;
+  --forest-mid:  #2D5440;
+  --sage:        #7A9E8A;
+  --cream:       #F5F0E8;
+  --cream-dark:  #EAE3D5;
+  --amber:       #D4820A;
+  --amber-light: #F5A623;
+  --blue-badge:  #3A5FB8;
+  --blue-light:  #EEF2FF;
+  --blue-mid:    #6B8DD6;
+  --text-dark:   #1C2E20;
+  --text-mid:    #3A5040;
+  --text-soft:   #6A8070;
+}
+
+html, body {
+  min-height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* ── HONEYCOMB BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(90,160,100,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(212,130,10,0.08) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle hex pattern */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 50 L28 66 L0 50 L0 16Z' fill='none' stroke='rgba(28,56,41,0.045)' stroke-width='1'/%3E%3Cpath d='M28 66 L56 82 L56 116 L28 132 L0 116 L0 82Z' fill='none' stroke='rgba(28,56,41,0.045)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(32px, 6vh, 72px) clamp(20px, 5vw, 48px) 60px;
+}
+
+/* ── BACK LINK ── */
+.back-link {
+  position: absolute;
+  top: clamp(16px, 3vh, 28px);
+  left: clamp(20px, 4vw, 40px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-soft);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--forest); }
+.back-link svg { width:14px; height:14px; }
+
+/* ── WORDMARK ── */
+.wordmark {
+  text-align: center;
+  margin-bottom: clamp(32px, 5vh, 56px);
+  animation: rise 0.7s cubic-bezier(0.22,1,0.36,1) both;
+}
+.wordmark h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  color: var(--forest);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.wordmark h1 em {
+  font-style: italic;
+  color: var(--amber);
+}
+.wordmark h1 sup {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.28em;
+  font-weight: 500;
+  color: rgba(28,56,41,0.45);
+  vertical-align: super;
+}
+.wordmark-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(10px, 1.1vw, 13px);
+  color: var(--text-soft);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 7px;
+}
+
+/* ── BETA BADGE ── */
+.beta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--blue-light);
+  border: 1.5px solid rgba(58,95,184,0.25);
+  color: var(--blue-badge);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 5px 14px 5px 10px;
+  border-radius: 20px;
+  margin-bottom: clamp(24px, 4vh, 40px);
+  animation: rise 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+}
+.beta-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--blue-badge);
+  animation: pulse-dot 2.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.65); }
+}
+
+/* ── HERO CARD ── */
+.hero-card {
+  width: 100%;
+  max-width: 680px;
+  background: white;
+  border-radius: 24px;
+  box-shadow:
+    0 2px 4px rgba(28,56,41,0.04),
+    0 8px 24px rgba(28,56,41,0.08),
+    0 32px 64px rgba(28,56,41,0.06);
+  overflow: hidden;
+  animation: rise 0.75s 0.15s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--forest) 0%, #2D5040 60%, #3A6848 100%);
+  padding: clamp(28px, 5vh, 44px) clamp(28px, 5vw, 48px);
+  position: relative;
+  overflow: hidden;
+}
+/* Decorative honeycomb overlay on header */
+.card-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='70'%3E%3Cpath d='M20 0 L40 11 L40 35 L20 46 L0 35 L0 11Z' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.card-header-bee {
+  font-size: clamp(36px, 6vw, 56px);
+  display: block;
+  margin-bottom: 12px;
+  animation: bob 3s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-6px) rotate(3deg); }
+}
+.card-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 3.5vw, 36px);
+  font-weight: 700;
+  color: white;
+  line-height: 1.15;
+  position: relative;
+}
+.card-header h2 em {
+  font-style: italic;
+  color: var(--amber-light);
+}
+.card-header p {
+  margin-top: 12px;
+  font-size: clamp(14px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.78);
+  line-height: 1.6;
+  max-width: 520px;
+  position: relative;
+}
+
+/* ── CARD BODY ── */
+.card-body {
+  padding: clamp(24px, 4vh, 40px) clamp(28px, 5vw, 48px);
+}
+
+/* Tester perks strip */
+.perks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: clamp(24px, 4vh, 36px);
+}
+.perk {
+  background: var(--cream);
+  border: 1px solid rgba(28,56,41,0.08);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.perk:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(28,56,41,0.08);
+}
+.perk-icon { font-size: 24px; margin-bottom: 7px; display: block; }
+.perk-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 3px;
+}
+.perk-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(28,56,41,0.12), transparent);
+  margin: clamp(20px, 3vh, 30px) 0;
+}
+
+/* ── FEEDBACK SECTION ── */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 14px;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 540px) { .field-row { grid-template-columns: 1fr; } }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-mid);
+  letter-spacing: 0.02em;
+}
+.field input,
+.field textarea,
+.field select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: var(--cream);
+  border: 1.5px solid rgba(28,56,41,0.15);
+  border-radius: 10px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: none;
+}
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--forest-mid);
+  box-shadow: 0 0 0 3px rgba(45,84,64,0.10);
+}
+.field textarea { min-height: 90px; }
+
+/* Submit feedback button */
+.btn-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--forest);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  align-self: flex-start;
+  box-shadow: 0 2px 8px rgba(28,56,41,0.18);
+}
+.btn-feedback:hover {
+  background: var(--forest-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(28,56,41,0.22);
+}
+.btn-feedback:active { transform: translateY(0); }
+.btn-feedback svg { width:16px; height:16px; }
+
+/* Sent state */
+.feedback-sent {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: rgba(42,144,64,0.08);
+  border: 1.5px solid rgba(42,144,64,0.25);
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: #1A6030;
+  font-weight: 500;
+}
+.feedback-sent.show { display: flex; }
+
+/* ── ACKNOWLEDGE + ENTER ── */
+.ack-section {
+  background: linear-gradient(135deg, rgba(212,130,10,0.06), rgba(245,166,35,0.04));
+  border: 1.5px solid rgba(212,130,10,0.20);
+  border-radius: 16px;
+  padding: clamp(18px, 3vh, 28px) clamp(20px, 4vw, 32px);
+  margin-top: clamp(20px, 3vh, 32px);
+}
+
+.ack-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+.ack-checkbox-row input[type="checkbox"] {
+  width: 20px; height: 20px;
+  min-width: 20px;
+  accent-color: var(--amber);
+  cursor: pointer;
+  margin-top: 2px;
+}
+.ack-text {
+  font-size: clamp(13px, 1.3vw, 15px);
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+.ack-text strong { color: var(--text-dark); }
+
+/* Enter button */
+.btn-enter {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--amber) 0%, #C17020 100%);
+  color: white;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(16px, 1.8vw, 20px);
+  font-weight: 600;
+  font-style: italic;
+  padding: clamp(14px, 2.5vh, 18px) 32px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.35;
+  pointer-events: none;
+  transition: opacity 0.35s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(212,130,10,0.25);
+  letter-spacing: 0.01em;
+}
+.btn-enter.enabled {
+  opacity: 1;
+  pointer-events: auto;
+}
+.btn-enter.enabled:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(212,130,10,0.38);
+}
+.btn-enter.enabled:active { transform: translateY(0); }
+.btn-enter svg { width: 20px; height: 20px; }
+
+/* ── FOOTER ── */
+.page-footer {
+  margin-top: clamp(24px, 4vh, 40px);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-soft);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.04em;
+  animation: rise 0.75s 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+.page-footer a {
+  color: var(--forest-mid);
+  text-decoration: none;
+}
+.page-footer a:hover { text-decoration: underline; }
+
+/* ── ANIMATIONS ── */
+@keyframes rise {
+  from { opacity:0; transform: translateY(18px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Back to home -->
+  <a class="back-link" href="/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    back to varroamate.com
+  </a>
+
+  <!-- Wordmark -->
+  <div class="wordmark">
+    <h1>Varroa<em>Mate</em><sup>™</sup></h1>
+    <div class="wordmark-sub">Smart Planner</div>
+  </div>
+
+  <!-- Beta badge -->
+  <div class="beta-badge">
+    <span class="beta-dot"></span>
+    Beta testing — currently active
+  </div>
+
+  <!-- Hero card -->
+  <div class="hero-card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <span class="card-header-bee">🐝</span>
+      <h2>You're one of our<br><em>pioneering testers.</em></h2>
+      <p>The Smart Planner is in active beta — and the fact that you're here makes a real difference. Your feedback directly shapes what this tool becomes for beekeepers everywhere.</p>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+      <!-- Perks -->
+      <div class="perks">
+        <div class="perk">
+          <span class="perk-icon">🏅</span>
+          <div class="perk-title">Early Access</div>
+          <div class="perk-desc">Full planner access before public release</div>
+        </div>
+        <div class="perk">
+          <span class="perk-icon">🎯</span>
+          <div class="perk-title">Shape the Product</div>
+          <div class="perk-desc">Your feedback drives what gets built next</div>
+        </div>
+        <div class="perk">
+          <span class="perk-icon">💛</span>
+          <div class="perk-title">Our Gratitude</div>
+          <div class="perk-desc">Beta testers will be recognised at launch</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Feedback form -->
+      <div class="section-label">Share your thoughts (optional)</div>
+
+      <div class="feedback-form" id="feedbackForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="fb-name">Your name</label>
+            <input type="text" id="fb-name" placeholder="e.g. Sarah B." autocomplete="off"/>
+          </div>
+          <div class="field">
+            <label for="fb-email">Your email <span style="color:var(--text-soft);font-weight:400">(optional)</span></label>
+            <input type="email" id="fb-email" placeholder="for a reply" autocomplete="off"/>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fb-experience">How's your beekeeping experience?</label>
+          <select id="fb-experience">
+            <option value="" disabled selected>Select one…</option>
+            <option value="hobbyist">Hobbyist (1–5 hives)</option>
+            <option value="semi-pro">Semi-pro (6–20 hives)</option>
+            <option value="commercial">Commercial (20+ hives)</option>
+            <option value="new">Brand new to beekeeping</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fb-comments">What would you love to see in the planner?</label>
+          <textarea id="fb-comments" placeholder="Any features, improvements, or things that would make this indispensable for you…"></textarea>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <button class="btn-feedback" onclick="submitFeedback()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Send feedback
+          </button>
+          <div class="feedback-sent" id="feedbackSent">
+            ✅ Thank you — we'll be in touch!
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Acknowledge + Enter -->
+      <div class="ack-section">
+        <label class="ack-checkbox-row">
+          <input type="checkbox" id="ackCheck" onchange="toggleEnter()"/>
+          <span class="ack-text">
+            <strong>I understand this is beta software.</strong> Features may change, some things may not work perfectly, and I'm happy to help by reporting anything unusual to <a href="mailto:hello@varroamate.com" style="color:var(--forest-mid);">hello@varroamate.com</a>.
+          </span>
+        </label>
+
+        <button class="btn-enter" id="enterBtn" onclick="enterPlanner()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          Enter the Smart Planner
+        </button>
+      </div>
+
+    </div><!-- end card-body -->
+  </div><!-- end hero-card -->
+
+  <div class="page-footer">
+    <a href="/">← varroamate.com</a> &nbsp;·&nbsp;
+    Questions? <a href="mailto:hello@varroamate.com">hello@varroamate.com</a> &nbsp;·&nbsp;
+    &copy; 2026 VarroaMate™
+  </div>
+
+</div><!-- end page -->
+
+<script>
+// ── CHECKBOX → ENABLE ENTER BUTTON ───────────────
+function toggleEnter(){
+  const checked = document.getElementById('ackCheck').checked;
+  const btn     = document.getElementById('enterBtn');
+  btn.classList.toggle('enabled', checked);
+}
+
+// ── ENTER PLANNER ────────────────────────────────
+function enterPlanner(){
+  if(!document.getElementById('ackCheck').checked) return;
+  // Record acknowledgement in sessionStorage so planner knows they came through the gate
+  sessionStorage.setItem('vmsp_beta_ack', '1');
+  window.location.href = '/planner/';
+}
+
+// ── FEEDBACK → MAILTO ────────────────────────────
+function submitFeedback(){
+  const name       = document.getElementById('fb-name').value.trim();
+  const email      = document.getElementById('fb-email').value.trim();
+  const experience = document.getElementById('fb-experience').value;
+  const comments   = document.getElementById('fb-comments').value.trim();
+
+  if(!comments && !experience){
+    // Nothing to send — just acknowledge
+    document.getElementById('feedbackSent').classList.add('show');
+    return;
+  }
+
+  const expLabels = {
+    hobbyist:   'Hobbyist (1–5 hives)',
+    'semi-pro': 'Semi-pro (6–20 hives)',
+    commercial: 'Commercial (20+ hives)',
+    new:        'New to beekeeping',
+  };
+
+  const body = [
+    name       ? `Name: ${name}`                        : '',
+    email      ? `Email: ${email}`                      : '',
+    experience ? `Experience: ${expLabels[experience]}` : '',
+    '',
+    comments   ? `Feedback:\n${comments}`               : '',
+  ].filter(Boolean).join('\n');
+
+  const subject = encodeURIComponent('VarroaMate Smart Planner — Beta Feedback');
+  const bodyEnc = encodeURIComponent(body);
+
+  window.location.href = `mailto:hello@varroamate.com?subject=${subject}&body=${bodyEnc}`;
+
+  // Show sent confirmation after a beat
+  setTimeout(()=>{
+    document.getElementById('feedbackSent').classList.add('show');
+    // Soft-clear form
+    document.getElementById('fb-comments').value = '';
+  }, 800);
+}
+
+// ── KEYBOARD: Enter on checkbox triggers toggle ──
+document.getElementById('ackCheck').addEventListener('keydown', e => {
+  if(e.key === 'Enter') e.target.click();
+});
+</script>
+</body>
+</html>
