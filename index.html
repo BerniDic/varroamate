@@ -147,7 +147,7 @@ html, body {
 /* ── HIVES ── */
 #hives-container {
   position: absolute;
-  bottom: 28%;
+  bottom: 6%;
   left: 0; right: 0;
   display: flex;
   justify-content: center;
@@ -397,6 +397,25 @@ html, body {
   animation: flutter-path var(--dur,12s) ease-in-out infinite var(--delay,0s);
   z-index: 5;
 }
+
+/* ── KANGAROO ── */
+#kangaroo-wrap {
+  position: absolute;
+  bottom: 24%;
+  right: 4%;
+  z-index: 6;
+  pointer-events: none;
+  animation: roo-hop 1.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes roo-hop {
+  0%   { transform: translateY(0px)   scaleY(1)    rotate(0deg);    }
+  20%  { transform: translateY(-18px) scaleY(1.04) rotate(-3deg);   }
+  40%  { transform: translateY(0px)   scaleY(0.96) rotate(0deg);    }
+  55%  { transform: translateY(-8px)  scaleY(1.02) rotate(-1.5deg); }
+  70%  { transform: translateY(0px)   scaleY(0.98) rotate(0deg);    }
+  100% { transform: translateY(0px)   scaleY(1)    rotate(0deg);    }
+}
 @keyframes flutter-path {
   0%   { transform: translate(0, 0) rotate(0deg); opacity:0; }
   8%   { opacity: 1; }
@@ -607,7 +626,7 @@ html, body {
 
     <!-- ── STEMS & LEAVES scattered across bottom third ── -->
     <!-- Poppy 1 -->
-    <g transform="translate(80,260)">
+    <g transform="translate(-10,260)">
       <line x1="0" y1="0" x2="-4" y2="-70" stroke="#2D7830" stroke-width="2.2"/>
       <ellipse cx="-14" cy="-38" rx="10" ry="6" fill="#3A8C3A" opacity="0.7" transform="rotate(-30,-14,-38)"/>
       <g transform="translate(0,-70)">
@@ -618,7 +637,7 @@ html, body {
       </g>
     </g>
     <!-- Daisy 1 -->
-    <g transform="translate(155,260)">
+    <g transform="translate(65,260)">
       <line x1="0" y1="0" x2="3" y2="-55" stroke="#2D7830" stroke-width="1.8"/>
       <ellipse cx="12" cy="-28" rx="9" ry="5" fill="#3A8C3A" opacity="0.65" transform="rotate(-20,12,-28)"/>
       <g transform="translate(3,-55)">
@@ -631,7 +650,7 @@ html, body {
       </g>
     </g>
     <!-- Lavender cluster 1 -->
-    <g transform="translate(230,260)">
+    <g transform="translate(140,260)">
       <line x1="0" y1="0" x2="0" y2="-65" stroke="#4A7840" stroke-width="1.6"/>
       <line x1="0" y1="0" x2="-8" y2="-58" stroke="#4A7840" stroke-width="1.4"/>
       <line x1="0" y1="0" x2="8" y2="-58" stroke="#4A7840" stroke-width="1.4"/>
@@ -647,7 +666,7 @@ html, body {
       </g>
     </g>
     <!-- Buttercup 1 -->
-    <g transform="translate(310,260)">
+    <g transform="translate(220,260)">
       <line x1="0" y1="0" x2="2" y2="-48" stroke="#2D7830" stroke-width="1.6"/>
       <g transform="translate(2,-48)">
         <use href="#bp" transform="rotate(0)"/><use href="#bp" transform="rotate(72)"/><use href="#bp" transform="rotate(144)"/>
@@ -656,7 +675,7 @@ html, body {
       </g>
     </g>
     <!-- Sunflower 1 (small) -->
-    <g transform="translate(390,260)">
+    <g transform="translate(300,260)">
       <line x1="0" y1="0" x2="-3" y2="-80" stroke="#3A6020" stroke-width="2.5"/>
       <ellipse cx="-13" cy="-42" rx="12" ry="6" fill="#3A8030" opacity="0.6" transform="rotate(-25,-13,-42)"/>
       <ellipse cx="8" cy="-60" rx="9" ry="5" fill="#3A8030" opacity="0.55" transform="rotate(20,8,-60)"/>
@@ -670,7 +689,7 @@ html, body {
       </g>
     </g>
     <!-- Poppy 2 -->
-    <g transform="translate(470,260)">
+    <g transform="translate(380,260)">
       <line x1="0" y1="0" x2="5" y2="-62" stroke="#2D7830" stroke-width="2"/>
       <ellipse cx="15" cy="-32" rx="10" ry="5" fill="#3A8C3A" opacity="0.65" transform="rotate(35,15,-32)"/>
       <g transform="translate(5,-62)">
@@ -680,7 +699,7 @@ html, body {
       </g>
     </g>
     <!-- Daisy 2 -->
-    <g transform="translate(545,260)">
+    <g transform="translate(455,260)">
       <line x1="0" y1="0" x2="-2" y2="-50" stroke="#2D7830" stroke-width="1.7"/>
       <g transform="translate(-2,-50)">
         <use href="#dp" transform="rotate(15)"/><use href="#dp" transform="rotate(45)"/><use href="#dp" transform="rotate(75)"/>
@@ -691,7 +710,7 @@ html, body {
       </g>
     </g>
     <!-- Lavender 2 -->
-    <g transform="translate(625,260)">
+    <g transform="translate(535,260)">
       <line x1="0" y1="0" x2="0" y2="-72" stroke="#4A7840" stroke-width="1.7"/>
       <line x1="0" y1="0" x2="-9" y2="-63" stroke="#4A7840" stroke-width="1.4"/>
       <line x1="0" y1="0" x2="9" y2="-63" stroke="#4A7840" stroke-width="1.4"/>
@@ -707,7 +726,7 @@ html, body {
       </g>
     </g>
     <!-- Buttercup 2 -->
-    <g transform="translate(700,260)">
+    <g transform="translate(790,260)">
       <line x1="0" y1="0" x2="-3" y2="-44" stroke="#2D7830" stroke-width="1.5"/>
       <g transform="translate(-3,-44)">
         <use href="#bp" transform="rotate(10)"/><use href="#bp" transform="rotate(82)"/><use href="#bp" transform="rotate(154)"/>
@@ -716,7 +735,7 @@ html, body {
       </g>
     </g>
     <!-- Poppy 3 (pink) -->
-    <g transform="translate(775,260)">
+    <g transform="translate(865,260)">
       <line x1="0" y1="0" x2="4" y2="-68" stroke="#2D7830" stroke-width="2.1"/>
       <ellipse cx="-12" cy="-36" rx="10" ry="5" fill="#3A8C3A" opacity="0.6" transform="rotate(-40,-12,-36)"/>
       <g transform="translate(4,-68)">
@@ -727,7 +746,7 @@ html, body {
       </g>
     </g>
     <!-- Daisy 3 -->
-    <g transform="translate(850,260)">
+    <g transform="translate(940,260)">
       <line x1="0" y1="0" x2="2" y2="-58" stroke="#2D7830" stroke-width="1.8"/>
       <ellipse cx="11" cy="-30" rx="9" ry="5" fill="#3A8C3A" opacity="0.6" transform="rotate(25,11,-30)"/>
       <g transform="translate(2,-58)">
@@ -739,7 +758,7 @@ html, body {
       </g>
     </g>
     <!-- Sunflower 2 -->
-    <g transform="translate(940,260)">
+    <g transform="translate(1030,260)">
       <line x1="0" y1="0" x2="3" y2="-88" stroke="#3A6020" stroke-width="2.6"/>
       <ellipse cx="14" cy="-48" rx="13" ry="6" fill="#3A8030" opacity="0.55" transform="rotate(30,14,-48)"/>
       <g transform="translate(3,-88)">
@@ -752,7 +771,7 @@ html, body {
       </g>
     </g>
     <!-- Lavender 3 -->
-    <g transform="translate(1020,260)">
+    <g transform="translate(1110,260)">
       <line x1="0" y1="0" x2="0" y2="-60" stroke="#4A7840" stroke-width="1.6"/>
       <line x1="0" y1="0" x2="-8" y2="-52" stroke="#4A7840" stroke-width="1.3"/>
       <line x1="0" y1="0" x2="8" y2="-52" stroke="#4A7840" stroke-width="1.3"/>
@@ -767,7 +786,7 @@ html, body {
       </g>
     </g>
     <!-- Poppy 4 -->
-    <g transform="translate(1100,260)">
+    <g transform="translate(1190,260)">
       <line x1="0" y1="0" x2="-4" y2="-66" stroke="#2D7830" stroke-width="2"/>
       <ellipse cx="-14" cy="-34" rx="10" ry="5" fill="#3A8C3A" opacity="0.65" transform="rotate(-30,-14,-34)"/>
       <g transform="translate(-4,-66)">
@@ -777,7 +796,7 @@ html, body {
       </g>
     </g>
     <!-- Daisy 4 -->
-    <g transform="translate(1178,260)">
+    <g transform="translate(1268,260)">
       <line x1="0" y1="0" x2="2" y2="-52" stroke="#2D7830" stroke-width="1.7"/>
       <g transform="translate(2,-52)">
         <use href="#dp" transform="rotate(0)"/><use href="#dp" transform="rotate(30)"/><use href="#dp" transform="rotate(60)"/>
@@ -788,7 +807,7 @@ html, body {
       </g>
     </g>
     <!-- Buttercup 3 -->
-    <g transform="translate(1255,260)">
+    <g transform="translate(1345,260)">
       <line x1="0" y1="0" x2="3" y2="-46" stroke="#2D7830" stroke-width="1.5"/>
       <g transform="translate(3,-46)">
         <use href="#bp" transform="rotate(5)"/><use href="#bp" transform="rotate(77)"/><use href="#bp" transform="rotate(149)"/>
@@ -797,7 +816,7 @@ html, body {
       </g>
     </g>
     <!-- Lavender 4 -->
-    <g transform="translate(1330,260)">
+    <g transform="translate(1420,260)">
       <line x1="0" y1="0" x2="0" y2="-68" stroke="#4A7840" stroke-width="1.6"/>
       <line x1="0" y1="0" x2="-8" y2="-60" stroke="#4A7840" stroke-width="1.3"/>
       <line x1="0" y1="0" x2="8" y2="-60" stroke="#4A7840" stroke-width="1.3"/>
@@ -1067,9 +1086,64 @@ let beeAnimFrame = null;
 function setup(){
   addClouds();
   addButterflies();
+  addKangaroo();
   placeBeeAtRest();
   setupHiveListeners();
   setupIdleBobble();
+}
+
+
+// ── KANGAROO ─────────────────────────────────────
+function addKangaroo(){
+  const scene = document.getElementById('scene');
+  const wrap = document.createElement('div');
+  wrap.id = 'kangaroo-wrap';
+  wrap.title = "G'day! 🦘";
+  // SVG: mum kangaroo facing left, joey head peeking from pouch
+  wrap.innerHTML = `
+  <svg width="72" height="90" viewBox="0 0 72 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Mum: tail -->
+    <path d="M54 72 Q68 80 66 90" stroke="#A0622A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+    <!-- Mum: hind legs -->
+    <path d="M42 74 Q40 84 34 88" stroke="#8A5220" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M50 72 Q50 84 44 90" stroke="#8A5220" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <!-- Mum: body -->
+    <ellipse cx="44" cy="60" rx="18" ry="22" fill="#C07830" transform="rotate(-10 44 60)"/>
+    <!-- Mum: pouch bulge -->
+    <ellipse cx="36" cy="64" rx="10" ry="12" fill="#B06828" transform="rotate(-15 36 64)"/>
+    <!-- Joey head peeking out of pouch -->
+    <circle cx="32" cy="54" r="8" fill="#D49050"/>
+    <!-- Joey ears -->
+    <ellipse cx="27" cy="47" rx="3" ry="5" fill="#D49050" transform="rotate(-20 27 47)"/>
+    <ellipse cx="27" cy="47" rx="1.5" ry="3" fill="#E8B080" transform="rotate(-20 27 47)"/>
+    <ellipse cx="36" cy="46" rx="3" ry="5" fill="#D49050" transform="rotate(10 36 46)"/>
+    <ellipse cx="36" cy="46" rx="1.5" ry="3" fill="#E8B080" transform="rotate(10 36 46)"/>
+    <!-- Joey eyes -->
+    <circle cx="29" cy="54" r="1.4" fill="#2A1000"/>
+    <circle cx="35" cy="54" r="1.4" fill="#2A1000"/>
+    <!-- Joey nose -->
+    <ellipse cx="32" cy="57" rx="1.5" ry="1" fill="#8A4010"/>
+    <!-- Mum: chest/neck -->
+    <ellipse cx="30" cy="44" rx="9" ry="12" fill="#C8823A" transform="rotate(15 30 44)"/>
+    <!-- Mum: forelegs (short, tucked) -->
+    <path d="M28 50 Q22 58 20 62" stroke="#A06828" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M32 52 Q28 60 26 65" stroke="#A06828" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <!-- Mum: head -->
+    <ellipse cx="22" cy="30" rx="10" ry="13" fill="#C8823A" transform="rotate(-5 22 30)"/>
+    <!-- Mum: snout -->
+    <ellipse cx="14" cy="34" rx="6" ry="4.5" fill="#B87030" transform="rotate(10 14 34)"/>
+    <!-- Mum: nose -->
+    <ellipse cx="10" cy="33" rx="2.5" ry="2" fill="#7A3808"/>
+    <!-- Mum: eye -->
+    <circle cx="18" cy="26" r="2.2" fill="#1A0E00"/>
+    <circle cx="18.7" cy="25.3" r="0.7" fill="white" opacity="0.7"/>
+    <!-- Mum: ear -->
+    <ellipse cx="26" cy="18" rx="4" ry="7" fill="#C8823A" transform="rotate(-10 26 18)"/>
+    <ellipse cx="26" cy="18" rx="2" ry="4.5" fill="#E0A060" transform="rotate(-10 26 18)"/>
+    <ellipse cx="16" cy="16" rx="4" ry="7" fill="#C8823A" transform="rotate(10 16 16)"/>
+    <ellipse cx="16" cy="16" rx="2" ry="4.5" fill="#E0A060" transform="rotate(10 16 16)"/>
+  </svg>`;
+  scene.appendChild(wrap);
 }
 
 // ── CLOUDS ────────────────────────────────────────
