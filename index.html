@@ -466,11 +466,9 @@ html, body {
     gap: 0;
     padding: 8px 6px 0;
     padding-bottom: calc(8px + env(safe-area-inset-bottom));
-    background: rgba(245,240,228,0.25);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid rgba(255,255,255,0.45);
-    box-shadow: 0 -2px 20px rgba(28,56,41,0.10);
+    background: transparent;
+    border-top: none;
+    box-shadow: none;
     border-radius: 20px 20px 0 0;
     z-index: 20;
   }
@@ -514,13 +512,14 @@ html, body {
     padding: 5px 5px 7px;
     border-radius: 10px;
     box-sizing: border-box;
-    background: rgba(255,255,255,0.30);
+    background: transparent;
   }
   .hive-label-name {
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(255,255,255,0.8);
   }
   .hive-label-sub {
     font-size: 8px;
@@ -528,6 +527,7 @@ html, body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 1px 3px rgba(255,255,255,0.7);
   }
   .status-badge {
     font-size: 7.5px;
@@ -552,6 +552,102 @@ html, body {
   /* Bee above panel */
   #bee { z-index: 25; }
 }
+
+/* ── MOBILE INFO POPUP ── */
+#hive-popup {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+}
+#hive-popup.show { display: block; }
+#hive-popup-inner {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 -4px 32px rgba(28,56,41,0.18);
+  padding: 20px 20px 16px;
+  animation: popup-slide 0.32s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes popup-slide {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.popup-drag-handle {
+  width: 36px; height: 4px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.popup-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1C3829;
+  margin-bottom: 2px;
+}
+.popup-title em { font-style: italic; color: #D4820A; }
+.popup-sub {
+  font-size: 13px;
+  color: rgba(30,70,40,0.7);
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 12px;
+}
+.popup-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.popup-badge.release { background: rgba(42,144,64,0.10); color: #1A6030; }
+.popup-badge.soon    { background: rgba(120,120,120,0.10); color: #606060; }
+.popup-badge .dot    { width: 6px; height: 6px; border-radius: 50%; }
+.popup-badge.release .dot { background: #2A9040; }
+.popup-badge.soon    .dot { background: #909090; }
+.popup-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  margin-bottom: 8px;
+  transition: opacity 0.2s;
+}
+.popup-btn:active { opacity: 0.75; }
+.popup-btn-primary {
+  background: linear-gradient(135deg, #D4820A, #C07020);
+  color: white;
+}
+.popup-btn-close {
+  background: rgba(28,56,41,0.08);
+  color: #3A5040;
+  font-size: 14px;
+  font-style: normal;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+}
+#popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(0,0,0,0.25);
+}
+#popup-overlay.show { display: block; }
 
 </style>
 </head>
@@ -1226,6 +1322,19 @@ html, body {
   <!-- Hint -->
   <p id="hint" aria-hidden="true">click a hive to open the app</p>
 
+
+<!-- Mobile hive info popup -->
+<div id="popup-overlay" onclick="closeHivePopup()"></div>
+<div id="hive-popup">
+  <div id="hive-popup-inner">
+    <div class="popup-drag-handle"></div>
+    <div class="popup-title" id="popup-title">VarroaMate</div>
+    <div class="popup-sub" id="popup-sub">mite tracking & treatments</div>
+    <div class="popup-badge" id="popup-badge"><span class="dot"></span><span id="popup-badge-text"></span></div>
+    <button class="popup-btn popup-btn-primary" id="popup-action" onclick="popupAction()">Open App →</button>
+    <button class="popup-btn popup-btn-close" onclick="closeHivePopup()">Close</button>
+  </div>
+</div>
 </div><!-- end scene -->
 
 <script>
@@ -1258,6 +1367,7 @@ function setup(){
   placeBeeAtRest();
   setupHiveListeners();
   setupIdleBobble();
+  setupMobilePopup();
 }
 
 
@@ -1703,6 +1813,55 @@ function showToast(msg){
   t.classList.add('show');
   if(toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>{ t.classList.remove('show'); }, 2800);
+}
+
+
+// ── MOBILE HIVE POPUP ────────────────────────────
+const APP_INFO = {
+  vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: 'full release imminent', url: '/app/' },
+  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'soon',    badgeText: 'coming very soon',     url: null },
+  prod:   { title: 'Productivity',        sub: 'hive records & tasks',        badge: 'soon',    badgeText: 'coming soon',          url: null },
+  health: { title: 'Bee Health',          sub: 'colony diagnostics',          badge: 'soon',    badgeText: 'coming soon',          url: null },
+};
+let _popupApp = null;
+
+function isMobile(){ return window.innerWidth <= 540; }
+
+function showHivePopup(app){
+  const info = APP_INFO[app];
+  if(!info) return;
+  _popupApp = app;
+  document.getElementById('popup-title').innerHTML   = info.title;
+  document.getElementById('popup-sub').textContent   = info.sub;
+  document.getElementById('popup-badge-text').textContent = info.badgeText;
+  const badge = document.getElementById('popup-badge');
+  badge.className = 'popup-badge ' + info.badge;
+  const btn = document.getElementById('popup-action');
+  btn.style.display = info.url ? 'block' : 'none';
+  document.getElementById('popup-overlay').classList.add('show');
+  document.getElementById('hive-popup').classList.add('show');
+}
+
+function closeHivePopup(){
+  document.getElementById('popup-overlay').classList.remove('show');
+  document.getElementById('hive-popup').classList.remove('show');
+  _popupApp = null;
+}
+
+function popupAction(){
+  const info = APP_INFO[_popupApp];
+  if(info && info.url) window.location.href = info.url;
+  else closeHivePopup();
+}
+
+function setupMobilePopup(){
+  if(!isMobile()) return;
+  document.querySelectorAll('.hive-wrapper').forEach(hive => {
+    hive.addEventListener('click', e => {
+      e.stopImmediatePropagation();
+      showHivePopup(hive.dataset.app);
+    }, true);
+  });
 }
 
 // ── INIT ─────────────────────────────────────────
