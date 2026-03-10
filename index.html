@@ -450,6 +450,68 @@ html, body {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ── MOBILE ── */
+@media (max-width: 540px) {
+
+  /* Shrink hive SVGs via scale */
+  .hive-svg-wrap {
+    transform: scale(0.58);
+    transform-origin: bottom center;
+  }
+  .hive-wrapper.coming-soon:hover .hive-svg-wrap,
+  .hive-wrapper:hover .hive-svg-wrap {
+    transform: scale(0.58) translateY(-4px);
+  }
+
+  /* Tighten container */
+  #hives-container {
+    gap: clamp(4px, 2vw, 14px);
+    padding: 0 4px;
+    bottom: 4%;
+  }
+
+  /* Smaller label cards */
+  .hive-label {
+    min-width: 70px;
+    padding: 6px 8px 8px;
+  }
+  .hive-label-name {
+    font-size: 12px;
+  }
+  .hive-label-sub {
+    font-size: 9px;
+    margin-top: 2px;
+  }
+  .status-badge {
+    font-size: 8px;
+    padding: 2px 6px;
+    gap: 3px;
+    margin-top: 4px;
+  }
+  .status-badge .dot {
+    width: 5px; height: 5px;
+  }
+
+  /* Wordmark */
+  #wordmark {
+    top: clamp(12px, 3vh, 24px);
+  }
+
+  /* Shrink kangaroo on mobile */
+  #kangaroo-wrap {
+    transform: scale(0.7);
+    transform-origin: bottom right;
+    right: 1%;
+    bottom: 20%;
+  }
+
+  /* Hint text */
+  #hint {
+    font-size: 13px;
+    bottom: 1%;
+  }
+}
+
 </style>
 </head>
 <body>
