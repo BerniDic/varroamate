@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    // QR code deep-link: if ?h=CODE param present, redirect straight to the app
+    (function(){
+      var p = new URLSearchParams(window.location.search).get('h');
+      if(p) window.location.replace('/app/?h=' + encodeURIComponent(p));
+    })();
+  </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VarroaMate — Choose Your App</title>
