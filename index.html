@@ -466,7 +466,7 @@ html, body {
     gap: 0;
     padding: 8px 6px 0;
     padding-bottom: calc(8px + env(safe-area-inset-bottom));
-    background: rgba(245,240,228,0.55);
+    background: rgba(245,240,228,0.25);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid rgba(255,255,255,0.45);
@@ -514,7 +514,7 @@ html, body {
     padding: 5px 5px 7px;
     border-radius: 10px;
     box-sizing: border-box;
-    background: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.30);
   }
   .hive-label-name {
     font-size: 11px;
@@ -547,7 +547,7 @@ html, body {
 
   /* Hide hint and kangaroo on mobile */
   #hint { display: none; }
-  #kangaroo-wrap { display: none; }
+  #kangaroo-wrap { display: block; transform: scale(0.55); transform-origin: bottom right; right: 2%; bottom: 160px; }
 
   /* Bee above panel */
   #bee { z-index: 25; }
