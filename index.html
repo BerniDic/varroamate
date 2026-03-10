@@ -453,72 +453,120 @@ html, body {
 /* ── MOBILE ── */
 @media (max-width: 540px) {
 
-  /* 2x2 grid layout */
+  /* On mobile: fixed overlay panel at bottom, cards + hives stacked */
   #hives-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 12px 8px;
-    padding: 0 16px;
-    bottom: 4%;
-    align-items: end;
-    justify-items: center;
+    /* Take over the whole screen bottom as a panel */
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: rgba(245,240,232,0.97);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(200,180,140,0.4);
+    box-shadow: 0 -4px 24px rgba(28,56,41,0.12);
+    border-radius: 20px 20px 0 0;
+    z-index: 20;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Row of 4 tiny hive SVGs at the top of the panel */
+  #hives-container::before {
+    content: '';
+    display: block;
+    height: 8px;
+  }
+
+  /* Hive wrappers: row of SVGs first, then cards below */
+  /* Restructure: all SVGs in a flex row, all cards in a flex row */
+  /* We use order to sort: SVGs first (order:1), labels second (order:2) */
   .hive-wrapper {
-    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    gap: 0;
   }
 
-  /* Reset SVG scale — let them breathe in the grid */
+  /* The container itself: two rows — top row = SVGs, bottom row = cards */
+  /* Achieved with flex-wrap and fixed widths */
+  #hives-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* Each wrapper = 25% width */
+  .hive-wrapper {
+    width: 25%;
+    flex: 0 0 25%;
+    padding: 6px 2px 0;
+    box-sizing: border-box;
+  }
+
+  /* Shrink SVGs to tiny hive icons */
   .hive-svg-wrap {
-    transform: scale(0.72);
+    transform: scale(0.42);
     transform-origin: bottom center;
+    margin-bottom: -28px; /* pull label up under the scaled SVG */
   }
   .hive-wrapper:hover .hive-svg-wrap {
-    transform: scale(0.72) translateY(-4px);
+    transform: scale(0.42) translateY(-4px);
   }
   .hive-wrapper.coming-soon:hover .hive-svg-wrap {
-    transform: scale(0.72);
+    transform: scale(0.42);
   }
 
-  /* Label cards — readable size */
+  /* Label cards — clean row under the hives */
   .hive-label {
-    min-width: 100px;
-    padding: 7px 10px 9px;
+    min-width: 0;
+    width: 100%;
+    padding: 6px 6px 8px;
+    border-radius: 10px;
+    margin-top: 0;
+    box-sizing: border-box;
   }
   .hive-label-name {
-    font-size: 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .hive-label-sub {
-    font-size: 10px;
-    margin-top: 2px;
+    font-size: 9px;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .status-badge {
-    font-size: 9px;
-    padding: 2px 7px;
-    gap: 4px;
-    margin-top: 4px;
+    font-size: 8px;
+    padding: 2px 5px;
+    gap: 3px;
+    margin-top: 3px;
   }
   .status-badge .dot {
-    width: 5px; height: 5px;
+    width: 4px; height: 4px;
   }
 
-  /* Wordmark — tuck up a little */
+  /* Wordmark — keep visible above the panel */
   #wordmark {
-    top: clamp(10px, 2vh, 20px);
+    bottom: 180px;
+    top: auto;
   }
 
-  /* Kangaroo — hide on mobile to reduce clutter */
-  #kangaroo-wrap {
-    display: none;
-  }
+  /* Hide hint — panel makes it obvious */
+  #hint { display: none; }
 
-  /* Hint text */
-  #hint {
-    font-size: 12px;
-    bottom: 1%;
-  }
+  /* Hide kangaroo on mobile */
+  #kangaroo-wrap { display: none; }
+
+  /* Bee stays in scene above panel */
+  #bee { z-index: 25; }
 }
 
 </style>
