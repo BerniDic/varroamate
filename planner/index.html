@@ -43,7 +43,7 @@ html{scroll-behavior:smooth;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
 /* ── HEADER ── */
-.header{background:var(--forest);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,0.22);}
+.header{background:var(--forest);padding:0;height:58px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,0.22);}.header-inner{padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between;}
 .logo{font-family:'Playfair Display',serif;font-size:21px;color:var(--cream);}
 .logo em{color:var(--amber-light);font-style:italic;}
 .logo sup{font-size:9px;font-family:'DM Sans',sans-serif;vertical-align:super;color:var(--sage-light);}
@@ -53,8 +53,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
 @keyframes pdot{0%,100%{opacity:1;}50%{opacity:0.25;}}
 
 /* ── LAYOUT ── */
-.main{padding:20px 24px 60px;max-width:1120px;margin:0 auto;}
-.two-col{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+.main{padding:20px 24px 60px;}
+.two-col{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
 @media(max-width:900px){.two-col{grid-template-columns:1fr;}}
   .dp-tab{padding:8px 16px;background:white;border:1.5px solid var(--border);border-radius:20px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;}
   .dp-tab:hover{border-color:var(--sage);color:var(--forest);}
@@ -194,10 +194,20 @@ canvas#tlCanvas{display:block;width:100%;cursor:default;}
 .palette-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .palette-title{font-family:'Playfair Display',serif;font-size:16px;}
 .palette-hint{font-size:12px;color:var(--text3);margin-top:2px;}
-.palette-body{padding:10px 18px 14px;display:flex;flex-direction:column;gap:4px;}
-.palette-group{margin-top:8px;}
+.palette-body{padding:10px 18px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 8px;}
+.palette-group{margin-top:8px;grid-column:1/-1;}
 .palette-group-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);padding:4px 0 4px 2px;border-bottom:1px solid var(--border);margin-bottom:4px;}
 .palette-group:first-child{margin-top:0;}
+
+.chip-info-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;min-width:16px;border-radius:50%;border:1.5px solid rgba(28,56,41,0.3);font-size:9px;font-weight:700;cursor:pointer;opacity:0.5;flex-shrink:0;margin-left:auto;transition:opacity 0.15s;background:transparent;color:var(--text2);line-height:1;padding:0;font-family:'DM Sans',sans-serif;}
+.chip-info-btn:hover{opacity:1;border-color:var(--forest);}
+#chipInfoPopup{position:fixed;z-index:600;background:var(--forest);color:var(--cream);border-radius:12px;padding:14px 16px;font-size:12px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.4);line-height:1.6;display:none;}
+#chipInfoPopup.show{display:block;}
+#chipInfoPopup .cip-title{font-family:'Playfair Display',serif;font-weight:700;font-size:14px;margin-bottom:6px;color:var(--amber-light);}
+#chipInfoPopup .cip-notes{font-size:12px;line-height:1.6;margin-bottom:8px;}
+#chipInfoPopup .cip-reg{font-size:11px;opacity:0.8;border-top:1px solid rgba(255,255,255,0.15);padding-top:8px;margin-top:4px;}
+#chipInfoPopup .cip-close{position:absolute;top:8px;right:10px;cursor:pointer;font-size:16px;opacity:0.6;line-height:1;}
+#chipInfoPopup .cip-close:hover{opacity:1;}
 .treat-chip{padding:9px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--cream);cursor:grab;display:flex;align-items:center;gap:10px;transition:all 0.15s;user-select:none;font-size:13px;}
 .treat-chip:hover{box-shadow:0 3px 12px rgba(28,56,41,0.12);transform:translateY(-1px);}
 .treat-chip.dragging{opacity:0.45;transform:scale(0.96);}
@@ -338,7 +348,87 @@ canvas.drop-blocked{cursor:not-allowed;}
 .tag-amber{background:rgba(212,130,10,0.12);color:var(--amber);}
 .tag-red{background:rgba(184,92,56,0.12);color:var(--rust);}
 
-@media(max-width:600px){.main{padding:14px 14px 60px;}.pref-banner{flex-wrap:wrap;gap:10px;}}
+
+
+/* ── PALETTE joined below timeline ── */
+.tl-card { border-radius: var(--radius) var(--radius) 0 0; margin-bottom: 0; }
+#paletteCard { border-top: 1px solid rgba(28,56,41,0.08); margin-bottom: 16px; }
+.palette-head { padding: 10px 18px; display:flex; align-items:center; }
+
+/* ── VMSP CHAT ASSISTANT ── */
+.vmsp-chat-fab{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:var(--forest);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(28,56,41,0.35);z-index:400;border:none;transition:all 0.2s;}
+.vmsp-chat-fab:hover{background:var(--forest-mid);transform:scale(1.08);}
+.vmsp-chat-panel{position:fixed;bottom:calc(140px + env(safe-area-inset-bottom));right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border);z-index:401;display:none;flex-direction:column;max-height:440px;overflow:hidden;}
+.vmsp-chat-panel.open{display:flex;}
+.vmsp-chat-header{background:var(--forest);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-radius:18px 18px 0 0;flex-shrink:0;}
+.vmsp-chat-header-info{flex:1;}
+.vmsp-chat-header-title{font-weight:700;font-size:15px;}
+.vmsp-chat-header-sub{font-size:11px;opacity:0.75;}
+.vmsp-chat-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0 4px;line-height:1;}
+.vmsp-chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.vmsp-chat-msg{max-width:88%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.55;}
+.vmsp-chat-msg.bot{background:var(--cream);color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid var(--border);}
+.vmsp-chat-msg.user{background:var(--forest);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.vmsp-chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+.vmsp-chat-input{flex:1;padding:8px 13px;border-radius:20px;border:1.5px solid var(--border);font-family:inherit;font-size:14px;background:var(--cream);color:var(--text);}
+.vmsp-chat-input:focus{outline:none;border-color:var(--forest);}
+.vmsp-chat-send{background:var(--forest);color:#fff;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:15px;flex-shrink:0;transition:background 0.15s;}
+.vmsp-chat-send:hover{background:var(--forest-mid);}
+@media(max-width:480px){.vmsp-chat-panel{width:calc(100vw - 20px);right:10px;}}
+
+/* ── SCREENS & TABBAR ── */
+.screen{display:none;min-height:calc(100vh - 58px);flex-direction:column;}
+.screen.active{display:flex;}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--forest);z-index:300;box-shadow:0 -2px 16px rgba(0,0,0,0.22);}.tabbar-inner{padding:0 12px;display:flex;justify-content:space-around;align-items:center;height:calc(60px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);}
+.tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.5);cursor:pointer;padding:8px 12px;border-radius:10px;transition:all 0.2s;font-size:11px;gap:3px;flex:1;}
+.tab-item .tab-icon{font-size:22px;line-height:1;}
+.tab-item.active{color:var(--amber-light);}
+.tab-item:hover{color:rgba(255,255,255,0.85);}
+
+/* ── MISSION PAGE ── */
+.mission-wrap{max-width:700px;margin:0 auto;padding:clamp(24px,5vh,56px) 24px calc(80px + env(safe-area-inset-bottom));}
+.mission-hero{text-align:center;margin-bottom:40px;}
+.mission-hero h2{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,44px);font-weight:700;color:var(--forest);line-height:1.15;margin-bottom:12px;}
+.mission-hero h2 em{font-style:italic;color:var(--amber);}
+.mission-hero p{font-size:clamp(14px,1.6vw,17px);color:var(--text2);line-height:1.7;max-width:520px;margin:0 auto;}
+.mission-pillars{display:flex;flex-direction:column;gap:14px;margin-bottom:40px;}
+.pillar{display:flex;align-items:flex-start;gap:16px;background:white;border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);}
+.pillar-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
+.pillar-text h3{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:4px;}
+.pillar-text p{font-size:13px;color:var(--text2);line-height:1.6;}
+.mission-cta{text-align:center;}
+.mission-cta-btn{display:inline-block;background:linear-gradient(135deg,var(--forest) 0%,var(--forest-mid) 100%);color:white;font-family:'Playfair Display',serif;font-size:18px;font-style:italic;font-weight:700;padding:16px 40px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(28,56,41,0.25);transition:transform 0.2s,box-shadow 0.2s;}
+.mission-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(28,56,41,0.32);}
+
+/* ── DISCLAIMER PAGE ── */
+.disc-wrap{max-width:680px;margin:0 auto;padding:clamp(24px,5vh,48px) 24px calc(80px + env(safe-area-inset-bottom));}
+.disc-wrap h2{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--forest);margin-bottom:20px;}
+.disc-box{background:white;border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);margin-bottom:24px;font-size:13px;color:var(--text2);line-height:1.75;}
+.disc-box p{margin-bottom:14px;}
+.disc-box p:last-child{margin-bottom:0;}
+.disc-ack{display:flex;align-items:flex-start;gap:14px;background:var(--amber-pale);border:1.5px solid rgba(212,130,10,0.25);border-radius:14px;padding:18px 20px;margin-bottom:20px;cursor:pointer;}
+.disc-ack input[type=checkbox]{width:20px;height:20px;min-width:20px;accent-color:var(--amber);margin-top:2px;cursor:pointer;}
+.disc-ack-text{font-size:14px;color:var(--text);line-height:1.55;}
+.disc-enter-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--amber) 0%,#C07020 100%);color:white;font-family:'Playfair Display',serif;font-size:18px;font-style:italic;font-weight:700;border:none;border-radius:14px;cursor:pointer;opacity:0.3;pointer-events:none;transition:opacity 0.3s,transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 20px rgba(212,130,10,0.2);}
+.disc-enter-btn.enabled{opacity:1;pointer-events:auto;}
+.disc-enter-btn.enabled:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(212,130,10,0.35);}
+
+/* ── DAY PLANNER BIG BUTTONS ── */
+.dayplan-wrap{padding:clamp(20px,4vh,40px) 24px calc(80px + env(safe-area-inset-bottom));}
+.dayplan-wrap h2{font-family:'Playfair Display',serif;font-size:clamp(20px,3vw,30px);font-weight:700;color:var(--forest);margin-bottom:6px;}
+.dayplan-wrap .dp-intro{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6;}
+.dayplan-grid{display:flex;flex-direction:column;gap:12px;}
+.dayplan-row{display:flex;gap:12px;}
+.dayplan-btn{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:white;border:1.5px solid var(--border);border-radius:16px;padding:20px 20px;cursor:pointer;transition:all 0.18s;box-shadow:var(--shadow);text-align:left;}
+.dayplan-btn:hover{border-color:var(--forest-light);transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.dayplan-btn.active{border-color:var(--forest);background:rgba(28,56,41,0.04);}
+.dayplan-btn-icon{font-size:28px;margin-bottom:2px;}
+.dayplan-btn-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);line-height:1.2;}
+.dayplan-btn-sub{font-size:11px;color:var(--text3);line-height:1.4;}
+.dayplan-content{margin-top:20px;display:none;}
+.dayplan-content.active{display:block;}
+
+@media(max-width:600px){.main{padding:14px 14px 80px;}.pref-banner{flex-wrap:wrap;gap:10px;}}
 </style>
 </head>
 <body>
@@ -403,13 +493,102 @@ canvas.drop-blocked{cursor:not-allowed;}
 
 <!-- HEADER -->
 <header class="header">
+<div class="header-inner">
   <div style="display:flex;align-items:center;gap:0;">
+    <a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.12);color:white;text-decoration:none;font-size:15px;transition:background 0.2s;flex-shrink:0;margin-right:6px;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">🏠</a>
     <div class="logo">Varroa<em>Mate</em><sup>™</sup></div>
     <span class="logo-sub">Smart Planner</span>
   </div>
-  <div class="sync-pill"><div class="sync-dot"></div>Synced with VM</div>
+  <span id="vmSyncBadge" style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.45);padding:2px 0;"></span>
+</div>
 </header>
 
+<!-- ══ SCREEN 1: MISSION ══ -->
+<div class="screen active" id="screen-mission">
+  <div class="mission-wrap">
+    <div class="mission-hero">
+      <h2>Plan with Purpose.<br><em>Save Your Bees.</em></h2>
+      <p>The VarroaMate Smart Planner exists for one reason — to help you think ahead, act deliberately, and give your colonies the best possible chance against Varroa.</p>
+    </div>
+    <div class="mission-pillars">
+      <div class="pillar">
+        <div class="pillar-icon">🗓️</div>
+        <div class="pillar-text">
+          <h3>Think and plan ahead</h3>
+          <p>Varroa management cannot be improvised. The treatments that work best require advance planning — the right product at the right time, for the right duration. Build your season before it starts.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🧘</div>
+        <div class="pillar-text">
+          <h3>Do not be reactive and panic</h3>
+          <p>Panic treatments — grabbing whatever is available when mite levels spike — are rarely effective and often harmful. A calm, pre-planned approach outperforms reactive intervention every time.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🔍</div>
+        <div class="pillar-text">
+          <h3>Recognise valuable season/treatment combinations</h3>
+          <p>Some of the most powerful treatment windows are easy to miss — late summer broodless periods, post-flow windows for oxalic acid, spring drone brood trapping. The planner highlights them before they pass.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🍯</div>
+        <div class="pillar-text">
+          <h3>Optimal treatment and flow combinations</h3>
+          <p>Not all treatments are compatible with honey supers. Placing the wrong treatment during a flow risks contaminating your harvest. The planner ensures your treatment windows align with — not against — your nectar flows.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">❄️</div>
+        <div class="pillar-text">
+          <h3>Ensure your bees are ready for winter</h3>
+          <p>Winter bees must be raised from mite-free brood in late summer. Miss this window and your colony enters winter weakened, short-lived, and vulnerable. The planner keeps this critical deadline front and centre.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">💛</div>
+        <div class="pillar-text">
+          <h3>Keep your bees happy and alive</h3>
+          <p>Everything in this planner comes back to one thing — thriving, productive colonies. Healthy bees, sustainable beekeeping, and the quiet satisfaction of knowing you gave your hives their best chance.</p>
+        </div>
+      </div>
+    </div>
+    <div class="mission-cta">
+      <button class="mission-cta-btn" onclick="gotoScreen('screen-disclaimer')">Get Started →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: DISCLAIMER ══ -->
+<div class="screen" id="screen-disclaimer">
+  <div class="disc-wrap">
+    <h2>Before You Plan</h2>
+    <div class="disc-box">
+      <p>The VarroaMate Smart Planner provides planning tools and guidance to assist beekeepers in managing Varroa mite. It does not constitute veterinary, biosecurity, or professional beekeeping advice.</p>
+      <p>Treatment recommendations represent one of several possible approaches and must be considered alongside your specific colony conditions, local climate, and current regulatory requirements. Always verify treatment permits, withholding periods, and registration status with your state agriculture authority before treating.</p>
+      <p>Varroa is a notifiable pest across all Australian states and territories. All positive detections must be reported promptly to your state or territory agriculture authority.</p>
+      <p>Timing windows shown are indicative for southern hemisphere beekeeping. Actual conditions vary by location, season, and colony strength. The planner score is a guide only — it does not guarantee treatment outcomes.</p>
+      <p>Anthropic's Claude AI is used to provide plan analysis. AI-generated advice should be reviewed critically and not followed without independent judgement. No liability is accepted for decisions made based on planner output or AI guidance.</p>
+      <p>No liability is accepted for any loss of colonies, honey, income, or other loss arising from use of this application.</p>
+    </div>
+    <div class="disc-box" style="background:linear-gradient(135deg,rgba(28,56,41,0.04),rgba(212,130,10,0.05));border-color:rgba(212,130,10,0.2);">
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:10px;">📋 This is a planning tool — and plans change. That's fine.</p>
+      <p>The Smart Planner is here to help you think ahead, not lock you in. A plan you build in August may look quite different by October — a hive splits unexpectedly, a flow comes early, mite levels surprise you. Life happens in beekeeping.</p>
+      <p>The planner is designed to be adjusted. Drag treatments, shift windows, swap methods. Every time your situation changes, update the plan and keep moving forward. A dynamic, imperfect plan beats a rigid one — and both beat the alternative.</p>
+      <p style="margin-bottom:0;font-weight:600;color:var(--forest);font-size:14px;font-style:italic;">"The worst plan to have is no plan at all."</p>
+    </div>
+
+    <label class="disc-ack" id="discAckRow">
+      <input type="checkbox" id="discAck" onchange="toggleDiscEnter()"/>
+      <span class="disc-ack-text"><strong>I understand this is a planning aid, not professional advice.</strong> I will verify treatment requirements with my state authority and apply my own judgement to all beekeeping decisions.</span>
+    </label>
+    <button class="disc-enter-btn" id="discEnterBtn" onclick="enterPlanner()">Enter the Smart Planner →</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: SEASONAL PLANNER ══ -->
+<div class="screen" id="screen-planner">
 <div class="main">
 
   <!-- PREF BANNER -->
@@ -461,7 +640,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           <span class="plan-sel-badge new" id="planSelBadge" style="display:none;">new plan</span>
           <span id="planSelMobile" style="display:none;font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(212,130,10,0.18);color:var(--amber-light);border:1px solid rgba(212,130,10,0.3);margin-left:2px;font-family:'DM Mono',monospace;">🚛 mobile</span>
           <button id="planItinBtn" onclick="openItinModal()" style="display:none;margin-left:6px;padding:4px 10px;border-radius:5px;border:1.5px solid rgba(212,130,10,0.4);background:rgba(212,130,10,0.12);color:var(--amber-light);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;">Itinerary →</button>
-          <span id="vmSyncBadge" style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.45);padding:2px 0;"></span>
+
         </div>
         <div class="tl-head">
           <div>
@@ -500,18 +679,32 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div>
         <div class="tl-legend">
           <div class="leg-item" style="gap:6px;"><span style="display:inline-block;width:18px;height:7px;background:rgba(90,158,96,0.3);border-radius:2px;border-left:3px solid #5A9E60"></span>Flow window (drag to move · edges to resize · × to delete)</div>
-          <div class="leg-item" style="cursor:pointer;" onclick="const p=document.getElementById('oppInfo');p.style.display=p.style.display==='none'?'block':'none'" title="Learn about opportunity windows"><div class="leg-dot" style="background:#5A9E60;opacity:0.6"></div>Ideal opportunity <span style="color:var(--amber-light);font-size:10px;">ⓘ tap to learn</span></div>
+          <div class="leg-item" style="cursor:pointer;" onclick="const p=document.getElementById('oppInfo');const wasHidden=p.style.display==='none';p.style.display=wasHidden?'block':'none';if(wasHidden){p.scrollIntoView({behavior:'smooth',block:'center'});}" title="Learn about opportunity windows"><div class="leg-dot" style="background:#5A9E60;opacity:0.6"></div>Ideal opportunity <span style="color:var(--amber-light);font-size:10px;">ⓘ tap to learn</span></div>
           <div class="leg-item"><div class="leg-dot" style="background:#D4820A;opacity:0.6"></div>Caution / possible</div>
           <div class="leg-item"><div class="leg-dot" style="background:#B85C38;opacity:0.5"></div>Avoid / risk</div>
-          <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><rect x="0" y="1" width="22" height="6" fill="rgba(212,130,10,0.22)"/><line x1="0" y1="1" x2="22" y2="1" stroke="rgba(212,130,10,0.55)" stroke-width="1"/></svg>Action zone — treat soon (thresholds vary by season)</div>
-          <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="rgba(184,92,56,0.8)" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Colony loss threshold — treat urgently (varies by season)</div>
+          <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><rect x="0" y="1" width="22" height="6" fill="rgba(212,130,10,0.22)"/><line x1="0" y1="1" x2="22" y2="1" stroke="rgba(212,130,10,0.55)" stroke-width="1"/></svg>Action zone (seasonal)</div>
+          <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="rgba(184,92,56,0.8)" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Colony loss threshold (seasonal)</div>
           <div class="leg-item"><div class="leg-dot" style="background:#5A9E60"></div>Organic [OA/EO]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#1C3829"></div>Synthetic [AMZ/PYR]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#7B6FA0"></div>Mechanical [MCH]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#A0522D"></div>Physical Plan [PHY] — Heat / Duplex</div>
           <div class="leg-item" style="gap:5px;"><span style="display:inline-block;width:18px;height:5px;background:#4A90A4;border-radius:1px;opacity:0.7"></span>Supers must be OFF</div>
           <div class="leg-item" style="gap:5px;"><span style="background:#B85C38;color:white;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;">!</span> Wrong season</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#D4820A"></div>⚠ MoA conflict</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#D4820A"></div>⚠ Rotation conflict</div>
+        </div>
+      </div>
+
+      <!-- PALETTE — inline below timeline for easy drag access -->
+      <div class="palette-card" id="paletteCard" style="margin-top:0;border-top:none;border-radius:0 0 var(--radius) var(--radius);">
+        <div class="palette-head" onclick="togglePalette()" style="cursor:pointer;user-select:none;">
+          <div>
+            <div class="palette-title">🧪 Treatment Palette</div>
+            <div class="palette-hint">Drag onto the timeline to plan a treatment</div>
+          </div>
+          <span id="paletteChevron" style="font-size:22px;color:var(--sage);transition:transform 0.25s;margin-left:auto;line-height:1;">▴</span>
+        </div>
+        <div id="paletteBodyWrap" style="overflow:hidden;transition:max-height 0.3s ease;">
+          <div class="palette-body" id="paletteBody"></div>
         </div>
       </div>
 
@@ -524,25 +717,20 @@ canvas.drop-blocked{cursor:not-allowed;}
         <div class="plan-body" id="planList"><div class="empty-plan">No treatments planned yet — drag from the palette onto the timeline</div></div>
       </div>
 
-      <!-- ADAPTIVE ALERTS -->
-      <div class="alerts-card">
+      <!-- ADAPTIVE ALERTS — dynamically populated from VM mite data once synced -->
+      <div class="alerts-card" id="smartAlertsCard">
         <div class="alerts-head">
           <h3>🤖 Smart Adjustments</h3>
-          <div class="alert-badge">2</div>
-          <div style="margin-left:auto;font-size:11px;color:var(--text3);">Based on weather, mite data & your philosophy</div>
+          <div class="alert-badge" id="alertBadge" style="display:none;">0</div>
+          <div style="margin-left:auto;font-size:11px;color:var(--text3);">Based on mite data &amp; your plan</div>
         </div>
-        <div class="alert-row">
-          <div class="alert-icon">🌡️</div>
-          <div class="alert-content">
-            <div class="alert-title">Spring window opening ~18 days earlier than average</div>
-            <div class="alert-body">BOM forecast for your location shows warmer-than-average August. Your planned OA treatment window has been adjusted forward. Review your plan timing.</div>
-          </div>
-        </div>
-        <div class="alert-row">
-          <div class="alert-icon">📈</div>
-          <div class="alert-content">
-            <div class="alert-title">Alcohol wash: 9 mites/300 bees — above urgent threshold</div>
-            <div class="alert-body">Consider adding a second treatment pass in spring. Your current plan has a single OA treatment which may be insufficient given current mite pressure.</div>
+        <div id="alertsBody">
+          <div class="alert-row">
+            <div class="alert-icon">🔗</div>
+            <div class="alert-content">
+              <div class="alert-title">Waiting for VarroaMate data</div>
+              <div class="alert-body">Smart adjustments will activate once you sign in to VarroaMate. Mite counts and treatment history will be used to flag risks and recommend timing changes.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -595,7 +783,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <div style="padding:8px 10px;background:rgba(90,158,96,0.06);border-left:3px solid #5A9E60;border-radius:0 5px 5px 0;">
-                  <div style="font-size:12px;font-weight:600;color:#3A6E40;">⚖️ Philosophy Alignment</div>
+                  
                   <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Penalised for every treatment that falls outside your chosen strategy (e.g. a synthetic in an organic-only plan). 100% = all treatments match your philosophy.</div>
                 </div>
                 <div style="padding:8px 10px;background:rgba(74,120,152,0.06);border-left:3px solid #4A7898;border-radius:0 5px 5px 0;">
@@ -675,6 +863,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           </div>
           <div class="suggest-proposals" id="suggestProposals" style="display:none;"></div>
           <button class="suggest-apply-all" id="suggestApplyAll" onclick="applyAllAccepted()">✅ Add all accepted treatments to timeline</button>
+          <div id="suggestRationaleBelow" style="display:none;margin-top:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);font-size:12px;color:var(--text2);line-height:1.6;border-left:3px solid var(--forest-light);"></div>
           <!-- Live rating preview for accepted proposals -->
           <div id="suggestRatingPreview" style="display:none;margin-top:14px;padding:12px 14px;background:var(--cream);border-radius:var(--radius-sm);border:1px solid var(--border);">
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:8px;">Preview rating for accepted treatments</div>
@@ -686,17 +875,6 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div>
       </div>
 
-      <!-- PALETTE -->
-      <div class="palette-card">
-        <div class="palette-head">
-          <div>
-            <div class="palette-title">🧪 Treatment Palette</div>
-            <div class="palette-hint">Drag onto the timeline to plan a treatment</div>
-          </div>
-        </div>
-        <div class="palette-body" id="paletteBody"></div>
-      </div>
-
     </div><!-- end right -->
 
   </div><!-- end two-col -->
@@ -705,17 +883,6 @@ canvas.drop-blocked{cursor:not-allowed;}
   <!-- DAY PLANNERS SECTION                                    -->
   <!-- ═══════════════════════════════════════════════════════ -->
   <div id="dayPlannersSection" style="margin-top:28px;">
-
-    <!-- Section header -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;cursor:pointer;" onclick="toggleDayPlanners()">
-      <div style="flex:1;height:1px;background:var(--border);"></div>
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;background:white;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);">
-        <span style="font-size:15px;">🗓</span>
-        <span style="font-family:'Playfair Display',serif;font-size:14px;color:var(--forest);font-weight:600;">Day-Level Treatment Planners</span>
-        <span id="dpChevron" style="font-size:11px;color:var(--text3);transition:transform 0.2s;">▾</span>
-      </div>
-      <div style="flex:1;height:1px;background:var(--border);"></div>
-    </div>
 
     <div id="dpBody" style="display:none;">
 
@@ -742,141 +909,61 @@ canvas.drop-blocked{cursor:not-allowed;}
       <div class="dp-page active" id="dppage-drone">
         <div class="dp-print-header" id="dp-print-header-drone"></div>
 
-        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;" class="dp-two-col">
-
-          <!-- Left: description + setup -->
-          <div>
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;">
-              <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;">
-                <span style="font-size:32px;flex-shrink:0;">🐝</span>
-                <div>
-                  <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--forest);margin-bottom:4px;">Drone Brood Removal</div>
-                  <div style="font-size:12px;color:var(--text3);line-height:1.6;">Varroa mites prefer drone brood — reproducing <strong>8–10× more successfully</strong> in drone cells than worker cells. Placing a drone-sized frame then removing it while fully capped traps large numbers of mites with zero chemicals. Best used as a suppression tool in spring alongside a full treatment plan.</div>
-                </div>
-              </div>
-              <div style="padding:10px 12px;background:rgba(184,92,56,0.08);border:1.5px solid rgba(184,92,56,0.35);border-radius:7px;margin-bottom:12px;font-size:12px;color:#7A3018;line-height:1.6;">
-                ⚠️ <strong>Timing is everything.</strong> Remove the frame too early (before day 20) and mites haven't fully entered the cells — they escape back into the colony. Remove too late (day 25+) and drones begin emerging, releasing all trapped mites back into the hive. The net result is a <em>worse</em> outcome than doing nothing — you've just disrupted the colony with no benefit. Stay in the days 20–24 window.
-              </div>
-
-              <!-- Biology strips -->
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;">
-                <div style="padding:8px 10px;background:rgba(168,200,122,0.12);border-left:3px solid #A8C87A;border-radius:0 5px 5px 0;">
-                  <div style="font-size:11px;font-weight:700;color:#4A7A1A;">Egg stage</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 1–3 (same as worker bees)</div>
-                </div>
-                <div style="padding:8px 10px;background:rgba(122,174,200,0.12);border-left:3px solid #7AAEC8;border-radius:0 5px 5px 0;">
-                  <div style="font-size:11px;font-weight:700;color:#1A5A7A;">Capped stage</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 10–24 (14 days — longer than worker 12d)</div>
-                </div>
-                <div style="padding:8px 10px;background:rgba(64,184,184,0.15);border-left:3px solid #40B8B8;border-radius:0 5px 5px 0;">
-                  <div style="font-size:11px;font-weight:700;color:#006060;">Removal window</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 20–24: fully capped, mites trapped, no emergence yet</div>
-                </div>
-                <div style="padding:8px 10px;background:rgba(155,107,138,0.15);border-left:3px solid #9B6B8A;border-radius:0 5px 5px 0;">
-                  <div style="font-size:11px;font-weight:700;color:#5A2A4A;">Repeat cycle</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Replace frame immediately. Repeat every 24–28 days through spring</div>
-                </div>
-              </div>
+        <!-- Row 1: Description + warning + biology strips — full width -->
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;">
+            <span style="font-size:32px;flex-shrink:0;">🐝</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--forest);margin-bottom:4px;">Drone Brood Removal</div>
+              <div style="font-size:12px;color:var(--text3);line-height:1.6;">Varroa mites prefer drone brood — reproducing <strong>8–10× more successfully</strong> in drone cells than worker cells. Placing a drone-sized frame then removing it while fully capped traps large numbers of mites with zero chemicals. Best used as a suppression tool in spring alongside a full treatment plan.</div>
             </div>
-
-            <!-- Timeline canvas -->
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;">
-              <div style="background:var(--forest);padding:10px 16px;display:flex;align-items:center;gap:8px;">
-                <span style="font-size:13px;font-weight:600;color:white;">📊 Drone Frame Development — 42 days</span>
-                <span id="drone-timeline-label" style="margin-left:auto;font-size:11px;color:var(--sage-light);"></span>
-              </div>
-              <div style="overflow-x:auto;">
-                <canvas id="droneCanvas" style="display:block;"></canvas>
-              </div>
-              <!-- Legend -->
-              <div style="display:flex;gap:12px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--border);background:var(--cream);">
-                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#B8D890;"></div>Open brood</div>
-                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#5E9EC0;"></div>Capped drone</div>
-                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#9B6B8A;"></div>Mite trap zone</div>
-                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#40B8B8;"></div>Remove now</div>
-                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#C84040;"></div>Too late</div>
-              </div>
+          </div>
+          <div style="padding:10px 12px;background:rgba(184,92,56,0.08);border:1.5px solid rgba(184,92,56,0.35);border-radius:7px;margin-bottom:12px;font-size:12px;color:#7A3018;line-height:1.6;">
+            ⚠️ <strong>Timing is everything.</strong> Remove the frame too early (before day 20) and mites haven't fully entered the cells — they escape back into the colony. Remove too late (day 25+) and drones begin emerging, releasing all trapped mites back into the hive. The net result is a <em>worse</em> outcome than doing nothing — you've just disrupted the colony with no benefit. Stay in the days 20–24 window.
+          </div>
+          <!-- Biology strips -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+            <div style="padding:8px 10px;background:rgba(168,200,122,0.12);border-left:3px solid #A8C87A;border-radius:0 5px 5px 0;">
+              <div style="font-size:11px;font-weight:700;color:#4A7A1A;">Egg stage</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 1–3 (same as worker bees)</div>
             </div>
-
-            <!-- ─── Frame type diagrams (left col — always visible) ─── -->
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;margin-top:14px;">
-              <div style="font-size:13px;font-weight:700;color:var(--forest);margin-bottom:12px;">🖼 Drone frame options — choose what suits your setup</div>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
-
-                <!-- Option 1: Plastic green frame -->
-                <div style="border:1.5px solid #5A9E60;border-radius:8px;overflow:hidden;">
-                  <div style="background:#5A9E60;padding:6px 10px;font-size:11px;font-weight:700;color:white;">① Plastic drone frame (green)</div>
-                  <div style="padding:10px;">
-                    <svg viewBox="0 0 180 120" style="width:100%;height:auto;display:block;margin-bottom:8px;" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="5" y="4" width="170" height="10" rx="2" fill="#6B4A2A"/>
-                      <rect x="5" y="106" width="170" height="10" rx="2" fill="#6B4A2A"/>
-                      <rect x="5" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
-                      <rect x="167" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
-                      <defs><pattern id="droneHex" x="0" y="0" width="14" height="12" patternUnits="userSpaceOnUse"><circle cx="7" cy="6" r="5.2" fill="#90C060" stroke="#5A9040" stroke-width="0.8"/></pattern></defs>
-                      <rect x="16" y="17" width="148" height="86" fill="url(#droneHex)"/>
-                      <rect x="16" y="17" width="148" height="86" fill="rgba(255,255,255,0.0)"/>
-                      <text x="90" y="60" text-anchor="middle" font-size="10" fill="white" font-weight="bold" font-family="sans-serif">ALL DRONE CELLS</text>
-                      <text x="90" y="74" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,0.9)" font-family="sans-serif">pre-moulded large cell</text>
-                    </svg>
-                    <div style="font-size:10px;color:var(--text3);line-height:1.5;">Entire frame is drone-sized cells. Queen fills readily. Freeze to kill mites, scratch caps, return for bees to clean. Reusable indefinitely. Best for beginners.</div>
-                  </div>
-                </div>
-
-                <!-- Option 2: Half-foundation -->
-                <div style="border:1.5px solid #D4820A;border-radius:8px;overflow:hidden;">
-                  <div style="background:#D4820A;padding:6px 10px;font-size:11px;font-weight:700;color:white;">② Half-foundation frame</div>
-                  <div style="padding:10px;">
-                    <svg viewBox="0 0 180 120" style="width:100%;height:auto;display:block;margin-bottom:8px;" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="5" y="4" width="170" height="10" rx="2" fill="#6B4A2A"/>
-                      <rect x="5" y="106" width="170" height="10" rx="2" fill="#6B4A2A"/>
-                      <rect x="5" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
-                      <rect x="167" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
-                      <defs><pattern id="workerCells" x="0" y="0" width="10" height="9" patternUnits="userSpaceOnUse"><circle cx="5" cy="4.5" r="3.5" fill="#E8D890" stroke="#C0A840" stroke-width="0.6"/></pattern></defs>
-                      <rect x="16" y="17" width="148" height="44" fill="url(#workerCells)"/>
-                      <text x="90" y="43" text-anchor="middle" font-size="8.5" fill="#6A4A00" font-weight="bold" font-family="sans-serif">WORKER FOUNDATION</text>
-                      <line x1="16" y1="63" x2="164" y2="63" stroke="#8A5010" stroke-width="1.5" stroke-dasharray="5,3"/>
-                      <text x="90" y="59" text-anchor="middle" font-size="7" fill="#8A5010" font-family="sans-serif">— foundation ends here —</text>
-                      <rect x="16" y="63" width="148" height="40" fill="#F5EDD0"/>
-                      <text x="90" y="80" text-anchor="middle" font-size="9.5" fill="#8A5010" font-weight="bold" font-family="sans-serif">OPEN — bees draw</text>
-                      <text x="90" y="94" text-anchor="middle" font-size="9.5" fill="#8A5010" font-weight="bold" font-family="sans-serif">natural drone comb ↓</text>
-                    </svg>
-                    <div style="font-size:10px;color:var(--text3);line-height:1.5;">Worker foundation top half only. Bees fill the bottom with natural drone-size comb. No special equipment — any standard deep frame works.</div>
-                  </div>
-                </div>
-
-                <!-- Option 3: Ideal/super frame in full-depth -->
-                <div style="border:1.5px solid #9B6B8A;border-radius:8px;overflow:hidden;">
-                  <div style="background:#9B6B8A;padding:6px 10px;font-size:11px;font-weight:700;color:white;">③ Ideal frame in full-depth box</div>
-                  <div style="padding:10px;">
-                    <svg viewBox="0 0 180 120" style="width:100%;height:auto;display:block;margin-bottom:8px;" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="5" y="4" width="170" height="10" rx="2" fill="#6B4A2A"/>
-                      <rect x="5" y="106" width="170" height="10" rx="2" fill="#6B4A2A"/>
-                      <rect x="5" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
-                      <rect x="167" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
-                      <rect x="8" y="14" width="164" height="92" fill="#F5F0E8"/>
-                      <!-- Ideal frame (shorter, sits at top) -->
-                      <rect x="18" y="17" width="144" height="52" rx="2" fill="#E8D090" stroke="#9B6B8A" stroke-width="1.5"/>
-                      <text x="90" y="36" text-anchor="middle" font-size="9" fill="#5A2A4A" font-weight="bold" font-family="sans-serif">IDEAL / SUPER FRAME</text>
-                      <text x="90" y="50" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">(shorter — sits at top of slot)</text>
-                      <!-- Gap arrows -->
-                      <line x1="60" y1="71" x2="60" y2="97" stroke="#9B6B8A" stroke-width="1" marker-end="url(#arr)"/>
-                      <line x1="120" y1="71" x2="120" y2="97" stroke="#9B6B8A" stroke-width="1"/>
-                      <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#9B6B8A"/></marker></defs>
-                      <!-- Gap area -->
-                      <rect x="18" y="70" width="144" height="32" rx="1" fill="rgba(155,107,138,0.15)" stroke="#9B6B8A" stroke-width="1" stroke-dasharray="4,2"/>
-                      <text x="90" y="82" text-anchor="middle" font-size="8.5" fill="#5A2A4A" font-weight="bold" font-family="sans-serif">GAP — bees draw</text>
-                      <text x="90" y="95" text-anchor="middle" font-size="8.5" fill="#5A2A4A" font-family="sans-serif">drone comb downward ↓</text>
-                    </svg>
-                    <div style="font-size:10px;color:var(--text3);line-height:1.5;">Shorter (ideal/super depth) frame in a full-depth slot. Bees extend drone comb below the frame bottom. Cut out and freeze. No foundation needed.</div>
-                  </div>
-                </div>
-
-              </div>
+            <div style="padding:8px 10px;background:rgba(122,174,200,0.12);border-left:3px solid #7AAEC8;border-radius:0 5px 5px 0;">
+              <div style="font-size:11px;font-weight:700;color:#1A5A7A;">Capped stage</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 10–24 (14 days — longer than worker 12d)</div>
             </div>
+            <div style="padding:8px 10px;background:rgba(64,184,184,0.15);border-left:3px solid #40B8B8;border-radius:0 5px 5px 0;">
+              <div style="font-size:11px;font-weight:700;color:#006060;">Removal window</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 20–24: fully capped, mites trapped, no emergence yet</div>
+            </div>
+            <div style="padding:8px 10px;background:rgba(155,107,138,0.15);border-left:3px solid #9B6B8A;border-radius:0 5px 5px 0;">
+              <div style="font-size:11px;font-weight:700;color:#5A2A4A;">Repeat cycle</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Replace frame immediately. Repeat every 24–28 days through spring</div>
+            </div>
+          </div>
+        </div>
 
-          </div><!-- end drone left col -->
+        <!-- Row 2: Canvas (left, wide) + Date picker & actions (right, compact) -->
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;margin-bottom:14px;">
 
-          <!-- Right: setup + action cards -->
+          <!-- Canvas -->
+          <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;">
+            <div style="background:var(--forest);padding:10px 16px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13px;font-weight:600;color:white;">📊 Drone Frame Development — 42 days</span>
+              <span id="drone-timeline-label" style="margin-left:auto;font-size:11px;color:var(--sage-light);"></span>
+            </div>
+            <div style="overflow-x:auto;">
+              <canvas id="droneCanvas" style="display:block;"></canvas>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--border);background:var(--cream);">
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#B8D890;"></div>Open brood</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#5E9EC0;"></div>Capped drone</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#9B6B8A;"></div>Mite trap zone</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#40B8B8;"></div>Remove now</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:12px;height:12px;border-radius:2px;background:#C84040;"></div>Too late</div>
+            </div>
+          </div>
+
+          <!-- Date picker + action cards -->
           <div>
             <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
               <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">🗓 Set frame placement date</div>
@@ -884,33 +971,102 @@ canvas.drop-blocked{cursor:not-allowed;}
               <div style="font-size:11px;color:var(--text3);font-style:italic;">The day you place the drone-sized foundation frame into the hive</div>
             </div>
             <div id="drone-actions" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
 
-            <!-- Video resources -->
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;margin-top:10px;">
-              <div style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <a href="https://www.varroa.org.au/resources" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
-                  <span style="font-size:15px;">🇦🇺</span>
-                  <div><div>varroa.org.au — Resources</div><div style="font-weight:400;color:var(--text3);font-size:10px;">National Varroa Mite Management Program — factsheets &amp; guides</div></div>
-                  <span style="margin-left:auto;opacity:0.5;">↗</span>
-                </a>
-                <a href="https://extensionaus.com.au/professionalbeekeepers/chemical-free-management-of-varroa-brood-breaks-and-drone-trapping/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
-                  <span style="font-size:15px;">📄</span>
-                  <div><div>ExtensionAUS — Drone Trapping Guide</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Peer-reviewed article: chemical-free varroa management</div></div>
-                  <span style="margin-left:auto;opacity:0.5;">↗</span>
-                </a>
+        </div><!-- end canvas+date row -->
 
-                <a href="https://honeybeehealthcoalition.org/resources/varroa-management/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
-                  <span style="font-size:15px;">🎬</span>
-                  <div><div>Honey Bee Health Coalition — Videos</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Step-by-step technique videos including drone brood removal</div></div>
-                  <span style="margin-left:auto;opacity:0.5;">↗</span>
-                </a>
+        <!-- Row 3: Frame options + Further learning side by side -->
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;">
+
+          <!-- Frame type diagrams -->
+          <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;">
+            <div style="font-size:13px;font-weight:700;color:var(--forest);margin-bottom:12px;">🖼 Drone frame options — choose what suits your setup</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+
+              <div style="border:1.5px solid #5A9E60;border-radius:8px;overflow:hidden;">
+                <div style="background:#5A9E60;padding:6px 10px;font-size:11px;font-weight:700;color:white;">① Plastic drone frame (green)</div>
+                <div style="padding:10px;">
+                  <svg viewBox="0 0 180 120" style="width:100%;height:auto;display:block;margin-bottom:8px;" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="4" width="170" height="10" rx="2" fill="#6B4A2A"/><rect x="5" y="106" width="170" height="10" rx="2" fill="#6B4A2A"/>
+                    <rect x="5" y="4" width="8" height="112" rx="2" fill="#8B6030"/><rect x="167" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
+                    <defs><pattern id="droneHex" x="0" y="0" width="14" height="12" patternUnits="userSpaceOnUse"><circle cx="7" cy="6" r="5.2" fill="#90C060" stroke="#5A9040" stroke-width="0.8"/></pattern></defs>
+                    <rect x="16" y="17" width="148" height="86" fill="url(#droneHex)"/>
+                    <rect x="30" y="46" width="120" height="34" rx="3" fill="rgba(0,0,0,0.35)"/>
+                    <text x="90" y="58" text-anchor="middle" font-size="11" fill="white" font-weight="bold" font-family="sans-serif">ALL DRONE CELLS</text>
+                    <text x="90" y="74" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,0.95)" font-weight="600" font-family="sans-serif">pre-moulded large cell</text>
+                  </svg>
+                  <div style="font-size:10px;color:#3A3A3A;line-height:1.5;">Entire frame is drone-sized cells. Queen fills readily. Freeze to kill mites, scratch caps, return for bees to clean. Reusable indefinitely. Best for beginners.</div>
+                </div>
               </div>
+
+              <div style="border:1.5px solid #D4820A;border-radius:8px;overflow:hidden;">
+                <div style="background:#D4820A;padding:6px 10px;font-size:11px;font-weight:700;color:white;">② Half-foundation frame</div>
+                <div style="padding:10px;">
+                  <svg viewBox="0 0 180 120" style="width:100%;height:auto;display:block;margin-bottom:8px;" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="4" width="170" height="10" rx="2" fill="#6B4A2A"/><rect x="5" y="106" width="170" height="10" rx="2" fill="#6B4A2A"/>
+                    <rect x="5" y="4" width="8" height="112" rx="2" fill="#8B6030"/><rect x="167" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
+                    <defs><pattern id="workerCells" x="0" y="0" width="10" height="9" patternUnits="userSpaceOnUse"><circle cx="5" cy="4.5" r="3.5" fill="#E8D890" stroke="#C0A840" stroke-width="0.6"/></pattern></defs>
+                    <rect x="16" y="17" width="148" height="44" fill="url(#workerCells)"/>
+                    <text x="90" y="43" text-anchor="middle" font-size="8.5" fill="#6A4A00" font-weight="bold" font-family="sans-serif">WORKER FOUNDATION</text>
+                    <line x1="16" y1="63" x2="164" y2="63" stroke="#8A5010" stroke-width="1.5" stroke-dasharray="5,3"/>
+                    <text x="90" y="59" text-anchor="middle" font-size="7" fill="#8A5010" font-family="sans-serif">— foundation ends here —</text>
+                    <rect x="16" y="63" width="148" height="40" fill="#F5EDD0"/>
+                    <text x="90" y="80" text-anchor="middle" font-size="9.5" fill="#8A5010" font-weight="bold" font-family="sans-serif">OPEN — bees draw</text>
+                    <text x="90" y="94" text-anchor="middle" font-size="9.5" fill="#8A5010" font-weight="bold" font-family="sans-serif">natural drone comb ↓</text>
+                  </svg>
+                  <div style="font-size:10px;color:var(--text3);line-height:1.5;">Worker foundation top half only. Bees fill the bottom with natural drone-size comb. No special equipment — any standard deep frame works.</div>
+                </div>
+              </div>
+
+              <div style="border:1.5px solid #9B6B8A;border-radius:8px;overflow:hidden;">
+                <div style="background:#9B6B8A;padding:6px 10px;font-size:11px;font-weight:700;color:white;">③ Ideal frame in full-depth box</div>
+                <div style="padding:10px;">
+                  <svg viewBox="0 0 180 120" style="width:100%;height:auto;display:block;margin-bottom:8px;" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="4" width="170" height="10" rx="2" fill="#6B4A2A"/><rect x="5" y="106" width="170" height="10" rx="2" fill="#6B4A2A"/>
+                    <rect x="5" y="4" width="8" height="112" rx="2" fill="#8B6030"/><rect x="167" y="4" width="8" height="112" rx="2" fill="#8B6030"/>
+                    <rect x="8" y="14" width="164" height="92" fill="#F5F0E8"/>
+                    <rect x="18" y="17" width="144" height="52" rx="2" fill="#E8D090" stroke="#9B6B8A" stroke-width="1.5"/>
+                    <text x="90" y="36" text-anchor="middle" font-size="9" fill="#5A2A4A" font-weight="bold" font-family="sans-serif">IDEAL / SUPER FRAME</text>
+                    <text x="90" y="50" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">(shorter — sits at top of slot)</text>
+                    <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#9B6B8A"/></marker></defs>
+                    <rect x="18" y="70" width="144" height="32" rx="1" fill="rgba(155,107,138,0.15)" stroke="#9B6B8A" stroke-width="1" stroke-dasharray="4,2"/>
+                    <text x="90" y="82" text-anchor="middle" font-size="8.5" fill="#5A2A4A" font-weight="bold" font-family="sans-serif">GAP — bees draw</text>
+                    <text x="90" y="95" text-anchor="middle" font-size="8.5" fill="#5A2A4A" font-family="sans-serif">drone comb downward ↓</text>
+                  </svg>
+                  <div style="font-size:10px;color:var(--text3);line-height:1.5;">Shorter (ideal/super depth) frame in a full-depth slot. Bees extend drone comb below the frame bottom. Cut out and freeze. No foundation needed.</div>
+                </div>
+              </div>
+
             </div>
-          </div><!-- end drone right col -->
-        </div><!-- end drone dp-two-col -->
+          </div>
+
+          <!-- Further learning -->
+          <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;">
+            <div style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <a href="https://www.varroa.org.au/resources" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
+                <span style="font-size:15px;">🇦🇺</span>
+                <div><div>varroa.org.au — Resources</div><div style="font-weight:400;color:var(--text3);font-size:10px;">National Varroa Mite Management Program — factsheets &amp; guides</div></div>
+                <span style="margin-left:auto;opacity:0.5;">↗</span>
+              </a>
+              <a href="https://extensionaus.com.au/professionalbeekeepers/chemical-free-management-of-varroa-brood-breaks-and-drone-trapping/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
+                <span style="font-size:15px;">📄</span>
+                <div><div>ExtensionAUS — Drone Trapping Guide</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Peer-reviewed article: chemical-free varroa management</div></div>
+                <span style="margin-left:auto;opacity:0.5;">↗</span>
+              </a>
+              <a href="https://honeybeehealthcoalition.org/resources/varroa-management/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
+                <span style="font-size:15px;">🎬</span>
+                <div><div>Honey Bee Health Coalition — Videos</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Step-by-step technique videos including drone brood removal</div></div>
+                <span style="margin-left:auto;opacity:0.5;">↗</span>
+              </a>
+            </div>
+          </div>
+
+        </div><!-- end frame options row -->
+
       </div><!-- end dppage-drone -->
 
+      <!-- ─── BROOD BREAK + OAV ─── -->
       <!-- ─── BROOD BREAK + OAV ─── -->
       <div class="dp-page" id="dppage-brood-break">
         <div class="dp-print-header" id="dp-print-header-brood-break"></div>
@@ -1173,7 +1329,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                   <div style="border:1.5px solid #5A9E60;border-radius:8px;overflow:hidden;">
                     <div style="background:#5A9E60;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Queenright half (stays)</div>
                     <div style="padding:10px;">
-                      <svg viewBox="0 0 160 130" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+                      <svg viewBox="0 0 160 145" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
                         <!-- Box -->
                         <rect x="10" y="10" width="140" height="110" rx="3" fill="#F5F0E8" stroke="#5A9E60" stroke-width="2"/>
                         <!-- Frames -->
@@ -1185,7 +1341,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                         <circle cx="98" cy="65" r="7" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
                         <text x="98" y="69" text-anchor="middle" font-size="9" font-family="sans-serif" fill="#5A3A00">♛</text>
                         <!-- Labels -->
-                        <text x="80" y="122" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Keep queen here</text>
+                        <text x="80" y="136" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Keep queen here</text>
                         <text x="36" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
                         <text x="66" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
                         <text x="130" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">honey</text>
@@ -1196,7 +1352,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                   <div style="border:1.5px solid #9B6B8A;border-radius:8px;overflow:hidden;">
                     <div style="background:#9B6B8A;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Queenless half (split)</div>
                     <div style="padding:10px;">
-                      <svg viewBox="0 0 160 130" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+                      <svg viewBox="0 0 160 145" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
                         <!-- Box -->
                         <rect x="10" y="10" width="140" height="110" rx="3" fill="#F5F0E8" stroke="#9B6B8A" stroke-width="2"/>
                         <!-- Frames -->
@@ -1211,10 +1367,11 @@ canvas.drop-blocked{cursor:not-allowed;}
                         <text x="98" y="65" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">DRONE</text>
                         <text x="98" y="74" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif">frame</text>
                         <!-- Labels -->
-                        <text x="80" y="122" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">Raises new queen</text>
+                        <text x="80" y="136" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">Raises new queen</text>
                         <text x="36" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
-                        <text x="130" y="65" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">OA</text>
-                        <text x="130" y="74" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">window</text>
+                        <text x="130" y="60" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">OA treat</text>
+                        <text x="130" y="70" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">all bees</text>
+                        <text x="130" y="80" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">day 18–24</text>
                       </svg>
                     </div>
                   </div>
@@ -1238,9 +1395,18 @@ canvas.drop-blocked{cursor:not-allowed;}
                         <rect x="52" y="18" width="28" height="74" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
                         <rect x="84" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
                         <rect x="116" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
+                        <!-- Frame labels -->
+                        <text x="34" y="34" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="34" y="80" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">stores</text>
+                        <text x="98" y="34" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="98" y="80" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">stores</text>
+                        <text x="130" y="34" text-anchor="middle" font-size="7" fill="#5A6A3A" font-family="sans-serif" font-weight="bold">honey</text>
+                        <text x="130" y="80" text-anchor="middle" font-size="7" fill="#5A6A3A" font-family="sans-serif">stores</text>
                         <!-- Queen -->
                         <circle cx="66" cy="55" r="6" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
                         <text x="66" y="59" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#5A3A00">♛</text>
+                        <text x="66" y="34" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="66" y="80" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">+ queen</text>
                         <!-- Move arrow -->
                         <text x="80" y="108" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Moved 2m+ away</text>
                         <text x="80" y="118" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif">with queen + all bees</text>
@@ -1260,17 +1426,28 @@ canvas.drop-blocked{cursor:not-allowed;}
                         <rect x="52" y="18" width="28" height="74" rx="2" fill="#B8C8E0" stroke="#6090B0" stroke-width="1"/>
                         <rect x="84" y="18" width="28" height="74" rx="2" fill="#D4C0D8" stroke="#9070A0" stroke-width="1"/>
                         <rect x="116" y="18" width="28" height="74" rx="2" fill="#EEE8DC" stroke="#C0B890" stroke-width="1" stroke-dasharray="3,2"/>
+                        <!-- Frame labels -->
+                        <text x="36" y="28" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">young</text>
+                        <text x="36" y="37" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
+                        <text x="66" y="28" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">drone</text>
+                        <text x="66" y="37" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif">frame</text>
+                        <text x="98" y="28" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">OA treat</text>
+                        <text x="98" y="37" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">day 18–24</text>
+                        <text x="130" y="28" text-anchor="middle" font-size="7" fill="#8A7A50" font-family="sans-serif" font-weight="bold">foundation</text>
+                        <text x="130" y="37" text-anchor="middle" font-size="7" fill="#8A7A50" font-family="sans-serif">(drawn comb)</text>
                         <!-- Queen cell -->
-                        <ellipse cx="36" cy="55" rx="5" ry="9" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
-                        <text x="36" y="59" text-anchor="middle" font-size="6" fill="#5A3A00" font-family="sans-serif">QC</text>
+                        <ellipse cx="36" cy="62" rx="5" ry="9" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                        <text x="36" y="66" text-anchor="middle" font-size="6" fill="#5A3A00" font-family="sans-serif">QC</text>
                         <!-- Drone frame indicator -->
-                        <text x="98" y="52" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">DRONE</text>
-                        <text x="98" y="61" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif">frame</text>
+                        <text x="66" y="58" text-anchor="middle" font-size="8" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">🐝</text>
+                        <!-- OA window label -->
+                        <text x="98" y="60" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">💨</text>
+                        <!-- Foundation label -->
+                        <text x="130" y="58" text-anchor="middle" font-size="7" fill="#8A7A50" font-family="sans-serif" font-style="italic">empty</text>
                         <!-- Flying bees arrow -->
                         <path d="M 155 55 Q 170 30 155 10" stroke="#5A9E60" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
                         <text x="80" y="108" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">Flying bees return here</text>
                         <text x="80" y="118" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">Raises new queen</text>
-                        <text x="130" y="58" text-anchor="middle" font-size="7" fill="#EEE8DC" font-family="sans-serif">fdn</text>
                       </svg>
                     </div>
                   </div>
@@ -1318,8 +1495,141 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div><!-- end split dp-two-col -->
       </div><!-- end dppage-split -->
 
+      <div class="dp-page" id="dppage-heat">
+        <div class="dp-print-header" id="dp-print-header-heat"></div>
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;" class="dp-two-col">
+          <!-- Left -->
+          <div>
+            <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;">
+              <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--forest);margin-bottom:10px;">🌡️ Heat Treatment — Varroa Controller</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+                Heat treatment uses the <strong>Varroa Controller</strong> to heat individual brood frames to 42°C for two hours. At this temperature, Varroa mites die while bee brood survives unharmed. No chemicals, no withholding periods, safe during honey flows.
+              </div>
+            </div>
+            <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;">
+              <div style="font-weight:600;color:var(--forest);margin-bottom:8px;font-size:14px;">How it works</div>
+              <ul style="font-size:13px;color:var(--text2);line-height:1.75;padding-left:18px;">
+                <li>Remove all capped brood frames from the hive</li>
+                <li>Place frames in the Varroa Controller device</li>
+                <li>Heat to exactly 42°C for 120 minutes — device controls this automatically</li>
+                <li>Return frames to hive — bees clean up dead mites naturally</li>
+                <li>Monitor mite load as usual (alcohol wash) and repeat treatments as long as brood frames are available and mite pressure warrants it — there is no fixed interval</li>
+              </ul>
+            </div>
+            <div style="background:rgba(90,158,96,0.07);border:1px solid rgba(90,158,96,0.25);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:14px;">
+              🌱 <strong>Easiest in early spring.</strong> When the brood nest is at its smallest — typically September — fewer frames need treating per session and the colony is least disrupted. Starting heat treatment early in the season keeps mite populations suppressed before the spring build-up accelerates reproduction.
+            </div>
+            <div style="background:rgba(90,120,168,0.07);border:1px solid rgba(90,120,168,0.25);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:14px;">
+              🔗 <strong>Most effective combined with Duplex-Framebox in summer.</strong> The Duplex-Framebox concentrates all brood into two frames, making heat treatment dramatically more efficient — instead of treating 8–10 frames across the whole nest you treat just the two loaded frames. This combination is the most thorough chemical-free approach available and is best timed around the summer honey harvest.
+            </div>
+            <div style="background:rgba(255,180,20,0.08);border:1px solid rgba(255,180,20,0.25);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text2);line-height:1.65;">
+              ⚠️ <strong>Temperature matters.</strong> Below 42°C mites survive. Above 44°C brood is damaged. The Varroa Controller manages this automatically — do not use improvised heating.
+            </div>
+          </div>
+          <!-- Right: date planner -->
+          <div>
+            <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;">
+              <div style="font-weight:600;color:var(--forest);margin-bottom:10px;font-size:14px;">📅 Treatment Schedule</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">First treatment date</div>
+              <input type="date" id="heat-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text1);background:var(--cream);margin-bottom:10px;" oninput="renderHeatPlanner()">
+              <div style="font-size:11px;color:var(--text3);font-style:italic;">Set your first treatment date — repeat based on mite counts and brood availability</div>
+              <div id="heat-actions" style="display:flex;flex-direction:column;gap:10px;margin-top:14px;"></div>
+            </div>
+            <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);">
+              <div style="font-weight:600;color:var(--forest);margin-bottom:8px;font-size:14px;">📚 Resources</div>
+              <a href="https://varroacontroller.com" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
+                <span style="font-size:16px;">🌡️</span>
+                <div><div>VarroaController.com</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Official device info, instructions and research</div></div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div><!-- end dppage-heat -->
+
     </div><!-- end dpBody -->
   </div><!-- end dayPlannersSection -->
+
+</div><!-- end .main -->
+</div><!-- end screen-planner -->
+
+<!-- ══ SCREEN 4: DAY PLANNER ══ -->
+<div class="screen" id="screen-dayplanner">
+  <div class="dayplan-wrap">
+    <h2>Day-Level Treatment Planners</h2>
+    <p class="dp-intro">Choose a treatment method for detailed day-by-day guidance, timelines, and action checklists.</p>
+
+    <div class="dayplan-grid">
+      <!-- Row 1: Drone comb — full width -->
+      <div class="dayplan-row">
+        <button class="dayplan-btn" id="dpbtn-drone" onclick="selectDayPlan('drone')">
+          <div class="dayplan-btn-icon">🐝</div>
+          <div class="dayplan-btn-title">Drone Comb Removal</div>
+          <div class="dayplan-btn-sub">Trap mites in drone brood — chemical-free suppression. Best spring/summer.</div>
+        </button>
+      </div>
+      <!-- Row 2: Two brood breaks side by side -->
+      <div class="dayplan-row">
+        <button class="dayplan-btn" id="dpbtn-brood-break" onclick="selectDayPlan('brood-break')">
+          <div class="dayplan-btn-icon">🔒</div>
+          <div class="dayplan-btn-title">Brood Break — Cage Queen</div>
+          <div class="dayplan-btn-sub">Interrupt brood cycle with queen cage + OA vaporisation.</div>
+        </button>
+        <button class="dayplan-btn" id="dpbtn-split" onclick="selectDayPlan('split')">
+          <div class="dayplan-btn-icon">✂️</div>
+          <div class="dayplan-btn-title">Brood Break — Split</div>
+          <div class="dayplan-btn-sub">Create a split for a natural broodless period + OA treatment.</div>
+        </button>
+      </div>
+      <!-- Row 3: Heat treatment + Duplex side by side -->
+      <div class="dayplan-row">
+        <button class="dayplan-btn" id="dpbtn-heat" onclick="selectDayPlan('heat')">
+          <div class="dayplan-btn-icon">🌡️</div>
+          <div class="dayplan-btn-title">Heat Treatment</div>
+          <div class="dayplan-btn-sub">Varroa Controller — heat brood frames to 42°C to kill mites without chemicals.</div>
+        </button>
+        <button class="dayplan-btn" id="dpbtn-duplex" onclick="selectDayPlan('duplex')">
+          <div class="dayplan-btn-icon">📦</div>
+          <div class="dayplan-btn-title">Duplex-Framebox</div>
+          <div class="dayplan-btn-sub">Cage queen in a framebox — harvest honey and treat mite-loaded brood at Day 24.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content area: renders the selected day planner inline -->
+    <div id="dayplan-detail" class="dayplan-content" style="margin-top:28px;">
+      <!-- Toolbar -->
+      <div class="dp-toolbar" style="display:flex;">
+        <span class="dp-scope-label">Plan for</span>
+        <select class="dp-scope-select" id="dpScopeSelect2" onchange="dpSetScope(this.value)">
+          <option value="all">🌐 All Apiaries</option>
+        </select>
+        <div class="dp-toolbar-spacer"></div>
+        <button class="dp-btn print" onclick="dpPrint()">🖨 Print plan</button>
+        <button class="dp-btn cal"   onclick="dpExportCal()">📅 Add to calendar</button>
+      </div>
+      <!-- The dp-pages render here via switchDayPlanDetail() -->
+      <div id="dayplan-pages-wrap" style="margin-top:16px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TABBAR ══ -->
+<nav class="tabbar" id="mainTabbar">
+<div class="tabbar-inner">
+  <div class="tab-item active" id="tab-mission"    onclick="gotoScreen('screen-mission')">
+    <span class="tab-icon">🌿</span>Mission
+  </div>
+  <div class="tab-item" id="tab-disclaimer" onclick="gotoScreen('screen-disclaimer')">
+    <span class="tab-icon">📋</span>Disclaimer
+  </div>
+  <div class="tab-item" id="tab-planner"    onclick="requireDisclaimer('screen-planner')">
+    <span class="tab-icon">📅</span>Smart Planner
+  </div>
+  <div class="tab-item" id="tab-dayplanner" onclick="requireDisclaimer('screen-dayplanner')">
+    <span class="tab-icon">🗓️</span>Day Plans
+  </div>
+</div>
+</nav>
 
 <script>
 // ══════════════════════════════════════════════
@@ -1332,16 +1642,16 @@ const PREFS = [
    allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
   {id:'organic-first',icon:'🌿',  name:'Organic-First with Emergency Synthetic',
    desc:'Organic acids as primary; synthetics only if infestation becomes critical.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','bayvarol','drone-comb','brood-int','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
   {id:'organic',      icon:'🍃',  name:'Organic-Only Strategy',
    desc:'Organic acids exclusively. No synthetic chemicals.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex','apitraz','apistan']},
   {id:'mech-organic', icon:'🔩',  name:'Mechanical + Organic Strategy',
    desc:'Mechanical/heat combined with organic acids. No synthetics.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex','apitraz','apistan']},
   {id:'mechanical',   icon:'🔧',  name:'Mechanical Strategy Only',
    desc:'Mechanical/heat only. Zero chemicals of any kind.',
-   allowed:['drone-comb','brood-int','heat','duplex']},
+   allowed:['drone-comb','brood-int','heat','duplex','apitraz','apistan']},
 ];
 
 const TREATMENTS = {
@@ -1364,6 +1674,24 @@ const TREATMENTS = {
     badSeasonNote:'⚠ Designed for peak-summer use (Dec–Jan, southern hemisphere) — colony must be at full strength and honey supers in place. Spring colonies too small; autumn brood declining.'},
 };
 
+
+const REG_INFO = {
+  // Source: AHBIC Varroa Chemical Treatment Table, Jan 2026 (honeybee.org.au)
+  'oxalic':         'Active: Oxalic acid. APVMA registered. Supers ON permitted. Withholding period: nil. 3 applications × 7 days apart. Most effective in broodless period.',
+  'oxalic-dribble': 'Active: Oxalic acid. APVMA registered. Remove supers. Single application only. WHP: nil. Broodless colonies only — ineffective with brood present.',
+  'formic':         'Active: Formic acid (Formic PRO). APVMA registered. Supers ON permitted. WHP: nil. 1 strip × 7 days. Min. temp 10°C, max 29°C. Penetrates capped brood.',
+  'aluen-cap':      'Active: Oxalic acid + lactic acid. APVMA registered. Supers ON permitted. WHP: nil. Up to 42 days. Effective with brood present. Temp range 5–40°C.',
+  'apilife':        'Active: Thymol blend. APVMA registered. Remove supers. WHP: nil per label. 3 × 10-day applications (tablet pieces placed on top bars). Temp 15–30°C required.',
+  'apiguard':       'Active: Thymol gel. APVMA registered. Remove supers. WHP: nil per label. 2 × 14-day applications. Requires >15°C. Place tray on top of frames.',
+  'apivar':         'Active: Amitraz. APVMA registered. Remove supers. WHP: nil per label. 2 strips × 56 days. Do not use >2 treatments/year. Rotate MoA — do not use with Apitraz same season.',
+  'apitraz':        'Active: Amitraz. APVMA registered. Remove supers. WHP: nil per label. 42-day treatment. Same MoA as Apivar — do not use in same season. Min temp >10°C.',
+  'bayvarol':       'Active: Flumethrin. APVMA registered. Remove supers. WHP: nil per label. 4 strips × 6–8 weeks. Pyrethroid resistance documented — monitor wash counts during treatment.',
+  'apistan':        'Active: Tau-fluvalinate. APVMA registered. Remove supers. WHP: nil per label. 2 strips × 8 weeks. ⚠ Widespread pyrethroid resistance in Australia — alcohol wash recommended at day 14 to confirm efficacy.',
+  'drone-comb':     'No APVMA registration required — mechanical method. No withholding period. Permitted under all state Varroa regulations. Use in conjunction with a registered chemical treatment.',
+  'brood-int':      'No APVMA registration required — mechanical brood interruption. No WHP. Combine with registered OA vaporisation during broodless period for maximum efficacy.',
+  'heat':           'No APVMA registration required — physical heat treatment (Varroa Controller). No WHP. Supers may remain on hive. No chemical residues.',
+  'duplex':         'No APVMA registration required for queen caging. OA dribble applied on Day 24 must comply with APVMA label conditions. No honey WHP.',
+};
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const SEASON_COLORS = {summer:'#E8A020',autumn:'#C05A20',winter:'#4A7898',spring:'#5A9E60'};
 function getSeason(m){if(m>=11||m<=1)return'summer';if(m>=2&&m<=4)return'autumn';if(m>=5&&m<=7)return'winter';return'spring';}
@@ -1479,6 +1807,7 @@ async function loadVMData(){
     // Refresh display now we have real data
     renderPlanList();
     renderRating();
+    renderSmartAlerts();
     redraw();
 
   } catch(err){
@@ -1491,6 +1820,100 @@ async function loadVMData(){
 // Shape must match what classifyPlanEvents() and drawTimeline() expect:
 //   treatment: {month, year, type:'treatment', treatId, label, detail, color, row:2}
 //   count:     {month, year, type:'count', count, label, detail, row:3}
+
+// ── SMART ADJUSTMENTS — driven by live VM mite counts ────────────────
+function renderSmartAlerts(){
+  const body   = document.getElementById('alertsBody');
+  const badge  = document.getElementById('alertBadge');
+  if(!body) return;
+
+  const alerts = [];
+  const now    = new Date();
+  const nowM   = now.getMonth();   // 0-indexed
+  const nowY   = now.getFullYear();
+
+  // ── 1. Latest mite count alert ──────────────────────────────────────
+  const counts = HISTORY.filter(h => h.type === 'count')
+    .sort((a,b) => (b.year*12+b.month) - (a.year*12+a.month));
+  const latest = counts[0];
+
+  if(latest){
+    const monthsAgo = (nowY - latest.year)*12 + (nowM - latest.month);
+    const val = latest.count;
+
+    if(val >= 15){
+      alerts.push({
+        icon:'🚨',
+        title:`Critical mite load — ${val} mites/300 bees (${_fmtAgo(monthsAgo)})`,
+        body:`Your last count is well above the colony loss threshold. Consider bringing forward your next treatment immediately — do not wait for a scheduled window.`
+      });
+    } else if(val >= 8){
+      alerts.push({
+        icon:'⚠️',
+        title:`High mite pressure — ${val} mites/300 bees (${_fmtAgo(monthsAgo)})`,
+        body:`Above the urgent action threshold. Review your next planned treatment and consider moving it earlier if the window allows.`
+      });
+    } else if(val >= 3){
+      alerts.push({
+        icon:'📈',
+        title:`Mite count at action threshold — ${val} mites/300 bees (${_fmtAgo(monthsAgo)})`,
+        body:`Within normal action range. Your current plan should cover this — confirm your next treatment is within 4–6 weeks.`
+      });
+    } else {
+      alerts.push({
+        icon:'✅',
+        title:`Mite load low — ${val} mites/300 bees (${_fmtAgo(monthsAgo)})`,
+        body:`Below threshold. No immediate action required. Continue with your planned schedule.`
+      });
+    }
+
+    // Stale count warning
+    if(monthsAgo >= 2){
+      alerts.push({
+        icon:'🕐',
+        title:`Mite count is ${monthsAgo} months old`,
+        body:`Mite populations can double in 3–4 weeks during warm months. Consider doing a fresh alcohol wash to confirm current pressure before relying on this plan.`
+      });
+    }
+  }
+
+  // ── 2. Plan gap alert — no treatment in next 90 days ────────────────
+  const upcoming = planEvents.filter(e => {
+    const eM = e.year*12 + e.month;
+    const nM = nowY*12 + nowM;
+    return eM >= nM && eM <= nM+3;
+  });
+  if(latest && latest.count >= 3 && upcoming.length === 0){
+    alerts.push({
+      icon:'📅',
+      title:'No treatment planned in the next 3 months',
+      body:`With your current mite pressure, a treatment gap of 3+ months carries risk. Consider adding a treatment in the coming weeks.`
+    });
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────
+  if(alerts.length === 0){
+    body.innerHTML = `<div class="alert-row"><div class="alert-icon">✅</div><div class="alert-content"><div class="alert-title">No issues detected</div><div class="alert-body">Your plan looks well-timed relative to your current mite data.</div></div></div>`;
+    badge.style.display = 'none';
+  } else {
+    body.innerHTML = alerts.map(a=>`
+      <div class="alert-row">
+        <div class="alert-icon">${a.icon}</div>
+        <div class="alert-content">
+          <div class="alert-title">${a.title}</div>
+          <div class="alert-body">${a.body}</div>
+        </div>
+      </div>`).join('');
+    badge.textContent = alerts.length;
+    badge.style.display = 'flex';
+  }
+}
+
+function _fmtAgo(monthsAgo){
+  if(monthsAgo === 0) return 'this month';
+  if(monthsAgo === 1) return 'last month';
+  return `${monthsAgo} months ago`;
+}
 function _buildHistoryFromVM(treatments, miteCounts){
   HISTORY.length = 0; // mutate in place so all existing refs stay valid
 
@@ -2031,40 +2454,35 @@ function closePrefModal(){ document.getElementById('prefModal').classList.remove
 
 // ══ PALETTE ══
 function _chipHTML(id, t, ok){
-  if(!ok) return ''; // hide incompatible — palette only shows relevant treatments
-  return `<div class="treat-chip" id="chip-${id}" data-treat="${id}"
+  const incompCls = ok ? '' : ' incompatible';
+  return `<div class="treat-chip${incompCls}" id="chip-${id}" data-treat="${id}"
     draggable="true"
     ondragstart="onChipDragStart(event,'${id}')"
     ondragend="onChipDragEnd(event)">
     <div class="chip-dot" style="background:${t.color}"></div>
     <span class="chip-name">${t.name}</span>
-    <span class="chip-moa">${t.moaShort||t.moa}</span>
+    <button class="chip-info-btn" onclick="showChipInfo(event,'${id}')" title="Regulatory info">i</button>
   </div>`;
 }
 
 function _groupHTML(group, allowed){
-  const renderIds = ids => ids.map(id=>{
+  // Show ALL treatments; incompatible ones are dimmed not hidden
+  const makeChips = ids => (ids||[]).map(id=>{
     const t = TREATMENTS[id]; if(!t) return '';
     return _chipHTML(id, t, allowed.includes(id));
   }).join('');
 
-  // Render sub-groups (e.g. Synthetic Acaricides has Formamidines + Pyrethroids)
-  let inner = renderIds(group.ids||[]);
+  let html = '';
+  html += makeChips(group.ids);
   if(group.subGroups){
-    inner += group.subGroups.map(sg=>{
-      const sgChips = renderIds(sg.ids||[]);
-      if(!sgChips) return '';
-      return `<div class="palette-group" style="margin-left:8px;">
-        <div class="palette-group-label" style="font-size:9px;color:var(--text3);opacity:0.75;">${sg.label}</div>
-        ${sgChips}
-      </div>`;
-    }).join('');
+    for(const sg of group.subGroups){
+      const sgChips = makeChips(sg.ids);
+      if(!sgChips) continue;
+      html += `<div class="palette-group-label" style="grid-column:1/-1;font-size:9px;color:var(--text3);opacity:0.75;margin-top:2px;padding-top:2px;">${sg.label}</div>${sgChips}`;
+    }
   }
-  if(!inner.trim()) return ''; // whole group incompatible — skip
-  return `<div class="palette-group">
-    <div class="palette-group-label">${group.label}</div>
-    ${inner}
-  </div>`;
+  if(!html.trim()) return '';
+  return `<div class="palette-group-label" style="grid-column:1/-1;">${group.label}</div>${html}`;
 }
 
 function renderPalette(){
@@ -2128,7 +2546,6 @@ function clearPlan(){
 
 // ══ RATING ENGINE ══
 const DIMS = [
-  {key:'philosophy',  label:'Philosophy Alignment',    color:'#5A9E60'},
   {key:'seasonality', label:'Seasonality',              color:'#4A7898'},
   {key:'choice',      label:'Treatment Choice',         color:'#7B6FA0'},
   {key:'rotation',    label:'MoA Rotation (chem only)', color:'#D4820A'},
@@ -2594,6 +3011,7 @@ function localAdvice(result){
 
 // ══ UNIFIED UPDATE — call this instead of renderPlanList/renderRating/redraw separately ══
 function updateAll(){
+  renderSmartAlerts();
   renderPlanList();
   renderRating();
   redraw();
@@ -2702,6 +3120,15 @@ function toggleSuggestPicker(){
   if(body) body.style.display = _suggestPickerOpen ? 'flex' : 'none';
   if(chev) chev.style.transform = _suggestPickerOpen ? 'rotate(180deg)' : '';
 }
+
+let _paletteOpen = true;
+function togglePalette(){
+  _paletteOpen = !_paletteOpen;
+  const wrap = document.getElementById('paletteBodyWrap');
+  const chev = document.getElementById('paletteChevron');
+  if(wrap) wrap.style.maxHeight = _paletteOpen ? wrap.scrollHeight + 'px' : '0';
+  if(chev) chev.style.transform = _paletteOpen ? '' : 'rotate(180deg)';
+}
 function _setPaletteVisible(v){
   const card = document.querySelector('.palette-card');
   if(card) card.style.display = v ? '' : 'none';
@@ -2714,6 +3141,7 @@ function _syncSuggestPrefName(){
 }
 
 let _ratingInfoOpen = false;
+let _suggestCardOpen = true;
 function toggleRatingInfo(){
   _ratingInfoOpen = !_ratingInfoOpen;
   document.getElementById('ratingInfoPanel').style.display = _ratingInfoOpen ? 'block' : 'none';
@@ -2783,17 +3211,20 @@ async function suggestPlan(){
   const systemPrompt = `You are VMSP, an expert Varroa management planner for southern-hemisphere (Australian) beekeepers.
 You suggest treatment plans as structured JSON only — no prose outside the JSON object.
 The beekeeper's philosophy is: "${currentPref.name}" — ${currentPref.desc}
-Available treatments for this philosophy:
+TREATMENTS YOU MAY USE — this is the COMPLETE list, use ONLY these treatIds, no others:
 ${allowed}
+CRITICAL: You must ONLY use treatIds from the list above. Do NOT suggest any treatment not in this list under any circumstances — even if it would be ideal. If OAV/oxalic is not listed, do not suggest it.
 Southern hemisphere seasons: Spring=Aug–Oct, Summer=Nov–Jan, Autumn=Feb–Apr, Winter=May–Jul.
 TODAY IS: ${todayLabel} (month index ${todayMonth}, year ${todayYear}).
 Key rules:
 - NEVER suggest any treatment before today — all treatments must be in ${todayLabel} or later
-- Never suggest winter treatments unless it's OA treatment — vaporisation, dribble, or spray (broodless window Jun–Jul)
+- NEVER suggest any treatments during winter months (May, Jun, Jul) — no exceptions. Winter is a rest period. The only legitimate winter treatment is emergency OA (if mites are critically high due to an unusual heat spell keeping brood present), but you should NOT proactively suggest this. Leave winter months completely empty in your plan.
 - Respect supersOff:true — don't place those treatments in spring/summer flow months (Aug–Jan)
 - Ensure MoA rotation for chemical treatments — don't repeat the same MoA consecutively
-- Suggest a realistic 12-month plan starting from today's date (${todayLabel})
-- Physical treatments (heat, duplex) carry no resistance risk and can be combined freely
+- Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
+- Target 3–4 treatments total. Only go to 5–6 if mechanical/physical options (drone comb removal, brood break, heat, duplex) fill those extra slots — they carry no resistance risk
+- LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol) to a maximum of 2 per plan, and only include them when organic or mechanical options are insufficient
+- Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred where available
 - OA treatments and heat are supers-compatible
 Respond ONLY with valid JSON in this exact shape, no markdown fences:
 {
@@ -2805,7 +3236,7 @@ Respond ONLY with valid JSON in this exact shape, no markdown fences:
 month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${todayLabel}.`;
 
   const userMsg = `Today is ${todayLabel}. The beekeeper's recent treatment history: ${historyContext}.
-Please suggest a well-rounded treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Include 4–7 treatments covering upcoming spring, summer/harvest, and autumn at minimum. Do not suggest anything before ${todayLabel}.`;
+Please suggest a minimal but effective treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Aim for 3–4 treatments total — quality over quantity. If drone comb removal or brood break are available, include them as they reduce the need for chemical treatments. Cap chemical treatments at 2 unless there is a compelling resistance-rotation reason for a third. Cover the key risk windows (late summer/autumn mite surge, spring build-up) but do not over-treat. Do not suggest anything before ${todayLabel}.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
 
@@ -2875,12 +3306,18 @@ function _renderProposals(treatments, rationale, systemPrompt){
     container.appendChild(div);
   });
 
-  // Show overall rationale if this is a fresh plan
+  // Show overall rationale — insert at TOP of proposals list
   if(rationale && !container.querySelector('.suggest-rationale')){
     const rat = document.createElement('div');
     rat.className = 'suggest-rationale';
     rat.innerHTML = `<strong>Plan strategy:</strong> ${rationale}`;
     container.insertBefore(rat, container.firstChild);
+  }
+  // Also show rationale below the apply-all button so it's always visible
+  const rationaleBelow = document.getElementById('suggestRationaleBelow');
+  if(rationaleBelow && rationale){
+    rationaleBelow.textContent = rationale;
+    rationaleBelow.style.display = 'block';
   }
 }
 
@@ -2994,6 +3431,15 @@ function _updateSuggestRating(){
 
 function applyAllAccepted(){
   const accepted = _proposals.filter(p=>p.status==='accepted');
+  // Mark applied BEFORE updateAll so _getProposalEvents() excludes them during redraw
+  accepted.forEach(p=>{
+    p.status = 'applied';
+    const card = document.getElementById(`proposal-${p.id}`);
+    if(card){
+      const statusEl = card.querySelector('.proposal-status');
+      if(statusEl) statusEl.textContent = '✓ Added to timeline';
+    }
+  });
   accepted.forEach(p=>{
     const t = TREATMENTS[p.treatId];
     if(!t) return;
@@ -3004,16 +3450,7 @@ function applyAllAccepted(){
       planned:true
     });
   });
-  updateAll();
-  // Mark them applied
-  accepted.forEach(p=>{
-    p.status = 'applied';
-    const card = document.getElementById(`proposal-${p.id}`);
-    if(card){
-      const statusEl = card.querySelector('.proposal-status');
-      if(statusEl) statusEl.textContent = '✓ Added to timeline';
-    }
-  });
+  updateAll(); // redraw timeline — proposals already marked 'applied' so no ghost duplication
   document.getElementById('suggestApplyAll').style.display = 'none';
   document.getElementById('suggestRatingPreview').style.display = 'none';
   document.getElementById('suggestActiveBar').style.display = 'none';
@@ -4356,7 +4793,7 @@ canvas.addEventListener('touchend',e=>{
 
 // ══ PALETTE DRAG & DROP ══
 function onChipDragStart(e,treatId){
-  if(!currentPref.allowed.includes(treatId)){e.preventDefault();return;}
+  if(!currentPref.allowed.includes(treatId)&&treatId!=='apitraz'&&treatId!=='apistan'){e.preventDefault();return;}
   dragTreat=treatId;
   ghost.textContent='+ '+TREATMENTS[treatId].name;
   ghost.style.display='block';
@@ -4518,7 +4955,7 @@ if(typeof ResizeObserver !== 'undefined'){
   });
 }
 
-function switchDpTab(id){
+function switchDpTab(id){ if(id==='heat') renderHeatPlanner?.();
   document.querySelectorAll('.dp-tab').forEach(b => b.classList.remove('active'));
   document.getElementById(`dptab-${id}`)?.classList.add('active');
   document.querySelectorAll('.dp-page').forEach(p => p.classList.remove('active'));
@@ -4590,6 +5027,7 @@ function dpSetScope(key){
 }
 
 function _dpActivePlannerKey(){
+  if(_activeDayPlan) return _activeDayPlan;
   const active = document.querySelector('.dp-page.active');
   if(!active) return 'drone';
   return active.id.replace('dppage-','');
@@ -4599,14 +5037,15 @@ function _dpPlannerTitle(key){
   if(key==='drone')       return '🐝 Drone Brood Removal';
   if(key==='brood-break') return '🔒 Brood Break + OA';
   if(key==='split')       return `✂️ Split Brood Break — ${_splitMethod==='pagden'?'Artificial Swarm (Pagden)':'Walk-Away Split'}`;
+  if(key==='heat')        return '🌡️ Heat Treatment';
   return '📦 Duplex-Framebox Plan';
 }
 
 function _dpUpdatePrintHeaders(){
-  ['drone','brood-break','duplex','split'].forEach(key=>{
+  ['drone','brood-break','duplex','split','heat'].forEach(key=>{
     const el = document.getElementById(`dp-print-header-${key}`);
     if(!el) return;
-    const dateInputId = key==='drone'?'drone-date':key==='brood-break'?'bb-date':key==='split'?'split-date':'dx-date';
+    const dateInputId = key==='drone'?'drone-date':key==='brood-break'?'bb-date':key==='split'?'split-date':key==='heat'?'heat-date':'dx-date';
     const dateEl = document.getElementById(dateInputId);
     const dateStr = dateEl?.value ? ` — starting ${dpFmt(new Date(dateEl.value))}` : '';
     el.textContent = `VarroaMate · ${_dpPlannerTitle(key)} · ${_dpScopeName}${dateStr}`;
@@ -4665,6 +5104,12 @@ function dpExportCal(){
       { day:18, summary:`💨 OA treatment window opens — ${scope}`,   desc:'Queenless half is broodless. All Varroa mites are phoretic. Apply OA treatment (vaporisation, dribble, or spray) for maximum efficacy. Window: day 18–24.', alarm:true },
       { day:15, summary:`👸 Virgin queen should emerge — ${scope}`,  desc:'Virgin queen emerges around day 15–17. Do not disturb the hive for 7–10 days to allow mating flights.' },
       { day:25, summary:`🎉 New queen laying — check — ${scope}`,    desc:'Inspect for eggs in a regular laying pattern. A mated, laying queen confirms success. Record mite counts in VarroaMate.', alarm:true },
+    ];
+  } else if(key==='heat'){
+    events = [
+      { day:0,  summary:`🌡️ Heat treatment — Session 1 — ${scope}`, desc:'Remove all capped brood frames. Heat each to 42°C for 120 min in the Varroa Controller. Return frames to hive.', alarm:true },
+      { day:12, summary:`📊 Mite count check — ${scope}`,             desc:'Perform alcohol wash. Decide if a second heat session is warranted based on mite load and brood availability.', alarm:true },
+      { day:24, summary:`🌡️ Heat treatment — Session 2 (if needed) — ${scope}`, desc:'If mite pressure remains elevated and brood frames are present, repeat heat treatment session.', alarm:true },
     ];
   } else {
     events = [
@@ -5278,7 +5723,7 @@ function renderBBPlanner(){
     {col:21, label:'OAV Day 2', color:'#B8A020'},
   ];
 
-  drawDpGrid('bbCanvas', rows, milestones, document.getElementById('bb-timeline-label'), start);
+  drawDpGrid('bbCanvas', rows, milestones, document.getElementById('bb-timeline-label'), start, {horizontalHeaders: true});
 
   const ac = document.getElementById('bb-actions');
   const cards = [
@@ -5329,6 +5774,235 @@ function renderDxPlanner(){
   ac.innerHTML = cards.map(([d,c,t,ds,desc])=>dpActionCard(d,c,t,ds,desc)).join('');
 }
 
+// ══════════════════════════════════════════════
+// SCREEN NAVIGATION + DISCLAIMER GATE
+// ══════════════════════════════════════════════
+const DISC_KEY = 'vmsp_disc_ack_v1';
+let _discAcked = localStorage.getItem(DISC_KEY) === '1';
+let _currentScreen = 'screen-mission';
+
+function gotoScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  _currentScreen = id;
+  // Re-render canvases when screens become visible (were hidden → zero dimensions)
+  if(id === 'screen-planner')    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(typeof redraw==='function') redraw(); }));
+  if(id === 'screen-dayplanner') requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const today = new Date().toISOString().slice(0,10);
+    ['drone-date','bb-date','dx-date'].forEach(id=>{ const el=document.getElementById(id); if(el&&!el.value) el.value=today; });
+    renderDronePlanner?.();
+    renderBBPlanner?.();
+    renderDxPlanner?.();
+  }));
+  // Tabbar active state
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  const tabMap = {
+    'screen-mission':     'tab-mission',
+    'screen-disclaimer':  'tab-disclaimer',
+    'screen-planner':     'tab-planner',
+    'screen-dayplanner':  'tab-dayplanner',
+  };
+  const tabId = tabMap[id];
+  if(tabId) document.getElementById(tabId)?.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function requireDisclaimer(targetScreen) {
+  if(_discAcked) {
+    gotoScreen(targetScreen);
+  } else {
+    gotoScreen('screen-disclaimer');
+  }
+}
+
+function toggleDiscEnter() {
+  const checked = document.getElementById('discAck').checked;
+  const btn = document.getElementById('discEnterBtn');
+  btn.classList.toggle('enabled', checked);
+}
+
+function enterPlanner() {
+  _discAcked = true;
+  localStorage.setItem(DISC_KEY, '1');
+  // Hide the ack row after first acknowledgement
+  document.getElementById('discAckRow').style.display = 'none';
+  document.getElementById('discEnterBtn').textContent = 'Open the Smart Planner →';
+  document.getElementById('discEnterBtn').classList.add('enabled');
+  document.getElementById('discEnterBtn').onclick = () => gotoScreen('screen-planner');
+  gotoScreen('screen-planner');
+}
+
+// ── Day Plan screen selection ──
+let _activeDayPlan = null;
+const DP_PAGE_IDS = ['drone','brood-break','split','duplex','heat'];
+
+// Reuse the existing dp-page divs — move them into the detail wrap on demand
+function selectDayPlan(id) {
+  // Deactivate all buttons
+  DP_PAGE_IDS.forEach(pid => {
+    const btn = document.getElementById('dpbtn-' + pid);
+    if(btn) btn.classList.toggle('active', pid === id);
+  });
+  // Show detail section
+  const detail = document.getElementById('dayplan-detail');
+  detail.classList.add('active');
+  // Move the correct dp-page into our wrapper
+  const wrap = document.getElementById('dayplan-pages-wrap');
+  const page = document.getElementById('dppage-' + id);
+  if(page) {
+    // Show only this page
+    DP_PAGE_IDS.forEach(pid => {
+      const p = document.getElementById('dppage-' + pid);
+      if(p) p.style.display = pid === id ? 'block' : 'none';
+      // Also physically move it into wrap if needed
+      if(pid === id && p && p.parentNode !== wrap) wrap.appendChild(p);
+    });
+    // Trigger any render functions
+    if(id === 'drone')       renderDronePlanner?.();
+    if(id === 'brood-break') renderBBPlanner?.();
+    if(id === 'split')       renderSplitPlanner?.();
+    if(id === 'duplex')      renderDxPlanner?.();
+    if(id === 'heat')        renderHeatPlanner?.();
+    // Sync the scope select
+    const sc2 = document.getElementById('dpScopeSelect2');
+    const sc1 = document.getElementById('dpScopeSelect');
+    if(sc2 && sc1) sc2.innerHTML = sc1.innerHTML;
+  }
+  _activeDayPlan = id;
+}
+
+// On load: if disclaimer already acked, skip to planner; otherwise show mission
+window.addEventListener('DOMContentLoaded', () => {
+  if(_discAcked) {
+    // Already acked — update disclaimer page UI
+    const ackRow = document.getElementById('discAckRow');
+    const btn = document.getElementById('discEnterBtn');
+    if(ackRow) ackRow.style.display = 'none';
+    if(btn) {
+      btn.textContent = 'Open the Smart Planner →';
+      btn.classList.add('enabled');
+      btn.onclick = () => gotoScreen('screen-planner');
+    }
+  }
+  // Init palette open state
+  const pbw = document.getElementById('paletteBodyWrap');
+  if(pbw) pbw.style.maxHeight = pbw.scrollHeight + 'px';
+  gotoScreen('screen-mission');
+});
+
+function renderHeatPlanner(){
+  const dateEl = document.getElementById('heat-date');
+  const ac = document.getElementById('heat-actions');
+  if(!dateEl || !ac) return;
+  const startStr = dateEl.value;
+  if(!startStr){ ac.innerHTML=''; return; }
+  const start = new Date(startStr + 'T12:00:00');
+  const fmt = d => d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  const add = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+  const treatments = [
+    [0,  'amber', '🌡️ Treatment 1', fmt(start),          'Remove capped brood frames. Load into Varroa Controller. Heat to 42°C for 120 minutes. Return frames to hive.'],
+    [12, 'teal',  '🌡️ Treatment 2', fmt(add(start,12)),  'Repeat with any newly capped frames. Check mite drop after 48 hours to assess effectiveness.'],
+    [24, 'amber', '🌡️ Treatment 3', fmt(add(start,24)),  'Third cycle completes one full brood cycle treatment. Monitor mite drop. If substantially reduced, colony is on track.'],
+    [36, '',      '🔍 Follow-up check', fmt(add(start,36)), 'Assess mite levels via alcohol wash or sugar roll. If below threshold, monthly maintenance treatments sufficient.'],
+  ];
+  ac.innerHTML = treatments.map(([d,c,t,ds,desc]) => dpActionCard(d,c,t,ds,desc)).join('');
+}
+
+
+// ── VMSP CHAT ASSISTANT ──
+let vmspChatHistory = [];
+function vmspToggleChat(){
+  const p = document.getElementById('vmsp-chat-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) setTimeout(()=>document.getElementById('vmsp-chat-input').focus(), 100);
+}
+function vmspAddMsg(text, type){
+  const msgs = document.getElementById('vmsp-chat-messages');
+  const el = document.createElement('div');
+  el.className = 'vmsp-chat-msg ' + type;
+  el.textContent = text;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+async function vmspSendChat(){
+  const input = document.getElementById('vmsp-chat-input');
+  const msg = input.value.trim(); if(!msg) return;
+  input.value = '';
+  vmspAddMsg(msg, 'user');
+  vmspChatHistory.push({role:'user', content:msg});
+  const loading = vmspAddMsg('…', 'bot');
+  try{
+    const headers = {'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
+    const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
+      method:'POST', headers,
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:`You are the VarroaMate Smart Planner assistant, an expert advisor for Australian beekeepers. Help users build effective Varroa treatment plans. Focus on: treatment timing and windows, resistance rotation, organic vs chemical strategies, honey flow compatibility, seasonal planning for southern hemisphere, and how to interpret plan scores. Always use "Formic PRO" not "MAQS". Keep answers concise and practical.`,
+        messages: vmspChatHistory
+      })
+    });
+    const data = await r.json();
+    const reply = data.content?.map(b=>b.text||'').join('') || 'Sorry, could not respond.';
+    vmspChatHistory.push({role:'assistant', content:reply});
+    loading.textContent = reply;
+  } catch(e){
+    loading.textContent = 'Connection failed. Please try again.';
+  }
+  const msgs = document.getElementById('vmsp-chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showChipInfo(e, id){
+  e.stopPropagation(); e.preventDefault();
+  const t = TREATMENTS[id]; if(!t) return;
+  const pop = document.getElementById('chipInfoPopup');
+  document.getElementById('cipTitle').textContent = t.name;
+  document.getElementById('cipNotes').textContent = t.notes || '';
+  document.getElementById('cipReg').textContent = REG_INFO[id] || '';
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pw = 260, ph = 220;
+  let left = rect.left - pw - 8;
+  if(left < 8) left = rect.right + 8;
+  let top = rect.top - 20;
+  if(top + ph > window.innerHeight - 8) top = window.innerHeight - ph - 8;
+  if(top < 8) top = 8;
+  pop.style.left = left + 'px';
+  pop.style.top  = top  + 'px';
+  pop.classList.add('show');
+  setTimeout(() => document.addEventListener('click', hideChipInfo, {once:true}), 10);
+}
+function hideChipInfo(){
+  document.getElementById('chipInfoPopup')?.classList.remove('show');
+}
+
 </script>
+
+<div id="chipInfoPopup" style="position:fixed;">
+  <span class="cip-close" onclick="hideChipInfo()">✕</span>
+  <div class="cip-title" id="cipTitle"></div>
+  <div class="cip-notes" id="cipNotes"></div>
+  <div class="cip-reg" id="cipReg"></div>
+</div>
+<!-- VMSP BEE ASSISTANT -->
+<button class="vmsp-chat-fab" id="vmsp-chat-fab" onclick="vmspToggleChat()">🐝</button>
+<div class="vmsp-chat-panel" id="vmsp-chat-panel">
+  <div class="vmsp-chat-header">
+    <div style="font-size:20px;">🐝</div>
+    <div class="vmsp-chat-header-info">
+      <div class="vmsp-chat-header-title">Smart Planner Assistant</div>
+      <div class="vmsp-chat-header-sub">Ask anything about your treatment plan</div>
+    </div>
+    <button class="vmsp-chat-close" onclick="vmspToggleChat()">✕</button>
+  </div>
+  <div class="vmsp-chat-messages" id="vmsp-chat-messages">
+    <div class="vmsp-chat-msg bot">G'day! 🐝 I'm your Smart Planner assistant. Ask me about treatment timing, plan strategy, resistance management, or how to interpret your plan score.</div>
+  </div>
+  <div class="vmsp-chat-input-row">
+    <input class="vmsp-chat-input" id="vmsp-chat-input" placeholder="Ask about your plan…" onkeydown="if(event.key==='Enter')vmspSendChat()">
+    <button class="vmsp-chat-send" onclick="vmspSendChat()">➤</button>
+  </div>
+</div>
+
 </body>
 </html>
