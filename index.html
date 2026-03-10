@@ -453,98 +453,84 @@ html, body {
 /* ── MOBILE ── */
 @media (max-width: 540px) {
 
-  /* On mobile: fixed overlay panel at bottom, cards + hives stacked */
+  /* Fixed translucent panel anchored to bottom */
   #hives-container {
-    /* Take over the whole screen bottom as a panel */
     position: fixed;
     bottom: 0;
     left: 0; right: 0;
     top: auto;
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
     gap: 0;
-    padding: 0;
-    background: rgba(245,240,232,0.97);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(200,180,140,0.4);
-    box-shadow: 0 -4px 24px rgba(28,56,41,0.12);
+    padding: 8px 6px 0;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    background: rgba(245,240,228,0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255,255,255,0.45);
+    box-shadow: 0 -2px 20px rgba(28,56,41,0.10);
     border-radius: 20px 20px 0 0;
     z-index: 20;
-    padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Row of 4 tiny hive SVGs at the top of the panel */
-  #hives-container::before {
-    content: '';
-    display: block;
-    height: 8px;
-  }
-
-  /* Hive wrappers: row of SVGs first, then cards below */
-  /* Restructure: all SVGs in a flex row, all cards in a flex row */
-  /* We use order to sort: SVGs first (order:1), labels second (order:2) */
+  /* Each hive = equal quarter width, column layout */
   .hive-wrapper {
-    flex: 1;
+    flex: 0 0 25%;
+    width: 25%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
-  }
-
-  /* The container itself: two rows — top row = SVGs, bottom row = cards */
-  /* Achieved with flex-wrap and fixed widths */
-  #hives-container {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-
-  /* Each wrapper = 25% width */
-  .hive-wrapper {
-    width: 25%;
-    flex: 0 0 25%;
-    padding: 6px 2px 0;
+    padding: 0 3px;
     box-sizing: border-box;
   }
 
-  /* Shrink SVGs to tiny hive icons */
+  /* Fixed height SVG container so all hives align uniformly */
   .hive-svg-wrap {
-    transform: scale(0.42);
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: visible;
+  }
+  .hive-svg-wrap svg {
+    transform: scale(0.40);
     transform-origin: bottom center;
-    margin-bottom: -28px; /* pull label up under the scaled SVG */
   }
-  .hive-wrapper:hover .hive-svg-wrap {
-    transform: scale(0.42) translateY(-4px);
+  .hive-wrapper:hover .hive-svg-wrap svg {
+    transform: scale(0.40) translateY(-6px);
   }
-  .hive-wrapper.coming-soon:hover .hive-svg-wrap {
-    transform: scale(0.42);
+  .hive-wrapper.coming-soon:hover .hive-svg-wrap svg {
+    transform: scale(0.40);
   }
 
-  /* Label cards — clean row under the hives */
+  /* Label cards — uniform, no min-width fighting */
   .hive-label {
-    min-width: 0;
     width: 100%;
-    padding: 6px 6px 8px;
+    min-width: 0;
+    margin-top: 2px;
+    padding: 5px 5px 7px;
     border-radius: 10px;
-    margin-top: 0;
     box-sizing: border-box;
+    background: rgba(255,255,255,0.65);
   }
   .hive-label-name {
-    font-size: 12px;
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .hive-label-sub {
-    font-size: 9px;
+    font-size: 8px;
     margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .status-badge {
-    font-size: 8px;
+    font-size: 7.5px;
     padding: 2px 5px;
     gap: 3px;
     margin-top: 3px;
@@ -553,19 +539,17 @@ html, body {
     width: 4px; height: 4px;
   }
 
-  /* Wordmark — keep visible above the panel */
+  /* Wordmark — sit above the panel */
   #wordmark {
-    bottom: 180px;
+    bottom: 175px;
     top: auto;
   }
 
-  /* Hide hint — panel makes it obvious */
+  /* Hide hint and kangaroo on mobile */
   #hint { display: none; }
-
-  /* Hide kangaroo on mobile */
   #kangaroo-wrap { display: none; }
 
-  /* Bee stays in scene above panel */
+  /* Bee above panel */
   #bee { z-index: 25; }
 }
 
