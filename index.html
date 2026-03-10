@@ -1044,8 +1044,8 @@ html, body {
 <script>
 // ── APP URLS ─────────────────────────────────────
 const APP_URLS = {
-  vm:     '/app/',
-  vmsp:   '/planner/',
+  vm:     'V87.html',
+  vmsp:   'VMSP_v56.html',
   prod:   null,
   health: null,
 };
@@ -1229,15 +1229,72 @@ function onHiveClick(hive){
 
   flyBeeToHive(hive, ()=>{
     if(url){
-      // Try to navigate — if the file isn't there it will 404 naturally
-      // but we show a toast first and attempt after a short beat
-      setTimeout(()=>{ window.location.href = url; }, 300);
+      // Bee emerges, flies back to centre, then navigates
+      showToast(APP_TOASTS[app] || '');
+      setTimeout(()=>{ flyBeeBackThenNavigate(url); }, 400);
     } else {
-      // Coming soon — bee peeks in, backs out, toast shown
+      // Coming soon — bee emerges and returns
       showToast(APP_TOASTS[app] || '🐝 Coming soon!');
       setTimeout(()=>{ flyBeeBack(); }, 500);
     }
   });
+}
+
+// ── BEE EMERGE + FLY BACK TO CENTRE ─────────────
+function flyBeeBackThenNavigate(url){
+  // Reappear at the hive entrance, then arc back to rest position
+  bee.style.transition = 'opacity 0.25s ease-out';
+  bee.style.opacity    = '1';
+
+  setTimeout(()=>{
+    bee.style.transition = '';
+
+    // Fly from current hive position back to rest
+    const sceneRect = document.getElementById('scene').getBoundingClientRect();
+    const W = sceneRect.width, H = sceneRect.height;
+    const restX = W * 0.46, restY = H * 0.52;
+
+    const startX = beeX, startY = beeY;
+
+    // Gentle arc back — smaller than the inbound loop
+    const cp1X = startX + (Math.random() - 0.5) * W * 0.25;
+    const cp1Y = startY - H * 0.18 - Math.random() * H * 0.08;
+    const cp2X = restX  + (Math.random() - 0.5) * W * 0.12;
+    const cp2Y = restY  - H * 0.12;
+
+    const duration = 1400;
+    const start    = performance.now();
+    beeFlying = true; bobblePaused = true;
+
+    function cubicBez(t, p0, p1, p2, p3){
+      const u = 1-t;
+      return u*u*u*p0 + 3*u*u*t*p1 + 3*u*t*t*p2 + t*t*t*p3;
+    }
+    function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+
+    function animate(now){
+      const tRaw = Math.min((now - start) / duration, 1);
+      const t    = easeInOut(tRaw);
+      const x = cubicBez(t, startX, cp1X, cp2X, restX);
+      const y = cubicBez(t, startY, cp1Y, cp2Y, restY);
+      const step = 0.006;
+      const t2 = easeInOut(Math.min(tRaw + step, 1));
+      const nx = cubicBez(t2, startX, cp1X, cp2X, restX);
+      const ny = cubicBez(t2, startY, cp1Y, cp2Y, restY);
+      const angle = Math.atan2(ny-y, nx-x) * 180/Math.PI + 90;
+      positionBee(x, y, angle);
+
+      if(tRaw < 1){
+        requestAnimationFrame(animate);
+      } else {
+        beeX = restX; beeY = restY;
+        beeFlying = false; bobblePaused = false;
+        // Navigate after bee has settled
+        setTimeout(()=>{ window.location.href = url; }, 300);
+      }
+    }
+    requestAnimationFrame(animate);
+  }, 260);
 }
 
 // ── BEE FLIGHT ANIMATION ─────────────────────────
@@ -1327,13 +1384,55 @@ function animateBeeEnter(hive, onArrival){
 }
 
 function flyBeeBack(){
-  // Reset bee visibility and position
-  bee.style.transition = 'opacity 0.4s';
+  // Re-emerge from hive entrance — fade in small then grow
+  bee.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+  bee.style.transform  = 'rotate(0deg) scale(1)';
   bee.style.opacity    = '1';
-  placeBeeAtRest();
-  beeFlying    = false;
-  bobblePaused = false;
-  setTimeout(()=>{ bee.style.transition=''; }, 450);
+
+  setTimeout(()=>{
+    bee.style.transition = '';
+
+    const sceneRect = document.getElementById('scene').getBoundingClientRect();
+    const W = sceneRect.width, H = sceneRect.height;
+    const restX = W * 0.46, restY = H * 0.52;
+    const startX = beeX, startY = beeY;
+
+    const cp1X = startX + (Math.random()-0.5) * W * 0.2;
+    const cp1Y = startY - H * 0.15 - Math.random() * H * 0.06;
+    const cp2X = restX  + (Math.random()-0.5) * W * 0.1;
+    const cp2Y = restY  - H * 0.10;
+
+    const duration = 1200;
+    const start    = performance.now();
+    beeFlying = true; bobblePaused = true;
+
+    function cubicBez(t, p0, p1, p2, p3){
+      const u=1-t; return u*u*u*p0+3*u*u*t*p1+3*u*t*t*p2+t*t*t*p3;
+    }
+    function easeInOut(t){ return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2; }
+
+    function animate(now){
+      const tRaw = Math.min((now-start)/duration, 1);
+      const t = easeInOut(tRaw);
+      const x = cubicBez(t, startX, cp1X, cp2X, restX);
+      const y = cubicBez(t, startY, cp1Y, cp2Y, restY);
+      const step = 0.006;
+      const t2 = easeInOut(Math.min(tRaw+step, 1));
+      const nx = cubicBez(t2, startX, cp1X, cp2X, restX);
+      const ny = cubicBez(t2, startY, cp1Y, cp2Y, restY);
+      const angle = Math.atan2(ny-y, nx-x)*180/Math.PI + 90;
+      positionBee(x, y, angle);
+      if(tRaw < 1){
+        requestAnimationFrame(animate);
+      } else {
+        beeX = restX; beeY = restY;
+        beeFlying = false; bobblePaused = false;
+        // Un-light the hive
+        document.querySelectorAll('.hive-wrapper').forEach(h => h.classList.remove('lit'));
+      }
+    }
+    requestAnimationFrame(animate);
+  }, 320);
 }
 
 // ── HIVE LIGHTING ────────────────────────────────
