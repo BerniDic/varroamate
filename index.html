@@ -453,61 +453,70 @@ html, body {
 /* ── MOBILE ── */
 @media (max-width: 540px) {
 
-  /* Shrink hive SVGs via scale */
+  /* 2x2 grid layout */
+  #hives-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 12px 8px;
+    padding: 0 16px;
+    bottom: 4%;
+    align-items: end;
+    justify-items: center;
+  }
+
+  .hive-wrapper {
+    width: 100%;
+    align-items: center;
+  }
+
+  /* Reset SVG scale — let them breathe in the grid */
   .hive-svg-wrap {
-    transform: scale(0.50);
+    transform: scale(0.72);
     transform-origin: bottom center;
   }
-  .hive-wrapper.coming-soon:hover .hive-svg-wrap,
   .hive-wrapper:hover .hive-svg-wrap {
-    transform: scale(0.50) translateY(-4px);
+    transform: scale(0.72) translateY(-4px);
+  }
+  .hive-wrapper.coming-soon:hover .hive-svg-wrap {
+    transform: scale(0.72);
   }
 
-  /* Tighten container */
-  #hives-container {
-    gap: clamp(2px, 1.5vw, 10px);
-    padding: 0 2px;
-    bottom: 2%;
-  }
-
-  /* Smaller label cards */
+  /* Label cards — readable size */
   .hive-label {
-    min-width: 58px;
-    padding: 4px 6px 6px;
+    min-width: 100px;
+    padding: 7px 10px 9px;
   }
   .hive-label-name {
-    font-size: 10px;
+    font-size: 14px;
   }
   .hive-label-sub {
-    font-size: 8px;
-    margin-top: 1px;
+    font-size: 10px;
+    margin-top: 2px;
   }
   .status-badge {
-    font-size: 7px;
-    padding: 2px 5px;
-    gap: 3px;
-    margin-top: 3px;
+    font-size: 9px;
+    padding: 2px 7px;
+    gap: 4px;
+    margin-top: 4px;
   }
   .status-badge .dot {
-    width: 4px; height: 4px;
+    width: 5px; height: 5px;
   }
 
-  /* Wordmark */
+  /* Wordmark — tuck up a little */
   #wordmark {
-    top: clamp(12px, 3vh, 24px);
+    top: clamp(10px, 2vh, 20px);
   }
 
-  /* Shrink kangaroo on mobile */
+  /* Kangaroo — hide on mobile to reduce clutter */
   #kangaroo-wrap {
-    transform: scale(0.7);
-    transform-origin: bottom right;
-    right: 1%;
-    bottom: 20%;
+    display: none;
   }
 
   /* Hint text */
   #hint {
-    font-size: 13px;
+    font-size: 12px;
     bottom: 1%;
   }
 }
@@ -548,6 +557,71 @@ html, body {
     <div class="hill hill-3"></div>
   </div>
 
+
+  <!-- Gum Trees — left side, outback style -->
+  <svg id="gum-trees" aria-hidden="true" viewBox="0 0 320 420" preserveAspectRatio="xMinYMax meet"
+       xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute;bottom:28%;left:0;width:clamp(140px,18vw,280px);height:auto;pointer-events:none;z-index:3;">
+
+    <!-- Tree 1: tallest, leftmost -->
+    <!-- Trunk -->
+    <path d="M48 420 L48 120 Q50 100 52 80" stroke="#B8A888" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <!-- Bark texture -->
+    <path d="M46 380 Q50 370 48 360" stroke="#A09070" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M50 320 Q46 308 50 298" stroke="#A09070" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M47 250 Q52 240 48 228" stroke="#A09070" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <!-- Main branches -->
+    <path d="M52 80 Q30 55 10 35" stroke="#B0A080" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M52 80 Q70 50 85 25" stroke="#B0A080" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M52 100 Q20 90 0 75" stroke="#B0A080" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M52 110 Q80 95 100 80" stroke="#B0A080" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M52 130 Q35 120 18 108" stroke="#B0A080" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <!-- Sparse leaf clusters — eucalyptus style, drooping -->
+    <ellipse cx="10" cy="32" rx="14" ry="8" fill="#6A9060" opacity="0.82" transform="rotate(-20 10 32)"/>
+    <ellipse cx="10" cy="32" rx="10" ry="5" fill="#7AAA6A" opacity="0.6" transform="rotate(15 10 32)"/>
+    <ellipse cx="85" cy="22" rx="16" ry="7" fill="#5A8050" opacity="0.80" transform="rotate(25 85 22)"/>
+    <ellipse cx="85" cy="22" rx="10" ry="5" fill="#6A9A5A" opacity="0.55" transform="rotate(-10 85 22)"/>
+    <ellipse cx="0" cy="70" rx="12" ry="6" fill="#6A9060" opacity="0.70" transform="rotate(-10 0 70)"/>
+    <ellipse cx="100" cy="76" rx="13" ry="6" fill="#5A8050" opacity="0.72" transform="rotate(20 100 76)"/>
+    <ellipse cx="18" cy="104" rx="11" ry="5" fill="#7AAA6A" opacity="0.60" transform="rotate(-25 18 104)"/>
+    <!-- Hanging leaf sprays -->
+    <path d="M10 36 Q6 48 4 56" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M85 26 Q90 40 88 52" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M0 74 Q-4 86 -2 96" stroke="#5A8050" stroke-width="1.2" fill="none" opacity="0.5"/>
+
+    <!-- Tree 2: slightly shorter, more to right -->
+    <!-- Trunk -->
+    <path d="M195 420 L194 160 Q196 140 198 115" stroke="#C0AA88" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Bark -->
+    <path d="M193 360 Q197 348 194 336" stroke="#A89870" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M196 280 Q192 268 196 256" stroke="#A89870" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <!-- Branches -->
+    <path d="M198 115 Q175 88 155 65" stroke="#B8A880" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M198 115 Q220 85 240 62" stroke="#B8A880" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M198 135 Q170 125 148 112" stroke="#B8A880" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M198 145 Q225 130 248 118" stroke="#B8A880" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M198 160 Q180 150 162 142" stroke="#B8A880" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <!-- Leaf clusters -->
+    <ellipse cx="154" cy="62" rx="15" ry="7" fill="#6A9060" opacity="0.80" transform="rotate(-15 154 62)"/>
+    <ellipse cx="154" cy="62" rx="9"  ry="4" fill="#80AA70" opacity="0.55" transform="rotate(20 154 62)"/>
+    <ellipse cx="240" cy="58" rx="14" ry="6" fill="#5A8050" opacity="0.78" transform="rotate(20 240 58)"/>
+    <ellipse cx="240" cy="58" rx="9"  ry="4" fill="#6A9A5A" opacity="0.50" transform="rotate(-15 240 58)"/>
+    <ellipse cx="147" cy="108" rx="12" ry="5" fill="#6A9060" opacity="0.68" transform="rotate(-20 147 108)"/>
+    <ellipse cx="248" cy="114" rx="13" ry="5" fill="#5A8050" opacity="0.65" transform="rotate(15 248 114)"/>
+    <ellipse cx="162" cy="138" rx="10" ry="5" fill="#7AAA6A" opacity="0.58" transform="rotate(-10 162 138)"/>
+    <!-- Hanging sprays -->
+    <path d="M154 66 Q150 80 148 90" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.55"/>
+    <path d="M240 62 Q245 76 243 88" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.55"/>
+
+    <!-- Tree 3: small, far left, very distant -->
+    <path d="M-8 420 L-8 260 Q-6 248 -4 235" stroke="#C8B898" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <path d="M-4 235 Q-18 218 -28 205" stroke="#C0B088" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <path d="M-4 235 Q8 215 18 200" stroke="#C0B088" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <path d="M-4 248 Q-20 238 -32 228" stroke="#C0B088" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <ellipse cx="-28" cy="202" rx="12" ry="5" fill="#7A9870" opacity="0.60" transform="rotate(-20 -28 202)"/>
+    <ellipse cx="18"  cy="197" rx="11" ry="5" fill="#6A9060" opacity="0.58" transform="rotate(18 18 197)"/>
+    <ellipse cx="-32" cy="224" rx="10" ry="4" fill="#7A9870" opacity="0.52" transform="rotate(-10 -32 224)"/>
+  </svg>
   <!-- Ground -->
   <div id="ground" aria-hidden="true"></div>
 
