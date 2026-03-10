@@ -33,7 +33,7 @@ html, body {
 /* ── SCENE CONTAINER ── */
 #scene {
   position: relative;
-  width: 100vw; height: 100vh;
+  width: 100vw; height: 100vh; height: 100dvh;
   overflow: hidden;
   cursor: default;
 }
@@ -455,41 +455,41 @@ html, body {
 
   /* Shrink hive SVGs via scale */
   .hive-svg-wrap {
-    transform: scale(0.58);
+    transform: scale(0.50);
     transform-origin: bottom center;
   }
   .hive-wrapper.coming-soon:hover .hive-svg-wrap,
   .hive-wrapper:hover .hive-svg-wrap {
-    transform: scale(0.58) translateY(-4px);
+    transform: scale(0.50) translateY(-4px);
   }
 
   /* Tighten container */
   #hives-container {
-    gap: clamp(4px, 2vw, 14px);
-    padding: 0 4px;
-    bottom: 4%;
+    gap: clamp(2px, 1.5vw, 10px);
+    padding: 0 2px;
+    bottom: 2%;
   }
 
   /* Smaller label cards */
   .hive-label {
-    min-width: 70px;
-    padding: 6px 8px 8px;
+    min-width: 58px;
+    padding: 4px 6px 6px;
   }
   .hive-label-name {
-    font-size: 12px;
+    font-size: 10px;
   }
   .hive-label-sub {
-    font-size: 9px;
-    margin-top: 2px;
+    font-size: 8px;
+    margin-top: 1px;
   }
   .status-badge {
-    font-size: 8px;
-    padding: 2px 6px;
+    font-size: 7px;
+    padding: 2px 5px;
     gap: 3px;
-    margin-top: 4px;
+    margin-top: 3px;
   }
   .status-badge .dot {
-    width: 5px; height: 5px;
+    width: 4px; height: 4px;
   }
 
   /* Wordmark */
