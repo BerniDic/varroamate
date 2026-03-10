@@ -403,7 +403,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 
 <!-- HEADER -->
 <header class="header">
-  <div style="display:flex;align-items:center;gap:0;"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.12);color:white;text-decoration:none;font-size:15px;transition:background 0.2s;flex-shrink:0;margin-right:6px;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">🏠</a>
+  <div style="display:flex;align-items:center;gap:0;">
     <div class="logo">Varroa<em>Mate</em><sup>™</sup></div>
     <span class="logo-sub">Smart Planner</span>
   </div>
@@ -1573,14 +1573,18 @@ function _showVMSyncStatus(state){
   const el = document.getElementById('vmSyncBadge');
   if(!el) return;
   const cfg = {
-    'not-signed-in': { text:'🔗 Not signed in to VarroaMate', color:'rgba(255,255,255,0.45)' },
+    'not-signed-in': { text:'🔗 Sign in to VarroaMate first to sync your hives', color:'rgba(255,255,255,0.55)', link:'/app/' },
     'loading':        { text:'⏳ Syncing with VarroaMate…',   color:'rgba(255,255,255,0.55)' },
     'ok':             { text:`✅ Synced with VarroaMate · ${LIVE_APIARIES.length} apiaries · ${LIVE_HIVES.length} hives`, color:'rgba(255,255,255,0.80)' },
     'error':          { text:'⚠ Could not load VarroaMate data', color:'#F5A623' },
   };
   const c = cfg[state] || cfg['error'];
-  el.textContent = c.text;
-  el.style.color  = c.color;
+  if(c.link){
+    el.innerHTML = `<a href="${c.link}" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">${c.text}</a>`;
+  } else {
+    el.textContent = c.text;
+  }
+  el.style.color = c.color;
 }
 
 // Default window set (used when no saved plan exists for a selection)
