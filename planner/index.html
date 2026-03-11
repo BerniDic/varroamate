@@ -1967,56 +1967,54 @@ function _fmtHistDate(d){
 }
 
 // ── Rebuild plan selector dropdowns after live data arrives ──
+function _fillHiveOptions(apiaryId){
+  const sel = document.getElementById('psbHive');
+  if(!sel) return;
+  while(sel.options.length > 1) sel.remove(1);
+  const hives = apiaryId
+    ? MOCK_HIVES.filter(h => String(h.apiaryId) === String(apiaryId))
+    : MOCK_HIVES;
+  hives.forEach(h => {
+    const o = document.createElement('option'); o.value = h.id; o.textContent = h.name; sel.appendChild(o);
+  });
+}
+
 function _rebuildSelectorDropdowns(){
   const aSelect = document.getElementById('psbApiary');
   const hSelect = document.getElementById('psbHive');
   if(!aSelect || !hSelect) return;
 
-  const aClone = aSelect.cloneNode(false);
-  const hClone = hSelect.cloneNode(false);
-  aSelect.parentNode.replaceChild(aClone, aSelect);
-  hSelect.parentNode.replaceChild(hClone, hSelect);
+  // Wipe and repopulate without cloning — keeps listeners stable
+  while(aSelect.options.length) aSelect.remove(0);
+  while(hSelect.options.length) hSelect.remove(0);
 
-  const aNew = document.getElementById('psbApiary');
-  const hNew = document.getElementById('psbHive');
-
-  // Placeholder options
-  const aph = document.createElement('option'); aph.value=''; aph.textContent='— Apiary —'; aNew.appendChild(aph);
-  const hph = document.createElement('option'); hph.value=''; hph.textContent='— Hive —'; hNew.appendChild(hph);
+  const aph = document.createElement('option'); aph.value=''; aph.textContent='— Apiary —'; aSelect.appendChild(aph);
+  const hph = document.createElement('option'); hph.value=''; hph.textContent='— Hive —'; hSelect.appendChild(hph);
 
   MOCK_APIARIES.forEach(a => {
-    const o = document.createElement('option'); o.value = a.id; o.textContent = a.name; aNew.appendChild(o);
+    const o = document.createElement('option'); o.value = a.id; o.textContent = a.name; aSelect.appendChild(o);
   });
 
-  // Populate hives for selected apiary (or all if none selected)
-  const fillHives = (apiaryId) => {
-    while(hNew.options.length > 1) hNew.remove(1);
-    const hives = apiaryId
-      ? MOCK_HIVES.filter(h => String(h.apiaryId) === String(apiaryId))
-      : MOCK_HIVES;
-    hives.forEach(h => {
-      const o = document.createElement('option'); o.value = h.id; o.textContent = h.name; hNew.appendChild(o);
-    });
-  };
-  fillHives(currentScopeKey.startsWith('apiary:') ? currentScopeKey.slice(7) : null);
-
-  aNew.addEventListener('change', () => {
-    fillHives(aNew.value || null);
+  // Attach listeners once — safe because we're not cloning
+  aSelect.onchange = () => {
+    _fillHiveOptions(aSelect.value || null);
     _silentSet('psbHive', '');
-    if(aNew.value) selectPlanScope('apiary:' + aNew.value);
-  });
-  hNew.addEventListener('change', () => { if(hNew.value) selectPlanScope('hive:' + hNew.value); });
+    if(aSelect.value) selectPlanScope('apiary:' + aSelect.value);
+  };
+  hSelect.onchange = () => { if(hSelect.value) selectPlanScope('hive:' + hSelect.value); };
 
-  // Restore selections
+  // Populate hives and restore selections
   if(currentScopeKey.startsWith('hive:')){
     const h = MOCK_HIVES.find(x => String(x.id) === currentScopeKey.slice(5));
-    if(h){ _silentSet('psbApiary', h.apiaryId); fillHives(h.apiaryId); _silentSet('psbHive', h.id); }
+    if(h){ _silentSet('psbApiary', h.apiaryId); _fillHiveOptions(h.apiaryId); _silentSet('psbHive', h.id); }
+    else { _fillHiveOptions(null); }
   } else if(currentScopeKey.startsWith('apiary:')){
     _silentSet('psbApiary', currentScopeKey.slice(7));
-    fillHives(currentScopeKey.slice(7));
+    _fillHiveOptions(currentScopeKey.slice(7));
+  } else {
+    _fillHiveOptions(null);
   }
 
-  // Build plan dropdown for current scope
   _rebuildPlanDropdown(currentScopeKey);
 }
 
@@ -2283,11 +2281,7 @@ function selectPlanScope(key){
 }
 
 function _populateHiveSelect(apiaryId){
-  const sel = document.getElementById('psbHive');
-  while(sel.options.length > 1) sel.remove(1);
-  MOCK_HIVES.filter(h=>h.apiaryId===apiaryId).forEach(h=>{
-    const o = document.createElement('option'); o.value=h.id; o.textContent=h.name; sel.appendChild(o);
-  });
+  _fillHiveOptions(apiaryId);
 }
 
 function _syncSelectorUI(key, isNew){
