@@ -614,19 +614,23 @@ canvas.drop-blocked{cursor:not-allowed;}
         <div class="plan-sel-bar" id="planSelBar">
           <span class="plan-sel-label">Plan for</span>
           <div class="plan-sel-group">
-            <button class="plan-sel-btn active" id="psbAll" onclick="selectPlanScope('all')">🌐 All Apiaries</button>
             <select class="plan-sel-select" id="psbApiary" title="Select an apiary">
               <option value="">— Apiary —</option>
             </select>
             <select class="plan-sel-select" id="psbHive" title="Select a hive">
               <option value="">— Hive —</option>
             </select>
+            <select class="plan-sel-select" id="psbPlan" title="Select a plan" style="display:none;">
+              <option value="Plan 1">Plan 1</option>
+            </select>
+            <button onclick="promptNewPlan()" title="New plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--border);background:var(--cream);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;" id="psbNewPlan">+ New</button>
+            <button onclick="promptRenamePlan()" title="Rename plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--border);background:var(--cream);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;" id="psbRenamePlan">✏ Rename</button>
+            <button onclick="promptDeletePlan()" title="Delete plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid rgba(184,92,56,0.3);background:rgba(184,92,56,0.06);color:var(--rust);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;" id="psbDeletePlan">🗑</button>
           </div>
-          <span class="plan-sel-name" id="planSelName">All Apiaries</span>
+          <span class="plan-sel-name" id="planSelName"></span>
           <span class="plan-sel-badge new" id="planSelBadge" style="display:none;">new plan</span>
           <span id="planSelMobile" style="display:none;font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(212,130,10,0.18);color:var(--amber-light);border:1px solid rgba(212,130,10,0.3);margin-left:2px;font-family:'DM Mono',monospace;">🚛 mobile</span>
           <button id="planItinBtn" onclick="openItinModal()" style="display:none;margin-left:6px;padding:4px 10px;border-radius:5px;border:1.5px solid rgba(212,130,10,0.4);background:rgba(212,130,10,0.12);color:var(--amber-light);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;">Itinerary →</button>
-
         </div>
         <div class="tl-head">
           <div>
@@ -1783,11 +1787,11 @@ async function loadVMData(){
     _rebuildSelectorDropdowns();
 
     _showVMSyncStatus('ok');
-    // Refresh display now we have real data
-    renderPlanList();
-    renderRating();
-    renderSmartAlerts();
-    redraw();
+    // If we already had a hive selected, reload its plan with fresh history
+    if(currentScopeKey.startsWith('hive:')){
+      loadPlan(currentScopeKey, currentPlanName);
+    }
+    updateAll();
 
   } catch(err){
     console.error('VMSP loadVMData:', err);
@@ -1812,7 +1816,7 @@ function renderSmartAlerts(){
   const nowY   = now.getFullYear();
 
   // ── 1. Latest mite count alert ──────────────────────────────────────
-  const counts = HISTORY.filter(h => h.type === 'count')
+  const counts = _filteredHistory().filter(h => h.type === 'count')
     .sort((a,b) => (b.year*12+b.month) - (a.year*12+a.month));
   const latest = counts[0];
 
@@ -1913,7 +1917,7 @@ function _buildHistoryFromVM(treatments, miteCounts){
 
   treatments.forEach(t => {
     const d = new Date(t.date + 'T12:00:00');
-    const month = d.getMonth();     // 0-indexed, same as HISTORY convention
+    const month = d.getMonth();
     const year  = d.getFullYear();
     const tr = TREATMENTS[t.product];
     HISTORY.push({
@@ -1924,7 +1928,8 @@ function _buildHistoryFromVM(treatments, miteCounts){
       detail:  `${_fmtHistDate(d)} · ${tr?.duration||'?'} days · ${tr?.moa||''}`,
       color:   tr?.color || '#5A9E60',
       row:     2,
-      vmId:    t.id,    // keep VM's id for reference, never used to write
+      vmId:    t.id,
+      hiveId:  t.hive_id,  // for per-hive filtering
     });
   });
 
@@ -1942,8 +1947,18 @@ function _buildHistoryFromVM(treatments, miteCounts){
       detail: `${_fmtHistDate(d)} · ${val} mites/300 bees · ${pressure}`,
       row:    3,
       vmId:   c.id,
+      hiveId: c.hive_id,   // for per-hive filtering
     });
   });
+}
+
+// Returns HISTORY filtered to the currently selected hive (or all if no hive selected)
+function _filteredHistory(){
+  if(currentScopeKey.startsWith('hive:')){
+    const hid = currentScopeKey.slice(5);
+    return HISTORY.filter(e => String(e.hiveId) === String(hid));
+  }
+  return HISTORY;
 }
 
 function _fmtHistDate(d){
@@ -1957,8 +1972,7 @@ function _rebuildSelectorDropdowns(){
   const hSelect = document.getElementById('psbHive');
   if(!aSelect || !hSelect) return;
 
-  // Detach listeners, wipe options, repopulate, reattach
-  const aClone = aSelect.cloneNode(false); // cloneNode(false) = no children
+  const aClone = aSelect.cloneNode(false);
   const hClone = hSelect.cloneNode(false);
   aSelect.parentNode.replaceChild(aClone, aSelect);
   hSelect.parentNode.replaceChild(hClone, hSelect);
@@ -1966,23 +1980,140 @@ function _rebuildSelectorDropdowns(){
   const aNew = document.getElementById('psbApiary');
   const hNew = document.getElementById('psbHive');
 
+  // Placeholder options
+  const aph = document.createElement('option'); aph.value=''; aph.textContent='— Apiary —'; aNew.appendChild(aph);
+  const hph = document.createElement('option'); hph.value=''; hph.textContent='— Hive —'; hNew.appendChild(hph);
+
   MOCK_APIARIES.forEach(a => {
     const o = document.createElement('option'); o.value = a.id; o.textContent = a.name; aNew.appendChild(o);
   });
-  MOCK_HIVES.forEach(h => {
-    const apiary = MOCK_APIARIES.find(a => a.id === h.apiaryId);
-    const o = document.createElement('option');
-    o.value = h.id;
-    o.textContent = `${h.name} (${apiary?.name || ''})`;
-    hNew.appendChild(o);
+
+  // Populate hives for selected apiary (or all if none selected)
+  const fillHives = (apiaryId) => {
+    while(hNew.options.length > 1) hNew.remove(1);
+    const hives = apiaryId
+      ? MOCK_HIVES.filter(h => String(h.apiaryId) === String(apiaryId))
+      : MOCK_HIVES;
+    hives.forEach(h => {
+      const o = document.createElement('option'); o.value = h.id; o.textContent = h.name; hNew.appendChild(o);
+    });
+  };
+  fillHives(currentScopeKey.startsWith('apiary:') ? currentScopeKey.slice(7) : null);
+
+  aNew.addEventListener('change', () => {
+    fillHives(aNew.value || null);
+    _silentSet('psbHive', '');
+    if(aNew.value) selectPlanScope('apiary:' + aNew.value);
   });
+  hNew.addEventListener('change', () => { if(hNew.value) selectPlanScope('hive:' + hNew.value); });
 
-  aNew.addEventListener('change', () => { if(aNew.value) selectPlanScope('apiary:' + aNew.value); });
-  hNew.addEventListener('change', () => { if(hNew.value) selectPlanScope('hive:'   + hNew.value); });
+  // Restore selections
+  if(currentScopeKey.startsWith('hive:')){
+    const h = MOCK_HIVES.find(x => String(x.id) === currentScopeKey.slice(5));
+    if(h){ _silentSet('psbApiary', h.apiaryId); fillHives(h.apiaryId); _silentSet('psbHive', h.id); }
+  } else if(currentScopeKey.startsWith('apiary:')){
+    _silentSet('psbApiary', currentScopeKey.slice(7));
+    fillHives(currentScopeKey.slice(7));
+  }
 
-  // Restore current selection silently
-  _silentSet('psbApiary', currentScopeKey.startsWith('apiary:') ? currentScopeKey.slice(7) : '');
-  _silentSet('psbHive',   currentScopeKey.startsWith('hive:')   ? currentScopeKey.slice(5) : '');
+  // Build plan dropdown for current scope
+  _rebuildPlanDropdown(currentScopeKey);
+}
+
+function _rebuildPlanDropdown(scopeKey){
+  const pSel   = document.getElementById('psbPlan');
+  const pNew   = document.getElementById('psbNewPlan');
+  const pRen   = document.getElementById('psbRenamePlan');
+  const pDel   = document.getElementById('psbDeletePlan');
+  if(!pSel) return;
+
+  const isHive = scopeKey && scopeKey.startsWith('hive:');
+  pSel.style.display  = isHive ? '' : 'none';
+  if(pRen) pRen.style.display = isHive ? '' : 'none';
+  if(pDel) pDel.style.display = isHive ? '' : 'none';
+
+  if(!isHive) return;
+
+  const list = getPlanList(scopeKey);
+  // Rebuild options
+  while(pSel.options.length) pSel.remove(0);
+  list.forEach(name => {
+    const o = document.createElement('option');
+    o.value = name; o.textContent = name;
+    pSel.appendChild(o);
+  });
+  _silentSet('psbPlan', currentPlanName);
+
+  // Swap listener
+  const pClone = pSel.cloneNode(true);
+  pSel.parentNode.replaceChild(pClone, pSel);
+  document.getElementById('psbPlan').addEventListener('change', e => {
+    if(e.target.value) switchPlan(e.target.value);
+  });
+}
+
+function switchPlan(planName){
+  savePlan(currentScopeKey, currentPlanName);
+  currentPlanName = planName;
+  loadPlan(currentScopeKey, planName);
+  updateAll();
+  _updatePlanSelName();
+}
+
+function promptNewPlan(){
+  if(!currentScopeKey.startsWith('hive:')){
+    alert('Please select a hive first before creating a plan.');
+    return;
+  }
+  const name = prompt('Name for new plan:', `Plan ${getPlanList(currentScopeKey).length + 1}`);
+  if(!name || !name.trim()) return;
+  const trimmed = name.trim();
+  savePlan(currentScopeKey, currentPlanName); // save current first
+  addNewPlan(currentScopeKey, trimmed);
+  currentPlanName = trimmed;
+  loadPlan(currentScopeKey, trimmed); // load fresh (empty)
+  _rebuildPlanDropdown(currentScopeKey);
+  updateAll();
+  _updatePlanSelName();
+}
+
+function promptRenamePlan(){
+  if(!currentScopeKey.startsWith('hive:')) return;
+  const name = prompt('Rename plan to:', currentPlanName);
+  if(!name || !name.trim() || name.trim() === currentPlanName) return;
+  const trimmed = name.trim();
+  renamePlan(currentScopeKey, currentPlanName, trimmed);
+  currentPlanName = trimmed;
+  _rebuildPlanDropdown(currentScopeKey);
+  _updatePlanSelName();
+}
+
+function promptDeletePlan(){
+  if(!currentScopeKey.startsWith('hive:')) return;
+  const list = getPlanList(currentScopeKey);
+  if(list.length <= 1){ alert('You need at least one plan per hive.'); return; }
+  if(!confirm(`Delete "${currentPlanName}"? This cannot be undone.`)) return;
+  const next = deletePlan(currentScopeKey, currentPlanName);
+  currentPlanName = next;
+  loadPlan(currentScopeKey, next);
+  _rebuildPlanDropdown(currentScopeKey);
+  updateAll();
+  _updatePlanSelName();
+}
+
+function _updatePlanSelName(){
+  const el = document.getElementById('planSelName');
+  if(!el) return;
+  if(currentScopeKey.startsWith('hive:')){
+    const h = MOCK_HIVES.find(x => String(x.id) === currentScopeKey.slice(5));
+    const a = h ? MOCK_APIARIES.find(x => String(x.id) === String(h.apiaryId)) : null;
+    el.textContent = h ? `${a ? a.name + ' › ' : ''}${h.name} › ${currentPlanName}` : currentPlanName;
+  } else if(currentScopeKey.startsWith('apiary:')){
+    const a = MOCK_APIARIES.find(x => String(x.id) === currentScopeKey.slice(7));
+    el.textContent = a ? a.name : '';
+  } else {
+    el.textContent = '';
+  }
 }
 
 // ── VM sync status badge ──────────────────────────────────────
@@ -1992,7 +2123,7 @@ function _showVMSyncStatus(state){
   const cfg = {
     'not-signed-in': { text:'🔗 Sign in to VarroaMate first to sync your hives', color:'rgba(255,255,255,0.55)', link:'/app/' },
     'loading':        { text:'⏳ Syncing with VarroaMate…',   color:'rgba(255,255,255,0.55)' },
-    'ok':             { text:`✅ Synced with VarroaMate · ${LIVE_APIARIES.length} apiaries · ${LIVE_HIVES.length} hives`, color:'rgba(255,255,255,0.80)' },
+    'ok':             { text:`✅ Synced · ${LIVE_APIARIES.length} apiaries · ${LIVE_HIVES.length} hives · select a hive above to plan`, color:'rgba(255,255,255,0.80)' },
     'error':          { text:'⚠ Could not load VarroaMate data', color:'#F5A623' },
   };
   const c = cfg[state] || cfg['error'];
@@ -2014,15 +2145,56 @@ const DEFAULT_WINDOWS = ()=>[
   {id:6, type:'flow', label:'Nectar Flow', startFrac:35, endFrac:38},
 ];
 
-let currentScopeKey  = 'all';
+let currentScopeKey  = '';
 let currentScopeName = 'All Apiaries';
 let _autoSaveTimer   = null;
 let _appReady        = false; // set true after DOMContentLoaded init completes
 
 // ── Storage helpers ─────────────────────────────
-function _planStorageKey(scopeKey){ return `vmsp_plan_${scopeKey}`; }
+// ── Plan name management ──────────────────────────────────────
+let currentPlanName = 'Plan 1'; // active plan name within current hive
 
-function savePlan(scopeKey){
+function _planStorageKey(scopeKey, planName){
+  const pn = (planName || currentPlanName).replace(/[^a-zA-Z0-9 _-]/g,'');
+  return `vmsp_plan2_${scopeKey}_${pn}`;
+}
+function _planListKey(scopeKey){ return `vmsp_planlist_${scopeKey}`; }
+
+function getPlanList(scopeKey){
+  try {
+    const raw = localStorage.getItem(_planListKey(scopeKey));
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return ['Plan 1'];
+}
+function _savePlanList(scopeKey, list){
+  try { localStorage.setItem(_planListKey(scopeKey), JSON.stringify(list)); } catch(e){}
+}
+function addNewPlan(scopeKey, name){
+  const list = getPlanList(scopeKey);
+  if(!list.includes(name)) list.push(name);
+  _savePlanList(scopeKey, list);
+}
+function renamePlan(scopeKey, oldName, newName){
+  const list = getPlanList(scopeKey);
+  const i = list.indexOf(oldName);
+  if(i >= 0) list[i] = newName;
+  _savePlanList(scopeKey, list);
+  // Move storage
+  const data = localStorage.getItem(_planStorageKey(scopeKey, oldName));
+  if(data) localStorage.setItem(_planStorageKey(scopeKey, newName), data);
+  localStorage.removeItem(_planStorageKey(scopeKey, oldName));
+}
+function deletePlan(scopeKey, name){
+  let list = getPlanList(scopeKey);
+  list = list.filter(n => n !== name);
+  if(!list.length) list = ['Plan 1'];
+  _savePlanList(scopeKey, list);
+  localStorage.removeItem(_planStorageKey(scopeKey, name));
+  return list[0];
+}
+
+function savePlan(scopeKey, planName){
   const data = {
     planEvents: planEvents,
     userWindowsData: userWindows,
@@ -2030,37 +2202,37 @@ function savePlan(scopeKey){
     winNextId: _winNextId,
     savedAt: Date.now(),
   };
-  try { localStorage.setItem(_planStorageKey(scopeKey), JSON.stringify(data)); } catch(e){}
+  try { localStorage.setItem(_planStorageKey(scopeKey, planName || currentPlanName), JSON.stringify(data)); } catch(e){}
 }
 
-function loadPlan(scopeKey){
+function loadPlan(scopeKey, planName){
   try {
-    const raw = localStorage.getItem(_planStorageKey(scopeKey));
+    const raw = localStorage.getItem(_planStorageKey(scopeKey, planName || currentPlanName));
     if(raw){
       const data = JSON.parse(raw);
       planEvents   = data.planEvents   || [];
       userWindows  = data.userWindowsData || DEFAULT_WINDOWS();
       nextId       = data.nextId       || (planEvents.length ? Math.max(...planEvents.map(e=>e.id))+1 : 1);
       _winNextId   = data.winNextId    || 7;
-      return true; // had a saved plan
+      return true;
     }
   } catch(e){}
-  // No saved plan — start fresh with defaults
   planEvents  = [];
   userWindows = DEFAULT_WINDOWS();
   nextId      = 1;
   _winNextId  = 7;
-  return false; // new plan
+  return false;
 }
 
-function hasSavedPlan(scopeKey){
-  return !!localStorage.getItem(_planStorageKey(scopeKey));
+function hasSavedPlan(scopeKey, planName){
+  return !!localStorage.getItem(_planStorageKey(scopeKey, planName || currentPlanName));
 }
 
 function autoSave(){
   if(!_appReady) return;
+  if(!currentScopeKey.startsWith('hive:')) return;
   clearTimeout(_autoSaveTimer);
-  _autoSaveTimer = setTimeout(()=>{ savePlan(currentScopeKey); }, 600);
+  _autoSaveTimer = setTimeout(()=>{ savePlan(currentScopeKey, currentPlanName); }, 600);
 }
 
 // ── Scope switching ─────────────────────────────
@@ -2071,8 +2243,8 @@ function selectPlanScope(key){
   if(key === 'apiary:' || key === 'hive:') return;
   _scopeSwitching = true; // placeholder option selected
 
-  // Save current plan before switching
-  savePlan(currentScopeKey);
+  // Save current plan before switching (only if a hive is selected)
+  if(currentScopeKey.startsWith('hive:')) savePlan(currentScopeKey, currentPlanName);
 
   currentScopeKey = key;
 
@@ -2091,13 +2263,22 @@ function selectPlanScope(key){
     currentScopeName = h ? `${h.name}` : key;
   }
 
-  const isNew = !loadPlan(key);
+  // When switching to a hive, reset to first plan in that hive's plan list
+  if(key.startsWith('hive:')){
+    const planList = getPlanList(key);
+    currentPlanName = planList[0] || 'Plan 1';
+  } else {
+    currentPlanName = 'Plan 1';
+  }
+  const isNew = !loadPlan(key, currentPlanName);
+  _rebuildPlanDropdown(key);
 
   // Sync selects to reflect active scope
   _syncSelectorUI(key, isNew);
 
   updateAll();
   renderRating();
+  _updatePlanSelName();
   _scopeSwitching = false;
 }
 
@@ -2110,48 +2291,31 @@ function _populateHiveSelect(apiaryId){
 }
 
 function _syncSelectorUI(key, isNew){
-  document.getElementById('psbAll').classList.toggle('active', key==='all');
-
-  if(key === 'all'){
-    _silentSet('psbApiary', '');
-    _silentSet('psbHive', '');
-  } else if(key.startsWith('apiary:')){
+  if(key.startsWith('apiary:')){
     _silentSet('psbApiary', key.slice(7));
     _silentSet('psbHive', '');
   } else if(key.startsWith('hive:')){
-    const h = MOCK_HIVES.find(x=>x.id===key.slice(5));
+    const h = MOCK_HIVES.find(x=>String(x.id)===key.slice(5));
     if(h){ _silentSet('psbApiary', h.apiaryId); _populateHiveSelect(h.apiaryId); _silentSet('psbHive', h.id); }
+  } else {
+    _silentSet('psbApiary', '');
+    _silentSet('psbHive', '');
   }
-
-  document.getElementById('planSelName').textContent = currentScopeName;
   const badge = document.getElementById('planSelBadge');
   if(badge){ badge.style.display = isNew ? 'inline' : 'none'; }
   _updateMobileIndicator();
+  _updatePlanSelName();
 }
 
 function _initPlanSelector(){
-  const aSelect = document.getElementById('psbApiary');
-  const hSelect = document.getElementById('psbHive');
-
-  // Populate dropdowns first — no listeners attached yet so no events fire
-  MOCK_APIARIES.forEach(a=>{
-    const o = document.createElement('option'); o.value=a.id; o.textContent=a.name; aSelect.appendChild(o);
-  });
-  MOCK_HIVES.forEach(h=>{
-    const apiary = MOCK_APIARIES.find(a=>a.id===h.apiaryId);
-    const o = document.createElement('option');
-    o.value = h.id;
-    o.textContent = `${h.name} (${apiary?.name||''})`;
-    hSelect.appendChild(o);
-  });
-
-  // Wire change listeners AFTER all options are added — safe from spurious events
-  aSelect.addEventListener('change', ()=>{ if(aSelect.value) selectPlanScope('apiary:'+aSelect.value); });
-  hSelect.addEventListener('change', ()=>{ if(hSelect.value) selectPlanScope('hive:'+hSelect.value); });
-
-  // Load default scope
-  const isNew = !loadPlan('all');
-  _syncSelectorUI('all', isNew);
+  // Dropdowns are now populated by _rebuildSelectorDropdowns after VM data loads
+  // Start with empty scope — user must select a hive
+  planEvents  = [];
+  userWindows = DEFAULT_WINDOWS();
+  currentScopeKey  = '';
+  currentPlanName  = 'Plan 1';
+  _updatePlanSelName();
+  updateAll();
 }
 
 // Set a select value without firing its onchange handler
@@ -2488,6 +2652,10 @@ function renderPalette(){
 // ══ PLAN LIST ══
 function renderPlanList(){
   const list = document.getElementById('planList');
+  if(!currentScopeKey.startsWith('hive:')){
+    list.innerHTML = '<div class="empty-plan" style="text-align:center;padding:24px 16px;">🐝 Select an apiary and hive above to start planning</div>';
+    return;
+  }
   if(!planEvents.length){
     list.innerHTML = '<div class="empty-plan">No treatments planned yet — drag from the palette onto the timeline</div>';
     return;
@@ -2569,7 +2737,7 @@ function scorePlan(){
   // ── Mite pressure context ──
   // Find the most recent mite count from HISTORY to inform pressure-aware scoring.
   // Thresholds mirror VarroaMate's ACTION_ZONE_BY_MONTH / LOSS_THRESHOLD_BY_MONTH.
-  const countHistory = HISTORY.filter(e=>e.type==='count' && e.count!=null)
+  const countHistory = _filteredHistory().filter(e=>e.type==='count' && e.count!=null)
     .sort((a,b)=>b.year*12+b.month - (a.year*12+a.month)); // most recent first
   const latestCount = countHistory[0] || null;
   const latestMites = latestCount?.count ?? 0;
@@ -2809,6 +2977,12 @@ function ratingWord(score){
 }
 
 function renderRating(){
+  if(!currentScopeKey.startsWith('hive:')){
+    // No hive selected — clear rating panel quietly
+    const el = document.getElementById('ratingBody');
+    if(el) el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--sage);font-size:13px;">Select a hive to see plan rating</div>';
+    return;
+  }
   // When AI proposals are active, score includes accepted proposals as a preview
   const acceptedProposals = _proposals.filter(p=>p.status==='accepted');
   const hasProposals = acceptedProposals.length > 0;
@@ -3194,7 +3368,7 @@ async function suggestPlan(){
     return `${id}: ${t.name} (MoA: ${t.moa}, duration: ${t.duration}d, seasons: ${t.season.join('/')}, supersOff: ${t.supersOff})`;
   }).join('\n');
 
-  const historyContext = HISTORY.filter(e=>e.type==='treatment').map(e=>{
+  const historyContext = _filteredHistory().filter(e=>e.type==='treatment').map(e=>{
     const t = TREATMENTS[e.treatId]||{};
     return `${t.name||e.label} in ${MONTHS[e.month]} ${e.year}`;
   }).join(', ') || 'No treatment history';
@@ -3531,7 +3705,7 @@ function durationInMonths(treatId){ return treatId ? (TREATMENTS[treatId]?.durat
 function getConflicts(){
   const conflicts = new Set();
   const all = [
-    ...HISTORY.filter(e=>e.type==='treatment'&&e.treatId),
+    ..._filteredHistory().filter(e=>e.type==='treatment'&&e.treatId),
     ...planEvents
   ].map(e=>({
     id: e.id||('h'+e.month+e.year),
@@ -3868,7 +4042,7 @@ function drawTimeline(){
   const conflicts=getConflicts();
   const dotR=windowSpan<=6?Math.min(rowH*0.22,8):windowSpan<=12?Math.min(rowH*0.20,7):Math.min(rowH*0.18,6);
   const treatEvents=[
-    ...HISTORY.filter(e=>e.type==='treatment').map(e=>({...e,isHistory:true,lifecycle:'history'})),
+    ..._filteredHistory().filter(e=>e.type==='treatment').map(e=>({...e,isHistory:true,lifecycle:'history'})),
     ...classifyPlanEvents().map(e=>({...e,
       isHistory: e.lifecycle === 'executed', // executed treatments render like history
       type:'treatment',
@@ -4171,7 +4345,7 @@ function drawTimeline(){
   });
 
   // ── 10. MITE COUNT CHART (row 5) — VM-synchronised ──
-  const countEvents=HISTORY.filter(e=>e.type==='count'&&e.count!=null)
+  const countEvents=_filteredHistory().filter(e=>e.type==='count'&&e.count!=null)
     .sort((a,b)=>monthFrac(a.year,a.month)-monthFrac(b.year,b.month));
   const cRy=rowTops[2];
   const countH=rowHeights[2];
@@ -4378,7 +4552,7 @@ function isInPast(year,month){
 // An overdue treatment draws in amber/dashed and penalises the survival score.
 
 function classifyPlanEvents(){
-  const historyTreatments = HISTORY.filter(e => e.type === 'treatment' && e.treatId);
+  const historyTreatments = _filteredHistory().filter(e => e.type === 'treatment' && e.treatId);
   const now = new Date();
   const todayM = now.getFullYear() * 12 + now.getMonth();
 
@@ -4963,7 +5137,7 @@ function _initDpScope(){
 
 function dpSetScope(key){
   _dpScope = key;
-  if(key==='all')            _dpScopeName='All Apiaries';
+  if(!key || key==='all')    _dpScopeName='All Apiaries';
   else if(key.startsWith('apiary:')){ const a=MOCK_APIARIES.find(x=>x.id===key.slice(7)); _dpScopeName=a?.name||key; }
   else if(key.startsWith('hive:'))  { const h=MOCK_HIVES.find(x=>x.id===key.slice(5));    _dpScopeName=h?.name||key; }
   // Re-render active planner so print header updates
