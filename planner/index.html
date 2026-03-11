@@ -1998,9 +1998,10 @@ function _rebuildSelectorDropdowns(){
 
   // Attach listeners once — safe because we're not cloning
   aSelect.onchange = () => {
+    // Just filter the hive dropdown — don't switch scope yet
+    // Scope only changes when user picks an actual hive
     _fillHiveOptions(aSelect.value || null);
     _silentSet('psbHive', '');
-    if(aSelect.value) selectPlanScope('apiary:' + aSelect.value);
   };
   hSelect.onchange = () => { if(hSelect.value) selectPlanScope('hive:' + hSelect.value); };
 
@@ -2250,19 +2251,6 @@ function selectPlanScope(key){
   // Derive display name
   if(key === 'all'){
     currentScopeName = 'All Apiaries';
-  } else if(key.startsWith('apiary:')){
-    const id = key.slice(7);
-    const a  = MOCK_APIARIES.find(x=>x.id===id);
-    currentScopeName = a ? `${a.name}` : key;
-    // Release lock BEFORE repopulating hive dropdown so its onchange can fire
-    _scopeSwitching = false;
-    _fillHiveOptions(id);
-    _silentSet('psbHive', '');
-    _rebuildPlanDropdown(key);
-    _syncSelectorUI(key, false);
-    updateAll();
-    _updatePlanSelName();
-    return; // early return — wait for user to pick a hive
   } else if(key.startsWith('hive:')){
     const id = key.slice(5);
     const h  = MOCK_HIVES.find(x=>x.id===id);
@@ -2298,7 +2286,7 @@ function _syncSelectorUI(key, isNew){
     _silentSet('psbHive', '');
   } else if(key.startsWith('hive:')){
     const h = MOCK_HIVES.find(x=>String(x.id)===key.slice(5));
-    if(h){ _silentSet('psbApiary', h.apiaryId); _populateHiveSelect(h.apiaryId); _silentSet('psbHive', h.id); }
+    if(h){ _silentSet('psbApiary', h.apiaryId); _silentSet('psbHive', h.id); }
   } else {
     _silentSet('psbApiary', '');
     _silentSet('psbHive', '');
