@@ -84,7 +84,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
     body>*{display:none!important;}
     #screen-dayplanner{display:block!important;}
     #dayPlannersSection{display:block!important;}
-    .dp-toolbar,.dp-tab,.dp-two-col>div:last-child,.tl-card,.pref-banner,.two-col,.plan-sel-bar{display:none!important;}
+    .dp-toolbar,.dp-tab,.tl-card,.pref-banner,.two-col,.plan-sel-bar{display:none!important;}
+    .no-print{display:none!important;}
+    .no-print ~ *{display:none!important;}
+    .dp-two-col{display:block!important;}
     .dp-page{display:none!important;}
     .dp-page.print-active{display:block!important;}
     .dp-print-header{display:block!important;}
@@ -949,7 +952,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 
           <!-- Date picker + action cards -->
           <div>
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
+            <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
               <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">🗓 Set frame placement date</div>
               <input type="date" id="drone-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text1);background:var(--cream);margin-bottom:10px;" oninput="renderDronePlanner();_dpUpdatePrintHeaders()">
               <div style="font-size:11px;color:var(--text3);font-style:italic;">The day you place the drone-sized foundation frame into the hive</div>
@@ -1025,8 +1028,8 @@ canvas.drop-blocked{cursor:not-allowed;}
           </div>
 
           <!-- Further learning -->
-          <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;">
-            <div style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
+          <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;">
+            <div class="no-print" style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
             <div style="display:flex;flex-direction:column;gap:6px;">
               <a href="https://www.varroa.org.au/resources" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
                 <span style="font-size:15px;">🇦🇺</span>
@@ -1100,7 +1103,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           </div>
 
           <div>
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
+            <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
               <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">🗓 Set queen caging date (Day 1)</div>
               <input type="date" id="bb-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text1);background:var(--cream);margin-bottom:10px;" oninput="renderBBPlanner();_dpUpdatePrintHeaders()">
               <div style="font-size:11px;color:var(--text3);font-style:italic;">The day you place the queen in her cage</div>
@@ -1108,8 +1111,8 @@ canvas.drop-blocked{cursor:not-allowed;}
             <div id="bb-actions" style="display:flex;flex-direction:column;gap:10px;"></div>
 
             <!-- Video resources -->
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;margin-top:14px;">
-              <div style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
+            <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;margin-top:14px;">
+              <div class="no-print" style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 <a href="https://www.varroa.org.au/ipm" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
                   <span style="font-size:15px;">🇦🇺</span>
@@ -1174,7 +1177,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           </div>
 
           <div>
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
+            <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
               <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">🗓 Set Day 0 — Box placement date</div>
               <input type="date" id="dx-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text1);background:var(--cream);margin-bottom:10px;" oninput="renderDxPlanner();_dpUpdatePrintHeaders()">
               <div style="font-size:11px;color:var(--text3);font-style:italic;">Day you place the queen inside the Duplex-Framebox</div>
@@ -1199,7 +1202,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                   <div style="font-size:10px;color:var(--text3);">Supers on top of framebox — bees continue foraging and curing honey throughout</div>
                 </div>
               </div>
-              <div style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
+              <div class="no-print" style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 <a href="https://www.varroa.org.au/ipm" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
                   <span style="font-size:15px;">🇦🇺</span>
@@ -1446,7 +1449,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 
           <!-- Right: date + action cards + resources -->
           <div>
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
+            <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;">
               <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">🗓 Set split date (Day 0)</div>
               <input type="date" id="split-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text1);background:var(--cream);margin-bottom:10px;" oninput="renderSplitPlanner();_dpUpdatePrintHeaders()">
               <div style="font-size:11px;color:var(--text3);font-style:italic;">The day you make the split</div>
@@ -1454,8 +1457,8 @@ canvas.drop-blocked{cursor:not-allowed;}
             <div id="split-actions" style="display:flex;flex-direction:column;gap:10px;"></div>
 
             <!-- Resources -->
-            <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;margin-top:14px;">
-              <div style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
+            <div class="no-print" style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;margin-top:14px;">
+              <div class="no-print" style="font-size:12px;font-weight:700;color:var(--forest);margin-bottom:8px;">🎬 Further learning</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 <a href="https://www.varroa.org.au/ipm" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
                   <span style="font-size:15px;">🇦🇺</span>
@@ -1512,7 +1515,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           </div>
           <!-- Right: date planner -->
           <div>
-            <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;">
+            <div class="no-print" style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;">
               <div style="font-weight:600;color:var(--forest);margin-bottom:10px;font-size:14px;">📅 Treatment Schedule</div>
               <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">First treatment date</div>
               <input type="date" id="heat-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text1);background:var(--cream);margin-bottom:10px;" oninput="renderHeatPlanner()">
