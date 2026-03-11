@@ -2525,6 +2525,14 @@ function _savePhilosophyToVM(pref){
 
 // ══ INIT ══
 document.addEventListener('DOMContentLoaded', () => {
+  // ── Beta gate: redirect to gate page if not acknowledged ──
+  try {
+    if(sessionStorage.getItem('vmsp_beta_ack') !== '1'){
+      window.location.replace('/planner-beta/');
+      return;
+    }
+  } catch(e) {}
+
   // Init plan selector — loads saved plan for 'all' scope (or defaults)
   _initPlanSelector();
 
