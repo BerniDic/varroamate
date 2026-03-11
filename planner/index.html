@@ -3625,7 +3625,6 @@ const LOSS_THRESHOLD_BY_MONTH = {
   5:5,  6:5,  7:5,     // Winter
 };
 // Max Y for mite chart — must fit summer loss threshold of 15
-const MITE_CHART_MAX = 16;
 
 // ── OPPORTUNITY WINDOWS (row 1) — fixed seasonal guidance
 const REGIONAL_CALENDAR = [
@@ -4333,6 +4332,13 @@ function drawTimeline(){
     .sort((a,b)=>monthFrac(a.year,a.month)-monthFrac(b.year,b.month));
   const cRy=rowTops[2];
   const countH=rowHeights[2];
+  // Dynamic y-axis: scale to the highest of (max data point, max loss threshold, 16)
+  // Round up to a clean number so the chart doesn't feel cramped
+  const _maxData = countEvents.length ? Math.max(...countEvents.map(e=>e.count)) : 0;
+  const _maxThresh = Math.max(...Object.values(LOSS_THRESHOLD_BY_MONTH));
+  const _rawMax = Math.max(_maxData, _maxThresh, 16);
+  // Round up to nearest 5 above the max, with a 20% headroom buffer
+  const MITE_CHART_MAX = Math.ceil((_rawMax * 1.2) / 5) * 5;
   const countToY=(n)=>cRy+countH-(n/MITE_CHART_MAX)*countH*0.88-countH*0.04;
 
   ctx.save();ctx.beginPath();ctx.rect(PAD_L,cRy,TW,countH);ctx.clip();
