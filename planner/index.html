@@ -79,6 +79,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
   .dp-btn.print{border-color:rgba(28,56,41,0.3);}
   .dp-btn.cal{border-color:rgba(212,130,10,0.4);color:var(--amber);}
   .dp-btn.cal:hover{background:rgba(212,130,10,0.06);}
+  .dp-btn.preview{border-color:rgba(212,130,10,0.5);color:var(--amber);}
+  .dp-btn.preview:hover{background:rgba(212,130,10,0.06);}
+  .dp-btn.preview.playing{opacity:0.6;cursor:not-allowed;pointer-events:none;}
   /* ── Print styles ── */
   @media print{
     body>*{display:none!important;}
@@ -882,6 +885,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         <div class="dp-toolbar-spacer"></div>
         <button class="dp-btn print" onclick="dpPrint()">🖨 Print plan</button>
         <button class="dp-btn cal"   onclick="dpExportCal()">📅 Add to calendar</button>
+        <button class="dp-btn preview" id="dpPreviewBtn" onclick="dpPreview()" title="Animate the progress shading to see how the timeline looks as days pass">▶ Preview progress</button>
       </div>
 
       <!-- Sub-nav tabs -->
@@ -5171,6 +5175,86 @@ function _dpUpdatePrintHeaders(){
 }
 
 // ── Print ────────────────────────────────────────────
+// ── Day Planner Progress Preview ─────────────────────
+let _dpPreviewRaf = null;
+
+function dpPreview(){
+  const btn = document.getElementById('dpPreviewBtn');
+  if(!btn || btn.classList.contains('playing')) return;
+
+  // Figure out which tab is active and its renderer + num days
+  const tabMap = {
+    'drone':       { render: renderDronePlanner,  dateId: 'drone-date',  days: 42 },
+    'brood-break': { render: renderBBPlanner,     dateId: 'bb-date',     days: 34 },
+    'duplex':      { render: renderDxPlanner,     dateId: 'dx-date',     days: 42 },
+    'split':       { render: renderSplitPlanner,  dateId: 'split-date',  days: 42 },
+    'heat':        { render: renderHeatPlanner,   dateId: 'heat-date',   days: 14 },
+  };
+  const activeTab = document.querySelector('.dp-tab.active')?.id?.replace('dptab-','') || 'drone';
+  const cfg = tabMap[activeTab];
+  if(!cfg) return;
+
+  // If no date set yet, set today so preview has something to work with
+  const dateEl = document.getElementById(cfg.dateId);
+  const hadDate = dateEl?.value;
+  if(dateEl && !dateEl.value){
+    const t = new Date(); dateEl.value = t.toISOString().slice(0,10);
+    cfg.render?.();
+  }
+
+  btn.classList.add('playing');
+  btn.textContent = '⏹ Stop';
+
+  const TOTAL_DAYS = cfg.days;
+  const DURATION_MS = 2400; // full sweep in ms
+  const startTime = performance.now();
+
+  // Patch drawDpGrid to inject previewDay
+  const _origDraw = drawDpGrid;
+  window._dpPreviewDay = 0;
+
+  function _patchedDraw(canvasId, rows, milestones, labelEl, startDate, opts){
+    _origDraw(canvasId, rows, milestones, labelEl, startDate,
+      {...(opts||{}), previewDay: window._dpPreviewDay});
+  }
+
+  // Temporarily replace drawDpGrid
+  window.drawDpGrid = _patchedDraw;
+
+  function step(now){
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / DURATION_MS, 1);
+    // Ease in-out for smooth feel
+    const eased = progress < 0.5 ? 2*progress*progress : -1+(4-2*progress)*progress;
+    window._dpPreviewDay = Math.round(eased * TOTAL_DAYS);
+
+    cfg.render?.();
+
+    if(progress < 1 && btn.classList.contains('playing')){
+      _dpPreviewRaf = requestAnimationFrame(step);
+    } else {
+      _stopPreview(btn, cfg, _origDraw, hadDate, dateEl);
+    }
+  }
+
+  _dpPreviewRaf = requestAnimationFrame(step);
+
+  // Allow manual stop
+  btn.onclick = () => _stopPreview(btn, cfg, _origDraw, hadDate, dateEl);
+}
+
+function _stopPreview(btn, cfg, origDraw, hadDate, dateEl){
+  if(_dpPreviewRaf){ cancelAnimationFrame(_dpPreviewRaf); _dpPreviewRaf = null; }
+  window.drawDpGrid = origDraw;
+  window._dpPreviewDay = undefined;
+  btn.classList.remove('playing');
+  btn.textContent = '▶ Preview progress';
+  btn.onclick = dpPreview;
+  // Restore no-date state if we set one
+  if(!hadDate && dateEl) dateEl.value = '';
+  cfg.render?.();
+}
+
 function dpPrint(){
   _dpUpdatePrintHeaders();
   const key = _dpActivePlannerKey();
@@ -5603,9 +5687,11 @@ function drawDpGrid(canvasId, rows, milestones, labelEl, startDate, opts){
   const NUM_DAYS     = rows[0].cells.length;
 
   // Today relative to startDate — used for shading past rows
+  // opts.previewDay overrides real today for animation preview
   const todayMs   = new Date().setHours(0,0,0,0);
   const startMs   = startDate ? new Date(startDate).setHours(0,0,0,0) : null;
-  const todayDay  = startMs !== null ? Math.floor((todayMs - startMs) / 86400000) : -1; // day index of today
+  const realTodayDay = startMs !== null ? Math.floor((todayMs - startMs) / 86400000) : -1;
+  const todayDay  = (opts?.previewDay !== undefined) ? opts.previewDay : realTodayDay;
 
   const containerW = (canvas.parentElement?.clientWidth || 500);
   const DW   = 36;
