@@ -691,9 +691,35 @@ html, body {
 }
 #popup-overlay.show { display: block; }
 
+/* ── Launch announcement banner ── */
+.launch-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: linear-gradient(90deg, #1C3D2E 0%, #2A5A40 50%, #1C3D2E 100%);
+  color: white; text-align: center;
+  padding: 9px 48px 9px 16px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.5;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.launch-banner strong { color: #F5C842; }
+.launch-banner .sep { opacity: 0.4; margin: 0 8px; }
+.launch-banner .banner-close {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: rgba(255,255,255,0.6);
+  font-size: 18px; cursor: pointer; padding: 4px 6px; line-height: 1;
+}
+.launch-banner .banner-close:hover { color: white; }
+#scene { padding-top: 0; transition: padding-top 0.2s; }
 </style>
 </head>
 <body>
+<div class="launch-banner" id="launchBanner">
+  🔵 <strong>Smart Planner beta is live!</strong> Try it now — tap the blue hive.
+  <span class="sep">|</span>
+  🚀 Official launch with all plans: <strong>1 April 2026</strong>
+  <span class="sep">|</span>
+  ⚠️ App offline <strong>31 March</strong> for updates.
+  <button class="banner-close" onclick="dismissBanner()" aria-label="Close">×</button>
+</div>
 <div id="scene">
   <!-- Sky -->
   <div id="sky" aria-hidden="true"></div>
@@ -1246,7 +1272,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">Smart Planner</div>
         <div class="hive-label-sub">seasonal treatment planning</div>
-        <div class="status-badge soon"><span class="dot"></span>coming very soon</div>
+        <div class="status-badge beta"><span class="dot"></span>beta — try it now</div>
       </div>
     </div>
 
@@ -1381,16 +1407,25 @@ html, body {
 
 <script>
 // ── APP URLS ─────────────────────────────────────
+// ── Launch banner dismiss ────────────────────────
+function dismissBanner(){
+  const b = document.getElementById('launchBanner');
+  if(b){ b.style.display='none'; document.getElementById('scene').style.paddingTop='0'; }
+  try{ sessionStorage.setItem('banner_dismissed','1'); } catch(e){}
+}
+// Auto-dismiss if already closed this session
+(function(){ try{ if(sessionStorage.getItem('banner_dismissed')==='1') dismissBanner(); }catch(e){} })();
+
 const APP_URLS = {
   vm:     '/app/',
-  vmsp:   null,
+  vmsp:   '/planner/',
   prod:   null,
   health: null,
 };
 
 const APP_TOASTS = {
   vm:     '🟢 VarroaMate — full release imminent, stay tuned!',
-  vmsp:   '🔵 Smart Planner — coming very soon for beta testing, stay tuned!',
+  vmsp:   '🔵 Smart Planner — now in beta! Give it a try 🐝',
   prod:   '🐝 Productivity — this hive is still being built!',
   health: '🐝 Bee Health — this hive is still being built!',
 };
@@ -1861,7 +1896,7 @@ function showToast(msg){
 // ── MOBILE HIVE POPUP ────────────────────────────
 const APP_INFO = {
   vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: 'full release imminent', url: '/app/' },
-  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'soon',    badgeText: 'coming very soon',     url: null },
+  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'beta',    badgeText: 'beta — try it now',    url: '/planner/' },
   prod:   { title: 'Productivity',        sub: 'hive records & tasks',        badge: 'soon',    badgeText: 'coming soon',          url: null },
   health: { title: 'Bee Health',          sub: 'colony diagnostics',          badge: 'soon',    badgeText: 'coming soon',          url: null },
 };
