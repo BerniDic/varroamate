@@ -3123,9 +3123,9 @@ Please give a concise, warm, practical analysis of their plan. Structure your re
 Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:600,
@@ -3389,9 +3389,9 @@ Please suggest a minimal but effective treatment plan for the next 12 months (fr
 
 async function _callSuggestAPI(systemPrompt, btn){
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:900,
@@ -3503,9 +3503,9 @@ Respond with JSON in this exact shape, no markdown:
   card.after(loader);
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:400,
