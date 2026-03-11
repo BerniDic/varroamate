@@ -1958,7 +1958,8 @@ function _filteredHistory(){
     const hid = currentScopeKey.slice(5);
     return HISTORY.filter(e => String(e.hiveId) === String(hid));
   }
-  return HISTORY;
+  // No hive selected — show nothing (apiary or empty scope)
+  return [];
 }
 
 function _fmtHistDate(d){
@@ -2253,8 +2254,15 @@ function selectPlanScope(key){
     const id = key.slice(7);
     const a  = MOCK_APIARIES.find(x=>x.id===id);
     currentScopeName = a ? `${a.name}` : key;
-    // Reset hive dropdown — filter to this apiary's hives
-    _populateHiveSelect(id);
+    // Release lock BEFORE repopulating hive dropdown so its onchange can fire
+    _scopeSwitching = false;
+    _fillHiveOptions(id);
+    _silentSet('psbHive', '');
+    _rebuildPlanDropdown(key);
+    _syncSelectorUI(key, false);
+    updateAll();
+    _updatePlanSelName();
+    return; // early return — wait for user to pick a hive
   } else if(key.startsWith('hive:')){
     const id = key.slice(5);
     const h  = MOCK_HIVES.find(x=>x.id===id);
