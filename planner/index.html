@@ -3109,6 +3109,14 @@ async function getAIAdvice(){
     ? `IMPORTANT: ${result.conflictCount} chemical treatment(s) have overlapping duration bars with the same MoA — this is a resistance risk. Penalty severity depends on MoA: synthetics (pyrethroids, amitraz) carry the highest resistance risk and largest penalty; essential oils (thymol) are medium; organic acids (OA, formic) are lowest risk and carry a smaller penalty.`
     : 'No chemical MoA duration conflicts detected. Note: physical treatments (heat, Duplex-Framebox) carry no resistance risk and are excluded from MoA rotation scoring. Organic acid repetition (OA/formic) carries lower resistance risk than synthetic acaricide repetition.';
 
+  // Build mite pressure context from filtered history
+  const _adviceCounts = _filteredHistory().filter(e=>e.type==='count'&&e.count!=null)
+    .sort((a,b)=>(b.year*12+b.month)-(a.year*12+a.month));
+  const _latestCount = _adviceCounts[0];
+  const mitePressureContext = _latestCount
+    ? `Latest mite count: ${_latestCount.count} mites/300 bees (${MONTHS[_latestCount.month]} ${_latestCount.year}). Mite pressure is ${_latestCount.count>=15?'CRITICAL':_latestCount.count>=8?'HIGH':_latestCount.count>=3?'ELEVATED (action threshold)':'LOW — below action threshold'}. Only recommend additional treatments if the current mite pressure level warrants it.`
+    : 'No mite count data available for this hive — advise the beekeeper to do an alcohol wash before planning any treatments.';
+
   const prompt = `You are VMSP (VarroaMate Smart Planner), an expert advisor for Australian beekeepers planning their Varroa management season.
 
 The beekeeper's treatment philosophy is: "${currentPref.name}" — ${currentPref.desc}
@@ -3119,11 +3127,13 @@ Plan rating scores: ${scores}
 
 ${conflictNote}
 
+Current mite pressure: ${mitePressureContext}
+
 Please give a concise, warm, practical analysis of their plan. Structure your response with these sections using markdown headers:
 1. **Overall Assessment** — 2 sentences on the plan quality
 2. **What's Working Well** — 2-3 specific positives
-3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. Also check whether the plan is missing key opportunity windows: (a) the winter broodless OA window (Jun–Jul) — ideal for OAV/dribble/Aluen CAP when mites are fully phoretic; (b) the autumn treatment window (Feb–Apr) — only flag this if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment. If counts are elevated and no autumn treatment is planned, flag this as an important gap; (c) the spring treatment window (Aug–Oct) — pre-flow knockdown before build-up. If any of these windows have no treatment nearby, call it out explicitly.
-4. **Key Recommendation** — one clear, prioritised action to improve the plan
+3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. IMPORTANT: only recommend additional treatments if mite pressure warrants it — do not recommend prophylactic treatments. When flagging missing windows: (a) the winter broodless OA window (Jun–Jul) — only mention this if mite pressure is elevated (≥3 mites/300 bees) AND the beekeeper has no treatment in the preceding autumn window. If you do mention it, frame it as conditional: "consider OA in June/July only if mite pressure has not dropped below threshold by end of May — check with an alcohol wash first"; (b) the autumn treatment window (Feb–Apr) — only flag if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment; (c) the spring treatment window (Aug–Oct) — only flag if the plan has no spring coverage and mite pressure is above threshold.
+4. **Key Recommendation** — one clear, prioritised action. If mite pressure is currently low, the recommendation should focus on monitoring cadence, not adding treatments
 
 Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
 
