@@ -2236,44 +2236,39 @@ function autoSave(){
 }
 
 // ── Scope switching ─────────────────────────────
-let _scopeSwitching = false;
 function selectPlanScope(key){
-  if(_scopeSwitching) return;
-  if(key === currentScopeKey) return;
-  if(key === 'apiary:' || key === 'hive:') return;
-  _scopeSwitching = true; // placeholder option selected
+  if(!key || key === 'hive:') return; // ignore blank/partial keys
 
-  // Save current plan before switching (only if a hive is selected)
-  if(currentScopeKey.startsWith('hive:')) savePlan(currentScopeKey, currentPlanName);
+  // Save current plan before switching
+  if(currentScopeKey && currentScopeKey.startsWith('hive:')) {
+    savePlan(currentScopeKey, currentPlanName);
+  }
 
   currentScopeKey = key;
 
-  // Derive display name
-  if(key === 'all'){
-    currentScopeName = 'All Apiaries';
-  } else if(key.startsWith('hive:')){
+  // Sync dropdown visuals
+  if(key.startsWith('hive:')){
     const id = key.slice(5);
-    const h  = MOCK_HIVES.find(x=>x.id===id);
-    currentScopeName = h ? `${h.name}` : key;
+    const h  = MOCK_HIVES.find(x => String(x.id) === String(id));
+    currentScopeName = h ? h.name : key;
+    // Make sure apiary dropdown reflects this hive's apiary
+    if(h) _silentSet('psbApiary', h.apiaryId);
+    _silentSet('psbHive', id);
+  } else {
+    currentScopeName = '';
   }
 
-  // When switching to a hive, reset to first plan in that hive's plan list
+  // Load plan list and first plan for this hive
   if(key.startsWith('hive:')){
     const planList = getPlanList(key);
     currentPlanName = planList[0] || 'Plan 1';
   } else {
     currentPlanName = 'Plan 1';
   }
-  const isNew = !loadPlan(key, currentPlanName);
+  loadPlan(key, currentPlanName);
   _rebuildPlanDropdown(key);
-
-  // Sync selects to reflect active scope
-  _syncSelectorUI(key, isNew);
-
-  updateAll();
-  renderRating();
   _updatePlanSelName();
-  _scopeSwitching = false;
+  updateAll();
 }
 
 function _populateHiveSelect(apiaryId){
