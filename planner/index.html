@@ -1595,6 +1595,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           <option value="all">🌐 All Apiaries</option>
         </select>
         <div class="dp-toolbar-spacer"></div>
+        <button class="dp-btn preview" id="dpPreviewBtn2" onclick="dpPreview()" title="Animate the progress shading to see how the timeline looks as days pass">▶ Preview progress</button>
         <button class="dp-btn print" onclick="dpPrint()">🖨 Print plan</button>
         <button class="dp-btn cal"   onclick="dpExportCal()">📅 Add to calendar</button>
       </div>
@@ -5179,7 +5180,10 @@ function _dpUpdatePrintHeaders(){
 let _dpPreviewRaf = null;
 
 function dpPreview(){
-  const btn = document.getElementById('dpPreviewBtn');
+  // Support both toolbars — use whichever is visible
+  const btn = document.getElementById('dpPreviewBtn2')?.offsetParent
+    ? document.getElementById('dpPreviewBtn2')
+    : document.getElementById('dpPreviewBtn');
   if(!btn || btn.classList.contains('playing')) return;
 
   // Figure out which tab is active and its renderer + num days
@@ -5190,7 +5194,9 @@ function dpPreview(){
     'split':       { render: renderSplitPlanner,  dateId: 'split-date',  days: 42 },
     'heat':        { render: renderHeatPlanner,   dateId: 'heat-date',   days: 14 },
   };
-  const activeTab = document.querySelector('.dp-tab.active')?.id?.replace('dptab-','') || 'drone';
+  // In detail view _activeDayPlan is set; fall back to dp-tab for the tabbed view
+  const activeTab = (typeof _activeDayPlan !== 'undefined' && _activeDayPlan) ||
+    document.querySelector('.dp-tab.active')?.id?.replace('dptab-','') || 'drone';
   const cfg = tabMap[activeTab];
   if(!cfg) return;
 
@@ -5247,9 +5253,12 @@ function _stopPreview(btn, cfg, origDraw, hadDate, dateEl){
   if(_dpPreviewRaf){ cancelAnimationFrame(_dpPreviewRaf); _dpPreviewRaf = null; }
   window.drawDpGrid = origDraw;
   window._dpPreviewDay = undefined;
-  btn.classList.remove('playing');
-  btn.textContent = '▶ Preview progress';
-  btn.onclick = dpPreview;
+  [btn, document.getElementById('dpPreviewBtn'), document.getElementById('dpPreviewBtn2')].forEach(b=>{
+    if(!b) return;
+    b.classList.remove('playing');
+    b.textContent = '▶ Preview progress';
+    b.onclick = dpPreview;
+  });
   // Restore no-date state if we set one
   if(!hadDate && dateEl) dateEl.value = '';
   cfg.render?.();
