@@ -1886,18 +1886,19 @@ function renderSmartAlerts(){
     }
   }
 
-  // ── 2. Pre-winter gap alert — no autumn treatment planned ─────────────
-  // Warn from Jan through Apr (nowM 0–3) — still time to act before winter
+  // ── 2. Pre-winter gap alert — only if mite pressure warrants it ──────
+  // Only warn if latest count is at or above action threshold (≥3 mites)
+  // Zero or very low counts don't need a prophylactic autumn treatment
   const hasAutumnPlan = planEvents.some(e => {
     const eM = e.year*12 + e.month;
     const nM = nowY*12 + nowM;
     return getSeason(e.month) === 'autumn' && eM >= nM - 1 && eM <= nM + 12;
   });
-  if(nowM >= 0 && nowM <= 4 && !hasAutumnPlan){
+  if(nowM >= 0 && nowM <= 4 && !hasAutumnPlan && latest && latest.count >= 3){
     alerts.push({
       icon:'🍂',
       title:'No autumn treatment in your plan',
-      body:'Going into winter with high mite load is one of the leading causes of colony loss — winter bees live longer but are far more vulnerable to virus damage from mites. Add an autumn treatment (Feb–Apr) to knock mites down before the colony clusters and treatment becomes difficult or ineffective.'
+      body:`Your last mite count was ${latest.count} mites/300 bees — going into winter without an autumn treatment risks carrying that load through the untreatable winter period. Winter bees are long-lived and highly susceptible to virus damage. Consider adding an autumn treatment (Feb–Apr) to knock mites down before the colony clusters.`
     });
   }
 
@@ -2793,10 +2794,10 @@ function scorePlan(){
   if((pressure==='high' || pressure==='critical') && seasonsUsed.size <= 1){
     coverageScore = cap(coverageScore - pressurePenalty[pressure] * 0.6);
   }
-  // Pre-winter gap penalty — no autumn treatment (Feb–Apr) is a significant risk
-  // since winter is largely untreatable and mites carry over to damage winter bees
+  // Pre-winter gap penalty — only penalise if mite pressure is elevated
+  // (low/zero mite counts don't require prophylactic autumn treatment)
   const hasAutumnTreatment = planEvents.some(e => getSeason(e.month) === 'autumn');
-  if(!hasAutumnTreatment){
+  if(!hasAutumnTreatment && (pressure === 'medium' || pressure === 'high' || pressure === 'critical')){
     coverageScore = cap(coverageScore - 20);
   }
   scores.coverage = coverageScore;
@@ -3121,7 +3122,7 @@ ${conflictNote}
 Please give a concise, warm, practical analysis of their plan. Structure your response with these sections using markdown headers:
 1. **Overall Assessment** — 2 sentences on the plan quality
 2. **What's Working Well** — 2-3 specific positives
-3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. Also check whether the plan is missing key opportunity windows: (a) the winter broodless OA window (Jun–Jul) — ideal for OAV/dribble/Aluen CAP when mites are fully phoretic; (b) the autumn treatment window (Feb–Apr) — CRITICAL pre-winter window. Mite populations peak post-harvest and colonies enter winter with whatever mite load they carry now. Winter bees are long-lived and highly susceptible to virus damage — high mite loads going into winter are a leading cause of colony loss. If no autumn treatment is present, flag this as the single most important gap to fix; (c) the spring treatment window (Aug–Oct) — pre-flow knockdown before build-up. If any of these windows have no treatment nearby, call it out explicitly.
+3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. Also check whether the plan is missing key opportunity windows: (a) the winter broodless OA window (Jun–Jul) — ideal for OAV/dribble/Aluen CAP when mites are fully phoretic; (b) the autumn treatment window (Feb–Apr) — only flag this if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment. If counts are elevated and no autumn treatment is planned, flag this as an important gap; (c) the spring treatment window (Aug–Oct) — pre-flow knockdown before build-up. If any of these windows have no treatment nearby, call it out explicitly.
 4. **Key Recommendation** — one clear, prioritised action to improve the plan
 
 Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
@@ -3384,7 +3385,7 @@ Respond ONLY with valid JSON in this exact shape, no markdown fences:
 month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${todayLabel}.`;
 
   const userMsg = `Today is ${todayLabel}. The beekeeper's recent treatment history: ${historyContext}.
-Please suggest a minimal but effective treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Aim for 3–4 treatments total — quality over quantity. If drone comb removal or brood break are available, include them as they reduce the need for chemical treatments. Cap chemical treatments at 2 unless there is a compelling resistance-rotation reason for a third. Cover the key risk windows — especially the autumn pre-winter treatment (Feb–Apr) which is CRITICAL: colonies carry their mite load through winter when treatment is largely impossible, and winter bees are long-lived and highly susceptible to virus damage from mites. Also cover the spring build-up window. Do not over-treat. Do not suggest anything before ${todayLabel}.`;
+Please suggest a minimal but effective treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Aim for 3–4 treatments total — quality over quantity. If drone comb removal or brood break are available, include them as they reduce the need for chemical treatments. Cap chemical treatments at 2 unless there is a compelling resistance-rotation reason for a third. Cover the key risk windows — if mite pressure is elevated (≥3 mites/300 bees), include an autumn treatment (Feb–Apr) to reduce mite load before the untreatable winter period. Do not recommend autumn treatment prophylactically if mite counts are at or near zero. Also cover the spring build-up window. Do not over-treat. Do not suggest anything before ${todayLabel}.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
 
