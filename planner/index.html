@@ -208,14 +208,14 @@ canvas#tlCanvas{display:block;width:100%;cursor:default;}
 #chipInfoPopup .cip-reg{font-size:11px;opacity:0.8;border-top:1px solid rgba(255,255,255,0.15);padding-top:8px;margin-top:4px;}
 #chipInfoPopup .cip-close{position:absolute;top:8px;right:10px;cursor:pointer;font-size:16px;opacity:0.6;line-height:1;}
 #chipInfoPopup .cip-close:hover{opacity:1;}
-.treat-chip{padding:9px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--cream);cursor:grab;display:flex;align-items:center;gap:10px;transition:all 0.15s;user-select:none;font-size:13px;}
+.treat-chip{padding:6px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--cream);cursor:grab;display:flex;align-items:center;gap:7px;transition:all 0.15s;user-select:none;font-size:11px;}
 .treat-chip:hover{box-shadow:0 3px 12px rgba(28,56,41,0.12);transform:translateY(-1px);}
 .treat-chip.dragging{opacity:0.45;transform:scale(0.96);}
 .treat-chip.incompatible{opacity:0.38;cursor:not-allowed;border-style:dashed;}
 .treat-chip.incompatible::after{content:'✕ not in your philosophy';font-size:10px;color:var(--rust);margin-left:auto;}
-.chip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.chip-name{font-weight:500;color:var(--text);}
-.chip-moa{font-size:11px;color:var(--text3);margin-left:auto;}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.chip-name{font-weight:500;color:var(--text);font-size:11px;}
+.chip-moa{font-size:10px;color:var(--text3);margin-left:auto;}
 
 /* ── PLAN RATING ── */
 .rating-card{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
@@ -609,20 +609,6 @@ canvas.drop-blocked{cursor:not-allowed;}
     <div>
 
       <!-- TIMELINE -->
-      <div class="opp-info-banner" id="oppInfo" style="display:none;background:linear-gradient(135deg,#1C3829,#2D5240);border-radius:var(--radius);border:1px solid rgba(90,158,96,0.3);padding:14px 18px;margin-bottom:12px;font-size:13px;color:var(--cream);line-height:1.55;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-    <span style="font-family:'Playfair Display',serif;font-size:15px;color:var(--amber-light);">About: Opportunity Windows</span>
-    <button onclick="document.getElementById('oppInfo').style.display='none'" style="background:none;border:none;color:var(--sage);font-size:18px;cursor:pointer;line-height:1;">×</button>
-  </div>
-  <p style="margin:0 0 7px">The <strong style="color:#7AB87A">Opportunity</strong> row shows <strong>regionally-calibrated treatment windows</strong> for southern Australia — the ideal times to act based on colony biology and climate, not just the calendar.</p>
-  <p style="margin:0 0 7px">These are currently fixed regional defaults. <strong>In a future update</strong> they will be AI-personalised based on your hive's actual mite wash history and mite pressure trend from VarroaMate — so the windows shift earlier or later depending on whether your colonies are tracking high or low.</p>
-  <ul style="margin:6px 0 0;padding-left:18px;color:var(--sage-light);">
-    <li><strong style="color:#5A9E60">Winter OA Window (Jun–Aug)</strong> — broodless period, OA treatment (vaporisation, dribble, or spray) is most effective</li>
-    <li><strong style="color:#7AB87A">Pre-flow treat (Aug–Sep)</strong> — last chance to treat before supers go on and spring flow begins</li>
-    <li><strong style="color:#7AB87A">Autumn treat (Mar–Apr)</strong> — post-flow, rebuild colony health before winter cluster</li>
-    <li><strong style="color:#5A9E60">Drone brood season (Aug–Nov)</strong> — drone comb removal is effective while drones are being reared</li>
-  </ul>
-</div>
 <div class="tl-card">
         <!-- PLAN SELECTOR -->
         <div class="plan-sel-bar" id="planSelBar">
@@ -678,19 +664,16 @@ canvas.drop-blocked{cursor:not-allowed;}
           <div class="drop-indicator" id="dropInd"></div>
         </div>
         <div class="tl-legend">
-          <div class="leg-item" style="gap:6px;"><span style="display:inline-block;width:18px;height:7px;background:rgba(90,158,96,0.3);border-radius:2px;border-left:3px solid #5A9E60"></span>Flow window (drag to move · edges to resize · × to delete)</div>
-          <div class="leg-item" style="cursor:pointer;" onclick="const p=document.getElementById('oppInfo');const wasHidden=p.style.display==='none';p.style.display=wasHidden?'block':'none';if(wasHidden){p.scrollIntoView({behavior:'smooth',block:'center'});}" title="Learn about opportunity windows"><div class="leg-dot" style="background:#5A9E60;opacity:0.6"></div>Ideal opportunity <span style="color:var(--amber-light);font-size:10px;">ⓘ tap to learn</span></div>
-          <div class="leg-item"><div class="leg-dot" style="background:#D4820A;opacity:0.6"></div>Caution / possible</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#B85C38;opacity:0.5"></div>Avoid / risk</div>
+          <div class="leg-item" style="gap:6px;"><span style="display:inline-block;width:18px;height:7px;background:rgba(90,158,96,0.3);border-radius:2px;border-left:3px solid #5A9E60"></span>Nectar Flow</div>
+
           <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><rect x="0" y="1" width="22" height="6" fill="rgba(212,130,10,0.22)"/><line x1="0" y1="1" x2="22" y2="1" stroke="rgba(212,130,10,0.55)" stroke-width="1"/></svg>Action zone (seasonal)</div>
           <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="rgba(184,92,56,0.8)" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Colony loss threshold (seasonal)</div>
           <div class="leg-item"><div class="leg-dot" style="background:#5A9E60"></div>Organic [OA/EO]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#1C3829"></div>Synthetic [AMZ/PYR]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#7B6FA0"></div>Mechanical [MCH]</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#A0522D"></div>Physical Plan [PHY] — Heat / Duplex</div>
-          <div class="leg-item" style="gap:5px;"><span style="display:inline-block;width:18px;height:5px;background:#4A90A4;border-radius:1px;opacity:0.7"></span>Supers must be OFF</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#A0522D"></div>Physical [PHY]</div>
           <div class="leg-item" style="gap:5px;"><span style="background:#B85C38;color:white;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;">!</span> Wrong season</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#D4820A"></div>⚠ Rotation conflict</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#D4820A"></div>⚠ MoA Rotation!</div>
         </div>
       </div>
 
@@ -743,11 +726,7 @@ canvas.drop-blocked{cursor:not-allowed;}
       <!-- RATING -->
       <div class="rating-card">
         <div class="rating-head">
-          <div class="rating-title">📊 Plan Rating</div>
-          <div style="text-align:right;">
-            <div class="rating-overall" id="ratingOverall" style="color:var(--text3);">—</div>
-            <div class="rating-label" id="ratingLabel">Add treatments to score</div>
-          </div>
+          <div class="rating-title">🛡 Colony Survival &amp; Plan Quality</div>
         </div>
         <div class="rating-body" id="ratingBody">
           <div id="survivalGauge"></div>
@@ -765,7 +744,7 @@ canvas.drop-blocked{cursor:not-allowed;}
             <div id="ratingInfoPanel" style="display:none;margin-top:4px;border-top:1px solid var(--border);padding-top:12px;">
 
               <div style="font-size:13px;font-weight:700;color:var(--forest);margin-bottom:10px;">🧮 How your plan is scored</div>
-              <p style="font-size:12px;color:var(--text3);margin:0 0 12px;line-height:1.5;">Each plan is scored across 7 dimensions. The overall % is the average of the 6 plan quality dimensions — but is hard-capped by Colony Survival Chance if survival is critically low.</p>
+              <p style="font-size:12px;color:var(--text3);margin:0 0 12px;line-height:1.5;">Your plan is assessed across two areas: <strong>Colony Survival Chance</strong> (the headline indicator — how effectively your treatments protect the colony) and four <strong>plan quality dimensions</strong> that measure whether your plan is well-structured.</p>
 
               <!-- Colony Survival Chance -->
               <div style="margin-bottom:12px;padding:10px 12px;background:rgba(139,58,26,0.05);border-left:3px solid #8B3A1A;border-radius:0 6px 6px 0;">
@@ -788,14 +767,10 @@ canvas.drop-blocked{cursor:not-allowed;}
                 </div>
                 <div style="padding:8px 10px;background:rgba(74,120,152,0.06);border-left:3px solid #4A7898;border-radius:0 5px 5px 0;">
                   <div style="font-size:12px;font-weight:600;color:#2A5068;">📅 Seasonality</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Treatments placed in their bad season are penalised (e.g. thymol in winter, heat treatment in summer). Overdue skipped treatments are excluded — they didn't happen.</div>
-                </div>
-                <div style="padding:8px 10px;background:rgba(123,111,160,0.06);border-left:3px solid #7B6FA0;border-radius:0 5px 5px 0;">
-                  <div style="font-size:12px;font-weight:600;color:#4A3E70;">💊 Treatment Choice</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Scores appropriateness given temperature, brood state, and season. OA dribble outside winter scores 50% (works best broodless). Thymol in winter scores 0%. At high mite pressure, mechanical-only choices are penalised further.</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Scores seasonal and biological fit. Thymol in winter scores 0% (needs warmth). OA dribble outside winter scores 50% (most effective when broodless). Mechanical-only plans are penalised at high mite pressure. Overdue skipped treatments are excluded.</div>
                 </div>
                 <div style="padding:8px 10px;background:rgba(212,130,10,0.06);border-left:3px solid #D4820A;border-radius:0 5px 5px 0;">
-                  <div style="font-size:12px;font-weight:600;color:#8A5200;">🔄 MoA Rotation (chemical only)</div>
+                  <div style="font-size:12px;font-weight:600;color:#8A5200;">🔄 MoA Rotation</div>
                   <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Consecutive same-MoA treatments are penalised by resistance risk tier: Synthetics −25pts, Thymol −12pts, Organic acids −5pts. Overlapping same-MoA treatments score a conflict penalty. Physical treatments are exempt — no resistance mechanism.</div>
                 </div>
                 <div style="padding:8px 10px;background:rgba(184,92,56,0.06);border-left:3px solid #B85C38;border-radius:0 5px 5px 0;">
@@ -832,6 +807,10 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div>
         <div class="ai-panel-body" id="aiPanelBody">
           <div class="ai-dot-loading"><div class="dot-pulse"><span></span><span></span><span></span></div> Analysing your plan…</div>
+        </div>
+        <div style="padding:10px 18px 12px;border-top:1px solid var(--border);background:var(--cream);display:flex;align-items:flex-start;gap:8px;">
+          <span style="font-size:15px;flex-shrink:0;">💡</span>
+          <div style="font-size:11px;color:var(--text3);line-height:1.6;"><strong style="color:var(--text2);">Planning tip:</strong> For the best plan rating, cover at least one full year with a treatment in each of <strong>spring</strong>, <strong>summer</strong>, and <strong>autumn</strong>. Winter treatments are excluded from scoring — most treatments are ineffective or inappropriate during the winter broodless period.</div>
         </div>
       </div>
 
@@ -1079,7 +1058,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                 <span style="font-size:32px;flex-shrink:0;">🔒</span>
                 <div>
                   <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--forest);margin-bottom:4px;">Brood Break + OA Treatment</div>
-                  <div style="font-size:12px;color:var(--text3);line-height:1.6;">Caging the queen for 14 days stops new eggs. Existing brood hatches progressively, creating a window where <strong>all mites are phoretic</strong> — on adult bees, not in cells. This window is ideal for <strong>OA treatment</strong> — vaporisation (×3 applications), dribble (single application, broodless is ideal), or spray — all reach maximum efficacy when all mites are phoretic. The timeline shows all brood cohorts aging through to the broodless window.</div>
+                  <div style="font-size:12px;color:var(--text3);line-height:1.6;">Caging the queen for 14 days stops new eggs. Existing brood hatches progressively, creating a window where <strong>all mites are phoretic</strong> — on adult bees, not in cells. This window is ideal for <strong>OA treatment</strong> — OA vaporisation (×3 applications), OA dribble (single application, broodless is ideal), or Aluen CAP — all reach maximum efficacy when all mites are phoretic. Use whichever method is registered in your state. The timeline shows all brood cohorts aging through to the broodless window.</div>
                 </div>
               </div>
               <div style="padding:10px 12px;background:rgba(184,92,56,0.08);border:1.5px solid rgba(184,92,56,0.35);border-radius:7px;margin-bottom:12px;font-size:12px;color:#7A3018;line-height:1.6;">
@@ -1093,7 +1072,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                 <div style="padding:8px 10px;background:rgba(155,107,138,0.20);border-left:3px solid #9B6B8A;border-radius:0 5px 5px 0;">
                   <div style="font-size:11px;font-weight:700;color:#5A2A4A;">Phoretic window</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">~Days 21–24 after caging. All mites on adult bees</div></div>
                 <div style="padding:8px 10px;background:rgba(232,200,64,0.20);border-left:3px solid #B8A020;border-radius:0 5px 5px 0;">
-                  <div style="font-size:11px;font-weight:700;color:#6A5A00;">OA treatment window</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 21–24: OA treatment — vaporisation ×3, dribble ×1, or spray (choose method per your equipment)</div></div>
+                  <div style="font-size:11px;font-weight:700;color:#6A5A00;">OA treatment window</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Days 21–24: OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). Use whichever is registered in your state.</div></div>
               </div>
             </div>
             <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;">
@@ -1572,7 +1551,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         <button class="dayplan-btn" id="dpbtn-brood-break" onclick="selectDayPlan('brood-break')">
           <div class="dayplan-btn-icon">🔒</div>
           <div class="dayplan-btn-title">Brood Break — Cage Queen</div>
-          <div class="dayplan-btn-sub">Interrupt brood cycle with queen cage + OA vaporisation.</div>
+          <div class="dayplan-btn-sub">Interrupt brood cycle with queen cage + OA treatment (OAV, dribble, or Aluen CAP).</div>
         </button>
         <button class="dayplan-btn" id="dpbtn-split" onclick="selectDayPlan('split')">
           <div class="dayplan-btn-icon">✂️</div>
@@ -1877,7 +1856,22 @@ function renderSmartAlerts(){
     }
   }
 
-  // ── 2. Plan gap alert — no treatment in next 90 days ────────────────
+  // ── 2. Pre-winter gap alert — no autumn treatment planned ─────────────
+  // Warn from Jan through Apr (nowM 0–3) — still time to act before winter
+  const hasAutumnPlan = planEvents.some(e => {
+    const eM = e.year*12 + e.month;
+    const nM = nowY*12 + nowM;
+    return getSeason(e.month) === 'autumn' && eM >= nM - 1 && eM <= nM + 12;
+  });
+  if(nowM >= 0 && nowM <= 4 && !hasAutumnPlan){
+    alerts.push({
+      icon:'🍂',
+      title:'No autumn treatment in your plan',
+      body:'Going into winter with high mite load is one of the leading causes of colony loss — winter bees live longer but are far more vulnerable to virus damage from mites. Add an autumn treatment (Feb–Apr) to knock mites down before the colony clusters and treatment becomes difficult or ineffective.'
+    });
+  }
+
+  // ── 3. Plan gap alert — no treatment in next 90 days ────────────────
   const upcoming = planEvents.filter(e => {
     const eM = e.year*12 + e.month;
     const nM = nowY*12 + nowM;
@@ -2504,8 +2498,9 @@ function renderPlanList(){
     const ok = currentPref.allowed.includes(ev.treatId);
     const season = getSeason(ev.month);
     const badSeason = t.badSeasons && t.badSeasons.includes(season);
-    const flowMonths = new Set([8,9,10,11,0,1]);
-    const supersConflict = t.supersOff && flowMonths.has(ev.month);
+    const evFrac2 = (ev.year - 2024) * 12 + ev.month;
+    const evEnd2  = evFrac2 + (t.duration || 1) / 30;
+    const supersConflict = t.supersOff && userWindows.some(w => w.type === 'flow' && evFrac2 < w.endFrac && evEnd2 > w.startFrac);
     const supersNote = supersConflict ? `<div class="plan-item-warn" style="color:#4A90A4">🍯 Requires supers off — placed during honey flow</div>` : '';
     const supersTag  = supersConflict ? `<span class="tag" style="background:rgba(74,144,164,0.12);color:#4A90A4;border:1px solid rgba(74,144,164,0.3);margin-left:4px">🍯 supers off</span>` : '';
     const badNote    = badSeason ? `<div class="plan-item-warn">! ${t.badSeasonNote}</div>` : '';
@@ -2547,8 +2542,7 @@ function clearPlan(){
 // ══ RATING ENGINE ══
 const DIMS = [
   {key:'seasonality', label:'Seasonality',              color:'#4A7898'},
-  {key:'choice',      label:'Treatment Choice',         color:'#7B6FA0'},
-  {key:'rotation',    label:'MoA Rotation (chem only)', color:'#D4820A'},
+  {key:'rotation',    label:'MoA Rotation',              color:'#D4820A'},
   {key:'coverage',    label:'Season Coverage',          color:'#B85C38'},
   {key:'supers',      label:'Supers Compatibility',     color:'#4A90A4'},
   // Colony Survival Chance is rendered separately as a hero gauge — not in this list
@@ -2595,32 +2589,25 @@ function scorePlan(){
   const violations = planEvents.filter(e=>!currentPref.allowed.includes(e.treatId)).length;
   scores.philosophy = cap(100 - (violations/planEvents.length)*100);
 
-  // 2. Seasonality — active events only (overdue ones didn't happen)
+  // 2. Seasonality — merged with treatment suitability (choice)
   const scoreBase = activeEvents.length || planEvents.length;
   let seasonOk = 0;
   activeEvents.forEach(ev=>{
     const t = TREATMENTS[ev.treatId];
     const season = getSeason(ev.month);
+    // Bad season placement (e.g. thymol in winter, heat in summer)
     if(t.badSeasons && t.badSeasons.includes(season)) return;
+    // OA dribble outside winter — works but suboptimal without broodlessness
+    if(ev.treatId==='oxalic-dribble' && season!=='winter') { seasonOk+=0.5; return; }
     seasonOk++;
   });
-  scores.seasonality = cap(scoreBase ? (seasonOk/scoreBase)*100 : 0);
-
-  // 3. Treatment choice — active events + overdue penalty at high pressure
-  let choiceOk = 0;
-  activeEvents.forEach(ev=>{
-    const t = TREATMENTS[ev.treatId];
-    const season = getSeason(ev.month);
-    if((t.moa==='Essential Oil') && season==='winter') return;
-    if(ev.treatId==='oxalic-dribble' && season!=='winter') { choiceOk+=0.5; return; }
-    choiceOk++;
-  });
-  let choiceScore = cap(scoreBase ? (choiceOk/scoreBase)*100 : 0);
+  let seasonScore = cap(scoreBase ? (seasonOk/scoreBase)*100 : 0);
+  // Mechanical-only at high/critical pressure — biologically insufficient
   const allMech = activeEvents.length > 0 && activeEvents.every(e => TREATMENTS[e.treatId]?.moa === 'Mechanical');
   if(allMech && (pressure==='high' || pressure==='critical')){
-    choiceScore = cap(choiceScore - pressurePenalty[pressure]);
+    seasonScore = cap(seasonScore - pressurePenalty[pressure]);
   }
-  scores.choice = choiceScore;
+  scores.seasonality = seasonScore;
 
   // 4. MoA rotation — active events only
   const MOA_REPEAT_PENALTY   = {'Organic Acid':5, 'Essential Oil':12, 'Amitraz':25, 'Pyrethroid':25};
@@ -2651,14 +2638,27 @@ function scorePlan(){
   if((pressure==='high' || pressure==='critical') && seasonsUsed.size <= 1){
     coverageScore = cap(coverageScore - pressurePenalty[pressure] * 0.6);
   }
+  // Pre-winter gap penalty — no autumn treatment (Feb–Apr) is a significant risk
+  // since winter is largely untreatable and mites carry over to damage winter bees
+  const hasAutumnTreatment = planEvents.some(e => getSeason(e.month) === 'autumn');
+  if(!hasAutumnTreatment){
+    coverageScore = cap(coverageScore - 20);
+  }
   scores.coverage = coverageScore;
 
   // 6. Supers compatibility — active events only
-  const flowMonths = new Set([8,9,10,11,0,1]);
+  // Use user-defined nectar flow windows rather than hardcoded months
+  const _evInFlow = (ev) => {
+    const evFrac = (ev.year - 2024) * 12 + ev.month;
+    const t = TREATMENTS[ev.treatId];
+    const dur = t.duration || 1;
+    const evEnd = evFrac + dur / 30;
+    return userWindows.some(w => w.type === 'flow' && evFrac < w.endFrac && evEnd > w.startFrac);
+  };
   let supersOk = 0;
   activeEvents.forEach(ev=>{
     const t = TREATMENTS[ev.treatId];
-    if(t.supersOff && flowMonths.has(ev.month)) return;
+    if(t.supersOff && _evInFlow(ev)) return;
     supersOk++;
   });
   scores.supers = cap(activeEvents.length ? (supersOk/activeEvents.length)*100 : 100);
@@ -2783,6 +2783,13 @@ function renderSurvivalGauge(score, safetyCapActive){
         <div class="survival-bar" style="width:${score}%;background:${barColor};"></div>
       </div>
       ${capNote}
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;padding-top:7px;border-top:1px solid var(--border);">
+        <span style="font-size:10px;color:var(--text3);font-weight:600;align-self:center;margin-right:2px;">KEY:</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#5A9E60;flex-shrink:0;"></span>85–100% Excellent</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#7AB860;flex-shrink:0;"></span>70–84% Good</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#D4820A;flex-shrink:0;"></span>40–69% At risk</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#B83A1A;flex-shrink:0;"></span>&lt;40% Critical</span>
+      </div>
     </div>
     <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:${barColor};flex-shrink:0;">${score}%</div>
   </div>`;
@@ -2819,14 +2826,9 @@ function renderRating(){
   } else {
     result = scorePlan();
   }
-  const overall = document.getElementById('ratingOverall');
-  const label   = document.getElementById('ratingLabel');
   const dimRows = document.getElementById('dimRows');
 
   if(!result){
-    overall.textContent = '—';
-    overall.style.color = 'var(--text3)';
-    label.textContent = 'Add treatments to score';
     renderSurvivalGauge(null, false);
     dimRows.innerHTML = DIMS.map(d=>`
       <div class="dim-row">
@@ -2840,18 +2842,7 @@ function renderRating(){
   // Render survival gauge prominently above dim rows
   renderSurvivalGauge(result.scores.colonyRisk, result.safetyCapActive);
 
-  overall.textContent = result.overall + '%';
-  overall.style.color = ratingColor(result.overall);
-
-  // Safety cap — label override
-  let baseWord = ratingWord(result.overall);
-  if(result.safetyCapActive){
-    baseWord = result.scores.colonyRisk < 20 ? '⚠ Colony at Risk' : '⚠ Survival Risk';
-    overall.style.color = 'var(--rust)';
-  }
-  label.textContent = hasProposals ? `${baseWord} · incl. AI suggestions ✦` : baseWord;
-
-  // Dim rows — 6 plan quality dimensions (colony survival is now in the gauge above)
+  // Dim rows — plan quality dimensions (colony survival is in the gauge above)
   dimRows.innerHTML = DIMS.map(d=>{
     const s = Math.round(result.scores[d.key]);
     return `<div class="dim-row">
@@ -2953,7 +2944,7 @@ async function getAIAdvice(){
     : 'No treatments planned yet';
 
   const scores = result
-    ? `Philosophy: ${Math.round(result.scores.philosophy)}%, Seasonality: ${Math.round(result.scores.seasonality)}%, Treatment choice: ${Math.round(result.scores.choice)}%, MoA rotation: ${Math.round(result.scores.rotation)}%, Season coverage: ${Math.round(result.scores.coverage)}%, Overall: ${result.overall}%`
+    ? `Philosophy: ${Math.round(result.scores.philosophy)}%, Seasonality: ${Math.round(result.scores.seasonality)}%, MoA rotation: ${Math.round(result.scores.rotation)}%, Season coverage: ${Math.round(result.scores.coverage)}%, Overall: ${result.overall}%`
     : 'No plan to score yet';
 
   const conflictNote = result?.conflictCount>0
@@ -2973,10 +2964,10 @@ ${conflictNote}
 Please give a concise, warm, practical analysis of their plan. Structure your response with these sections using markdown headers:
 1. **Overall Assessment** — 2 sentences on the plan quality
 2. **What's Working Well** — 2-3 specific positives
-3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions
+3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. Also check whether the plan is missing key opportunity windows: (a) the winter broodless OA window (Jun–Jul) — ideal for OAV/dribble/Aluen CAP when mites are fully phoretic; (b) the autumn treatment window (Feb–Apr) — CRITICAL pre-winter window. Mite populations peak post-harvest and colonies enter winter with whatever mite load they carry now. Winter bees are long-lived and highly susceptible to virus damage — high mite loads going into winter are a leading cause of colony loss. If no autumn treatment is present, flag this as the single most important gap to fix; (c) the spring treatment window (Aug–Oct) — pre-flow knockdown before build-up. If any of these windows have no treatment nearby, call it out explicitly.
 4. **Key Recommendation** — one clear, prioritised action to improve the plan
 
-Keep it under 280 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO. Reference the regional calendar windows (spring flow Aug–Oct, OA window Jun–Jul, mite surge risk Feb–Apr) where relevant.`;
+Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
 
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -3051,7 +3042,7 @@ let _suggestPickerOpen = false;
 
 function renderSuggestPicker(){
   const allowed = currentPref.allowed;
-  _suggestAllowed = new Set(allowed); // reset to all on philosophy change
+  _suggestAllowed = new Set(); // default: none selected — user opts in
   _updatePickCount();
   const body = document.getElementById('suggestPickerBody');
   if(!body) return;
@@ -3060,7 +3051,7 @@ function renderSuggestPicker(){
     const t = TREATMENTS[id];
     if(!t || !allowed.includes(id)) return '';
     return `<label class="suggest-pick-item">
-      <input type="checkbox" checked id="spick-${id}" onchange="_toggleSuggestTreat('${id}',this.checked)">
+      <input type="checkbox" id="spick-${id}" onchange="_toggleSuggestTreat('${id}',this.checked)">
       <div class="suggest-pick-dot" style="background:${t.color}"></div>
       <span class="suggest-pick-name">${t.name}</span>
       <span class="suggest-pick-moa">${t.moaShort||t.moa}</span>
@@ -3236,7 +3227,7 @@ Respond ONLY with valid JSON in this exact shape, no markdown fences:
 month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${todayLabel}.`;
 
   const userMsg = `Today is ${todayLabel}. The beekeeper's recent treatment history: ${historyContext}.
-Please suggest a minimal but effective treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Aim for 3–4 treatments total — quality over quantity. If drone comb removal or brood break are available, include them as they reduce the need for chemical treatments. Cap chemical treatments at 2 unless there is a compelling resistance-rotation reason for a third. Cover the key risk windows (late summer/autumn mite surge, spring build-up) but do not over-treat. Do not suggest anything before ${todayLabel}.`;
+Please suggest a minimal but effective treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Aim for 3–4 treatments total — quality over quantity. If drone comb removal or brood break are available, include them as they reduce the need for chemical treatments. Cap chemical treatments at 2 unless there is a compelling resistance-rotation reason for a third. Cover the key risk windows — especially the autumn pre-winter treatment (Feb–Apr) which is CRITICAL: colonies carry their mite load through winter when treatment is largely impossible, and winter bees are long-lived and highly susceptible to virus damage from mites. Also cover the spring build-up window. Do not over-treat. Do not suggest anything before ${todayLabel}.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
 
@@ -3575,14 +3566,14 @@ function drawTimeline(){
   const PAD_L=80, PAD_R=14, PAD_T=44, PAD_B=34;
   const TW = W-PAD_L-PAD_R;
   const TH = H-PAD_T-PAD_B;
-  const ROWS=4;
-  // Rows 0 (Honey Flow) and 1 (Opportunity) are half-height; rows 2 (Treatments) and 3 (Trend) full-height
-  const unit = TH / 3; // 3 units total: 0.5 + 0.5 + 1 + 1
-  const rowHeights = [unit*0.5, unit*0.5, unit, unit];
+  const ROWS=3;
+  // Rows 0 (Honey Flow) half-height; rows 1 (Treatments) and 2 (Trend) full-height
+  const unit = TH / 2.5; // 2.5 units total: 0.5 + 1 + 1
+  const rowHeights = [unit*0.5, unit, unit];
   const rowTops = [PAD_T];
   for(let i=1;i<ROWS;i++) rowTops.push(rowTops[i-1]+rowHeights[i-1]);
-  const rowH = unit; // kept for legacy refs in treatment/trend sections (rows 2+3 are 1 unit each)
-  const LANE_LABELS=['Honey Flow','Opportunity','Treatments','Trend'];
+  const rowH = unit; // kept for legacy refs in treatment/trend sections (rows 1+2 are 1 unit each)
+  const LANE_LABELS=['Honey Flow','Treatments','Trend'];
 
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#FAFAF7';
@@ -3605,12 +3596,12 @@ function drawTimeline(){
     ctx.strokeStyle='rgba(28,56,41,0.05)';
     ctx.lineWidth=0.5;
     ctx.beginPath();ctx.moveTo(PAD_L,y);ctx.lineTo(PAD_L+TW,y);ctx.stroke();
-    if(r===2) continue; // sub-labels drawn in treatment section
+    if(r===1) continue; // sub-labels drawn in treatment section
     ctx.fillStyle='#7A9E8A';
     ctx.font='600 10px DM Sans,sans-serif';
     ctx.textAlign='right';
     // Trend label sits at top of row to avoid overlapping y-axis mite numbers
-    const labelY = r===3 ? y+11 : y+rh/2+3;
+    const labelY = r===2 ? y+11 : y+rh/2+3;
     ctx.fillText(LANE_LABELS[r],PAD_L-6,labelY);
   }
 
@@ -3731,8 +3722,8 @@ function drawTimeline(){
   // ── 5d. SETTLEMENT BUFFERS — hatched overlay on treatment rows after each move ──
   if(_apiaryIsMobile()){
     const buffers = getSettlementBuffers();
-    const bufY  = rowTops[1];   // starts at opportunity row
-    const bufH  = rowHeights[1] + rowHeights[2]; // spans opp + treatment rows
+    const bufY  = rowTops[1];   // starts at treatment row
+    const bufH  = rowHeights[1]; // treatment row only
 
     buffers.forEach(buf=>{
       const x1 = fracToX(buf.startFrac, PAD_L, TW);
@@ -3774,53 +3765,7 @@ function drawTimeline(){
     });
   }
 
-  // ── 5b. OPPORTUNITY WINDOWS (row 1) — single lane, 3 non-overlapping windows ──
-  {
-    const ry   = rowTops[1];
-    const barH = rowHeights[1] * 0.62;
-    const barOff = rowHeights[1] * 0.19;
-
-    // Build all visible segments
-    const segs = [];
-    [2024,2025,2026,2027].forEach(yr=>{
-      REGIONAL_CALENDAR.forEach(cal=>{
-        const raw = cal.endMonth < cal.startMonth
-          ? [{s:cal.startMonth,e:12,yr,cal},{s:0,e:cal.endMonth+1,yr:yr+1,cal}]
-          : [{s:cal.startMonth,e:cal.endMonth+1,yr,cal}];
-        raw.forEach(seg=>{
-          const sf=monthFrac(seg.yr,seg.s), ef=monthFrac(seg.yr,seg.e);
-          if(ef<windowStart-0.5||sf>windowStart+windowSpan+0.5) return;
-          segs.push({sf,ef,cal:seg.cal});
-        });
-      });
-    });
-
-    // Draw — single lane, full bar height
-    segs.forEach(({sf,ef,cal})=>{
-      const x1=fracToX(sf,PAD_L,TW), x2=fracToX(ef,PAD_L,TW);
-      const cx1=Math.max(x1,PAD_L), cx2=Math.min(x2,PAD_L+TW);
-      const bw=cx2-cx1;
-      const barY = ry + barOff;
-
-      ctx.fillStyle=cal.color+'40';
-      ctx.beginPath();ctx.roundRect(cx1,barY,bw,barH,3);ctx.fill();
-      ctx.fillStyle=cal.color+'AA';
-      ctx.beginPath();ctx.roundRect(cx1,barY,bw,2,[3,3,0,0]);ctx.fill();
-      if(bw>28){
-        ctx.save();ctx.beginPath();ctx.rect(cx1,barY,bw,barH);ctx.clip();
-        ctx.fillStyle=cal.color+'EE';
-        const fs = windowSpan<=10 ? 11 : windowSpan<=18 ? 10 : 9;
-        ctx.font=`600 ${fs}px DM Sans,sans-serif`;
-        const txt = cal.shortLabel||cal.label;
-        const txtW = ctx.measureText(txt).width;
-        if(bw >= txtW + 10){
-          ctx.textAlign='left';
-          ctx.fillText(txt, cx1+5, barY+barH*0.68);
-        }
-        ctx.restore();
-      }
-    });
-  }
+  // Opportunity row removed — windows surfaced via AI advice instead
 
   // ── 6. Grid lines + month labels ──
   const showWeeks=windowSpan<=8;
@@ -3934,7 +3879,7 @@ function drawTimeline(){
   const rects=[];
 
   // ── Sub-band geometry: row 2 split into 3 equal bands (chemical / mechanical / physical plan) ──
-  const treatRowTop = rowTops[2];
+  const treatRowTop = rowTops[1];
   const BAND_H = rowH / 3;           // each band = 1/3 the row
   const LANE_H = BAND_H / 2;         // each lane = half the band
   const BAR_PAD = LANE_H * 0.14;     // inset within a lane
@@ -4228,8 +4173,8 @@ function drawTimeline(){
   // ── 10. MITE COUNT CHART (row 5) — VM-synchronised ──
   const countEvents=HISTORY.filter(e=>e.type==='count'&&e.count!=null)
     .sort((a,b)=>monthFrac(a.year,a.month)-monthFrac(b.year,b.month));
-  const cRy=rowTops[3];
-  const countH=rowHeights[3];
+  const cRy=rowTops[2];
+  const countH=rowHeights[2];
   const countToY=(n)=>cRy+countH-(n/MITE_CHART_MAX)*countH*0.88-countH*0.04;
 
   ctx.save();ctx.beginPath();ctx.rect(PAD_L,cRy,TW,countH);ctx.clip();
@@ -4729,8 +4674,7 @@ document.addEventListener('mouseup',e=>{
     draggingEvent.month  = dragCurrentMonth;
     draggingEvent.year   = dragCurrentYear;
     draggingEvent.detail = `${MONTHS[dragCurrentMonth]} ${dragCurrentYear} · Planned · ${TREATMENTS[draggingEvent.treatId].moa}`;
-    renderPlanList();
-    renderRating();
+    updateAll();
   }
   draggingEvent=null;
   dragCurrentMonth=null; dragCurrentYear=null; dragValid=false;
@@ -5088,9 +5032,9 @@ function dpExportCal(){
       { day:6,  summary:`🔍 Mid-point hive check — ${scope}`,  desc:'Check queen is secure. Colony should be calm.' },
       { day:14, summary:`🔓 Release queen — ${scope}`,         desc:'Release queen. She resumes laying immediately.', alarm:true },
       { day:17, summary:`📋 Check broodlessness — ${scope}`,   desc:'Use sticky board to confirm all brood has hatched before applying OA.' },
-      { day:20, summary:`💨 OA treatment Day 1 — ${scope}`,    desc:'Colony broodless — all mites phoretic. Apply OAV or OA dribble now.', alarm:true },
-      { day:21, summary:`💨 OA treatment Day 2 — ${scope}`,    desc:'Second OA application (vaporisation, dribble, or spray — choose your method).', alarm:true },
-      { day:27, summary:`💨 OA treatment Day 3 — ${scope}`,    desc:'Optional third OAV (3-week protocol). Monitor mite drop after.', alarm:true },
+      { day:20, summary:`💨 OA treatment Day 1 — ${scope}`,    desc:'Colony broodless — all mites phoretic. Apply OAV, OA dribble, or Aluen CAP — use whichever is registered in your state.', alarm:true },
+      { day:21, summary:`💨 OA treatment Day 2 — ${scope}`,    desc:'Second OA application if using multi-dose protocol (OAV, OA dribble, or Aluen CAP).', alarm:true },
+      { day:27, summary:`💨 OA treatment Day 3 — ${scope}`,    desc:'Optional third application (OAV 3-week protocol). Monitor mite drop after.', alarm:true },
       { day:29, summary:`📋 Post-treatment check — ${scope}`,  desc:'Confirm queen laying normally. Count mite drop on sticky board.' },
     ];
   } else if(key==='split'){
@@ -5101,7 +5045,7 @@ function dpExportCal(){
       ..._splitMethod==='pagden' ? [{ day:1, summary:`🐝 Foragers return to original stand — ${scope}`, desc:'All foraging bees return to the original stand, boosting the queenless box with a strong adult bee population for queen rearing.' }] : [],
       { day:9,  summary:`🔍 Day 10 — Queen cell check — ${scope}`,   desc:'Inspect queenless half for queen cells. Keep 1–2 best cells. Remove all others to prevent after-swarms.', alarm:true },
       { day:19, summary:`✂️ Remove drone frame (ideal) — ${scope}`,  desc:'All drone brood fully capped — mites trapped. Remove and freeze/heat-treat. Day 19–23 is the removal window.', alarm:true },
-      { day:18, summary:`💨 OA treatment window opens — ${scope}`,   desc:'Queenless half is broodless. All Varroa mites are phoretic. Apply OA treatment (vaporisation, dribble, or spray) for maximum efficacy. Window: day 18–24.', alarm:true },
+      { day:18, summary:`💨 OA treatment window opens — ${scope}`,   desc:'Queenless half is broodless. All Varroa mites are phoretic. Apply OAV, OA dribble, or Aluen CAP for maximum efficacy — use whichever is registered in your state. Window: day 18–24.', alarm:true },
       { day:15, summary:`👸 Virgin queen should emerge — ${scope}`,  desc:'Virgin queen emerges around day 15–17. Do not disturb the hive for 7–10 days to allow mating flights.' },
       { day:25, summary:`🎉 New queen laying — check — ${scope}`,    desc:'Inspect for eggs in a regular laying pattern. A mated, laying queen confirms success. Record mite counts in VarroaMate.', alarm:true },
     ];
@@ -5116,7 +5060,7 @@ function dpExportCal(){
       { day:0,  summary:`📦 Place Duplex-Framebox — ${scope}`,    desc:'Find queen and place her in the box with a brood frame and foundation.' },
       { day:12, summary:`✂️ Day 12 extraction — ${scope}`,        desc:'Remove and heat-treat Frame A. Replace with empty frame. Reseal.', alarm:true },
       { day:24, summary:`🍯 Harvest + final treat — ${scope}`,    desc:'Harvest honey. Heat-treat both frames. OA treat adults. Release queen. Feed syrup.', alarm:true },
-      { day:25, summary:`📋 Fresh start check — ${scope}`,        desc:'Colony broodless. Monitor mite drop. Consider OAV if still elevated.' },
+      { day:25, summary:`📋 Fresh start check — ${scope}`,        desc:'Colony broodless. Monitor mite drop. Consider a follow-up OA treatment (OAV, OA dribble, or Aluen CAP) if still elevated.' },
       { day:28, summary:`🔍 Follow-up check — ${scope}`,          desc:'Confirm queen laying normally. Record results in VarroaMate.' },
     ];
   }
@@ -5434,7 +5378,7 @@ function renderSplitPlanner(){
         'All drone brood should be fully capped. Remove the frame — all mites that entered the cells are trapped. Freeze 48h or heat-treat in a Varroa Controller. Day 20–24 is the removal window; don\'t leave it past day 24 or drones start emerging.'],
       [21, 'teal',  '💨 Days 18–24 — OA treatment window',
         start ? `${dpFmt(dpAddDays(start,18))} → ${dpFmt(dpAddDays(start,24))}` : '—',
-        'The queenless half is completely broodless in this window — all Varroa mites are phoretic on adult bees. Apply OA treatment: vaporisation (1–3 applications on consecutive days), OA dribble (single application, highly effective when broodless), or OA spray. Maximum possible efficacy. Treat both halves if mite pressure is elevated in the queenright half too.'],
+        'The queenless half is completely broodless in this window — all Varroa mites are phoretic on adult bees. Apply OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). Maximum possible efficacy. Treat both halves if mite pressure is elevated in the queenright half too.'],
       [17, '',      '🔍 Day 16 — Virgin queen emerges',
         start ? dpFmt(dpAddDays(start,15)) : '—',
         'The virgin queen should be emerging around now (day 15–17). Do not disturb the hive for 7–10 days to allow undisturbed mating flights. Queens typically mate over 5–10 days with multiple drones.'],
@@ -5461,7 +5405,7 @@ function renderSplitPlanner(){
         'Remove and freeze/heat-treat the drone frame. All mites that entered the capped cells are trapped. Day 20–24 is your window — do not leave it past day 24.'],
       [21, 'teal',  '💨 Days 18–24 — OA treatment window (queenless box)',
         start ? `${dpFmt(dpAddDays(start,18))} → ${dpFmt(dpAddDays(start,24))}` : '—',
-        'The queenless box on the original stand is broodless in this window. All Varroa mites are phoretic. Apply OA treatment now for maximum efficacy. The original hive (queenright, moved) continues normally — treat it separately when its mite counts warrant.'],
+        'The queenless box on the original stand is broodless in this window. All Varroa mites are phoretic. Apply OA vaporisation, OA dribble, or Aluen CAP (where registered in your state) for maximum efficacy. The original hive (queenright, moved) continues normally — treat it separately when its mite counts warrant.'],
       [26, 'amber', '🎉 Day 25–28 — New queen laying in queenless box',
         start ? dpFmt(dpAddDays(start,25)) : '—',
         'Check the queenless box for a laying queen. You now have two colonies: the original (queenright, strong, in a new position) and a new mite-depleted colony with a fresh young queen on the original stand. Record mite counts in VarroaMate.'],
@@ -5730,9 +5674,9 @@ function renderBBPlanner(){
     [1,  'amber', '🔒 Cage the queen',         dpFmt(start),                    'Find and cage your queen. No new eggs can be laid. All existing brood will progressively hatch over the next 21 days. Ensure adequate stores.'],
     [7,  '',      '🔍 Mid-point check',         dpFmt(dpAddDays(start,6)),       'Check queen is secure and colony is calm. Increased nurse bees is normal — more adult bees available when brood finishes hatching.'],
     [15, 'amber', '🔓 Release the queen',       dpFmt(dpAddDays(start,14)),      'Release the queen. She resumes laying immediately. Eggs she lays today won\'t be capped until ~day 24, so OA treatment at days 21–22 remains in the clear broodless window.'],
-    [21, 'teal',  '💨 OAV — Application 1',    dpFmt(dpAddDays(start,20)),      'Colony is broodless. All Varroa mites are phoretic (on adult bees, not in cells). Apply first OA treatment (vaporisation, dribble, or spray — choose your method). Maximum possible efficacy. Use manufacturer\'s recommended dose per hive body.'],
-    [22, 'teal',  '💨 OAV — Application 2',    dpFmt(dpAddDays(start,21)),      '24h after first application. Many protocols use 2–3 consecutive days. Alternatively: days 21, 28 and 35 for a 3-week protocol.'],
-    [22, 'teal',  '💧 OA Dribble (optional)',   dpFmt(dpAddDays(start,21)),      '<strong>The broodless window is also the ideal time for OA dribble</strong> — a single application when broodless is highly effective. Can be used instead of or alongside OAV for belt-and-braces knockdown. Apply 5ml per seam of bees; do not repeat.'],
+    [21, 'teal',  '💨 OAV — Application 1',    dpFmt(dpAddDays(start,20)),      'Colony is broodless. All Varroa mites are phoretic (on adult bees, not in cells). Apply first OA treatment: OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). Maximum possible efficacy. Use manufacturer\'s recommended dose per hive body.'],
+    [22, 'teal',  '💨 OAV — Application 2',    dpFmt(dpAddDays(start,21)),      '24h after first application (OAV protocol). Many protocols use 2–3 consecutive days. Alternatively: days 21, 28 and 35 for a 3-week protocol. Not applicable if using Aluen CAP or OA dribble (single application).'],
+    [22, 'teal',  '💧 OA Dribble (optional)',   dpFmt(dpAddDays(start,21)),      '<strong>Aluen CAP or OA dribble</strong> — a single application when broodless is highly effective. Aluen CAP: place caps on top bars per label. OA dribble: 5ml per seam of bees. Both are highly effective in the broodless window and can be used as an alternative to OAV. Do not repeat.'],
     [28, 'teal',  '💨 OAV — Application 3',    dpFmt(dpAddDays(start,27)),      'Optional third OA application (consecutive-day protocol). After this, monitor mite drop on a sticky board for 3 days to confirm efficacy.'],
     [30, '',      '📋 Post-treatment check',    dpFmt(dpAddDays(start,29)),      'Confirm queen is laying normally. Count mite drop on sticky board. If still elevated, consider a repeat OAV cycle. Record results in VarroaMate.'],
   ];
