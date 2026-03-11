@@ -1786,6 +1786,19 @@ async function loadVMData(){
     // Rebuild plan selector dropdowns with live data
     _rebuildSelectorDropdowns();
 
+    // Re-apply philosophy from VM (may have changed since DOMContentLoaded)
+    const vmPref = _loadPhilosophyFromVM();
+    if(vmPref){
+      currentPref = vmPref;
+      document.getElementById('prefIcon').textContent = currentPref.icon;
+      document.getElementById('prefName').textContent  = currentPref.name;
+      document.getElementById('prefDesc').textContent  = currentPref.desc;
+      const lbl = document.getElementById('prefSyncLabel');
+      if(lbl) lbl.textContent = 'synced with VarroaMate ✓';
+      renderPrefOptions();
+      renderPalette();
+    }
+
     _showVMSyncStatus('ok');
     // If we already had a hive selected, reload its plan with fresh history
     if(currentScopeKey.startsWith('hive:')){
@@ -1956,9 +1969,11 @@ function _buildHistoryFromVM(treatments, miteCounts){
 function _filteredHistory(){
   if(currentScopeKey.startsWith('hive:')){
     const hid = currentScopeKey.slice(5);
-    return HISTORY.filter(e => String(e.hiveId) === String(hid));
+    const result = HISTORY.filter(e => String(e.hiveId) === String(hid));
+    console.log(`[VMSP] _filteredHistory: hive=${hid}, HISTORY.length=${HISTORY.length}, matched=${result.length}`,
+      HISTORY.length ? `sample hiveId=${HISTORY[0].hiveId}` : '(empty)');
+    return result;
   }
-  // No hive selected — show nothing (apiary or empty scope)
   return [];
 }
 
