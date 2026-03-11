@@ -81,7 +81,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
   .dp-btn.cal:hover{background:rgba(212,130,10,0.06);}
   /* ── Print styles ── */
   @media print{
-    body>*:not(#dayPlannersSection){display:none!important;}
+    body>*{display:none!important;}
+    #screen-dayplanner{display:block!important;}
     #dayPlannersSection{display:block!important;}
     .dp-toolbar,.dp-tab,.dp-two-col>div:last-child,.tl-card,.pref-banner,.two-col,.plan-sel-bar{display:none!important;}
     .dp-page{display:none!important;}
@@ -5153,11 +5154,15 @@ function _dpUpdatePrintHeaders(){
 function dpPrint(){
   _dpUpdatePrintHeaders();
   const key = _dpActivePlannerKey();
-  // Mark active page for print-active class
+  // Mark active page for print
   document.querySelectorAll('.dp-page').forEach(p=>{
     p.classList.toggle('print-active', p.id===`dppage-${key}`);
   });
-  window.print();
+  // Ensure day planner screen is active before printing
+  // (print CSS makes it visible regardless, but this ensures canvases are rendered)
+  const wasOnDayPlanner = document.getElementById('screen-dayplanner')?.classList.contains('active');
+  if(!wasOnDayPlanner) gotoScreen('screen-dayplanner');
+  requestAnimationFrame(()=> window.print());
 }
 
 // ── ICS calendar export ──────────────────────────────
