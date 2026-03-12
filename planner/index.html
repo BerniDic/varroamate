@@ -5007,17 +5007,24 @@ canvas.addEventListener('drop',e=>{
   updateAll();
 });
 
-// Mobile tap-to-place (palette → timeline)
+// ── Mobile / tablet: tap-to-place + touch-drag for palette chips ──────────
 let mobilePendingTreat=null;
+let _touchDragTreat=null;
+
+function _isTouchDevice(){ return 'ontouchstart' in window || navigator.maxTouchPoints > 0; }
+
 document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     document.querySelectorAll('.treat-chip:not(.incompatible)').forEach(chip=>{
+
+      // ── Tap-to-place (tap chip, then tap canvas) ──
       chip.addEventListener('click',()=>{
         const id=chip.dataset.treat;
         if(!currentPref.allowed.includes(id))return;
         if(mobilePendingTreat===id){
           mobilePendingTreat=null;
           document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
+          canvas.style.cursor='default';
           return;
         }
         mobilePendingTreat=id;
@@ -5025,7 +5032,76 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
         chip.style.boxShadow=`0 0 0 2px ${TREATMENTS[id].color}`;
         canvas.style.cursor='crosshair';
       });
+
+      // ── Touch-drag: drag chip directly onto canvas ──
+      chip.addEventListener('touchstart', e=>{
+        const id=chip.dataset.treat;
+        if(!currentPref.allowed.includes(id)) return;
+        _touchDragTreat=id;
+        ghost.textContent='+ '+TREATMENTS[id].name;
+        ghost.style.background=TREATMENTS[id].color;
+        ghost.style.display='block';
+        ghost.style.position='fixed';
+        ghost.style.pointerEvents='none';
+        ghost.style.zIndex='9999';
+        const t=e.touches[0];
+        ghost.style.left=(t.clientX+12)+'px';
+        ghost.style.top=(t.clientY-20)+'px';
+        chip.classList.add('dragging');
+      },{passive:true});
+
+      chip.addEventListener('touchmove', e=>{
+        if(!_touchDragTreat) return;
+        e.preventDefault();
+        const t=e.touches[0];
+        ghost.style.left=(t.clientX+12)+'px';
+        ghost.style.top=(t.clientY-20)+'px';
+        // Highlight canvas if finger is over it
+        const cr=canvas.getBoundingClientRect();
+        if(t.clientX>=cr.left&&t.clientX<=cr.right&&t.clientY>=cr.top&&t.clientY<=cr.bottom){
+          if(drawnData){
+            const mx=t.clientX-cr.left;
+            const {PAD_L,TW}=drawnData;
+            const frac=windowStart+((mx-PAD_L)/TW)*windowSpan;
+            const mf=Math.floor(frac);
+            if(mf>=0&&mf<TOTAL_MONTHS){
+              const yr=2024+Math.floor(mf/12);
+              const mo=((mf%12)+12)%12;
+              if(!isInPast(yr,mo)){ dropYear=yr; dropMonth=mo; canvas.classList.remove('drop-blocked'); }
+              else { dropYear=null; dropMonth=null; canvas.classList.add('drop-blocked'); }
+              redraw();
+            }
+          }
+        } else {
+          dropYear=null; dropMonth=null;
+          canvas.classList.remove('drop-blocked');
+          redraw();
+        }
+      },{passive:false});
+
+      chip.addEventListener('touchend', e=>{
+        if(!_touchDragTreat) return;
+        ghost.style.display='none';
+        chip.classList.remove('dragging');
+        canvas.classList.remove('drop-blocked');
+        if(dropMonth!==null&&dropYear!==null){
+          const t=TREATMENTS[_touchDragTreat];
+          planEvents.push({id:nextId++,treatId:_touchDragTreat,month:dropMonth,year:dropYear,row:2,
+            label:t.name,color:t.color,
+            detail:`${MONTHS[dropMonth]} ${dropYear} · Planned · ${t.moa}`,planned:true});
+          dropMonth=null; dropYear=null;
+          updateAll();
+        }
+        _touchDragTreat=null;
+        document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
+        mobilePendingTreat=null;
+      },{passive:true});
+
     });
+  // On touch devices, disable HTML5 draggable so it doesn't swallow touch events
+  if(_isTouchDevice()){
+    document.querySelectorAll('.treat-chip').forEach(c=>c.removeAttribute('draggable'));
+  }
   },200);
 });
 
