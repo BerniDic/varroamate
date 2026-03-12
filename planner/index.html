@@ -2634,7 +2634,6 @@ function closePrefModal(){ document.getElementById('prefModal').classList.remove
 function _chipHTML(id, t, ok){
   const incompCls = ok ? '' : ' incompatible';
   return `<div class="treat-chip${incompCls}" id="chip-${id}" data-treat="${id}"
-    draggable="true"
     ondragstart="onChipDragStart(event,'${id}')"
     ondragend="onChipDragEnd(event)">
     <div class="chip-dot" style="background:${t.color}"></div>
@@ -5011,6 +5010,11 @@ canvas.addEventListener('drop',e=>{
 let mobilePendingTreat=null;
 document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
+    // Only enable HTML5 drag on devices with a fine pointer (mouse) — not touch
+    const hasFinePointer = window.matchMedia('(pointer:fine)').matches;
+    if(hasFinePointer){
+      document.querySelectorAll('.treat-chip').forEach(c=>c.setAttribute('draggable','true'));
+    }
     document.querySelectorAll('.treat-chip:not(.incompatible)').forEach(chip=>{
 
       // ── Tap-to-place (tap chip, then tap canvas) ──
