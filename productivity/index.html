@@ -1317,6 +1317,11 @@ function applySession(session){
 // 1. Read existing session immediately (covers shared VM session on same domain)
 _sb.auth.getSession().then(({data:{session}})=>{
   applySession(session);
+  if(session?.user){
+    showToast('Session found: '+session.user.email);
+  } else {
+    showToast('No session found — please sign in');
+  }
   loadAllData();
 });
 
@@ -2174,6 +2179,7 @@ async function deleteHarvest(){
 
 async function saveHarvest(){
   if(!_user){showToast('Please sign in to save data.');return;}
+  console.log('Saving harvest, user_id:', _user.id, 'email:', _user.email);
   const btn=document.getElementById('harvestSaveBtn');
   const hive_id=document.getElementById('hHive').value;
   const date=document.getElementById('hDate').value;
