@@ -5008,36 +5008,44 @@ canvas.addEventListener('drop',e=>{
 
 // ── Mobile / tablet: tap-to-place + touch-drag for palette chips ──────────
 let mobilePendingTreat=null;
-document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    // Only enable HTML5 drag on devices with a fine pointer (mouse) — not touch
-    const hasFinePointer = window.matchMedia('(pointer:fine)').matches;
-    if(hasFinePointer){
+
+// ── Chip tap-to-place: event delegation so it survives renderPalette() rebuilds ──
+document.addEventListener('DOMContentLoaded', ()=>{
+
+  // Enable HTML5 drag only for mouse (fine pointer) — use MutationObserver
+  // so draggable is re-set after every renderPalette() call
+  const hasFinePointer = window.matchMedia('(pointer:fine)').matches;
+  if(hasFinePointer){
+    const setDraggable = ()=>
       document.querySelectorAll('.treat-chip').forEach(c=>c.setAttribute('draggable','true'));
+    const pb = document.getElementById('paletteBody');
+    if(pb) new MutationObserver(setDraggable).observe(pb,{childList:true,subtree:true});
+    setTimeout(setDraggable, 400);
+  }
+
+  // Single delegated click listener on the stable paletteBody wrapper
+  // Works regardless of when renderPalette() rebuilds innerHTML
+  document.addEventListener('click', e=>{
+    if(e.target.closest('.chip-info-btn')) return; // let info btn handle itself
+    const chip = e.target.closest('.treat-chip');
+    if(!chip) return;
+    if(chip.classList.contains('incompatible')) return;
+    const id = chip.dataset.treat;
+    if(!id || !currentPref.allowed.includes(id)) return;
+
+    if(mobilePendingTreat === id){
+      mobilePendingTreat = null;
+      document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
+      if(canvas) canvas.style.cursor = 'default';
+      _hideTapHint();
+      return;
     }
-    document.querySelectorAll('.treat-chip:not(.incompatible)').forEach(chip=>{
-
-      // ── Tap-to-place (tap chip, then tap canvas) ──
-      chip.addEventListener('click',()=>{
-        const id=chip.dataset.treat;
-        if(!currentPref.allowed.includes(id))return;
-        if(mobilePendingTreat===id){
-          mobilePendingTreat=null;
-          document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
-          canvas.style.cursor='default';
-          _hideTapHint();
-          return;
-        }
-        mobilePendingTreat=id;
-        document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
-        chip.style.boxShadow=`0 0 0 3px ${TREATMENTS[id].color}, 0 0 0 5px white`;
-        canvas.style.cursor='crosshair';
-        _showTapHint(TREATMENTS[id].name, TREATMENTS[id].color);
-      });
-
-    });
-
-  },200);
+    mobilePendingTreat = id;
+    document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
+    chip.style.boxShadow = `0 0 0 3px ${TREATMENTS[id].color}, 0 0 0 5px white`;
+    if(canvas) canvas.style.cursor = 'crosshair';
+    _showTapHint(TREATMENTS[id].name, TREATMENTS[id].color);
+  });
 });
 
 // Tap hint banner — shown above timeline when a chip is armed on touch devices
