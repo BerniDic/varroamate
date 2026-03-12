@@ -1,1 +1,2452 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VarroaMate · Productivity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Bitter:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+// QR deep-link: ?h=HIVECODE opens inspection modal for that hive immediately
+(function(){
+  var p = new URLSearchParams(window.location.search).get('h');
+  if(p) window._qrHiveCode = p.toUpperCase();
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  /* ── VarroaMate Productivity palette ──────────────────
+     Inspired by a traditional honey house: aged timber,
+     raw beeswax, terracotta crocks, deep fig-wood shadows.
+     Deliberately distinct from VM (forest green) and VMSP.
+  ─────────────────────────────────────────────────────── */
+  --terra:       #C1593A;   /* terracotta — primary accent  */
+  --terra-deep:  #9A3E24;   /* dark terracotta              */
+  --terra-pale:  #FAF0EB;   /* very light terracotta tint   */
+  --terra-mid:   #E8896A;   /* mid terracotta               */
+  --wax:         #F2D98A;   /* raw beeswax yellow           */
+  --wax-deep:    #C9A83C;   /* deeper wax / old gold        */
+  --wax-pale:    #FDF8EC;   /* near-white warm paper        */
+  --plum:        #4A2545;   /* deep fig / plum — header bg  */
+  --plum-mid:    #6B3868;   /* mid plum                     */
+  --plum-light:  #C4A0C0;   /* dusty lavender               */
+  --timber:      #5C3A1E;   /* dark timber brown            */
+  --timber-mid:  #8C6040;   /* mid timber                   */
+  --cream:       #FDFAF3;   /* warm off-white page bg       */
+  --paper:       #F7F2E8;   /* card background              */
+  --text1:       #1E140A;   /* near-black warm              */
+  --text2:       #4A3828;   /* mid brown text               */
+  --text3:       #9A8878;   /* muted caption                */
+  --border:      #E0D0BC;   /* warm tan border              */
+  --border-mid:  #C8B89A;   /* darker border                */
+  --white:       #FFFFFF;
+  --shadow:      0 2px 12px rgba(90,50,20,0.10);
+  --shadow-lg:   0 8px 32px rgba(90,50,20,0.18);
+  --radius:      12px;
+  --radius-sm:   8px;
+  --radius-lg:   18px;
+  --nav-h:       64px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Bitter',serif;
+  background:var(--cream);
+  color:var(--text1);
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    radial-gradient(ellipse at 20% 0%,rgba(193,89,58,0.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 100%,rgba(74,37,69,0.05) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+#app{position:relative;z-index:1;}
+
+/* ══════════════════════════════════════════════
+   INLINE SIGN-IN BANNER
+══════════════════════════════════════════════ */
+.auth-input{
+  width:100%;padding:8px 11px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:'Bitter',serif;font-size:13px;
+  color:var(--text1);background:var(--cream);
+  outline:none;transition:border-color 0.15s;
+}
+.auth-input:focus{border-color:var(--terra);}
+.auth-err{color:#C04040;}
+
+/* ══════════════════════════════════════════════
+   LAYOUT SHELL
+══════════════════════════════════════════════ */
+#app{
+  display:none;
+  flex-direction:column;
+  height:100%;
+}
+#app.ready{display:flex;}
+
+/* TOP HEADER */
+.top-bar{
+  flex-shrink:0;
+  background:linear-gradient(135deg,var(--plum),var(--plum-mid));
+  padding:0 16px;
+  height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.top-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;font-weight:700;
+  color:white;letter-spacing:-0.2px;
+  text-decoration:none;
+  display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+}
+.top-logo-sub{
+  font-family:'Bitter',serif;
+  font-size:10px;font-weight:500;
+  color:var(--plum-light);letter-spacing:1.2px;text-transform:uppercase;
+  margin-left:2px;
+}
+.top-right{display:flex;align-items:center;gap:8px;}
+.hive-selector{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:6px;padding:5px 10px;
+  cursor:pointer;
+}
+.hive-selector select{
+  background:transparent;border:none;outline:none;
+  color:var(--plum-light);font-family:'Bitter',serif;
+  font-size:12px;cursor:pointer;
+  max-width:140px;
+}
+.hive-selector select option{background:var(--plum);color:white;}
+.top-user{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--terra);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:white;
+  cursor:pointer;flex-shrink:0;
+}
+
+/* CONTENT AREA */
+.content-area{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:16px 16px 80px;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  flex-shrink:0;
+  height:var(--nav-h);
+  background:var(--paper);
+  border-top:1.5px solid var(--border);
+  display:flex;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-tab{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;
+  padding:8px 4px;
+  transition:all 0.15s;
+  border:none;background:transparent;
+  color:var(--text3);
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-tab.active{color:var(--terra);}
+.nav-tab-icon{font-size:20px;line-height:1;}
+.nav-tab-label{font-size:10px;font-weight:600;letter-spacing:0.3px;}
+.nav-tab.active .nav-tab-label{color:var(--terra);}
+
+/* ══════════════════════════════════════════════
+   SCREEN SYSTEM
+══════════════════════════════════════════════ */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ══════════════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════════════ */
+.page-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:700;
+  color:var(--timber);
+  margin-bottom:4px;
+}
+.page-sub{
+  font-size:13px;color:var(--text3);
+  margin-bottom:20px;
+}
+.card{
+  background:var(--paper);
+  border-radius:var(--radius);
+  border:1.5px solid var(--border);
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+  overflow:hidden;
+}
+.card-head{
+  padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:var(--cream);
+}
+.card-title{
+  font-size:13px;font-weight:700;
+  color:var(--text2);
+  letter-spacing:0.2px;
+  display:flex;align-items:center;gap:6px;
+}
+.card-body{padding:16px;}
+.btn{
+  padding:8px 16px;border-radius:var(--radius-sm);
+  font-family:'Bitter',serif;font-size:13px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.btn-honey{
+  background:linear-gradient(135deg,var(--terra),var(--terra-deep));
+  color:white;
+}
+.btn-honey:hover{opacity:0.9;}
+.btn-outline{
+  background:transparent;
+  border:1.5px solid var(--border);
+  color:var(--text2);
+}
+.btn-outline:hover{border-color:var(--terra);color:var(--terra-deep);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.tag{
+  display:inline-flex;align-items:center;
+  padding:3px 9px;border-radius:20px;
+  font-size:11px;font-weight:600;
+}
+.tag-honey{background:var(--terra-pale);color:var(--terra-deep);}
+.tag-sage{background:#E8F0EA;color:var(--timber-mid);}
+.tag-red{background:#FDEAEA;color:#B03030;}
+.tag-blue{background:#E8F0FA;color:#2060A0;}
+.tag-grey{background:#F0EFE8;color:var(--text2);}
+.empty-state{
+  text-align:center;padding:32px 20px;
+  color:var(--text3);font-size:13px;
+}
+.empty-state-icon{font-size:36px;margin-bottom:10px;}
+.form-row{margin-bottom:12px;}
+.form-label{
+  font-size:11px;font-weight:700;color:var(--text2);
+  letter-spacing:0.5px;text-transform:uppercase;
+  margin-bottom:4px;display:block;
+}
+.form-input,.form-select,.form-textarea{
+  width:100%;padding:9px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:'Bitter',serif;font-size:13px;
+  color:var(--text1);background:var(--cream);
+  outline:none;transition:border-color 0.15s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--terra);
+}
+.form-textarea{resize:vertical;min-height:72px;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:100;
+  display:none;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+@media(min-width:600px){
+  .modal-overlay{align-items:center;}
+}
+.modal{
+  background:var(--paper);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  width:100%;max-width:560px;
+  max-height:92vh;
+  overflow-y:auto;
+  padding:20px 20px 32px;
+}
+@media(min-width:600px){
+  .modal{border-radius:var(--radius-lg);max-height:85vh;}
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;
+}
+.modal-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:700;color:var(--timber);
+}
+.modal-close{
+  background:none;border:none;cursor:pointer;
+  font-size:20px;color:var(--text3);padding:4px;
+  line-height:1;
+}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--plum);color:white;
+  padding:10px 18px;border-radius:20px;
+  font-size:13px;font-weight:500;
+  opacity:0;transition:all 0.25s;
+  z-index:999;white-space:nowrap;
+  pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Loading */
+.loading-spinner{
+  display:flex;align-items:center;justify-content:center;
+  padding:32px;color:var(--text3);font-size:13px;gap:8px;
+}
+.spinner{
+  width:18px;height:18px;
+  border:2px solid var(--border);
+  border-top-color:var(--terra);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════════════════════════════════════════════
+   🍯 HARVEST SCREEN
+══════════════════════════════════════════════ */
+.harvest-hero{
+  background:linear-gradient(160deg,var(--plum) 0%,var(--timber) 100%);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:20px;
+  overflow:hidden;
+  position:relative;
+}
+.harvest-hero::before{
+  content:'';
+  position:absolute;
+  right:-20px;top:-20px;
+  width:140px;height:140px;
+  background:radial-gradient(circle,rgba(242,217,138,0.20) 0%,transparent 70%);
+  border-radius:50%;
+}
+.hero-hive-wrap{flex-shrink:0;}
+.hero-text{flex:1;min-width:0;}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:700;color:white;
+  margin-bottom:2px;
+}
+.hero-hive-name{font-size:12px;color:var(--plum-light);margin-bottom:8px;}
+.hero-yield{
+  font-family:'Cormorant Garamond',serif;
+  font-size:36px;font-weight:700;
+  color:var(--wax);line-height:1;
+}
+.hero-yield-unit{font-size:14px;font-weight:400;color:var(--plum-light);margin-left:3px;}
+.hero-year{font-size:11px;color:var(--plum-light);margin-top:2px;}
+
+/* Honey hive SVG fill */
+.hive-svg-wrap{
+  position:relative;
+  width:72px;height:80px;
+}
+.hive-svg-wrap svg{width:72px;height:80px;}
+
+/* Year comparison row */
+.year-bar-row{
+  display:flex;gap:10px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  margin-bottom:16px;
+  scrollbar-width:none;
+}
+.year-bar-row::-webkit-scrollbar{display:none;}
+.year-bar-card{
+  flex-shrink:0;
+  background:var(--paper);
+  border-radius:var(--radius);
+  border:1.5px solid var(--border);
+  padding:12px 14px;
+  min-width:100px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.year-bar-card.active{
+  border-color:var(--terra);
+  background:var(--terra-pale);
+  box-shadow:0 0 0 3px rgba(193,89,58,0.12);
+}
+.year-bar-year{font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;}
+.year-bar-track{
+  height:6px;background:var(--border);
+  border-radius:3px;margin-bottom:4px;overflow:hidden;
+}
+.year-bar-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--terra),var(--terra-deep));
+  transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+.year-bar-kg{font-size:13px;font-weight:700;color:var(--text1);}
+
+/* Harvest list */
+.harvest-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  transition:background 0.1s;
+}
+.harvest-item:last-child{border-bottom:none;}
+.harvest-item:active{background:var(--cream);}
+.harvest-icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  background:var(--terra-pale);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.harvest-info{flex:1;min-width:0;}
+.harvest-date{font-size:12px;color:var(--text3);}
+.harvest-label{font-size:14px;font-weight:600;color:var(--text1);}
+.harvest-detail{font-size:11px;color:var(--text3);}
+.harvest-kg{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:700;color:var(--terra-deep);
+  text-align:right;flex-shrink:0;
+}
+.harvest-kg-unit{font-size:10px;font-weight:400;color:var(--text3);}
+
+/* Add harvest FAB */
+.fab{
+  position:fixed;
+  right:18px;
+  bottom:calc(var(--nav-h) + 14px + env(safe-area-inset-bottom,0px));
+  width:52px;height:52px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--terra),var(--terra-deep));
+  color:white;font-size:24px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(160,60,30,0.4);
+  cursor:pointer;border:none;
+  transition:transform 0.15s,box-shadow 0.15s;
+  z-index:50;
+}
+.fab:active{transform:scale(0.94);}
+
+/* ══════════════════════════════════════════════
+   🔍 INSPECTIONS SCREEN
+══════════════════════════════════════════════ */
+.insp-item{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.1s;
+}
+.insp-item:last-child{border-bottom:none;}
+.insp-item:active{background:var(--cream);}
+.insp-row1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.insp-date{font-size:11px;color:var(--text3);}
+.insp-hive{font-size:14px;font-weight:600;color:var(--text1);}
+.insp-ratings{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.rating-pill{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 8px;border-radius:20px;
+  font-size:11px;font-weight:500;
+  background:var(--cream);border:1px solid var(--border);
+  color:var(--text2);
+}
+.rating-pill.good{background:#EEF8F1;border-color:#A8D4B0;color:#256030;}
+.rating-pill.warn{background:#FFF4E0;border-color:#F0D090;color:#8A5010;}
+.rating-pill.bad{background:#FDEAEA;border-color:#F0C0C0;color:#903030;}
+.insp-notes{
+  font-size:12px;color:var(--text3);
+  margin-top:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* Inspection field grid — 2 cols on wide, 1 col on phone */
+.insp-field-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+@media(max-width:480px){
+  .insp-field-grid{grid-template-columns:1fr;}
+}
+.insp-field-group{
+  background:var(--cream);
+  border-radius:var(--radius-sm);
+  padding:10px;
+  border:1px solid var(--border);
+}
+.insp-field-label{
+  font-size:11px;font-weight:700;
+  color:var(--text2);
+  text-transform:uppercase;letter-spacing:0.5px;
+  margin-bottom:7px;
+}
+/* Larger tap targets for field use */
+.insp-opt{
+  padding:9px 10px !important;
+  font-size:13px !important;
+  flex:1;
+  text-align:center;
+  justify-content:center;
+}
+.rating-group{display:flex;gap:5px;flex-wrap:wrap;}
+
+/* Voice recording pulse */
+@keyframes voicePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(193,89,58,0.4);}
+  50%{box-shadow:0 0 0 8px rgba(193,89,58,0);}
+}
+.voice-recording{
+  animation:voicePulse 1.2s ease infinite !important;
+  background:var(--terra-deep) !important;
+}
+
+/* Rating selector */
+.rating-group{display:flex;gap:6px;flex-wrap:wrap;}
+.rating-opt{
+  padding:6px 12px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);
+  background:white;color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.rating-opt.selected-good{background:#EEF8F1;border-color:#60C070;color:#1A6A2A;}
+.rating-opt.selected-ok{background:#FFF4E0;border-color:#E0A030;color:#7A4A08;}
+.rating-opt.selected-bad{background:#FDEAEA;border-color:#E08080;color:#902020;}
+
+/* ══════════════════════════════════════════════
+   👑 QUEENS SCREEN
+══════════════════════════════════════════════ */
+.queen-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;
+}
+.queen-card{
+  background:var(--paper);
+  border-radius:var(--radius);
+  border:1.5px solid var(--border);
+  padding:14px;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.queen-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--terra);}
+.queen-card-hive{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.queen-card-name{font-size:14px;font-weight:700;color:var(--timber);margin-bottom:8px;}
+.queen-dot-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.queen-dot{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(0,0,0,0.12);
+  flex-shrink:0;
+}
+.queen-dot-label{font-size:11px;color:var(--text2);}
+.queen-age{
+  font-size:12px;color:var(--text3);
+  margin-top:6px;
+}
+.queen-status{margin-top:8px;}
+
+/* Apiary section header inside queen grid */
+.apiary-section-header{
+  display:flex;align-items:baseline;gap:8px;
+  padding:6px 2px 4px;
+  border-bottom:2px solid var(--terra-pale);
+  margin-top:6px;
+}
+.apiary-section-header:first-child{margin-top:0;}
+.apiary-section-label{
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;font-weight:600;
+  color:var(--terra-deep);letter-spacing:0.2px;
+}
+.apiary-section-addr{
+  font-size:11px;color:var(--text3);
+}
+.queen-card-empty{
+  border-style:dashed;
+  opacity:0.7;
+  background:var(--cream);
+}
+.queen-card-empty:hover{
+  opacity:1;border-color:var(--terra);border-style:solid;
+  background:var(--terra-pale);
+}
+
+/* Queen colour dots */
+.dot-white{background:#F5F5F5;border-color:#CCCCCC;}
+.dot-yellow{background:#FFE000;border-color:#CCA800;}
+.dot-red{background:#DD2020;border-color:#AA0000;}
+.dot-green{background:#30B040;border-color:#208030;}
+.dot-blue{background:#2060CC;border-color:#0040AA;}
+
+/* ══════════════════════════════════════════════
+   📊 INSIGHTS SCREEN
+══════════════════════════════════════════════ */
+.insight-section-title{
+  font-size:11px;font-weight:700;color:var(--terra);
+  text-transform:uppercase;letter-spacing:1.2px;
+  margin:18px 0 10px;
+}
+.insight-section-title:first-child{margin-top:0;}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:4px;
+}
+.stat-card{
+  background:var(--paper);
+  border-radius:var(--radius);
+  border:1.5px solid var(--border);
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.stat-value{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;font-weight:700;color:var(--timber);
+  line-height:1;
+}
+.stat-unit{font-size:12px;font-weight:400;color:var(--text3);}
+.stat-delta{font-size:11px;margin-top:3px;}
+.stat-delta.up{color:#30903A;}
+.stat-delta.down{color:#C04040;}
+
+/* Bar chart */
+.bar-chart{padding:4px 0;}
+.bar-row{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:8px;
+}
+.bar-row-label{
+  font-size:11px;color:var(--text2);
+  width:80px;flex-shrink:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.bar-track{
+  flex:1;height:22px;
+  background:var(--cream);
+  border-radius:4px;
+  overflow:hidden;
+  position:relative;
+}
+.bar-fill{
+  height:100%;border-radius:4px;
+  display:flex;align-items:center;
+  padding-left:8px;
+  font-size:11px;font-weight:600;color:white;
+  transition:width 0.8s cubic-bezier(0.34,1.2,0.64,1);
+  white-space:nowrap;
+}
+.bar-fill-honey{background:linear-gradient(90deg,var(--terra),var(--terra-deep));}
+.bar-fill-sage{background:linear-gradient(90deg,var(--plum-light),var(--plum-mid));}
+.bar-fill-mite{background:linear-gradient(90deg,#C04040,#902020);}
+
+/* Mite-vs-yield scatter dots */
+.scatter-wrap{
+  position:relative;
+  height:160px;
+  background:var(--cream);
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+  margin-top:8px;
+  overflow:hidden;
+}
+.scatter-dot{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:var(--terra);
+  border:2px solid white;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);
+  cursor:pointer;
+  transition:transform 0.15s;
+}
+.scatter-dot:hover{transform:translate(-50%,-50%) scale(1.5);}
+.scatter-axis{
+  position:absolute;
+  font-size:9px;color:var(--text3);
+}
+.scatter-axis.x{bottom:4px;right:6px;}
+.scatter-axis.y{top:4px;left:6px;}
+
+/* Hive system comparison */
+.system-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.system-row:last-child{border-bottom:none;}
+.system-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.system-info{flex:1;}
+.system-name{font-size:13px;font-weight:600;color:var(--text1);}
+.system-yield{font-size:11px;color:var(--text3);}
+.system-bar-wrap{width:80px;}
+.system-bar{
+  height:8px;background:var(--border);
+  border-radius:4px;overflow:hidden;
+}
+.system-bar-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--terra),var(--terra-deep));
+  transition:width 0.8s ease;
+}
+
+/* No-data message */
+.insight-no-data{
+  text-align:center;padding:20px;
+  color:var(--text3);font-size:12px;
+  background:var(--cream);border-radius:var(--radius-sm);
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.screen.active .card{
+  animation:fadeUp 0.3s ease both;
+}
+.screen.active .card:nth-child(2){animation-delay:0.05s;}
+.screen.active .card:nth-child(3){animation-delay:0.10s;}
+.screen.active .card:nth-child(4){animation-delay:0.15s;}
+.screen.active .harvest-hero{animation:fadeUp 0.35s ease both;}
+.screen.active .year-bar-row{animation:fadeUp 0.4s ease both;}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media(min-width:600px){
+  .content-area{padding:20px 24px 90px;}
+  .stat-grid{grid-template-columns:repeat(4,1fr);}
+  .queen-grid{grid-template-columns:repeat(auto-fill,minmax:180px,1fr);}
+  .year-bar-row{flex-wrap:wrap;overflow-x:visible;}
+}
+@media(min-width:900px){
+  #app{flex-direction:row;}
+  .top-bar{display:none;}
+  .bottom-nav{
+    width:220px;height:100%;
+    flex-direction:column;justify-content:flex-start;
+    border-top:none;border-right:1.5px solid var(--border);
+    padding:24px 0 24px;
+  }
+  .side-logo{
+    padding:0 20px 24px;
+    font-family:'Cormorant Garamond',serif;
+    font-size:18px;font-weight:700;
+    color:var(--timber);
+    display:block;
+    border-bottom:1px solid var(--border);
+    margin-bottom:16px;
+  }
+  .side-logo span{color:var(--terra);}
+  .side-logo-sub{
+    font-size:10px;font-weight:500;
+    color:var(--text3);letter-spacing:1px;
+    text-transform:uppercase;display:block;
+    margin-top:2px;
+  }
+  .nav-tab{
+    flex-direction:row;justify-content:flex-start;
+    padding:10px 20px;border-radius:0;
+    gap:10px;
+  }
+  .nav-tab.active{
+    background:var(--terra-pale);
+    border-left:3px solid var(--terra);
+    color:var(--terra);
+  }
+  .nav-tab-icon{font-size:18px;}
+  .nav-tab-label{font-size:13px;font-weight:600;}
+  .content-area{flex:1;max-width:none;}
+  .top-hive-bar{
+    display:flex;align-items:center;gap:12px;
+    padding:0 0 16px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ INLINE SIGN-IN BANNER (shown only when no session) ══ -->
+<div id="signInBanner" style="display:none;">
+  <div style="background:linear-gradient(135deg,var(--plum),var(--plum-mid));padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <div style="font-size:12px;color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:6px;">
+      🔒 <span>Sign in to load your hives and save data</span>
+    </div>
+    <button class="btn btn-sm" onclick="toggleSignInForm()"
+      style="background:var(--terra);color:white;border:none;flex-shrink:0;"
+      id="signInToggleBtn">Sign in ▾</button>
+  </div>
+  <div id="signInForm" style="display:none;background:var(--paper);border-bottom:1.5px solid var(--border);padding:14px 16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;flex-wrap:wrap;">
+      <div>
+        <label class="form-label">Email</label>
+        <input class="auth-input" id="authEmail" type="email" placeholder="you@example.com"
+          autocomplete="email" style="margin-bottom:0;"
+          onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <div>
+        <label class="form-label">Password</label>
+        <input class="auth-input" id="authPass" type="password" placeholder="Password"
+          autocomplete="current-password" style="margin-bottom:0;"
+          onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <button class="btn btn-honey" onclick="signIn()" id="signInBtn">Sign in</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <div class="auth-err" id="authErr" style="font-size:12px;"></div>
+      <div style="font-size:11px;color:var(--text3);">No account? <a href="/app/" target="_blank" style="color:var(--terra);text-decoration:none;font-weight:600;">Sign up in VarroaMate →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+
+<div id="signInBanner" style="display:none;">
+  <div style="background:linear-gradient(135deg,var(--plum),var(--plum-mid));padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <div style="font-size:12px;color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:6px;">
+      🔒 <span>Sign in to load your hives and save data</span>
+    </div>
+    <button class="btn btn-sm" onclick="toggleSignInForm()"
+      style="background:var(--terra);color:white;border:none;flex-shrink:0;"
+      id="signInToggleBtn">Sign in ▾</button>
+  </div>
+  <div id="signInForm" style="display:none;background:var(--paper);border-bottom:1.5px solid var(--border);padding:14px 16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;flex-wrap:wrap;">
+      <div>
+        <label class="form-label">Email</label>
+        <input class="auth-input" id="authEmail" type="email" placeholder="you@example.com"
+          autocomplete="email" style="margin-bottom:0;"
+          onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <div>
+        <label class="form-label">Password</label>
+        <input class="auth-input" id="authPass" type="password" placeholder="Password"
+          autocomplete="current-password" style="margin-bottom:0;"
+          onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <button class="btn btn-honey" onclick="signIn()" id="signInBtn">Sign in</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <div class="auth-err" id="authErr" style="font-size:12px;"></div>
+      <div style="font-size:11px;color:var(--text3);">No account? <a href="/app/" target="_blank" style="color:var(--terra);text-decoration:none;font-weight:600;">Sign up in VarroaMate →</a></div>
+    </div>
+  </div>
+</div>
+
+  <!-- Top bar (mobile/tablet) -->
+  <div class="top-bar">
+    <a class="top-logo" href="/">🐝 Varroa<span style="color:var(--wax);">Mate</span>™ <span class="top-logo-sub">Productivity</span></a>
+    <div class="top-right">
+      <div class="hive-selector">
+        🏠
+        <select id="topHiveSelect" onchange="onTopHiveChange()">
+          <option value="all">All hives</option>
+        </select>
+      </div>
+      <div class="top-user" id="topUser" onclick="signOut()">?</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area" id="contentArea">
+
+    <!-- 🍯 HARVEST -->
+    <div class="screen active" id="screen-harvest">
+      <div class="page-title">🍯 Harvest</div>
+      <div class="page-sub" id="harvestSub">Track honey yield per hive, season by season.</div>
+
+      <!-- Dynamic hive fill hero -->
+      <div class="harvest-hero" id="harvestHero">
+        <div class="hero-hive-wrap">
+          <div class="hive-svg-wrap" id="hiveSvgWrap"><!-- SVG injected --></div>
+        </div>
+        <div class="hero-text">
+          <div class="hero-title">Season total</div>
+          <div class="hero-hive-name" id="heroHiveName">All hives · 2026</div>
+          <div class="hero-yield"><span id="heroYield">—</span><span class="hero-yield-unit">kg</span></div>
+          <div class="hero-year" id="heroYearNote"></div>
+        </div>
+      </div>
+
+      <!-- Year comparison -->
+      <div class="year-bar-row" id="yearBarRow"></div>
+
+      <!-- Harvest log -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📋 Harvest log</div>
+          <button class="btn btn-honey btn-sm" onclick="openHarvestModal()">+ Add</button>
+        </div>
+        <div id="harvestList"><div class="loading-spinner"><div class="spinner"></div>Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- 🔍 INSPECTIONS -->
+    <div class="screen" id="screen-inspections">
+      <div class="page-title">🔍 Inspections</div>
+      <div class="page-sub">Quick field notes — glove-friendly.</div>
+
+      <!-- Last inspection summary strip -->
+      <div class="card" id="lastInspCard" style="display:none;">
+        <div class="card-body" style="display:flex;gap:12px;align-items:center;">
+          <div style="font-size:28px;">📋</div>
+          <div>
+            <div style="font-size:12px;color:var(--text3);" id="lastInspDate"></div>
+            <div style="font-size:14px;font-weight:600;color:var(--text1);" id="lastInspSummary"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📋 Inspection log</div>
+          <button class="btn btn-honey btn-sm" onclick="openInspModal()">+ Add</button>
+        </div>
+        <div id="inspList"><div class="loading-spinner"><div class="spinner"></div>Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- 👑 QUEENS -->
+    <div class="screen" id="screen-queens">
+      <div class="page-title">👑 Queen Register</div>
+      <div class="page-sub">Age, origin, colour and status per hive.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="btn btn-honey btn-sm" onclick="openQueenModal()">+ Add / Update</button>
+      </div>
+      <div id="queenGrid" class="queen-grid"></div>
+    </div>
+
+    <!-- 📊 INSIGHTS -->
+    <div class="screen" id="screen-insights">
+      <div class="page-title">📊 Insights</div>
+      <div class="page-sub">Where mite control meets productivity.</div>
+      <div id="insightsContent"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav" id="bottomNav">
+    <div class="side-logo" style="display:none;">Varroa<span>Mate</span>™<span class="side-logo-sub">Productivity</span></div>
+    <button class="nav-tab active" onclick="switchTab('harvest')" id="tab-harvest">
+      <span class="nav-tab-icon">🍯</span>
+      <span class="nav-tab-label">Harvest</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('inspections')" id="tab-inspections">
+      <span class="nav-tab-icon">🔍</span>
+      <span class="nav-tab-label">Inspections</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('queens')" id="tab-queens">
+      <span class="nav-tab-icon">👑</span>
+      <span class="nav-tab-label">Queens</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('insights')" id="tab-insights">
+      <span class="nav-tab-icon">📊</span>
+      <span class="nav-tab-label">Insights</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="onFab()">＋</button>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Harvest modal -->
+<div class="modal-overlay" id="harvestModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="harvestModalTitle">🍯 Record Harvest</div>
+      <button class="modal-close" onclick="closeModal('harvestModal')">✕</button>
+    </div>
+
+    <!-- Required fields -->
+    <div class="form-row">
+      <label class="form-label">Hive <span style="color:var(--terra)">*</span></label>
+      <select class="form-select" id="hHive" onchange="updateHiveLabel()"></select>
+      <div id="hHiveLabel" style="font-size:11px;color:var(--text3);margin-top:4px;padding-left:2px;"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row">
+        <label class="form-label">Date <span style="color:var(--terra)">*</span></label>
+        <input class="form-input" type="date" id="hDate">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Yield (kg) <span style="color:var(--terra)">*</span></label>
+        <input class="form-input" type="number" id="hKg" placeholder="0.0" step="0.1" min="0">
+      </div>
+    </div>
+
+    <!-- Optional fields toggle -->
+    <div style="margin:8px 0 4px;">
+      <button class="btn btn-outline btn-sm" onclick="toggleOptional()" id="optionalToggle" style="width:100%;justify-content:space-between;">
+        <span>Optional details</span><span id="optionalChevron">▾</span>
+      </button>
+    </div>
+    <div id="optionalFields" style="display:none;">
+      <div class="form-row" style="margin-top:10px;">
+        <label class="form-label">Honey type / label</label>
+        <input class="form-input" type="text" id="hLabel" placeholder="e.g. Spring blend, Bush honey…">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Supers harvested</label>
+        <input class="form-input" type="number" id="hSupers" placeholder="1" min="0" step="1">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="hNotes" placeholder="Colour, texture, aroma, extraction method…"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn btn-outline" id="harvestDeleteBtn" onclick="deleteHarvest()"
+        style="display:none;color:#B03030;border-color:#E0B0B0;">🗑 Delete</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-outline" onclick="closeModal('harvestModal')">Cancel</button>
+        <button class="btn btn-honey" onclick="saveHarvest()" id="harvestSaveBtn">Save harvest</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inspection modal -->
+<div class="modal-overlay" id="inspModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="inspModalTitle">🔍 Inspection</div>
+      <button class="modal-close" onclick="closeModal('inspModal')">✕</button>
+    </div>
+
+    <!-- Hive + date (required) -->
+    <div class="form-row">
+      <label class="form-label">Hive <span style="color:var(--terra)">*</span></label>
+      <select class="form-select" id="iHive" onchange="updateInspHiveLabel()"></select>
+      <div id="iHiveLabel" style="font-size:11px;color:var(--text3);margin-top:4px;padding-left:2px;"></div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Date <span style="color:var(--terra)">*</span></label>
+      <input class="form-input" type="date" id="iDate">
+    </div>
+
+    <!-- Voice entry bar -->
+    <div id="voiceBar" style="background:var(--terra-pale);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-size:12px;font-weight:600;color:var(--terra-deep);margin-bottom:2px;">🎙️ Voice entry</div>
+        <div style="font-size:11px;color:var(--text3);" id="voiceHint">Tap to dictate — AI will fill in the fields</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="btn btn-sm" id="voiceBtn" onclick="toggleVoice()"
+          style="background:var(--terra);color:white;border:none;min-width:80px;">
+          🎙️ Speak
+        </button>
+        <button class="btn btn-sm btn-outline" id="voiceExtractBtn" onclick="extractFromVoice()"
+          style="display:none;">✨ Fill fields</button>
+      </div>
+      <div id="voiceTranscript" style="width:100%;font-size:12px;color:var(--text2);font-style:italic;display:none;padding-top:4px;border-top:1px solid var(--border);margin-top:4px;"></div>
+    </div>
+
+    <!-- Tap-to-rate fields (large targets, glove-friendly) -->
+    <div class="insp-field-grid">
+
+      <div class="insp-field-group">
+        <div class="insp-field-label">👑 Queen</div>
+        <div class="rating-group" id="iQueenGroup">
+          <div class="rating-opt insp-opt" data-val="yes" onclick="selectRating(this,'iQueenGroup')">✅ Seen</div>
+          <div class="rating-opt insp-opt" data-val="eggs" onclick="selectRating(this,'iQueenGroup')">🥚 Eggs</div>
+          <div class="rating-opt insp-opt" data-val="no" onclick="selectRating(this,'iQueenGroup')">❌ None</div>
+        </div>
+      </div>
+
+      <div class="insp-field-group">
+        <div class="insp-field-label">🟩 Brood</div>
+        <div class="rating-group" id="iBroodGroup">
+          <div class="rating-opt insp-opt" data-val="solid" onclick="selectRating(this,'iBroodGroup')">🟢 Solid</div>
+          <div class="rating-opt insp-opt" data-val="patchy" onclick="selectRating(this,'iBroodGroup')">🟡 Patchy</div>
+          <div class="rating-opt insp-opt" data-val="poor" onclick="selectRating(this,'iBroodGroup')">🔴 Poor</div>
+        </div>
+      </div>
+
+      <div class="insp-field-group">
+        <div class="insp-field-label">🍯 Stores</div>
+        <div class="rating-group" id="iStoresGroup">
+          <div class="rating-opt insp-opt" data-val="full" onclick="selectRating(this,'iStoresGroup')">🍯 Full</div>
+          <div class="rating-opt insp-opt" data-val="ok" onclick="selectRating(this,'iStoresGroup')">👍 OK</div>
+          <div class="rating-opt insp-opt" data-val="low" onclick="selectRating(this,'iStoresGroup')">⚠️ Low</div>
+        </div>
+      </div>
+
+      <div class="insp-field-group">
+        <div class="insp-field-label">😌 Mood</div>
+        <div class="rating-group" id="iMoodGroup">
+          <div class="rating-opt insp-opt" data-val="calm" onclick="selectRating(this,'iMoodGroup')">😌 Calm</div>
+          <div class="rating-opt insp-opt" data-val="active" onclick="selectRating(this,'iMoodGroup')">🐝 Active</div>
+          <div class="rating-opt insp-opt" data-val="defensive" onclick="selectRating(this,'iMoodGroup')">😤 Defensive</div>
+        </div>
+      </div>
+
+      <div class="insp-field-group">
+        <div class="insp-field-label">🔴 Swarm cells</div>
+        <div class="rating-group" id="iSwarmGroup">
+          <div class="rating-opt insp-opt" data-val="none" onclick="selectRating(this,'iSwarmGroup')">✅ None</div>
+          <div class="rating-opt insp-opt" data-val="play" onclick="selectRating(this,'iSwarmGroup')">🔔 Play cups</div>
+          <div class="rating-opt insp-opt" data-val="sealed" onclick="selectRating(this,'iSwarmGroup')">⚠️ Sealed</div>
+        </div>
+      </div>
+
+      <div class="insp-field-group">
+        <div class="insp-field-label">💪 Population</div>
+        <div class="rating-group" id="iStrengthGroup">
+          <div class="rating-opt insp-opt" data-val="strong" onclick="selectRating(this,'iStrengthGroup')">💪 Strong</div>
+          <div class="rating-opt insp-opt" data-val="medium" onclick="selectRating(this,'iStrengthGroup')">👌 Medium</div>
+          <div class="rating-opt insp-opt" data-val="weak" onclick="selectRating(this,'iStrengthGroup')">📉 Weak</div>
+        </div>
+      </div>
+
+    </div><!-- /insp-field-grid -->
+
+    <!-- Notes (optional) -->
+    <div class="form-row" style="margin-top:12px;">
+      <label class="form-label">Notes <span style="font-weight:400;color:var(--text3);">(optional)</span></label>
+      <textarea class="form-textarea" id="iNotes" placeholder="Observations, actions taken, anything unusual…" rows="3"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn btn-outline" id="inspDeleteBtn" onclick="deleteInspection()"
+        style="display:none;color:#B03030;border-color:#E0B0B0;">🗑 Delete</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-outline" onclick="closeModal('inspModal')">Cancel</button>
+        <button class="btn btn-honey" onclick="saveInspection()" id="inspSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Queen modal -->
+<div class="modal-overlay" id="queenModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">👑 Queen Record</div>
+      <button class="modal-close" onclick="closeModal('queenModal')">✕</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Hive</label>
+      <select class="form-select" id="qHive"></select>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row">
+        <label class="form-label">Year introduced</label>
+        <input class="form-input" type="number" id="qYear" placeholder="2024" min="2020" max="2030">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Mark colour</label>
+        <select class="form-select" id="qColour">
+          <option value="">Unknown</option>
+          <option value="white">⚪ White (yr ending 1/6)</option>
+          <option value="yellow">🟡 Yellow (yr ending 2/7)</option>
+          <option value="red">🔴 Red (yr ending 3/8)</option>
+          <option value="green">🟢 Green (yr ending 4/9)</option>
+          <option value="blue">🔵 Blue (yr ending 5/0)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Origin</label>
+      <select class="form-select" id="qOrigin">
+        <option value="">Unknown</option>
+        <option value="purchased">Purchased mated queen</option>
+        <option value="raised">Home raised</option>
+        <option value="swarm">Swarm catch</option>
+        <option value="supersedure">Natural supersedure</option>
+        <option value="emergency">Emergency cell</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Hive system</label>
+      <select class="form-select" id="qSystem">
+        <option value="">Unknown</option>
+        <option value="langstroth">Langstroth</option>
+        <option value="flow">Flow Hive</option>
+        <option value="warre">Warré</option>
+        <option value="top-bar">Top Bar</option>
+        <option value="hiveiq">HiveIQ</option>
+        <option value="apimaye">Apimaye</option>
+        <option value="national">National (UK)</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Status</label>
+      <div class="rating-group" id="qStatusGroup">
+        <div class="rating-opt" data-val="laying" onclick="selectRating(this,'qStatusGroup')">✅ Laying</div>
+        <div class="rating-opt" data-val="suspect" onclick="selectRating(this,'qStatusGroup')">⚠️ Suspect</div>
+        <div class="rating-opt" data-val="replaced" onclick="selectRating(this,'qStatusGroup')">🔄 Replaced</div>
+        <div class="rating-opt" data-val="lost" onclick="selectRating(this,'qStatusGroup')">❌ Lost</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="qNotes" placeholder="Genetics, breeder, behaviour notes…"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-outline" onclick="closeModal('queenModal')">Cancel</button>
+      <button class="btn btn-honey" onclick="saveQueen()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// SUPABASE
+// ══════════════════════════════════════════════
+const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let _user       = null;
+let _apiaries   = [];
+let _hives      = [];
+let _mite_counts= [];
+let _treatments = [];
+let _harvests   = [];
+let _inspections= [];
+let _queens     = [];
+let _currentTab = 'harvest';
+let _filterHive = 'all'; // 'all' or hive id string
+let _editingHarvestId = null;
+let _editingInspId    = null;
+
+// ── Hive code helpers (matches VM's makeHiveCode exactly) ──
+function makeHiveCode(id){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let n=id,code='';
+  for(let i=0;i<4;i++){code+=chars[n%chars.length];n=Math.floor(n/chars.length)+7;}
+  return code;
+}
+function getHiveByCode(code){
+  return _hives.find(h=>makeHiveCode(h.id)===code.toUpperCase())||null;
+}
+let _tablesReady = false; // true once productivity tables confirmed to exist in Supabase
+
+const CURRENT_YEAR = new Date().getFullYear();
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+// Auth — app always visible; sign-in banner shown only when no session
+document.getElementById('app').classList.add('ready');
+
+_sb.auth.onAuthStateChange((event, session)=>{
+  if(session?.user){
+    _user = session.user;
+    const initials = (_user.email||'?')[0].toUpperCase();
+    document.getElementById('topUser').textContent = initials;
+    document.getElementById('topUser').title = _user.email||'';
+    document.getElementById('signInBanner').style.display = 'none';
+    loadAllData();
+  } else {
+    _user = null;
+    document.getElementById('topUser').textContent = '?';
+    document.getElementById('topUser').title = 'Not signed in';
+    document.getElementById('signInBanner').style.display = 'block';
+    loadAllData();
+  }
+});
+
+function toggleSignInForm(){
+  const form = document.getElementById('signInForm');
+  const btn  = document.getElementById('signInToggleBtn');
+  const open = form.style.display === 'none';
+  form.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? 'Cancel ▴' : 'Sign in ▾';
+  if(open) setTimeout(()=>document.getElementById('authEmail').focus(), 50);
+}
+
+async function signIn(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPass').value;
+  const err   = document.getElementById('authErr');
+  const btn   = document.getElementById('signInBtn');
+  err.textContent = '';
+  if(!email||!pass){err.textContent='Please enter email and password.';return;}
+  btn.textContent='Signing in…';btn.disabled=true;
+  const {error} = await _sb.auth.signInWithPassword({email,password:pass});
+  btn.textContent='Sign in';btn.disabled=false;
+  if(error){ err.textContent = error.message; return; }
+  // onAuthStateChange handles the rest
+}
+
+async function signOut(){
+  if(!_user){ showToast('Not signed in.'); return; }
+  if(!confirm('Sign out of VarroaMate?')) return;
+  await _sb.auth.signOut();
+  showToast('Signed out');
+}
+
+// ══════════════════════════════════════════════
+// DATA LOAD — syncs from VM's tables + new tables
+// ══════════════════════════════════════════════
+async function loadAllData(){
+  // If no user session, clear data and render empty states
+  if(!_user){
+    _apiaries=[];_hives=[];_mite_counts=[];_treatments=[];
+    _harvests=[];_inspections=[];_queens=[];
+    _tablesReady = false;
+    populateHiveSelectors();
+    renderAll();
+    return;
+  }
+  const uid = _user.id;
+
+  // Load from existing VM tables (apiaries, hives, mite counts, treatments)
+  const [apRes, hvRes, mcRes, txRes] = await Promise.all([
+    _sb.from('apiaries').select('*').eq('user_id',uid).order('created_at'),
+    _sb.from('hives').select('*').eq('user_id',uid).order('created_at'),
+    _sb.from('mite_counts').select('*').eq('user_id',uid).order('date',{ascending:false}),
+    _sb.from('treatments').select('*').eq('user_id',uid).order('date',{ascending:false}),
+  ]);
+  _apiaries    = apRes.data  || [];
+  _hives       = hvRes.data  || [];
+  _mite_counts = mcRes.data  || [];
+  _treatments  = txRes.data  || [];
+
+  // Load from productivity tables — graceful fallback if tables not yet created
+  // Error code 42P01 = relation does not exist (table not created yet in Supabase)
+  const safeQuery = async (query, tableName) => {
+    try {
+      const res = await query;
+      if(res.error){
+        if(res.error.code==='42P01'||res.error.message?.includes('does not exist')){
+          console.info(`Table "${tableName}" not yet created in Supabase — run SQL setup first.`);
+          _tablesReady = false;
+          return [];
+        }
+        console.warn(`Query "${tableName}" warning:`, res.error.message);
+        return [];
+      }
+      return res.data || [];
+    } catch(e){ console.warn('Query failed:', e); return []; }
+  };
+
+  _tablesReady = true; // assume true; safeQuery sets false if any table missing
+  [_harvests, _inspections, _queens] = await Promise.all([
+    safeQuery(_sb.from('harvests').select('*').eq('user_id',uid).order('date',{ascending:false}), 'harvests'),
+    safeQuery(_sb.from('inspections').select('*').eq('user_id',uid).order('date',{ascending:false}), 'inspections'),
+    safeQuery(_sb.from('queens').select('*').eq('user_id',uid).order('created_at',{ascending:false}), 'queens'),
+  ]);
+
+  populateHiveSelectors();
+  renderAll();
+
+  // QR deep-link: auto-open inspection modal for scanned hive
+  if(window._qrHiveCode){
+    const hive = getHiveByCode(window._qrHiveCode);
+    if(hive){
+      window._qrHiveCode = null; // consume
+      switchTab('inspections');
+      setTimeout(()=>openInspModal(null, String(hive.id)), 300);
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+// HIVE SELECTORS
+// ══════════════════════════════════════════════
+function populateHiveSelectors(){
+  // Build grouped options — one <optgroup> per apiary
+  function groupedOptions(includeAll=false){
+    let html = includeAll ? '<option value="all">🏠 All hives</option>' : '';
+    if(_apiaries.length===0 && _hives.length===0){
+      return html + '<option value="" disabled>No hives found — open VarroaMate first</option>';
+    }
+    // Apiaries that have hives
+    _apiaries.forEach(ap=>{
+      const apHives = _hives.filter(h=>h.apiary_id===ap.id);
+      if(apHives.length===0) return;
+      html += `<optgroup label="📍 ${ap.name}">`;
+      apHives.forEach(h=>{
+        html += `<option value="${h.id}">${h.name}</option>`;
+      });
+      html += '</optgroup>';
+    });
+    // Hives with no matching apiary (orphans)
+    const knownApiaryIds = new Set(_apiaries.map(a=>a.id));
+    const orphans = _hives.filter(h=>!knownApiaryIds.has(h.apiary_id));
+    if(orphans.length>0){
+      html += `<optgroup label="📍 Other">`;
+      orphans.forEach(h=>{ html += `<option value="${h.id}">${h.name}</option>`; });
+      html += '</optgroup>';
+    }
+    return html;
+  }
+
+  // Top filter (includes "All hives")
+  const top = document.getElementById('topHiveSelect');
+  top.innerHTML = groupedOptions(true);
+  // Restore saved filter if still valid
+  if(_filterHive!=='all' && _hives.some(h=>String(h.id)===String(_filterHive))){
+    top.value = _filterHive;
+  } else {
+    _filterHive = 'all';
+    top.value = 'all';
+  }
+
+  // Modal selects (no "All hives" option)
+  ['hHive','iHive','qHive'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = groupedOptions(false);
+  });
+}
+
+function onTopHiveChange(){
+  _filterHive = document.getElementById('topHiveSelect').value;
+  renderAll();
+}
+
+function filteredHives(){
+  if(_filterHive==='all') return _hives;
+  return _hives.filter(h=>String(h.id)===String(_filterHive));
+}
+
+function filteredHarvestData(){
+  if(_filterHive==='all') return _harvests;
+  return _harvests.filter(h=>String(h.hive_id)===String(_filterHive));
+}
+
+// ══════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════
+function renderAll(){
+  renderHarvest();
+  if(_currentTab==='inspections') renderInspections();
+  if(_currentTab==='queens') renderQueens();
+  if(_currentTab==='insights') renderInsights();
+}
+
+// ══════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════
+function switchTab(tab){
+  _currentTab = tab;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+
+  // FAB visibility
+  const fab = document.getElementById('fab');
+  fab.style.display = (tab==='insights') ? 'none' : 'flex';
+
+  if(tab==='inspections') renderInspections();
+  if(tab==='queens') renderQueens();
+  if(tab==='insights') renderInsights();
+}
+
+function onFab(){
+  if(_currentTab==='harvest') openHarvestModal();
+  else if(_currentTab==='inspections') openInspModal(null, _filterHive!=='all'?_filterHive:null);
+  else if(_currentTab==='queens') openQueenModal();
+}
+
+// ══════════════════════════════════════════════
+// HONEY HIVE SVG — dynamic fill based on yield %
+// ══════════════════════════════════════════════
+function buildHiveSVG(fillPct){
+  // fillPct 0–1
+  const fp = Math.max(0,Math.min(1,fillPct));
+  // Clip: fill from bottom, height = fp * 60 (total inner height ~60)
+  const fillH = Math.round(fp * 60);
+  const fillY = 80 - 10 - fillH; // 10px bottom margin inside hive body
+
+  return `<svg viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="hiveBodyClip">
+      <!-- Hive body shape: trapezoid stack -->
+      <path d="M14 18 L58 18 L64 72 L8 72 Z"/>
+    </clipPath>
+    <linearGradient id="honeyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD060"/>
+      <stop offset="100%" stop-color="#C4710A"/>
+    </linearGradient>
+  </defs>
+  <!-- Hive stand -->
+  <rect x="4" y="72" width="64" height="5" rx="2" fill="var(--terra-mid)" opacity="0.6"/>
+  <!-- Hive body outline -->
+  <path d="M14 18 L58 18 L64 72 L8 72 Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <!-- Honey fill clipped to hive body -->
+  <rect x="0" y="${fillY}" width="72" height="${fillH+20}" fill="url(#honeyGrad)" opacity="0.85" clip-path="url(#hiveBodyClip)"/>
+  <!-- Hive roof -->
+  <path d="M6 18 L36 4 L66 18 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+  <!-- Entrance -->
+  <rect x="28" y="68" width="16" height="4" rx="2" fill="rgba(0,0,0,0.3)"/>
+  <!-- Comb lines (decorative) -->
+  <line x1="20" y1="30" x2="52" y2="30" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <line x1="18" y1="42" x2="54" y2="42" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <line x1="16" y1="54" x2="56" y2="54" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  ${fp>0.02?`<text x="36" y="${Math.max(fillY+14, 38)}" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="9" font-weight="700" font-family="DM Sans,sans-serif">${Math.round(fp*100)}%</text>`:''}
+</svg>`;
+}
+
+// ══════════════════════════════════════════════
+// 🍯 HARVEST RENDER
+// ══════════════════════════════════════════════
+function renderHarvest(){
+  const data = filteredHarvestData();
+  const fHives = filteredHives();
+  const hiveName = _filterHive==='all' ? 'All hives' :
+    (_hives.find(h=>String(h.id)===String(_filterHive))?.name || 'Unknown hive');
+
+  // If no hives loaded yet, show a clear prompt
+  if(_hives.length===0){
+    document.getElementById('hiveSvgWrap').innerHTML = buildHiveSVG(0);
+    document.getElementById('heroYield').textContent = '—';
+    document.getElementById('heroHiveName').textContent = 'No hives found';
+    document.getElementById('yearBarRow').innerHTML = '';
+    document.getElementById('harvestList').innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🐝</div>
+      Open <strong>VarroaMate</strong> to add your apiaries and hives first.<br>
+      They'll appear here automatically once added.
+    </div>`;
+    return;
+  }
+
+  // Hero — current year total
+  const thisYearData = data.filter(h=>h.date?.startsWith(CURRENT_YEAR+''));
+  const totalKg = thisYearData.reduce((s,h)=>s+(parseFloat(h.kg)||0),0);
+
+  // Best year for fill % calc
+  const byYear = {};
+  data.forEach(h=>{
+    const yr = (h.date||'').slice(0,4);
+    if(yr) byYear[yr] = (byYear[yr]||0) + (parseFloat(h.kg)||0);
+  });
+  const years = Object.keys(byYear).sort();
+  const maxYield = Math.max(...Object.values(byYear), 1);
+  const fillPct = totalKg / maxYield;
+
+  document.getElementById('hiveSvgWrap').innerHTML = buildHiveSVG(fillPct);
+  document.getElementById('heroYield').textContent = totalKg>0 ? totalKg.toFixed(1) : '—';
+  document.getElementById('heroHiveName').textContent = `${hiveName} · ${CURRENT_YEAR}`;
+
+  // Year comparison
+  const yearRow = document.getElementById('yearBarRow');
+  if(years.length>0){
+    yearRow.innerHTML = years.reverse().map(yr=>`
+      <div class="year-bar-card ${yr===String(CURRENT_YEAR)?'active':''}">
+        <div class="year-bar-year">${yr}</div>
+        <div class="year-bar-track">
+          <div class="year-bar-fill" style="width:${Math.round((byYear[yr]/maxYield)*100)}%"></div>
+        </div>
+        <div class="year-bar-kg">${byYear[yr].toFixed(1)}<span style="font-size:9px;color:var(--text3);"> kg</span></div>
+      </div>
+    `).join('');
+  } else {
+    yearRow.innerHTML = '';
+  }
+
+  // Harvest list
+  const list = document.getElementById('harvestList');
+  if(!_tablesReady){
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🗄️</div>
+      <strong>Database tables not set up yet.</strong><br><br>
+      Run the SQL setup in your Supabase project to create the<br>
+      <code style="background:var(--border);padding:1px 5px;border-radius:3px;font-size:11px;">harvests</code>,
+      <code style="background:var(--border);padding:1px 5px;border-radius:3px;font-size:11px;">inspections</code> and
+      <code style="background:var(--border);padding:1px 5px;border-radius:3px;font-size:11px;">queens</code> tables.
+    </div>`;
+    return;
+  }
+  if(data.length===0){
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🍯</div>
+      No harvests recorded yet.<br>Tap <strong>+ Add</strong> to record your first harvest.
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = data.map(h=>{
+    const hive = _hives.find(hv=>String(hv.id)===String(h.hive_id));
+    const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+    const dt   = h.date ? new Date(h.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+    // Always show apiary + hive together so identical hive names across apiaries are unambiguous
+    const locationLine = [ap?.name, hive?.name].filter(Boolean).join(' · ') || 'Unknown hive';
+    const extras = [h.label, h.supers ? h.supers+' super'+(h.supers>1?'s':'') : null].filter(Boolean).join(' · ');
+    return `<div class="harvest-item" onclick="editHarvest('${h.id}')">
+      <div class="harvest-icon">🍯</div>
+      <div class="harvest-info">
+        <div class="harvest-date">${dt}</div>
+        <div class="harvest-label">${locationLine}</div>
+        ${extras?`<div class="harvest-detail">${extras}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="harvest-kg">${parseFloat(h.kg||0).toFixed(1)}<span class="harvest-kg-unit"> kg</span></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;">tap to edit</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// 🔍 INSPECTIONS RENDER
+// ══════════════════════════════════════════════
+function renderInspections(){
+  const fHiveIds = filteredHives().map(h=>String(h.id));
+  const data = _filterHive==='all' ? _inspections :
+    _inspections.filter(i=>fHiveIds.includes(String(i.hive_id)));
+
+  // Last inspection summary banner
+  const lastCard = document.getElementById('lastInspCard');
+  if(data.length>0){
+    const last = data[0];
+    const hive = _hives.find(h=>String(h.id)===String(last.hive_id));
+    const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+    const dt   = last.date ? new Date(last.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'}) : '';
+    const location = [ap?.name, hive?.name].filter(Boolean).join(' · ') || '?';
+    lastCard.style.display='block';
+    document.getElementById('lastInspDate').textContent = `Last inspection · ${dt}`;
+    document.getElementById('lastInspSummary').textContent =
+      `${location} — ${ratingLabel(last.brood,'brood')} brood · ${ratingLabel(last.stores,'stores')} stores`;
+  } else {
+    lastCard.style.display='none';
+  }
+
+  const list = document.getElementById('inspList');
+
+  if(!_tablesReady){
+    list.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🗄️</div>
+      Database tables not set up yet — see harvest tab for setup instructions.</div>`;
+    return;
+  }
+  if(data.length===0){
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      No inspections yet.<br>Tap <strong>+ Add</strong> or scan a hive QR code to start.
+    </div>`;
+    return;
+  }
+
+  // Group by apiary for clarity
+  const byApiary = {};
+  data.forEach(i=>{
+    const hive = _hives.find(h=>String(h.id)===String(i.hive_id));
+    const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+    const key  = ap?.id||'other';
+    if(!byApiary[key]) byApiary[key]={ap, items:[]};
+    byApiary[key].items.push({i, hive, ap});
+  });
+
+  let html='';
+  // Sort groups so current filter apiary is first
+  const groups = Object.values(byApiary).sort((a,b)=>{
+    if(!a.ap) return 1; if(!b.ap) return -1;
+    return a.ap.name.localeCompare(b.ap.name);
+  });
+
+  groups.forEach(({ap, items})=>{
+    if(Object.keys(byApiary).length>1){
+      html+=`<div style="padding:8px 16px 4px;background:var(--cream);border-bottom:1px solid var(--border);
+        font-size:11px;font-weight:700;color:var(--terra-deep);letter-spacing:0.8px;text-transform:uppercase;">
+        📍 ${ap?.name||'Other'}
+      </div>`;
+    }
+    items.forEach(({i, hive, ap})=>{
+      const dt = i.date ? new Date(i.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+      const location = [ap?.name, hive?.name].filter(Boolean).join(' · ') || 'Unknown hive';
+      const pills=[
+        i.queen   ? ratingPill(i.queen,  'queen')   : '',
+        i.brood   ? ratingPill(i.brood,  'brood')   : '',
+        i.stores  ? ratingPill(i.stores, 'stores')  : '',
+        i.mood    ? ratingPill(i.mood,   'mood')    : '',
+        i.strength? ratingPill(i.strength,'strength'): '',
+      ].filter(Boolean).join('');
+      html+=`<div class="insp-item" onclick="openInspModal('${i.id}')">
+        <div class="insp-row1">
+          <div>
+            <div class="insp-date">${dt}</div>
+            <div class="insp-hive">${location}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            ${i.swarm&&i.swarm!=='none'?'<span class="tag tag-red">⚠️ Swarm</span>':''}
+            <span style="font-size:10px;color:var(--text3);">tap to edit</span>
+          </div>
+        </div>
+        <div class="insp-ratings">${pills}</div>
+        ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
+      </div>`;
+    });
+  });
+  list.innerHTML = html;
+}
+
+function ratingLabel(val, type){
+  const map = {
+    solid:'solid',patchy:'patchy',poor:'poor',
+    full:'full',ok:'OK',low:'low',
+    yes:'seen',eggs:'eggs only',no:'not seen',
+    calm:'calm',active:'active',defensive:'defensive',
+    strong:'strong',medium:'medium',weak:'weak',
+    laying:'laying',suspect:'suspect',replaced:'replaced',lost:'lost',
+  };
+  return map[val]||val||'—';
+}
+
+function ratingPill(val, type){
+  const good = ['solid','full','yes','calm','strong','laying'];
+  const bad  = ['poor','low','no','defensive','weak','lost','sealed'];
+  const cls  = good.includes(val)?'good':bad.includes(val)?'bad':'';
+  const labels={
+    solid:'🟢 Solid brood',patchy:'🟡 Patchy brood',poor:'🔴 Poor brood',
+    full:'🍯 Full stores',ok:'👍 OK stores',low:'⚠️ Low stores',
+    yes:'👑 Queen seen',eggs:'🥚 Eggs seen',no:'❓ No queen',
+    calm:'😌 Calm',active:'🐝 Active',defensive:'😤 Defensive',
+    strong:'💪 Strong',medium:'👌 Medium',weak:'📉 Weak',
+  };
+  return `<span class="rating-pill ${cls}">${labels[val]||val}</span>`;
+}
+
+// ══════════════════════════════════════════════
+// 👑 QUEENS RENDER
+// ══════════════════════════════════════════════
+function renderQueens(){
+  const fHives = filteredHives();
+  const fHiveIds = fHives.map(h=>String(h.id));
+  const queensByHive = {};
+  _queens.forEach(q=>{ queensByHive[String(q.hive_id)] = q; });
+
+  const YEAR = new Date().getFullYear();
+  const colourClass={white:'dot-white',yellow:'dot-yellow',red:'dot-red',green:'dot-green',blue:'dot-blue'};
+  const statusColour={laying:'tag-sage',suspect:'tag-honey',replaced:'tag-grey',lost:'tag-red'};
+
+  function queenCard(q, hive, ap){
+    const age  = q.year_introduced ? (YEAR - parseInt(q.year_introduced)) : null;
+    const ageWarn = age!==null && age>=2;
+    return `<div class="queen-card" onclick="editQueen('${q.id}')">
+      <div class="queen-card-name">${hive?.name||'Unknown'}</div>
+      ${q.colour?`<div class="queen-dot-row">
+        <div class="queen-dot ${colourClass[q.colour]||''}"></div>
+        <div class="queen-dot-label">${q.colour.charAt(0).toUpperCase()+q.colour.slice(1)} mark</div>
+      </div>`:''}
+      ${q.year_introduced?`<div class="queen-age ${ageWarn?'tag tag-red':''}">
+        ${ageWarn?'⚠️ ':''}${age===0?'<1 yr':age===1?'~1 yr':age+' yrs old'} · ${q.year_introduced}
+      </div>`:''}
+      ${q.origin?`<div style="font-size:11px;color:var(--text3);margin-top:4px;">${originLabel(q.origin)}</div>`:''}
+      ${q.system?`<div style="font-size:11px;color:var(--text3);">${systemLabel(q.system)}</div>`:''}
+      <div class="queen-status">
+        <span class="tag ${statusColour[q.status]||'tag-grey'}">${statusIcon(q.status)} ${q.status||'Unknown'}</span>
+      </div>
+    </div>`;
+  }
+
+  function emptyCard(hive){
+    return `<div class="queen-card queen-card-empty" onclick="openQueenModalFor('${hive.id}')">
+      <div class="queen-card-name">${hive.name}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;">No queen on record</div>
+      <div style="font-size:11px;color:var(--terra);margin-top:10px;font-weight:600;">+ Add queen →</div>
+    </div>`;
+  }
+
+  // Group by apiary
+  const grid = document.getElementById('queenGrid');
+  const relevantApiaries = _apiaries.filter(ap=>
+    fHives.some(h=>h.apiary_id===ap.id)
+  );
+
+  if(relevantApiaries.length===0 && fHives.length===0){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-state-icon">👑</div>No hives found — open VarroaMate to add apiaries first.</div>`;
+    return;
+  }
+
+  let html = '';
+  relevantApiaries.forEach(ap=>{
+    const apHives = fHives.filter(h=>h.apiary_id===ap.id);
+    if(apHives.length===0) return;
+    html += `<div class="apiary-section-header" style="grid-column:1/-1;">
+      <span class="apiary-section-label">📍 ${ap.name}</span>
+      ${ap.address?`<span class="apiary-section-addr">${ap.address}</span>`:''}
+    </div>`;
+    apHives.forEach(hive=>{
+      const q = queensByHive[String(hive.id)];
+      html += q ? queenCard(q, hive, ap) : emptyCard(hive);
+    });
+  });
+
+  // Orphan hives
+  const knownAp = new Set(_apiaries.map(a=>a.id));
+  const orphans = fHives.filter(h=>!knownAp.has(h.apiary_id));
+  if(orphans.length>0){
+    html += `<div class="apiary-section-header" style="grid-column:1/-1;">
+      <span class="apiary-section-label">📍 Other hives</span>
+    </div>`;
+    orphans.forEach(hive=>{
+      const q = queensByHive[String(hive.id)];
+      html += q ? queenCard(q, hive, null) : emptyCard(hive);
+    });
+  }
+
+  grid.innerHTML = html || `<div class="empty-state" style="grid-column:1/-1">
+    <div class="empty-state-icon">👑</div>No hives found for the selected filter.</div>`;
+}
+
+function originLabel(v){
+  return {purchased:'💰 Purchased',raised:'🏠 Home raised',swarm:'🐝 Swarm catch',
+    supersedure:'🔄 Supersedure',emergency:'🆘 Emergency cell'}[v]||v;
+}
+function systemLabel(v){
+  return {langstroth:'📦 Langstroth',flow:'💧 Flow Hive',warre:'🌿 Warré',
+    'top-bar':'⚖️ Top Bar',hiveiq:'🤖 HiveIQ',apimaye:'🔵 Apimaye',national:'🇬🇧 National',other:'📦 Other'}[v]||v;
+}
+function statusIcon(v){
+  return {laying:'✅',suspect:'⚠️',replaced:'🔄',lost:'❌'}[v]||'•';
+}
+
+// ══════════════════════════════════════════════
+// 📊 INSIGHTS RENDER
+// ══════════════════════════════════════════════
+function renderInsights(){
+  const el = document.getElementById('insightsContent');
+
+  if(_hives.length===0){
+    el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📊</div>Open VarroaMate to add apiaries and hives first.</div>`;
+    return;
+  }
+
+  const YEAR = CURRENT_YEAR;
+  const lastYear = YEAR-1;
+
+  // ─ Season totals
+  const thisYearTotal = _harvests.filter(h=>h.date?.startsWith(YEAR+'')).reduce((s,h)=>s+(parseFloat(h.kg)||0),0);
+  const lastYearTotal = _harvests.filter(h=>h.date?.startsWith(lastYear+'')).reduce((s,h)=>s+(parseFloat(h.kg)||0),0);
+  const delta = lastYearTotal>0 ? ((thisYearTotal-lastYearTotal)/lastYearTotal*100) : null;
+  const hiveCount = _hives.length;
+  const perHive   = hiveCount>0 ? (thisYearTotal/hiveCount) : 0;
+
+  // ─ Average mite pressure per hive this year
+  const hiveMiteMap = {};
+  _mite_counts.filter(m=>m.date?.startsWith(YEAR+'')).forEach(m=>{
+    if(!hiveMiteMap[m.hive_id]) hiveMiteMap[m.hive_id]=[];
+    hiveMiteMap[m.hive_id].push(m.value||0);
+  });
+
+  // ─ Yield per hive (this year)
+  const hiveYieldMap = {};
+  _harvests.filter(h=>h.date?.startsWith(YEAR+'')).forEach(h=>{
+    hiveYieldMap[h.hive_id] = (hiveYieldMap[h.hive_id]||0)+(parseFloat(h.kg)||0);
+  });
+
+  // ─ Hive system breakdown
+  const systemYield = {};
+  const systemCount = {};
+  _queens.forEach(q=>{
+    if(!q.system||!q.hive_id) return;
+    const kg = hiveYieldMap[q.hive_id]||0;
+    systemYield[q.system] = (systemYield[q.system]||0)+kg;
+    systemCount[q.system] = (systemCount[q.system]||0)+1;
+  });
+  const systemAvg = Object.fromEntries(
+    Object.keys(systemYield).map(s=>[s,systemYield[s]/systemCount[s]])
+  );
+
+  // ─ Treatment philosophy breakdown
+  const prefYield = {};
+  const prefCount = {};
+  // Treatment philosophy from VMSP is stored in localStorage — we read it if same domain
+  // For now derive from treatment data: if mostly OA = organic-first, etc.
+
+  // Build scatter data: mite avg vs yield
+  const scatterHives = _hives.filter(h=>hiveMiteMap[h.id]&&hiveYieldMap[h.id]);
+  const maxMite = Math.max(...scatterHives.map(h=>
+    hiveMiteMap[h.id].reduce((a,b)=>a+b,0)/hiveMiteMap[h.id].length),1);
+  const maxYield = Math.max(...scatterHives.map(h=>hiveYieldMap[h.id]),1);
+
+  // ─ Top performing hives
+  const topHives = _hives
+    .map(h=>({...h,kg:hiveYieldMap[h.id]||0,
+      avgMite:hiveMiteMap[h.id]?(hiveMiteMap[h.id].reduce((a,b)=>a+b,0)/hiveMiteMap[h.id].length):null}))
+    .sort((a,b)=>b.kg-a.kg)
+    .slice(0,8);
+  const maxTopKg = Math.max(...topHives.map(h=>h.kg),1);
+
+  el.innerHTML = `
+  <!-- Season stats -->
+  <div class="insight-section-title">Season ${YEAR} at a glance</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total harvest</div>
+      <div class="stat-value">${thisYearTotal.toFixed(1)}<span class="stat-unit"> kg</span></div>
+      ${delta!==null?`<div class="stat-delta ${delta>=0?'up':'down'}">${delta>=0?'▲':'▼'} ${Math.abs(delta).toFixed(0)}% vs ${lastYear}</div>`:'<div class="stat-delta" style="color:var(--text3)">No prior year data</div>'}
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Per hive avg</div>
+      <div class="stat-value">${perHive.toFixed(1)}<span class="stat-unit"> kg</span></div>
+      <div class="stat-delta" style="color:var(--text3)">${hiveCount} hive${hiveCount!==1?'s':''}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Inspections</div>
+      <div class="stat-value">${_inspections.filter(i=>i.date?.startsWith(YEAR+'')).length}<span class="stat-unit"></span></div>
+      <div class="stat-delta" style="color:var(--text3)">this season</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Mite counts</div>
+      <div class="stat-value">${_mite_counts.filter(m=>m.date?.startsWith(YEAR+'')).length}<span class="stat-unit"></span></div>
+      <div class="stat-delta" style="color:var(--text3)">alcohol washes</div>
+    </div>
+  </div>
+
+  <!-- Yield per hive bar chart -->
+  <div class="insight-section-title">Yield per hive · ${YEAR}</div>
+  <div class="card">
+    <div class="card-body bar-chart">
+      ${topHives.length===0
+        ? `<div class="insight-no-data">No harvest data recorded for ${YEAR} yet.</div>`
+        : topHives.map(h=>{
+          const ap = _apiaries.find(a=>a.id===h.apiary_id);
+          const pct = Math.round((h.kg/maxTopKg)*100);
+          return `<div class="bar-row">
+            <div class="bar-row-label" title="${h.name}">${h.name}</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-honey" style="width:${pct}%">${h.kg>0?h.kg.toFixed(1)+' kg':''}</div>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>
+  </div>
+
+  <!-- Mite pressure vs yield scatter -->
+  <div class="insight-section-title">Mite pressure vs yield · ${YEAR}</div>
+  <div class="card">
+    <div class="card-body">
+      ${scatterHives.length<2
+        ? `<div class="insight-no-data">Needs mite count + harvest data on 2+ hives to compare.</div>`
+        : `<div class="scatter-wrap" id="scatterWrap">
+            <div class="scatter-axis y">← Lower mite pressure</div>
+            <div class="scatter-axis x">Higher yield →</div>
+            ${scatterHives.map(h=>{
+              const avgMite = hiveMiteMap[h.id].reduce((a,b)=>a+b,0)/hiveMiteMap[h.id].length;
+              const xPct = (hiveYieldMap[h.id]/maxYield)*85+5;
+              const yPct = 100-(avgMite/maxMite)*80-10;
+              const hive = _hives.find(hv=>String(hv.id)===String(h.id));
+              return `<div class="scatter-dot" style="left:${xPct}%;top:${yPct}%;" title="${hive?.name||''}: ${hiveYieldMap[h.id].toFixed(1)}kg, avg mite ${avgMite.toFixed(1)}/300"></div>`;
+            }).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">Hover dots to see hive details. Low mite pressure + high yield = top right. 🏆</div>`
+      }
+    </div>
+  </div>
+
+  <!-- Hive system comparison -->
+  ${Object.keys(systemAvg).length>0?`
+  <div class="insight-section-title">Yield by hive system</div>
+  <div class="card">
+    <div class="card-body">
+      ${Object.entries(systemAvg).sort((a,b)=>b[1]-a[1]).map(([sys,avg])=>{
+        const maxSys = Math.max(...Object.values(systemAvg));
+        const icons={langstroth:'📦',flow:'💧',warre:'🌿','top-bar':'⚖️',hiveiq:'🤖',apimaye:'🔵',national:'🇬🇧',other:'📦'};
+        return `<div class="system-row">
+          <div class="system-icon">${icons[sys]||'📦'}</div>
+          <div class="system-info">
+            <div class="system-name">${systemLabel(sys).replace(/^. /,'')}</div>
+            <div class="system-yield">${avg.toFixed(1)} kg avg · ${systemCount[sys]} hive${systemCount[sys]!==1?'s':''}</div>
+          </div>
+          <div class="system-bar-wrap">
+            <div class="system-bar">
+              <div class="system-bar-fill" style="width:${Math.round((avg/maxSys)*100)}%"></div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- Age warnings -->
+  ${_queens.filter(q=>q.year_introduced&&(YEAR-parseInt(q.year_introduced))>=2).length>0?`
+  <div class="insight-section-title">⚠️ Queen age alerts</div>
+  <div class="card">
+    <div class="card-body">
+      ${_queens.filter(q=>q.year_introduced&&(YEAR-parseInt(q.year_introduced))>=2).map(q=>{
+        const hive=_hives.find(h=>String(h.id)===String(q.hive_id));
+        const age=YEAR-parseInt(q.year_introduced);
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;">${hive?.name||'?'}</div>
+            <div style="font-size:11px;color:var(--text3);">Queen introduced ${q.year_introduced}</div>
+          </div>
+          <span class="tag tag-red">${age} yr${age!==1?'s':''} old</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:''}
+  `;
+}
+
+// ══════════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
+});
+
+function selectRating(el, groupId){
+  document.querySelectorAll(`#${groupId} .rating-opt`).forEach(o=>
+    o.className='rating-opt');
+  const val=el.dataset.val;
+  const goodVals=['solid','full','yes','calm','strong','laying','none'];
+  const badVals =['poor','low','no','defensive','weak','lost','sealed'];
+  const cls = goodVals.includes(val)?'selected-good':badVals.includes(val)?'selected-bad':'selected-ok';
+  el.classList.add(cls);
+}
+
+function getRating(groupId){
+  const sel = document.querySelector(`#${groupId} .rating-opt.selected-good,#${groupId} .rating-opt.selected-ok,#${groupId} .rating-opt.selected-bad`);
+  return sel?.dataset.val||null;
+}
+
+function clearRatings(groupId){
+  document.querySelectorAll(`#${groupId} .rating-opt`).forEach(o=>o.className='rating-opt');
+}
+
+// ══════════════════════════════════════════════
+// 🍯 HARVEST MODAL
+// ══════════════════════════════════════════════
+function openHarvestModal(editId=null){
+  _editingHarvestId = editId;
+  document.getElementById('harvestModalTitle').textContent = editId ? '🍯 Edit Harvest' : '🍯 Record Harvest';
+  // Reset to defaults
+  document.getElementById('hDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('hKg').value = '';
+  document.getElementById('hLabel').value = '';
+  document.getElementById('hSupers').value = '';
+  document.getElementById('hNotes').value = '';
+  document.getElementById('hHiveLabel').textContent = '';
+  // Optional fields: collapsed for new, expanded for edit (they have data)
+  const hasOptional = editId && (()=>{
+    const h=_harvests.find(x=>String(x.id)===String(editId));
+    return h && (h.label||h.supers||h.notes);
+  })();
+  setOptionalVisible(!!hasOptional);
+  // Delete button: only in edit mode
+  document.getElementById('harvestDeleteBtn').style.display = editId ? 'inline-flex' : 'none';
+
+  if(editId){
+    const h=_harvests.find(x=>String(x.id)===String(editId));
+    if(h){
+      document.getElementById('hHive').value=h.hive_id;
+      document.getElementById('hDate').value=h.date||'';
+      document.getElementById('hKg').value=h.kg||'';
+      document.getElementById('hLabel').value=h.label||'';
+      document.getElementById('hSupers').value=h.supers||'';
+      document.getElementById('hNotes').value=h.notes||'';
+      updateHiveLabel();
+    }
+  } else {
+    updateHiveLabel();
+  }
+  openModal('harvestModal');
+}
+
+function editHarvest(id){openHarvestModal(id);}
+
+function updateHiveLabel(){
+  const hiveId = document.getElementById('hHive').value;
+  const hive   = _hives.find(h=>String(h.id)===String(hiveId));
+  const ap     = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+  const label  = document.getElementById('hHiveLabel');
+  label.textContent = ap ? '📍 '+ap.name+(ap.address?' · '+ap.address:'') : '';
+}
+
+function setOptionalVisible(show){
+  document.getElementById('optionalFields').style.display = show ? 'block' : 'none';
+  document.getElementById('optionalChevron').textContent  = show ? '▴' : '▾';
+  document.getElementById('optionalToggle').querySelector('span').textContent =
+    show ? 'Hide optional details' : 'Optional details';
+}
+
+function toggleOptional(){
+  const cur = document.getElementById('optionalFields').style.display !== 'none';
+  setOptionalVisible(!cur);
+}
+
+async function deleteHarvest(){
+  if(!_editingHarvestId) return;
+  const h = _harvests.find(x=>String(x.id)===String(_editingHarvestId));
+  const hive = _hives.find(hv=>String(hv.id)===String(h?.hive_id));
+  const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+  const label = [ap?.name, hive?.name].filter(Boolean).join(' · ');
+  if(!confirm(`Delete harvest from ${label} (${h?.kg||0} kg on ${h?.date||'?'})?\nThis cannot be undone.`)) return;
+  const {error} = await _sb.from('harvests').delete().eq('id',_editingHarvestId).eq('user_id',_user.id);
+  if(error){showToast('Error: '+error.message);return;}
+  closeModal('harvestModal');
+  showToast('Harvest deleted');
+  await loadAllData();
+}
+
+async function saveHarvest(){
+  if(!_user){showToast('Please sign in to save data.');return;}
+  const btn=document.getElementById('harvestSaveBtn');
+  const hive_id=document.getElementById('hHive').value;
+  const date=document.getElementById('hDate').value;
+  const kg=parseFloat(document.getElementById('hKg').value)||0;
+  if(!hive_id||!date||!kg){showToast('Please fill in hive, date and yield.');return;}
+  btn.textContent='Saving…';btn.disabled=true;
+  const payload={user_id:_user.id,hive_id,date,kg,
+    label:document.getElementById('hLabel').value||null,
+    supers:parseInt(document.getElementById('hSupers').value)||null,
+    notes:document.getElementById('hNotes').value||null};
+  let err;
+  if(_editingHarvestId){
+    ({error:err}=await _sb.from('harvests').update(payload).eq('id',_editingHarvestId).eq('user_id',_user.id));
+  } else {
+    ({error:err}=await _sb.from('harvests').insert(payload));
+  }
+  btn.textContent='Save harvest';btn.disabled=false;
+  if(err){showToast('Error: '+err.message);return;}
+  closeModal('harvestModal');
+  showToast(_editingHarvestId?'Harvest updated ✓':'Harvest recorded 🍯');
+  await loadAllData();
+}
+
+// ══════════════════════════════════════════════
+// 🔍 INSPECTION MODAL
+// ══════════════════════════════════════════════
+// ── Voice entry state ──
+let _recognition = null;
+let _voiceActive = false;
+let _voiceTranscript = '';
+
+function openInspModal(editId=null, preselectedHiveId=null){
+  _editingInspId = editId;
+  document.getElementById('inspModalTitle').textContent = editId ? '🔍 Edit Inspection' : '🔍 Inspection';
+  document.getElementById('iDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('iNotes').value = '';
+  document.getElementById('iHiveLabel').textContent = '';
+  document.getElementById('inspDeleteBtn').style.display = editId ? 'inline-flex' : 'none';
+  ['iQueenGroup','iBroodGroup','iStoresGroup','iMoodGroup','iSwarmGroup','iStrengthGroup']
+    .forEach(clearRatings);
+  resetVoice();
+
+  if(editId){
+    const i=_inspections.find(x=>String(x.id)===String(editId));
+    if(i){
+      document.getElementById('iHive').value = i.hive_id;
+      document.getElementById('iDate').value = i.date||'';
+      document.getElementById('iNotes').value = i.notes||'';
+      if(i.queen)   preSelectRating('iQueenGroup',    i.queen);
+      if(i.brood)   preSelectRating('iBroodGroup',    i.brood);
+      if(i.stores)  preSelectRating('iStoresGroup',   i.stores);
+      if(i.mood)    preSelectRating('iMoodGroup',      i.mood);
+      if(i.swarm)   preSelectRating('iSwarmGroup',     i.swarm);
+      if(i.strength)preSelectRating('iStrengthGroup',  i.strength);
+    }
+  } else if(preselectedHiveId){
+    document.getElementById('iHive').value = preselectedHiveId;
+  }
+  updateInspHiveLabel();
+  openModal('inspModal');
+}
+
+function preSelectRating(groupId, val){
+  const el = document.querySelector(`#${groupId} [data-val="${val}"]`);
+  if(el) selectRating(el, groupId);
+}
+
+function updateInspHiveLabel(){
+  const hiveId = document.getElementById('iHive').value;
+  const hive   = _hives.find(h=>String(h.id)===String(hiveId));
+  const ap     = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+  document.getElementById('iHiveLabel').textContent = ap ? '📍 '+ap.name+(ap.address?' · '+ap.address:'') : '';
+}
+
+async function deleteInspection(){
+  if(!_editingInspId) return;
+  const i = _inspections.find(x=>String(x.id)===String(_editingInspId));
+  const hive = _hives.find(h=>String(h.id)===String(i?.hive_id));
+  const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+  const label = [ap?.name, hive?.name].filter(Boolean).join(' · ');
+  if(!confirm(`Delete inspection of ${label} on ${i?.date||'?'}?\nThis cannot be undone.`)) return;
+  const {error} = await _sb.from('inspections').delete().eq('id',_editingInspId).eq('user_id',_user.id);
+  if(error){showToast('Error: '+error.message);return;}
+  closeModal('inspModal');
+  showToast('Inspection deleted');
+  await loadAllData();
+}
+
+async function saveInspection(){
+  if(!_user){showToast('Please sign in to save data.');return;}
+  const hive_id = document.getElementById('iHive').value;
+  const date    = document.getElementById('iDate').value;
+  if(!hive_id||!date){showToast('Please select a hive and date.');return;}
+  const btn = document.getElementById('inspSaveBtn');
+  btn.textContent='Saving…';btn.disabled=true;
+  const payload={
+    user_id:_user.id, hive_id, date,
+    queen:   getRating('iQueenGroup'),
+    brood:   getRating('iBroodGroup'),
+    stores:  getRating('iStoresGroup'),
+    mood:    getRating('iMoodGroup'),
+    swarm:   getRating('iSwarmGroup'),
+    strength:getRating('iStrengthGroup'),
+    notes:   document.getElementById('iNotes').value||null,
+  };
+  let err;
+  if(_editingInspId){
+    ({error:err}=await _sb.from('inspections').update(payload).eq('id',_editingInspId).eq('user_id',_user.id));
+  } else {
+    ({error:err}=await _sb.from('inspections').insert(payload));
+  }
+  btn.textContent='Save';btn.disabled=false;
+  if(err){showToast('Error: '+err.message);return;}
+  closeModal('inspModal');
+  showToast(_editingInspId ? 'Inspection updated ✓' : 'Inspection saved ✓');
+  await loadAllData();
+}
+
+// ── Voice entry ──
+function resetVoice(){
+  if(_recognition){try{_recognition.stop();}catch(e){}}
+  _recognition=null; _voiceActive=false; _voiceTranscript='';
+  const btn=document.getElementById('voiceBtn');
+  const ext=document.getElementById('voiceExtractBtn');
+  const tx =document.getElementById('voiceTranscript');
+  const hint=document.getElementById('voiceHint');
+  if(btn){btn.textContent='🎙️ Speak';btn.classList.remove('voice-recording');}
+  if(ext) ext.style.display='none';
+  if(tx){tx.style.display='none';tx.textContent='';}
+  if(hint) hint.textContent='Tap to dictate — AI will fill in the fields';
+}
+
+function toggleVoice(){
+  if(_voiceActive){ stopVoice(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    showToast('Voice not supported on this browser. Try Chrome or Safari.');
+    return;
+  }
+  _recognition = new SR();
+  _recognition.continuous = true;
+  _recognition.interimResults = true;
+  _recognition.lang = 'en-AU';
+
+  _recognition.onstart = ()=>{
+    _voiceActive = true;
+    const btn=document.getElementById('voiceBtn');
+    btn.textContent='⏹ Stop';
+    btn.classList.add('voice-recording');
+    document.getElementById('voiceHint').textContent='Listening… speak your inspection notes';
+  };
+
+  _recognition.onresult = (e)=>{
+    let interim='', final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final += e.results[i][0].transcript+' ';
+      else interim += e.results[i][0].transcript;
+    }
+    _voiceTranscript += final;
+    const tx = document.getElementById('voiceTranscript');
+    tx.style.display='block';
+    tx.textContent = (_voiceTranscript + interim).trim();
+  };
+
+  _recognition.onerror = (e)=>{
+    stopVoice();
+    if(e.error!=='no-speech') showToast('Voice error: '+e.error);
+  };
+
+  _recognition.onend = ()=>{ if(_voiceActive) stopVoice(); };
+  _recognition.start();
+}
+
+function stopVoice(){
+  _voiceActive=false;
+  if(_recognition){try{_recognition.stop();}catch(e){}}
+  const btn=document.getElementById('voiceBtn');
+  btn.textContent='🎙️ Speak again';
+  btn.classList.remove('voice-recording');
+  document.getElementById('voiceHint').textContent='Transcript captured — tap "Fill fields" to extract';
+  if(_voiceTranscript.trim()){
+    document.getElementById('voiceExtractBtn').style.display='inline-flex';
+  }
+}
+
+async function extractFromVoice(){
+  const transcript = _voiceTranscript.trim();
+  if(!transcript){ showToast('No transcript to extract from.'); return; }
+  const btn = document.getElementById('voiceExtractBtn');
+  btn.textContent='✨ Extracting…'; btn.disabled=true;
+
+  try{
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        system:`You extract beehive inspection data from a beekeeper's spoken notes.
+Return ONLY valid JSON with these exact keys (all optional, use null if not mentioned):
+queen: "yes"|"eggs"|"no"
+brood: "solid"|"patchy"|"poor"
+stores: "full"|"ok"|"low"
+mood: "calm"|"active"|"defensive"
+swarm: "none"|"play"|"sealed"
+strength: "strong"|"medium"|"weak"
+notes: string (any additional observations not covered above, cleaned up)
+No markdown, no explanation, just the JSON object.`,
+        messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.find(b=>b.type==='text')?.text||'{}';
+    const extracted = JSON.parse(text.replace(/```json|```/g,'').trim());
+
+    // Apply extracted values
+    const fieldMap={
+      queen:'iQueenGroup', brood:'iBroodGroup', stores:'iStoresGroup',
+      mood:'iMoodGroup', swarm:'iSwarmGroup', strength:'iStrengthGroup'
+    };
+    let filled=0;
+    Object.entries(fieldMap).forEach(([key,groupId])=>{
+      if(extracted[key]){
+        preSelectRating(groupId, extracted[key]);
+        filled++;
+      }
+    });
+    if(extracted.notes){
+      const existing = document.getElementById('iNotes').value;
+      document.getElementById('iNotes').value = existing ? existing+'\n'+extracted.notes : extracted.notes;
+    }
+    showToast(`✨ Filled ${filled} field${filled!==1?'s':''} from voice`);
+    btn.textContent='✨ Fill fields'; btn.disabled=false;
+    document.getElementById('voiceHint').textContent=`Extracted ${filled} field${filled!==1?'s':''} — review and adjust`;
+  } catch(e){
+    btn.textContent='✨ Fill fields'; btn.disabled=false;
+    showToast('Could not extract — check your internet connection.');
+    console.error(e);
+  }
+}
+
+// ══════════════════════════════════════════════
+// 👑 QUEEN MODAL
+// ══════════════════════════════════════════════
+let _editingQueenId=null;
+function openQueenModal(editId=null){
+  _editingQueenId=editId;
+  document.getElementById('qYear').value='';
+  document.getElementById('qColour').value='';
+  document.getElementById('qOrigin').value='';
+  document.getElementById('qSystem').value='';
+  document.getElementById('qNotes').value='';
+  clearRatings('qStatusGroup');
+  if(editId){
+    const q=_queens.find(x=>String(x.id)===String(editId));
+    if(q){
+      document.getElementById('qHive').value=q.hive_id;
+      document.getElementById('qYear').value=q.year_introduced||'';
+      document.getElementById('qColour').value=q.colour||'';
+      document.getElementById('qOrigin').value=q.origin||'';
+      document.getElementById('qSystem').value=q.system||'';
+      document.getElementById('qNotes').value=q.notes||'';
+      // select status
+      const statEl=document.querySelector(`#qStatusGroup [data-val="${q.status}"]`);
+      if(statEl) selectRating(statEl,'qStatusGroup');
+    }
+  }
+  openModal('queenModal');
+}
+
+function openQueenModalFor(hiveId){
+  openQueenModal();
+  document.getElementById('qHive').value=hiveId;
+}
+
+function editQueen(id){openQueenModal(id);}
+
+async function saveQueen(){
+  if(!_user){showToast('Please sign in to save data.');return;}
+  const hive_id=document.getElementById('qHive').value;
+  if(!hive_id){showToast('Please select a hive.');return;}
+  const payload={
+    user_id:_user.id,hive_id,
+    year_introduced:parseInt(document.getElementById('qYear').value)||null,
+    colour:document.getElementById('qColour').value||null,
+    origin:document.getElementById('qOrigin').value||null,
+    system:document.getElementById('qSystem').value||null,
+    status:getRating('qStatusGroup')||'laying',
+    notes:document.getElementById('qNotes').value||null,
+  };
+  let err;
+  if(_editingQueenId){
+    ({error:err}=await _sb.from('queens').update(payload).eq('id',_editingQueenId).eq('user_id',_user.id));
+  } else {
+    ({error:err}=await _sb.from('queens').insert(payload));
+  }
+  if(err){showToast('Error: '+err.message);return;}
+  closeModal('queenModal');
+  showToast(_editingQueenId?'Queen updated ✓':'Queen record saved 👑');
+  await loadAllData();
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let _toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// Keyboard: close modals on Escape
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
