@@ -435,7 +435,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 .dayplan-content{margin-top:20px;display:none;}
 .dayplan-content.active{display:block;}
 
-@media(max-width:600px){.main{padding:14px 14px 80px;}.pref-banner{flex-wrap:wrap;gap:10px;}}
+@media(max-width:600px){.main{padding:14px 14px 80px;}.pref-banner{flex-wrap:wrap;gap:10px;}.dp-two-col{grid-template-columns:1fr!important;}}
 .mobile-nudge{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#2A4A9A,#1C3D2E);color:white;border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);}
 .mobile-nudge-icon{font-size:28px;flex-shrink:0;}
 .mobile-nudge-body{flex:1;font-size:13px;line-height:1.5;}
@@ -953,7 +953,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div>
 
         <!-- Row 2: Canvas (left, wide) + Date picker & actions (right, compact) -->
-        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:1fr min(300px,100%);gap:16px;align-items:start;margin-bottom:14px;" class="dp-two-col">
 
           <!-- Canvas -->
           <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;">
