@@ -5035,26 +5035,34 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
       });
 
       // ── Touch-drag: drag chip directly onto canvas ──
+      // Use movement threshold to distinguish tap from drag
+      let _chipTouchStartX=0, _chipTouchStartY=0, _chipDragStarted=false;
       chip.addEventListener('touchstart', e=>{
         const id=chip.dataset.treat;
         if(!currentPref.allowed.includes(id)) return;
-        _touchDragTreat=id;
-        ghost.textContent='+ '+TREATMENTS[id].name;
-        ghost.style.background=TREATMENTS[id].color;
-        ghost.style.display='block';
-        ghost.style.position='fixed';
-        ghost.style.pointerEvents='none';
-        ghost.style.zIndex='9999';
         const t=e.touches[0];
-        ghost.style.left=(t.clientX+12)+'px';
-        ghost.style.top=(t.clientY-20)+'px';
-        chip.classList.add('dragging');
+        _chipTouchStartX=t.clientX; _chipTouchStartY=t.clientY;
+        _chipDragStarted=false;
+        _touchDragTreat=id; // candidate — confirmed on move
       },{passive:true});
 
       chip.addEventListener('touchmove', e=>{
         if(!_touchDragTreat) return;
-        e.preventDefault();
         const t=e.touches[0];
+        const dx=t.clientX-_chipTouchStartX, dy=t.clientY-_chipTouchStartY;
+        // Only start drag after 8px movement — lets click handler fire for taps
+        if(!_chipDragStarted && Math.hypot(dx,dy)<8) return;
+        if(!_chipDragStarted){
+          _chipDragStarted=true;
+          ghost.textContent='+ '+TREATMENTS[_touchDragTreat].name;
+          ghost.style.background=TREATMENTS[_touchDragTreat].color;
+          ghost.style.display='block';
+          ghost.style.position='fixed';
+          ghost.style.pointerEvents='none';
+          ghost.style.zIndex='9999';
+          chip.classList.add('dragging');
+        }
+        e.preventDefault();
         ghost.style.left=(t.clientX+12)+'px';
         ghost.style.top=(t.clientY-20)+'px';
         // Calculate and store drop target locally — don't rely on shared dropMonth/dropYear
@@ -5091,6 +5099,7 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
         ghost.style.display='none';
         chip.classList.remove('dragging');
         canvas.classList.remove('drop-blocked');
+        if(!_chipDragStarted){ _touchDragTreat=null; return; } // was a tap — let click handle it
         // Use locally stored drop target — immune to canvas handler race
         if(_touchDropMonth!==null&&_touchDropYear!==null){
           const t=TREATMENTS[_touchDragTreat];
@@ -5106,10 +5115,8 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
       },{passive:true});
 
     });
-  // On touch devices, disable HTML5 draggable so it doesn't swallow touch events
-  if(_isTouchDevice()){
-    document.querySelectorAll('.treat-chip').forEach(c=>c.removeAttribute('draggable'));
-  }
+  // Keep draggable=true on all devices — touch drag uses touchstart/move/end
+  // The touchstart fires before dragstart so we can manage both paths
   },200);
 });
 
