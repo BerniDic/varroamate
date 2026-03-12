@@ -712,7 +712,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         <div class="palette-head" onclick="togglePalette()" style="cursor:pointer;user-select:none;">
           <div>
             <div class="palette-title">🧪 Treatment Palette</div>
-            <div class="palette-hint">Drag onto the timeline to plan a treatment</div>
+            <div class="palette-hint">Tap a treatment to select, then tap the timeline to place it</div>
           </div>
           <span id="paletteChevron" style="font-size:22px;color:var(--sage);transition:transform 0.25s;margin-left:auto;line-height:1;">▴</span>
         </div>
@@ -2666,6 +2666,10 @@ function renderPalette(){
   const body = document.getElementById('paletteBody');
   const allowed = currentPref.allowed;
   body.innerHTML = TREAT_GROUPS.map(g => _groupHTML(g, allowed)).join('');
+  // Re-apply draggable for mouse devices after innerHTML rebuild
+  if(window.matchMedia('(pointer:fine)').matches){
+    body.querySelectorAll('.treat-chip').forEach(c=>c.setAttribute('draggable','true'));
+  }
 }
 
 // ══ PLAN LIST ══
@@ -5048,26 +5052,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 });
 
-// Tap hint banner — shown above timeline when a chip is armed on touch devices
+// Tap hint — replaces the palette hint text when a chip is armed
 function _showTapHint(name, color){
-  let el = document.getElementById('tapHint');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'tapHint';
-    el.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);margin-bottom:10px;font-size:13px;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.18);";
-    const tl = document.querySelector('.tl-card');
-    if(tl) tl.parentNode.insertBefore(el, tl);
-    else document.querySelector('.main')?.prepend(el);
+  const hint = document.querySelector('.palette-hint');
+  if(hint){
+    hint._origText = hint._origText || hint.textContent;
+    hint.innerHTML = `👆 Tap the timeline to place <strong style="color:white;">${name}</strong> &nbsp;<span onclick="_cancelTapPlace()" style="cursor:pointer;opacity:0.8;">✕</span>`;
+    hint.style.background = color;
+    hint.style.color = 'white';
+    hint.style.padding = '3px 8px';
+    hint.style.borderRadius = '4px';
+    hint.style.fontWeight = '500';
   }
-  el.style.background = color;
-  el.style.color = 'white';
-  el.innerHTML = `<span>👆 Tap the timeline to place <strong>${name}</strong></span>`
-    + `<button onclick="_cancelTapPlace()" style="background:rgba(255,255,255,0.25);border:none;color:white;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">✕ Cancel</button>`;
-  el.style.display = 'flex';
 }
 function _hideTapHint(){
-  const el = document.getElementById('tapHint');
-  if(el) el.style.display = 'none';
+  const hint = document.querySelector('.palette-hint');
+  if(hint){
+    hint.innerHTML = hint._origText || 'Tap a treatment to place it on the timeline';
+    hint.style.background = '';
+    hint.style.color = '';
+    hint.style.padding = '';
+    hint.style.borderRadius = '';
+    hint.style.fontWeight = '';
+  }
 }
 function _cancelTapPlace(){
   mobilePendingTreat = null;
