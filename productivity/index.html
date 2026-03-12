@@ -528,6 +528,23 @@ body::before{
   background:var(--terra-deep) !important;
 }
 
+/* Pagination */
+.pagination{
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;padding:12px 16px;
+  border-top:1px solid var(--border);
+  background:var(--cream);
+}
+.page-btn{
+  padding:6px 14px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--paper);color:var(--text2);cursor:pointer;
+  transition:all 0.15s;
+}
+.page-btn:hover{border-color:var(--terra);color:var(--terra);}
+.page-btn:disabled{opacity:0.35;cursor:default;pointer-events:none;}
+.page-info{font-size:12px;color:var(--text3);min-width:80px;text-align:center;}
+
 /* Rating selector */
 .rating-group{display:flex;gap:6px;flex-wrap:wrap;}
 .rating-opt{
@@ -1290,6 +1307,9 @@ function getHiveByCode(code){
   return _hives.find(h=>makeHiveCode(h.id)===code.toUpperCase())||null;
 }
 let _tablesReady = false; // true once productivity tables confirmed to exist in Supabase
+const PAGE_SIZE = 5;
+let _harvestPage = 0;
+let _inspPage    = 0;
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -1652,11 +1672,14 @@ function renderHarvest(){
     return;
   }
 
-  list.innerHTML = data.map(h=>{
+  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+  if(_harvestPage >= totalPages) _harvestPage = Math.max(0, totalPages-1);
+  const pageData = data.slice(_harvestPage * PAGE_SIZE, (_harvestPage+1) * PAGE_SIZE);
+
+  const rows = pageData.map(h=>{
     const hive = _hives.find(hv=>String(hv.id)===String(h.hive_id));
     const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
     const dt   = h.date ? new Date(h.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
-    // Always show apiary + hive together so identical hive names across apiaries are unambiguous
     const locationLine = [ap?.name, hive?.name].filter(Boolean).join(' · ') || 'Unknown hive';
     const extras = [h.label, h.supers ? h.supers+' super'+(h.supers>1?'s':'') : null].filter(Boolean).join(' · ');
     return `<div class="harvest-item" onclick="editHarvest('${h.id}')">
@@ -1672,6 +1695,15 @@ function renderHarvest(){
       </div>
     </div>`;
   }).join('');
+
+  const pagination = totalPages > 1 ? `
+    <div class="pagination">
+      <button class="page-btn" onclick="_harvestPage--;renderHarvest()" ${_harvestPage===0?'disabled':''}>← Prev</button>
+      <span class="page-info">Page ${_harvestPage+1} of ${totalPages}</span>
+      <button class="page-btn" onclick="_harvestPage++;renderHarvest()" ${_harvestPage>=totalPages-1?'disabled':''}>Next →</button>
+    </div>` : '';
+
+  list.innerHTML = rows + pagination;
 }
 
 // ══════════════════════════════════════════════
@@ -1723,47 +1755,62 @@ function renderInspections(){
     byApiary[key].items.push({i, hive, ap});
   });
 
-  let html='';
-  // Sort groups so current filter apiary is first
+  // Flatten all items sorted by date desc for pagination
+  const allInspItems = [];
   const groups = Object.values(byApiary).sort((a,b)=>{
     if(!a.ap) return 1; if(!b.ap) return -1;
     return a.ap.name.localeCompare(b.ap.name);
   });
+  groups.forEach(({items})=> items.forEach(item=> allInspItems.push(item)));
 
-  groups.forEach(({ap, items})=>{
-    if(Object.keys(byApiary).length>1){
+  const totalPages = Math.ceil(allInspItems.length / PAGE_SIZE);
+  if(_inspPage >= totalPages) _inspPage = Math.max(0, totalPages-1);
+  const pageItems = allInspItems.slice(_inspPage * PAGE_SIZE, (_inspPage+1) * PAGE_SIZE);
+
+  let html = '';
+  let lastApId = null;
+  pageItems.forEach(({i, hive, ap})=>{
+    // Show apiary header when group changes (only if multiple apiaries)
+    if(Object.keys(byApiary).length > 1 && ap?.id !== lastApId){
+      lastApId = ap?.id;
       html+=`<div style="padding:8px 16px 4px;background:var(--cream);border-bottom:1px solid var(--border);
         font-size:11px;font-weight:700;color:var(--terra-deep);letter-spacing:0.8px;text-transform:uppercase;">
         📍 ${ap?.name||'Other'}
       </div>`;
     }
-    items.forEach(({i, hive, ap})=>{
-      const dt = i.date ? new Date(i.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
-      const location = [ap?.name, hive?.name].filter(Boolean).join(' · ') || 'Unknown hive';
-      const pills=[
-        i.queen   ? ratingPill(i.queen,  'queen')   : '',
-        i.brood   ? ratingPill(i.brood,  'brood')   : '',
-        i.stores  ? ratingPill(i.stores, 'stores')  : '',
-        i.mood    ? ratingPill(i.mood,   'mood')    : '',
-        i.strength? ratingPill(i.strength,'strength'): '',
-      ].filter(Boolean).join('');
-      html+=`<div class="insp-item" onclick="openInspModal('${i.id}')">
-        <div class="insp-row1">
-          <div>
-            <div class="insp-date">${dt}</div>
-            <div class="insp-hive">${location}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-            ${i.swarm&&i.swarm!=='none'?'<span class="tag tag-red">⚠️ Swarm</span>':''}
-            <span style="font-size:10px;color:var(--text3);">tap to edit</span>
-          </div>
+    const dt = i.date ? new Date(i.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+    const location = [ap?.name, hive?.name].filter(Boolean).join(' · ') || 'Unknown hive';
+    const pills=[
+      i.queen   ? ratingPill(i.queen,  'queen')   : '',
+      i.brood   ? ratingPill(i.brood,  'brood')   : '',
+      i.stores  ? ratingPill(i.stores, 'stores')  : '',
+      i.mood    ? ratingPill(i.mood,   'mood')    : '',
+      i.strength? ratingPill(i.strength,'strength'): '',
+    ].filter(Boolean).join('');
+    html+=`<div class="insp-item" onclick="openInspModal('${i.id}')">
+      <div class="insp-row1">
+        <div>
+          <div class="insp-date">${dt}</div>
+          <div class="insp-hive">${location}</div>
         </div>
-        <div class="insp-ratings">${pills}</div>
-        ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
-      </div>`;
-    });
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          ${i.swarm&&i.swarm!=='none'?'<span class="tag tag-red">⚠️ Swarm</span>':''}
+          <span style="font-size:10px;color:var(--text3);">tap to edit</span>
+        </div>
+      </div>
+      <div class="insp-ratings">${pills}</div>
+      ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
+    </div>`;
   });
-  list.innerHTML = html;
+
+  const pagination = totalPages > 1 ? `
+    <div class="pagination">
+      <button class="page-btn" onclick="_inspPage--;renderInspections()" ${_inspPage===0?'disabled':''}>← Prev</button>
+      <span class="page-info">Page ${_inspPage+1} of ${totalPages}</span>
+      <button class="page-btn" onclick="_inspPage++;renderInspections()" ${_inspPage>=totalPages-1?'disabled':''}>Next →</button>
+    </div>` : '';
+
+  list.innerHTML = html + pagination;
 }
 
 function ratingLabel(val, type){
@@ -1805,21 +1852,98 @@ function renderQueens(){
   const colourClass={white:'dot-white',yellow:'dot-yellow',red:'dot-red',green:'dot-green',blue:'dot-blue'};
   const statusColour={laying:'tag-sage',suspect:'tag-honey',replaced:'tag-grey',lost:'tag-red'};
 
+  function queenSignal(q, hiveId){
+    // Returns {level:'ok'|'watch'|'replace'|'urgent', badges:[], tip:''}
+    const age = q.year_introduced ? (YEAR - parseInt(q.year_introduced)) : null;
+    const badges = [];
+    let level = 'ok';
+
+    // Age signals
+    if(age !== null){
+      if(age >= 3){
+        badges.push({icon:'🔴', text:'Replace soon', cls:'tag-red'});
+        level = 'replace';
+      } else if(age === 2){
+        badges.push({icon:'🟡', text:'Plan replacement', cls:'tag-honey'});
+        if(level==='ok') level = 'watch';
+      }
+    }
+
+    // Inspection-based signals — look at last 3 inspections for this hive
+    const recentInsp = _inspections
+      .filter(i=>String(i.hive_id)===String(hiveId))
+      .slice(0, 3);
+
+    if(recentInsp.length > 0){
+      const queenNotSeen  = recentInsp.filter(i=>i.queen==='no').length;
+      const eggsOnly      = recentInsp.filter(i=>i.queen==='eggs').length;
+      const poorBrood     = recentInsp.filter(i=>i.brood==='poor').length;
+      const patchyBrood   = recentInsp.filter(i=>i.brood==='patchy').length;
+      const defensive     = recentInsp.filter(i=>i.mood==='defensive').length;
+      const swarming      = recentInsp.filter(i=>i.swarm==='sealed').length;
+      const playCups      = recentInsp.filter(i=>i.swarm==='play').length;
+
+      if(queenNotSeen >= 2){
+        badges.push({icon:'❓', text:'Queen not seen ×'+queenNotSeen, cls:'tag-red'});
+        level = 'urgent';
+      } else if(queenNotSeen === 1){
+        badges.push({icon:'❓', text:'Queen not seen recently', cls:'tag-honey'});
+        if(level==='ok') level = 'watch';
+      }
+      if(poorBrood >= 2){
+        badges.push({icon:'🔴', text:'Poor brood pattern', cls:'tag-red'});
+        if(level!=='urgent') level = 'replace';
+      } else if(poorBrood===1 || patchyBrood >= 2){
+        badges.push({icon:'🟡', text:'Patchy brood', cls:'tag-honey'});
+        if(level==='ok') level = 'watch';
+      }
+      if(swarming > 0){
+        badges.push({icon:'⚠️', text:'Sealed swarm cells!', cls:'tag-red'});
+        level = 'urgent';
+      } else if(playCups > 0){
+        badges.push({icon:'🔔', text:'Play cups seen', cls:'tag-honey'});
+        if(level==='ok') level = 'watch';
+      }
+      if(defensive >= 2){
+        badges.push({icon:'😤', text:'Defensive behaviour', cls:'tag-honey'});
+        if(level==='ok') level = 'watch';
+      }
+      if(eggsOnly >= 2 && queenNotSeen === 0){
+        badges.push({icon:'🥚', text:'Eggs only — confirm laying', cls:'tag-honey'});
+        if(level==='ok') level = 'watch';
+      }
+    }
+
+    const borderColour = {ok:'transparent', watch:'#D4A017', replace:'#C14040', urgent:'#C14040'}[level];
+    const headerBg     = {ok:'', watch:'background:rgba(212,160,23,0.08);', replace:'background:rgba(193,58,58,0.07);', urgent:'background:rgba(193,58,58,0.12);'}[level];
+    return {badges, level, borderColour, headerBg};
+  }
+
   function queenCard(q, hive, ap){
     const age  = q.year_introduced ? (YEAR - parseInt(q.year_introduced)) : null;
-    const ageWarn = age!==null && age>=2;
-    return `<div class="queen-card" onclick="editQueen('${q.id}')">
-      <div class="queen-card-name">${hive?.name||'Unknown'}</div>
+    const {badges, level, borderColour, headerBg} = queenSignal(q, hive?.id);
+
+    const badgeHtml = badges.map(b=>
+      `<span class="tag ${b.cls}" style="font-size:10px;padding:2px 7px;">${b.icon} ${b.text}</span>`
+    ).join('');
+
+    return `<div class="queen-card" onclick="editQueen('${q.id}')"
+        style="border-color:${borderColour||'var(--border)'};${borderColour!=='transparent'?'border-width:2px;':''}">
+      <div style="${headerBg}padding:10px 12px 8px;margin:-12px -12px 8px;border-radius:calc(var(--radius-sm) - 1px) calc(var(--radius-sm) - 1px) 0 0;">
+        <div class="queen-card-name">${hive?.name||'Unknown'}</div>
+        ${ap?`<div style="font-size:10px;color:var(--text3);margin-top:1px;">📍 ${ap.name}</div>`:''}
+      </div>
       ${q.colour?`<div class="queen-dot-row">
         <div class="queen-dot ${colourClass[q.colour]||''}"></div>
         <div class="queen-dot-label">${q.colour.charAt(0).toUpperCase()+q.colour.slice(1)} mark</div>
       </div>`:''}
-      ${q.year_introduced?`<div class="queen-age ${ageWarn?'tag tag-red':''}">
-        ${ageWarn?'⚠️ ':''}${age===0?'<1 yr':age===1?'~1 yr':age+' yrs old'} · ${q.year_introduced}
+      ${age!==null?`<div class="queen-age" style="color:${age>=3?'#C14040':age>=2?'#A07010':'var(--text2)'}">
+        ${age>=3?'🔴':age>=2?'🟡':'🟢'} ${age===0?'<1 yr':age===1?'~1 yr':age+' yrs'} · intro. ${q.year_introduced}
       </div>`:''}
       ${q.race?`<div style="font-size:12px;color:var(--timber);font-weight:600;margin-top:4px;">${raceLabel(q.race)}</div>`:''}
       ${q.origin?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">${originLabel(q.origin)}</div>`:''}
-      <div class="queen-status">
+      ${badgeHtml?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">${badgeHtml}</div>`:''}
+      <div class="queen-status" style="margin-top:8px;">
         <span class="tag ${statusColour[q.status]||'tag-grey'}">${statusIcon(q.status)} ${q.status||'Unknown'}</span>
       </div>
     </div>`;
@@ -1872,7 +1996,45 @@ function renderQueens(){
     });
   }
 
-  grid.innerHTML = html || `<div class="empty-state" style="grid-column:1/-1">
+  // Build full hive list for pagination (apiary headers inline)
+  // We paginate hive cards; headers reinserted as needed
+  const allQueenHives = [];
+  relevantApiaries.forEach(ap=>{
+    const apHives = fHives.filter(h=>h.apiary_id===ap.id);
+    if(apHives.length===0) return;
+    apHives.forEach(hive=> allQueenHives.push({hive, ap}));
+  });
+  const knownAp2 = new Set(_apiaries.map(a=>a.id));
+  fHives.filter(h=>!knownAp2.has(h.apiary_id)).forEach(hive=> allQueenHives.push({hive, ap:null}));
+
+  const totalPages = Math.ceil(allQueenHives.length / PAGE_SIZE);
+  const qPage = (window._queenPage||0);
+  if(qPage >= totalPages) window._queenPage = Math.max(0, totalPages-1);
+  const pageHives = allQueenHives.slice((window._queenPage||0)*PAGE_SIZE, ((window._queenPage||0)+1)*PAGE_SIZE);
+
+  let html2 = '';
+  let lastApName = null;
+  pageHives.forEach(({hive, ap})=>{
+    const apName = ap?.name||'Other hives';
+    if(relevantApiaries.length > 1 && apName !== lastApName){
+      lastApName = apName;
+      html2 += `<div class="apiary-section-header" style="grid-column:1/-1;">
+        <span class="apiary-section-label">📍 ${apName}</span>
+        ${ap?.address?`<span class="apiary-section-addr">${ap.address}</span>`:''}
+      </div>`;
+    }
+    const q = queensByHive[String(hive.id)];
+    html2 += q ? queenCard(q, hive, ap) : emptyCard(hive);
+  });
+
+  const pagination = totalPages > 1 ? `
+    <div class="pagination" style="grid-column:1/-1;">
+      <button class="page-btn" onclick="window._queenPage=Math.max(0,(window._queenPage||0)-1);renderQueens()" ${(window._queenPage||0)===0?'disabled':''}>← Prev</button>
+      <span class="page-info">Page ${(window._queenPage||0)+1} of ${totalPages}</span>
+      <button class="page-btn" onclick="window._queenPage=((window._queenPage||0)+1);renderQueens()" ${(window._queenPage||0)>=totalPages-1?'disabled':''}>Next →</button>
+    </div>` : '';
+
+  grid.innerHTML = (html2 + pagination) || `<div class="empty-state" style="grid-column:1/-1">
     <div class="empty-state-icon">👑</div>No hives found for the selected filter.</div>`;
 }
 
