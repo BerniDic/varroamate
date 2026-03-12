@@ -5010,6 +5010,7 @@ canvas.addEventListener('drop',e=>{
 // ── Mobile / tablet: tap-to-place + touch-drag for palette chips ──────────
 let mobilePendingTreat=null;
 let _touchDragTreat=null;
+let _touchDropMonth=null, _touchDropYear=null;
 
 function _isTouchDevice(){ return 'ontouchstart' in window || navigator.maxTouchPoints > 0; }
 
@@ -5056,7 +5057,8 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
         const t=e.touches[0];
         ghost.style.left=(t.clientX+12)+'px';
         ghost.style.top=(t.clientY-20)+'px';
-        // Highlight canvas if finger is over it
+        // Calculate and store drop target locally — don't rely on shared dropMonth/dropYear
+        // as canvas touch handlers with capture:true can clear them before our touchend fires
         const cr=canvas.getBoundingClientRect();
         if(t.clientX>=cr.left&&t.clientX<=cr.right&&t.clientY>=cr.top&&t.clientY<=cr.bottom){
           if(drawnData){
@@ -5067,13 +5069,18 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
             if(mf>=0&&mf<TOTAL_MONTHS){
               const yr=2024+Math.floor(mf/12);
               const mo=((mf%12)+12)%12;
-              if(!isInPast(yr,mo)){ dropYear=yr; dropMonth=mo; canvas.classList.remove('drop-blocked'); }
-              else { dropYear=null; dropMonth=null; canvas.classList.add('drop-blocked'); }
+              if(!isInPast(yr,mo)){
+                _touchDropYear=yr; _touchDropMonth=mo;
+                canvas.classList.remove('drop-blocked');
+              } else {
+                _touchDropYear=null; _touchDropMonth=null;
+                canvas.classList.add('drop-blocked');
+              }
               redraw();
             }
           }
         } else {
-          dropYear=null; dropMonth=null;
+          _touchDropYear=null; _touchDropMonth=null;
           canvas.classList.remove('drop-blocked');
           redraw();
         }
@@ -5084,12 +5091,13 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
         ghost.style.display='none';
         chip.classList.remove('dragging');
         canvas.classList.remove('drop-blocked');
-        if(dropMonth!==null&&dropYear!==null){
+        // Use locally stored drop target — immune to canvas handler race
+        if(_touchDropMonth!==null&&_touchDropYear!==null){
           const t=TREATMENTS[_touchDragTreat];
-          planEvents.push({id:nextId++,treatId:_touchDragTreat,month:dropMonth,year:dropYear,row:2,
+          planEvents.push({id:nextId++,treatId:_touchDragTreat,month:_touchDropMonth,year:_touchDropYear,row:2,
             label:t.name,color:t.color,
-            detail:`${MONTHS[dropMonth]} ${dropYear} · Planned · ${t.moa}`,planned:true});
-          dropMonth=null; dropYear=null;
+            detail:`${MONTHS[_touchDropMonth]} ${_touchDropYear} · Planned · ${t.moa}`,planned:true});
+          _touchDropMonth=null; _touchDropYear=null;
           updateAll();
         }
         _touchDragTreat=null;
