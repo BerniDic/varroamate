@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1016,6 +1015,22 @@ body::before{
       </div>
     </div>
 
+    <div class="form-row">
+      <label class="form-label">Hive system</label>
+      <select class="form-select" id="hSystem">
+        <option value="">Unknown / not set</option>
+        <option value="langstroth">📦 Langstroth</option>
+        <option value="flow">💧 Flow Hive</option>
+        <option value="warre">🌿 Warré</option>
+        <option value="top-bar">⚖️ Top Bar</option>
+        <option value="hiveiq">🤖 HiveIQ</option>
+        <option value="apimaye">🔵 Apimaye</option>
+        <option value="national">🇬🇧 National (UK)</option>
+        <option value="other">📦 Other</option>
+      </select>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px;">Used in Insights to compare productivity by system</div>
+    </div>
+
     <!-- Optional fields toggle -->
     <div style="margin:8px 0 4px;">
       <button class="btn btn-outline btn-sm" onclick="toggleOptional()" id="optionalToggle" style="width:100%;justify-content:space-between;">
@@ -1200,19 +1215,26 @@ body::before{
       </select>
     </div>
     <div class="form-row">
-      <label class="form-label">Hive system</label>
-      <select class="form-select" id="qSystem">
-        <option value="">Unknown</option>
-        <option value="langstroth">Langstroth</option>
-        <option value="flow">Flow Hive</option>
-        <option value="warre">Warré</option>
-        <option value="top-bar">Top Bar</option>
-        <option value="hiveiq">HiveIQ</option>
-        <option value="apimaye">Apimaye</option>
-        <option value="national">National (UK)</option>
-        <option value="other">Other</option>
+      <label class="form-label">Race / type</label>
+      <select class="form-select" id="qRace">
+        <option value="">Unknown / mixed</option>
+        <optgroup label="Common in Australia">
+          <option value="italian">Italian (Apis mellifera ligustica)</option>
+          <option value="carniolan">Carniolan (A. m. carnica)</option>
+          <option value="caucasian">Caucasian (A. m. caucasica)</option>
+          <option value="buckfast">Buckfast</option>
+          <option value="australian-hybrid">Australian hybrid / local stock</option>
+        </optgroup>
+        <optgroup label="Other / specialist">
+          <option value="saharan">Saharan / VSH line</option>
+          <option value="cordovan">Cordovan (colour variant)</option>
+          <option value="russian">Russian</option>
+          <option value="africanised">Africanised (AHB)</option>
+          <option value="other">Other</option>
+        </optgroup>
       </select>
     </div>
+
     <div class="form-row">
       <label class="form-label">Status</label>
       <div class="rating-group" id="qStatusGroup">
@@ -1274,23 +1296,39 @@ const CURRENT_YEAR = new Date().getFullYear();
 // ══════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════
-// Auth — app always visible; sign-in banner shown only when no session
+// Auth — app always visible; session shared from VM on same domain
 document.getElementById('app').classList.add('ready');
 
-_sb.auth.onAuthStateChange((event, session)=>{
+function applySession(session){
   if(session?.user){
     _user = session.user;
     const initials = (_user.email||'?')[0].toUpperCase();
     document.getElementById('topUser').textContent = initials;
     document.getElementById('topUser').title = _user.email||'';
     document.getElementById('signInBanner').style.display = 'none';
-    loadAllData();
   } else {
     _user = null;
     document.getElementById('topUser').textContent = '?';
     document.getElementById('topUser').title = 'Not signed in';
     document.getElementById('signInBanner').style.display = 'block';
-    loadAllData();
+  }
+}
+
+// 1. Read existing session immediately (covers shared VM session on same domain)
+_sb.auth.getSession().then(({data:{session}})=>{
+  applySession(session);
+  loadAllData();
+});
+
+// 2. Keep listening for sign-in / sign-out events
+_sb.auth.onAuthStateChange((event, session)=>{
+  applySession(session);
+  // Reload data on sign-in, clear on sign-out
+  if(event==='SIGNED_IN') loadAllData();
+  if(event==='SIGNED_OUT'){
+    _harvests=[];_inspections=[];_queens=[];
+    _apiaries=[];_hives=[];_mite_counts=[];_treatments=[];
+    renderAll();
   }
 });
 
@@ -1771,8 +1809,8 @@ function renderQueens(){
       ${q.year_introduced?`<div class="queen-age ${ageWarn?'tag tag-red':''}">
         ${ageWarn?'⚠️ ':''}${age===0?'<1 yr':age===1?'~1 yr':age+' yrs old'} · ${q.year_introduced}
       </div>`:''}
-      ${q.origin?`<div style="font-size:11px;color:var(--text3);margin-top:4px;">${originLabel(q.origin)}</div>`:''}
-      ${q.system?`<div style="font-size:11px;color:var(--text3);">${systemLabel(q.system)}</div>`:''}
+      ${q.race?`<div style="font-size:12px;color:var(--timber);font-weight:600;margin-top:4px;">${raceLabel(q.race)}</div>`:''}
+      ${q.origin?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">${originLabel(q.origin)}</div>`:''}
       <div class="queen-status">
         <span class="tag ${statusColour[q.status]||'tag-grey'}">${statusIcon(q.status)} ${q.status||'Unknown'}</span>
       </div>
@@ -1834,6 +1872,14 @@ function originLabel(v){
   return {purchased:'💰 Purchased',raised:'🏠 Home raised',swarm:'🐝 Swarm catch',
     supersedure:'🔄 Supersedure',emergency:'🆘 Emergency cell'}[v]||v;
 }
+function raceLabel(v){
+  return {
+    italian:'🇮🇹 Italian',carniolan:'🇸🇮 Carniolan',caucasian:'🏔️ Caucasian',
+    buckfast:'🔬 Buckfast','australian-hybrid':'🦘 Australian hybrid',
+    saharan:'🧬 VSH / Saharan',cordovan:'🟤 Cordovan',russian:'🇷🇺 Russian',
+    africanised:'⚠️ Africanised',other:'📦 Other'
+  }[v]||v;
+}
 function systemLabel(v){
   return {langstroth:'📦 Langstroth',flow:'💧 Flow Hive',warre:'🌿 Warré',
     'top-bar':'⚖️ Top Bar',hiveiq:'🤖 HiveIQ',apimaye:'🔵 Apimaye',national:'🇬🇧 National',other:'📦 Other'}[v]||v;
@@ -1876,17 +1922,15 @@ function renderInsights(){
     hiveYieldMap[h.hive_id] = (hiveYieldMap[h.hive_id]||0)+(parseFloat(h.kg)||0);
   });
 
-  // ─ Hive system breakdown
+  // ─ Hive system breakdown — derived from harvest records (system stored per harvest)
   const systemYield = {};
   const systemCount = {};
-  _queens.forEach(q=>{
-    if(!q.system||!q.hive_id) return;
-    const kg = hiveYieldMap[q.hive_id]||0;
-    systemYield[q.system] = (systemYield[q.system]||0)+kg;
-    systemCount[q.system] = (systemCount[q.system]||0)+1;
+  _harvests.filter(h=>h.date?.startsWith(YEAR+'')&&h.system).forEach(h=>{
+    systemYield[h.system] = (systemYield[h.system]||0)+(parseFloat(h.kg)||0);
+    systemCount[h.system] = (systemCount[h.system]||0)+1;
   });
   const systemAvg = Object.fromEntries(
-    Object.keys(systemYield).map(s=>[s,systemYield[s]/systemCount[s]])
+    Object.keys(systemYield).map(s=>[s, systemYield[s]/systemCount[s]])
   );
 
   // ─ Treatment philosophy breakdown
@@ -2060,6 +2104,7 @@ function openHarvestModal(editId=null){
   // Reset to defaults
   document.getElementById('hDate').value = new Date().toISOString().slice(0,10);
   document.getElementById('hKg').value = '';
+  document.getElementById('hSystem').value = '';
   document.getElementById('hLabel').value = '';
   document.getElementById('hSupers').value = '';
   document.getElementById('hNotes').value = '';
@@ -2079,6 +2124,7 @@ function openHarvestModal(editId=null){
       document.getElementById('hHive').value=h.hive_id;
       document.getElementById('hDate').value=h.date||'';
       document.getElementById('hKg').value=h.kg||'';
+      document.getElementById('hSystem').value=h.system||'';
       document.getElementById('hLabel').value=h.label||'';
       document.getElementById('hSupers').value=h.supers||'';
       document.getElementById('hNotes').value=h.notes||'';
@@ -2135,6 +2181,7 @@ async function saveHarvest(){
   if(!hive_id||!date||!kg){showToast('Please fill in hive, date and yield.');return;}
   btn.textContent='Saving…';btn.disabled=true;
   const payload={user_id:_user.id,hive_id,date,kg,
+    system:document.getElementById('hSystem').value||null,
     label:document.getElementById('hLabel').value||null,
     supers:parseInt(document.getElementById('hSupers').value)||null,
     notes:document.getElementById('hNotes').value||null};
@@ -2378,7 +2425,7 @@ function openQueenModal(editId=null){
   document.getElementById('qYear').value='';
   document.getElementById('qColour').value='';
   document.getElementById('qOrigin').value='';
-  document.getElementById('qSystem').value='';
+  document.getElementById('qRace').value='';
   document.getElementById('qNotes').value='';
   clearRatings('qStatusGroup');
   if(editId){
@@ -2388,7 +2435,7 @@ function openQueenModal(editId=null){
       document.getElementById('qYear').value=q.year_introduced||'';
       document.getElementById('qColour').value=q.colour||'';
       document.getElementById('qOrigin').value=q.origin||'';
-      document.getElementById('qSystem').value=q.system||'';
+      document.getElementById('qRace').value=q.race||'';
       document.getElementById('qNotes').value=q.notes||'';
       // select status
       const statEl=document.querySelector(`#qStatusGroup [data-val="${q.status}"]`);
@@ -2414,7 +2461,7 @@ async function saveQueen(){
     year_introduced:parseInt(document.getElementById('qYear').value)||null,
     colour:document.getElementById('qColour').value||null,
     origin:document.getElementById('qOrigin').value||null,
-    system:document.getElementById('qSystem').value||null,
+    race:document.getElementById('qRace').value||null,
     status:getRating('qStatusGroup')||'laying',
     notes:document.getElementById('qNotes').value||null,
   };
