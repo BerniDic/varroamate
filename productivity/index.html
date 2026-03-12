@@ -1315,13 +1315,16 @@ function applySession(session){
 }
 
 // 1. Read existing session immediately (covers shared VM session on same domain)
-_sb.auth.getSession().then(({data:{session}})=>{
-  applySession(session);
-  if(session?.user){
-    showToast('Session found: '+session.user.email);
-  } else {
-    showToast('No session found — please sign in');
+_sb.auth.getSession().then(async ({data:{session}})=>{
+  if(session?.access_token){
+    // Explicitly set session so Supabase client sends auth header on all requests
+    // This is needed when session is inherited from another app on the same domain
+    await _sb.auth.setSession({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token
+    });
   }
+  applySession(session);
   loadAllData();
 });
 
@@ -2179,7 +2182,9 @@ async function deleteHarvest(){
 
 async function saveHarvest(){
   if(!_user){showToast('Please sign in to save data.');return;}
-  console.log('Saving harvest, user_id:', _user.id, 'email:', _user.email);
+  // Re-verify session is still active before saving
+  const {data:{session}} = await _sb.auth.getSession();
+  if(!session){showToast('Session expired — please sign in again.');applySession(null);return;}
   const btn=document.getElementById('harvestSaveBtn');
   const hive_id=document.getElementById('hHive').value;
   const date=document.getElementById('hDate').value;
