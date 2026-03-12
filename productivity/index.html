@@ -2181,10 +2181,8 @@ async function deleteHarvest(){
 }
 
 async function saveHarvest(){
-  alert('saveHarvest called\n_user=' + (_user?.id||'NULL'));
   if(!_user){showToast('Please sign in to save data.');return;}
-  const {data:{session},error:sErr} = await _sb.auth.getSession();
-  alert('session uid=' + (session?.user?.id||'NULL') + '\nerr=' + (sErr?.message||'none'));
+  const {data:{session}} = await _sb.auth.getSession();
   if(!session){showToast('Session expired — please sign in again.');applySession(null);return;}
   const btn=document.getElementById('harvestSaveBtn');
   const hive_id=document.getElementById('hHive').value;
@@ -2204,11 +2202,7 @@ async function saveHarvest(){
     ({error:err}=await _sb.from('harvests').insert(payload));
   }
   btn.textContent='Save harvest';btn.disabled=false;
-  if(err){
-    console.error('FULL ERROR:', JSON.stringify(err));
-    showToast(err.message+' | code:'+err.code+' | hint:'+err.hint);
-    return;
-  }
+  if(err){showToast('Error: '+err.message);return;}
   closeModal('harvestModal');
   showToast(_editingHarvestId?'Harvest updated ✓':'Harvest recorded 🍯');
   await loadAllData();
