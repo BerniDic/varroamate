@@ -5035,15 +5035,17 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
       });
 
       // ── Touch-drag: drag chip directly onto canvas ──
-      // Use movement threshold to distinguish tap from drag
+      // Temporarily remove draggable on touchstart so browser doesn't intercept
+      // touchmove for HTML5 drag — restore it on touchend/touchcancel
       let _chipTouchStartX=0, _chipTouchStartY=0, _chipDragStarted=false;
       chip.addEventListener('touchstart', e=>{
         const id=chip.dataset.treat;
         if(!currentPref.allowed.includes(id)) return;
+        chip.removeAttribute('draggable'); // prevent HTML5 drag hijacking touch
         const t=e.touches[0];
         _chipTouchStartX=t.clientX; _chipTouchStartY=t.clientY;
         _chipDragStarted=false;
-        _touchDragTreat=id; // candidate — confirmed on move
+        _touchDragTreat=id;
       },{passive:true});
 
       chip.addEventListener('touchmove', e=>{
@@ -5109,10 +5111,20 @@ document.querySelectorAll&&document.addEventListener('DOMContentLoaded',()=>{
           _touchDropMonth=null; _touchDropYear=null;
           updateAll();
         }
+        chip.setAttribute('draggable','true'); // restore for desktop drag
         _touchDragTreat=null;
         document.querySelectorAll('.treat-chip').forEach(c=>c.style.boxShadow='');
         mobilePendingTreat=null;
       },{passive:true});
+
+      chip.addEventListener('touchcancel', ()=>{
+        chip.setAttribute('draggable','true');
+        _touchDragTreat=null; _chipDragStarted=false;
+        ghost.style.display='none';
+        chip.classList.remove('dragging');
+        canvas.classList.remove('drop-blocked');
+        _touchDropMonth=null; _touchDropYear=null;
+      });
 
     });
   // Keep draggable=true on all devices — touch drag uses touchstart/move/end
