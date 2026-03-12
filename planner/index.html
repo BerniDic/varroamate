@@ -436,6 +436,13 @@ canvas.drop-blocked{cursor:not-allowed;}
 .dayplan-content.active{display:block;}
 
 @media(max-width:600px){.main{padding:14px 14px 80px;}.pref-banner{flex-wrap:wrap;gap:10px;}}
+.mobile-nudge{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#2A4A9A,#1C3D2E);color:white;border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);}
+.mobile-nudge-icon{font-size:28px;flex-shrink:0;}
+.mobile-nudge-body{flex:1;font-size:13px;line-height:1.5;}
+.mobile-nudge-body strong{color:#F5C842;}
+.mobile-nudge-close{background:rgba(255,255,255,0.15);border:none;color:white;border-radius:50%;width:26px;height:26px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.mobile-nudge-close:hover{background:rgba(255,255,255,0.25);}
+@media(max-width:700px){.mobile-nudge{display:flex;}}
 </style>
 </head>
 <body>
@@ -502,9 +509,11 @@ canvas.drop-blocked{cursor:not-allowed;}
 <header class="header">
 <div class="header-inner">
   <div style="display:flex;align-items:center;gap:0;">
-    <a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.12);color:white;text-decoration:none;font-size:15px;transition:background 0.2s;flex-shrink:0;margin-right:6px;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">🏠</a>
-    <div class="logo">Varroa<em>Mate</em><sup>™</sup></div>
-    <span class="logo-sub">Smart Planner</span>
+    <a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:20px;background:rgba(255,255,255,0.08);color:white;text-decoration:none;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+      <span style="font-size:15px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;">🏠</span>
+      <div class="logo" style="pointer-events:none;">Varroa<em>Mate</em><sup>™</sup></div>
+      <span class="logo-sub" style="pointer-events:none;">Smart Planner</span>
+    </a>
   </div>
   <span id="vmSyncBadge" style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.45);padding:2px 0;"></span>
 </div>
@@ -599,6 +608,16 @@ canvas.drop-blocked{cursor:not-allowed;}
 <div class="main">
 
   <!-- PREF BANNER -->
+  <!-- Mobile nudge — shown on screens <700px -->
+  <div class="mobile-nudge" id="mobileNudge">
+    <div class="mobile-nudge-icon">🖥️</div>
+    <div class="mobile-nudge-body">
+      <strong>Best on desktop or tablet.</strong><br>
+      The Smart Planner uses detailed timelines and side-by-side panels that need a bigger screen. It'll work here, but you'll have a much better experience on a larger device.
+    </div>
+    <button class="mobile-nudge-close" onclick="document.getElementById('mobileNudge').style.display='none'" aria-label="Dismiss">×</button>
+  </div>
+
   <div class="pref-banner" id="prefBanner">
     <div class="pref-icon" id="prefIcon">⚖️</div>
     <div class="pref-info">
