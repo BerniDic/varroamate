@@ -3220,7 +3220,14 @@ Please give a concise, warm, practical analysis of their plan. Structure your re
 3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. IMPORTANT: only recommend additional treatments if mite pressure warrants it — do not recommend prophylactic treatments. When flagging missing windows: (a) the winter broodless OA window (Jun–Jul) — only mention this if mite pressure is elevated (≥3 mites/300 bees) AND the beekeeper has no treatment in the preceding autumn window. If you do mention it, frame it as conditional: "consider OA in June/July only if mite pressure has not dropped below threshold by end of May — check with an alcohol wash first"; (b) the autumn treatment window (Feb–Apr) — only flag if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment; (c) the spring treatment window (Aug–Oct) — only flag if the plan has no spring coverage and mite pressure is above threshold. Also check monitoring cadence — if the plan has alcohol wash checks scheduled more than 4 weeks apart, flag this and recommend checking at least every 4 weeks.
 4. **Key Recommendation** — one clear, prioritised action. If mite pressure is currently low, the recommendation should focus on monitoring cadence, not adding treatments. ALWAYS reinforce: never start a treatment without a mite count first — this is non-negotiable best practice. NEVER recommend scheduling an alcohol wash more than 4 weeks in the future — 4 weeks is an absolute maximum interval regardless of the situation, treatment status, or mite pressure level
 
-Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
+Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.
+CRITICAL — treatment classification reference (never mislabel these):
+- Organic acids (NOT synthetic): Oxalic Acid (OAV/dribble), Formic PRO, Aluen CAP — Aluen CAP is an organic slow-release oxalic + lactic acid treatment, never call it synthetic
+- Essential oils (NOT synthetic): Apiguard, ApiLife VAR
+- Synthetic acaricides ONLY: Apivar/Apitraz (amitraz), Bayvarol/Apistan (pyrethroids)
+- Physical: Varroa Controller heat treatment, Duplex-Framebox
+- Mechanical: Drone Comb Removal, Brood Interruption
+Always use the MoA from the plan summary above — never infer treatment type from context.`;
 
   try {
     const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
