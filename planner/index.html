@@ -2763,6 +2763,22 @@ function scorePlan(){
   const sorted = [...planEvents].sort((a,b)=>a.year*12+a.month-(b.year*12+b.month));
   const activeSorted = [...activeEvents].sort((a,b)=>a.year*12+a.month-(b.year*12+b.month));
 
+  // Scoring window — only score treatments within the next 12 months + past 3 months
+  // Treatments beyond 12 months are legitimate to plan but shouldn't dilute current scores
+  const now2 = new Date();
+  const todayFrac = now2.getFullYear() * 12 + now2.getMonth();
+  const scoreWindowEnd = todayFrac + 12; // 12 months forward
+  const scoreWindowStart = todayFrac - 3; // 3 months back (for recent overdue)
+  const scoringEvents = activeEvents.filter(e => {
+    const f = e.year * 12 + e.month;
+    return f >= scoreWindowStart && f <= scoreWindowEnd;
+  });
+  const scoringOverdue = overdueEvents.filter(e => {
+    const f = e.year * 12 + e.month;
+    return f >= scoreWindowStart && f <= todayFrac;
+  });
+  const scoringSorted = [...scoringEvents].sort((a,b)=>a.year*12+a.month-(b.year*12+b.month));
+
   // ── Mite pressure context ──
   // Find the most recent mite count from HISTORY to inform pressure-aware scoring.
   // Thresholds mirror VarroaMate's ACTION_ZONE_BY_MONTH / LOSS_THRESHOLD_BY_MONTH.
@@ -2784,12 +2800,12 @@ function scorePlan(){
 
   // 1. Philosophy alignment — score against all plan events (intended choices)
   const violations = planEvents.filter(e=>!currentPref.allowed.includes(e.treatId)).length;
-  scores.philosophy = cap(100 - (violations/planEvents.length)*100);
+  scores.philosophy = cap(planEvents.length ? 100 - (violations/planEvents.length)*100 : 100);
 
   // 2. Seasonality — merged with treatment suitability (choice)
-  const scoreBase = activeEvents.length || planEvents.length;
+  const scoreBase = scoringEvents.length || planEvents.length;
   let seasonOk = 0;
-  activeEvents.forEach(ev=>{
+  scoringEvents.forEach(ev=>{
     const t = TREATMENTS[ev.treatId];
     const season = getSeason(ev.month);
     // Bad season placement (e.g. thymol in winter, heat in summer)
@@ -2800,7 +2816,7 @@ function scorePlan(){
   });
   let seasonScore = cap(scoreBase ? (seasonOk/scoreBase)*100 : 0);
   // Mechanical-only at high/critical pressure — biologically insufficient
-  const allMech = activeEvents.length > 0 && activeEvents.every(e => TREATMENTS[e.treatId]?.moa === 'Mechanical');
+  const allMech = scoringEvents.length > 0 && scoringEvents.every(e => TREATMENTS[e.treatId]?.moa === 'Mechanical');
   if(allMech && (pressure==='high' || pressure==='critical')){
     seasonScore = cap(seasonScore - pressurePenalty[pressure]);
   }
@@ -2809,7 +2825,7 @@ function scorePlan(){
   // 4. MoA rotation — active events only
   const MOA_REPEAT_PENALTY   = {'Organic Acid':5, 'Essential Oil':12, 'Amitraz':25, 'Pyrethroid':25};
   const MOA_CONFLICT_PENALTY = {'Organic Acid':6, 'Essential Oil':10, 'Amitraz':18, 'Pyrethroid':18};
-  const chemSorted = activeSorted.filter(e => TREATMENTS[e.treatId]?.moa !== 'Physical');
+  const chemSorted = scoringSorted.filter(e => TREATMENTS[e.treatId]?.moa !== 'Physical');
   let rotPenalty = 0;
   for(let i=1;i<chemSorted.length;i++){
     const prevMoA = TREATMENTS[chemSorted[i-1].treatId]?.moa;
@@ -2830,14 +2846,14 @@ function scorePlan(){
 
   // 5. Season coverage — use all planned (intent matters for coverage)
   const activeSeasons = new Set(['spring','summer','autumn']);
-  const seasonsUsed = new Set(planEvents.map(e=>getSeason(e.month)).filter(s=>activeSeasons.has(s)));
+  const seasonsUsed = new Set(scoringEvents.map(e=>getSeason(e.month)).filter(s=>activeSeasons.has(s)));
   let coverageScore = cap((seasonsUsed.size/3)*100);
   if((pressure==='high' || pressure==='critical') && seasonsUsed.size <= 1){
     coverageScore = cap(coverageScore - pressurePenalty[pressure] * 0.6);
   }
   // Pre-winter gap penalty — only penalise if mite pressure is elevated
   // (low/zero mite counts don't require prophylactic autumn treatment)
-  const hasAutumnTreatment = planEvents.some(e => getSeason(e.month) === 'autumn');
+  const hasAutumnTreatment = scoringEvents.some(e => getSeason(e.month) === 'autumn');
   if(!hasAutumnTreatment && (pressure === 'medium' || pressure === 'high' || pressure === 'critical')){
     coverageScore = cap(coverageScore - 20);
   }
@@ -2853,12 +2869,12 @@ function scorePlan(){
     return userWindows.some(w => w.type === 'flow' && evFrac < w.endFrac && evEnd > w.startFrac);
   };
   let supersOk = 0;
-  activeEvents.forEach(ev=>{
+  scoringEvents.forEach(ev=>{
     const t = TREATMENTS[ev.treatId];
     if(t.supersOff && _evInFlow(ev)) return;
     supersOk++;
   });
-  scores.supers = cap(activeEvents.length ? (supersOk/activeEvents.length)*100 : 100);
+  scores.supers = cap(scoringEvents.length ? (supersOk/scoringEvents.length)*100 : 100);
 
   // 7. Colony Survival Chance
   const EFFICACY_CEILING = {
@@ -2878,7 +2894,7 @@ function scorePlan(){
   };
 
   // MoA breadth from ACTIVE events only — skipped treatments don't count
-  const moaClassesUsed = new Set(activeEvents.map(e => {
+  const moaClassesUsed = new Set(scoringEvents.map(e => {
     const moa = TREATMENTS[e.treatId]?.moa || '';
     if(moa.includes('Organic'))    return 'organic';
     if(moa.includes('Essential'))  return 'essential';
@@ -2892,11 +2908,11 @@ function scorePlan(){
   const hasChem      = moaClassesUsed.has('organic') || moaClassesUsed.has('essential') || moaClassesUsed.has('amitraz') || moaClassesUsed.has('pyrethroid');
   const hasMech      = moaClassesUsed.has('mechanical');
   const hasPhys      = moaClassesUsed.has('physical');
-  const mechOnly     = activeEvents.length > 0 && !hasChem && !hasPhys && hasMech;
+  const mechOnly     = scoringEvents.length > 0 && !hasChem && !hasPhys && hasMech;
   const fullSpectrum = hasChem && (hasMech || hasPhys) && moaClassesUsed.size >= 3;
 
   const seasonBest = {};
-  activeEvents.forEach(ev => {
+  scoringEvents.forEach(ev => {
     const s = getSeason(ev.month);
     const c = getCeiling(ev.treatId);
     if(!seasonBest[s] || c > seasonBest[s]) seasonBest[s] = c;
@@ -2913,8 +2929,8 @@ function scorePlan(){
   // Overdue penalty — each skipped treatment is a protection gap that already happened.
   // The mite population was growing unchecked during that window.
   // Penalty scales with efficacy ceiling of what was skipped × pressure level.
-  if(overdueEvents.length > 0){
-    const overduePenalties = overdueEvents.map(e => {
+  if(scoringOverdue.length > 0){
+    const overduePenalties = scoringOverdue.map(e => {
       const ceiling = getCeiling(e.treatId);
       const base = (ceiling / 100) * 20; // up to 20pts per skipped high-efficacy treatment
       const pressureMult = {low:0.5, moderate:0.8, high:1.2, critical:1.6}[pressure] ?? 1;
@@ -2944,7 +2960,7 @@ function scorePlan(){
   const safetyCapActive = overall < rawOverall;
 
   return {scores, overall, rawOverall, safetyCapActive, sorted, conflictCount,
-          latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents};
+          latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents};
 }
 
 function renderSurvivalGauge(score, safetyCapActive){
