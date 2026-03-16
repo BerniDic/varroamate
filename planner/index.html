@@ -3222,9 +3222,18 @@ async function getAIAdvice(){
       }).join('; ')
     : 'No treatments planned yet';
 
+  // Build a clear, unambiguous score summary — individual dim scores omitted to prevent AI hallucination
+  const weakDims = result ? [
+    result.scores.philosophy  < 70 ? `Philosophy alignment (${Math.round(result.scores.philosophy)}%)` : null,
+    result.scores.seasonality < 70 ? `Seasonality (${Math.round(result.scores.seasonality)}%)` : null,
+    result.scores.rotation    < 70 ? `MoA rotation (${Math.round(result.scores.rotation)}%)` : null,
+    result.scores.coverage    < 70 ? `Season coverage (${Math.round(result.scores.coverage)}%)` : null,
+    result.scores.colonyRisk  < 70 ? `Colony Survival (${Math.round(result.scores.colonyRisk)}%)` : null,
+  ].filter(Boolean) : [];
+
   const scores = result
-    ? `*** THE ACTUAL OVERALL PLAN RATING IS: ${result.overall}% — use ONLY this number when describing the plan rating, never any individual dimension score ***${result.safetyCapActive ? ` (RAW score was ${result.rawOverall}% before safety cap — capped to ${result.overall}% due to critically low Colony Survival; this cap must be explicitly acknowledged in your assessment)` : ''}
-Individual dimension scores (for reference only — do NOT report any of these as the overall rating): Philosophy: ${Math.round(result.scores.philosophy)}%, Seasonality: ${Math.round(result.scores.seasonality)}%, MoA rotation: ${Math.round(result.scores.rotation)}%, Season coverage: ${Math.round(result.scores.coverage)}%, Colony Survival: ${Math.round(result.scores.colonyRisk)}%`
+    ? `OVERALL PLAN RATING: ${result.overall}%${result.safetyCapActive ? ` [CAPPED — raw score was ${result.rawOverall}% before safety cap due to low Colony Survival (${Math.round(result.scores.colonyRisk)}%); you MUST acknowledge this cap in your assessment]` : ''}.
+${ratingWord(result.overall)} plan.${weakDims.length ? ` Dimensions scoring below 70% (needs attention): ${weakDims.join(', ')}.` : ' All dimensions scoring well.'}`
     : 'No plan to score yet';
 
   const conflictNote = result?.conflictCount>0
