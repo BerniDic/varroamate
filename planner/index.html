@@ -3471,11 +3471,23 @@ function _resetProposalUI(){
   if(activeBar) activeBar.style.display = 'none';
   const ratBelow = document.getElementById('suggestRationaleBelow');
   if(ratBelow){ ratBelow.textContent = ''; ratBelow.style.display = 'none'; }
+  const scoreEl = document.getElementById('suggestRatingScore');
+  if(scoreEl) scoreEl.textContent = '—';
+  const dimsEl = document.getElementById('suggestRatingDims');
+  if(dimsEl) dimsEl.innerHTML = '';
   const btn = document.getElementById('suggestBtn');
-  if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; btn.style.display = 'flex'; }
+  if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; btn.style.display = 'flex'; btn.classList.remove('loading'); }
   _setPaletteVisible(true);
   const picker = document.getElementById('suggestPicker');
   if(picker) picker.style.display = '';
+  // Also reset the suggest card body state — ensures it's expanded and shows the button
+  _suggestCardOpen = true;
+  const sb = document.getElementById('suggestBody');
+  if(sb) sb.classList.remove('collapsed');
+  const chev = document.getElementById('suggestChevron');
+  if(chev) chev.style.transform = '';
+  // Clear ghost treatment bars from timeline
+  if(typeof redraw === 'function') redraw();
 }
 
 function cancelSuggest(){
