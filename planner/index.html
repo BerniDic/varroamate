@@ -1584,7 +1584,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         <button class="dayplan-btn" id="dpbtn-brood-break" onclick="selectDayPlan('brood-break')">
           <div class="dayplan-btn-icon">🔒</div>
           <div class="dayplan-btn-title">Brood Break — Cage Queen</div>
-          <div class="dayplan-btn-sub">Interrupt brood cycle with queen cage + OA treatment (OAV, dribble, or Aluen CAP).</div>
+          <div class="dayplan-btn-sub">Interrupt brood cycle with queen cage + OA treatment (OAV, dribble, or Aluen CAP). Best in late summer (Jan–Feb) — avoid March onwards to protect winter bee rearing.</div>
         </button>
         <button class="dayplan-btn" id="dpbtn-split" onclick="selectDayPlan('split')">
           <div class="dayplan-btn-icon">✂️</div>
@@ -1679,7 +1679,7 @@ const TREATMENTS = {
   'bayvarol':    {name:'Bayvarol',              abbrev:'BAY',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'Flumethrin strips. Pyrethroid resistance documented. Monitor efficacy.',        duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'apistan':     {name:'Apistan',               abbrev:'API',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'⚠ High resistance risk in Australia. Confirm susceptibility first.',            duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'drone-comb':  {name:'Drone Comb Removal',    abbrev:'DCR',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Remove and freeze capped drone comb. Ongoing throughout drone-rearing season.', duration:0,  season:['spring','summer'],        badSeasons:['autumn','winter'], badSeasonNote:'⚠ Not effective in autumn — drone rearing has ceased by then'},
-  'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap.',    duration:25, season:['spring','summer','autumn'],  badSeasons:['winter'], badSeasonNote:'⚠ Cannot perform in winter — brood already absent'},
+  'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap. Best in late summer (Jan–Feb) when mite:brood ratio is highest and winter bee rearing has not yet begun. Avoid March–April — caging the queen disrupts critical winter bee production and weakens the colony heading into winter.',    duration:25, season:['spring','summer'],  badSeasons:['winter','autumn'], badSeasonNote:'⚠ Avoid in autumn (Mar–Apr) — disrupts winter bee rearing, weakening the colony heading into winter. Cannot perform in winter — brood already absent. Best timing: Jan–Feb (late summer)'},
   'heat':        {name:'Heat Treatment (Varroa Controller)', abbrev:'HT', color:'#C17B2A', moa:'Physical', moaShort:'PHY', synthetic:false, tempRange:'>18°C ambient', supersOff:false, notes:'Varroa Controller (varroa-controller.com) — currently the only commercial hyperthermia device. Removes capped brood frames, brushes off adult bees, places frames in heated chamber at ~40–42°C for 2 hrs with controlled humidity. Kills mites via heat-shock protein damage (25–50 hrs post-treatment). Treats up to 20 frames (2 hrs). Requires >18°C ambient. No chemical residues — supers can remain on during treatment. Highly effective when 80% of mites are in capped brood. Spring tip: treat when only 2–3 brood frames present — maximises mite concentration per frame and minimises session time. Can also be used summer (Duplex-Framebox method) and autumn. Results visible within 12 days.', duration:1, season:['spring'], badSeasons:['winter','summer','autumn'], badSeasonNote:'⚠ Best Sep–Nov (early spring, southern hemisphere) — brood nest is smallest so mite concentration per frame is highest and fewest frames need treating. Summer brood volume makes it very time-consuming. Winter: no capped brood to treat.'},
   'duplex':      {name:'Duplex-Framebox Plan',  abbrev:'DFB',  color:'#A0522D', moa:'Physical',      moaShort:'PHY', synthetic:false, tempRange:'>18°C', supersOff:false,
     notes:'Varroa Controller Duplex-Framebox — 24-day queen-caging mite concentration plan. Day 0: cage queen with 1 brood frame + 1 foundation in aluminium Duplex-Framebox; place in centre of brood super. All external brood continues to emerge. Day 12: first capped frame from box → heat treat in Varroa Controller; replace with empty frame; reclip box. Day 24 (honey harvest day): all brood outside box has now emerged — mites have no option but to enter the 2 box frames to reproduce. Remove both box frames → heat treat. Colony is now effectively broodless. Treat adult bees (lactic acid or OA dribble). Release queen immediately; feed with sugar syrup. Result: near-complete mite removal at honey harvest, ~20% more honey (bees not rearing brood for 24 days), fresh wax foundations, heat-treated frames available for nuc reinforcement. Requires marked queen for efficiency. Best timing: around summer solstice (Dec–Jan southern hemisphere).',
@@ -2913,10 +2913,23 @@ function scorePlan(){
   const fullSpectrum = hasChem && (hasMech || hasPhys) && moaClassesUsed.size >= 3;
 
   const seasonBest = {};
+  const seasonBestMech = {}; // track mechanical separately — don't let them drag down avgCeiling
   scoringEvents.forEach(ev => {
     const s = getSeason(ev.month);
     const c = getCeiling(ev.treatId);
-    if(!seasonBest[s] || c > seasonBest[s]) seasonBest[s] = c;
+    const isMech = (TREATMENTS[ev.treatId]?.moa || '') === 'Mechanical';
+    if(isMech){
+      // Mechanical treatments: track for season coverage but don't include in efficacy average
+      // They suppress mites but can't bring counts to safe levels alone
+      if(!seasonBestMech[s] || c > seasonBestMech[s]) seasonBestMech[s] = c;
+    } else {
+      if(!seasonBest[s] || c > seasonBest[s]) seasonBest[s] = c;
+    }
+  });
+  // If a season only has mechanical coverage (no chemical/physical), include it at its ceiling
+  // but capped low — mechanical alone is insufficient
+  Object.keys(seasonBestMech).forEach(s => {
+    if(!seasonBest[s]) seasonBest[s] = Math.min(seasonBestMech[s], 40);
   });
   const seasonCeilings = Object.values(seasonBest);
   const avgCeiling = seasonCeilings.length
