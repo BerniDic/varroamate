@@ -3439,7 +3439,7 @@ async function suggestPlan(){
 
   const allowed = allowedForAI.map(id => {
     const t = TREATMENTS[id];
-    return `${id}: ${t.name} (MoA: ${t.moa}, duration: ${t.duration}d, seasons: ${t.season.join('/')}, supersOff: ${t.supersOff})`;
+    return `${id}: ${t.name} (MoA: ${t.moa}, duration: ${t.duration}d, seasons: ${t.season.join('/')}, supersOff: ${t.supersOff}${t.badSeasons?.length ? `, NEVER USE IN: ${t.badSeasons.join('/')} — ${t.badSeasonNote||'not effective'}` : ''})`;
   }).join('\n');
 
   // Build treatment history — include recent past treatments with completion status
@@ -3485,6 +3485,7 @@ Key rules:
 - NEVER suggest any treatment before today — all treatments must be in ${todayLabel} or later
 - NEVER suggest any treatments during winter months (May, Jun, Jul) — no exceptions. Winter is a rest period. The only legitimate winter treatment is emergency OA (if mites are critically high due to an unusual heat spell keeping brood present), but you should NOT proactively suggest this. Leave winter months completely empty in your plan.
 - Respect supersOff:true — don't place those treatments in spring/summer flow months (Aug–Jan)
+- Respect NEVER USE IN seasons — each treatment lists its forbidden seasons explicitly. NEVER suggest a treatment in a forbidden season under any circumstances (e.g. drone comb removal is NEVER valid in autumn or winter — drones are not being reared)
 - Ensure MoA rotation for chemical treatments — don't repeat the same MoA consecutively
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
 - Target approximately 2 chemical treatments + approximately 2 mechanical/physical treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
