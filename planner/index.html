@@ -3033,7 +3033,7 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
       : `<li style="margin:2px 0;">Colony Survival score (${colRisk}%) is below the safety threshold</li>`;
 
     capNote = `<div style="margin-top:8px;padding:8px 10px;background:rgba(184,58,26,0.08);border:1.5px solid rgba(184,58,26,0.30);border-radius:6px;">
-      <div style="font-size:11px;font-weight:700;color:#9A2A0A;margin-bottom:4px;">⚠ Overall rating capped at ${result.overall}% — here's why:</div>
+      <div style="font-size:11px;font-weight:700;color:#9A2A0A;margin-bottom:4px;">⚠ Overall rating capped: raw score ${result.rawOverall}% → reduced to ${result.overall}% — here's why:</div>
       <ul style="margin:0;padding-left:16px;font-size:11px;color:#7A2A0A;line-height:1.5;">${reasonText}</ul>
       <div style="font-size:10px;color:#9A4A2A;margin-top:5px;">${hasPendingHighPressure ? 'Do a follow-up alcohol wash within 4 weeks to confirm efficacy — the cap will reassess once new mite count data is available.' : 'A high score in other dimensions cannot mask a colony at risk of collapse. Address the issues above to lift the cap.'}</div>
     </div>`;
