@@ -2977,7 +2977,7 @@ function scorePlan(){
           latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents};
 }
 
-function renderSurvivalGauge(score, safetyCapActive){
+function renderSurvivalGauge(score, safetyCapActive, result){
   const el = document.getElementById('survivalGauge');
   if(!el) return;
   if(score === null || score === undefined){
@@ -2997,9 +2997,39 @@ function renderSurvivalGauge(score, safetyCapActive){
                  : score >= 40 ? 'Some protection in place — consider strengthening your plan.'
                  : score >= 20 ? 'This plan is unlikely to prevent colony losses at current mite pressure.'
                  :               'Immediate action required. Mechanical methods alone cannot save this colony.';
-  const capNote  = safetyCapActive
-    ? `<div style="margin-top:5px;font-size:11px;color:#9A2A0A;font-weight:600;">⚠ Overall plan rating is capped — survival chance overrides other scores.</div>`
-    : '';
+  let capNote = '';
+  if(safetyCapActive && result){
+    // Build specific reasons why the cap was applied
+    const reasons = [];
+    const colRisk = Math.round(result.scores.colonyRisk);
+    const mites = result.latestCount?.count;
+    const pressure = result.pressure;
+
+    if(pressure === 'critical')
+      reasons.push(`Critical mite pressure (${mites} mites/300 bees) — colony loss risk is imminent`);
+    else if(pressure === 'high')
+      reasons.push(`High mite pressure (${mites} mites/300 bees) — current treatments insufficient to protect the colony`);
+
+    if(result.mechOnly)
+      reasons.push('Mechanical-only plan — cannot bring down a high infestation without chemical or physical treatment');
+
+    const covScore = Math.round(result.scores.coverage);
+    if(covScore < 40)
+      reasons.push(`Poor season coverage (${covScore}%) — key risk windows left unprotected`);
+
+    if(result.overdueEvents?.length > 0)
+      reasons.push(`${result.overdueEvents.length} planned treatment${result.overdueEvents.length>1?'s':''} not completed — protection gap already occurred`);
+
+    const reasonText = reasons.length
+      ? reasons.map(r => `<li style="margin:2px 0;">${r}</li>`).join('')
+      : `<li style="margin:2px 0;">Colony Survival score (${colRisk}%) is below the safety threshold</li>`;
+
+    capNote = `<div style="margin-top:8px;padding:8px 10px;background:rgba(184,58,26,0.08);border:1.5px solid rgba(184,58,26,0.30);border-radius:6px;">
+      <div style="font-size:11px;font-weight:700;color:#9A2A0A;margin-bottom:4px;">⚠ Overall rating capped at ${result.overall}% — here's why:</div>
+      <ul style="margin:0;padding-left:16px;font-size:11px;color:#7A2A0A;line-height:1.5;">${reasonText}</ul>
+      <div style="font-size:10px;color:#9A4A2A;margin-top:5px;">A high score in other dimensions cannot mask a colony at risk of collapse. Fix the issues above to lift the cap.</div>
+    </div>`;
+  }
   el.innerHTML = `<div class="survival-gauge">
     <div class="survival-light">${light}</div>
     <div class="survival-right">
@@ -3069,7 +3099,7 @@ function renderRating(){
   }
 
   // Render survival gauge prominently above dim rows
-  renderSurvivalGauge(result.scores.colonyRisk, result.safetyCapActive);
+  renderSurvivalGauge(result.scores.colonyRisk, result.safetyCapActive, result);
 
   // Dim rows — plan quality dimensions (colony survival is in the gauge above)
   dimRows.innerHTML = DIMS.map(d=>{
