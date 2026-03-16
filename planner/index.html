@@ -1892,7 +1892,7 @@ function renderSmartAlerts(){
       alerts.push({
         icon:'📈',
         title:`Mite count at action threshold — ${val} mites/300 bees (${_fmtAgo(monthsAgo)})`,
-        body:`Within normal action range. Your current plan should cover this — confirm your next treatment is within 4–6 weeks.`
+        body:`Within normal action range. Your current plan should cover this — confirm your next treatment is within 4 weeks.`
       });
     } else {
       alerts.push({
@@ -3167,7 +3167,7 @@ async function getAIAdvice(){
     return weeksAgo >= 0 && weeksAgo <= 8;
   });
   const recentTxContext = _recentTx.length
-    ? `IMPORTANT: The beekeeper recently applied the following treatment(s) within the last 8 weeks — the outcome is not yet fully known and a follow-up mite count has not been done yet: ${_recentTx.map(e=>{const t=TREATMENTS[e.treatId]||{};return `${t.name||e.label} (${MONTHS[e.month]} ${e.year})`;}).join(', ')}. Do NOT penalise the plan rating or recommend additional treatments solely because of low mite counts without this context — the recent treatment may still be working. Recommend a follow-up alcohol wash 4–6 weeks after treatment completion to assess efficacy.`
+    ? `IMPORTANT: The beekeeper recently applied the following treatment(s) within the last 8 weeks — the outcome is not yet fully known and a follow-up mite count has not been done yet: ${_recentTx.map(e=>{const t=TREATMENTS[e.treatId]||{};return `${t.name||e.label} (${MONTHS[e.month]} ${e.year})`;}).join(', ')}. Do NOT penalise the plan rating or recommend additional treatments solely because of low mite counts without this context — the recent treatment may still be working. Recommend a follow-up alcohol wash within 4 weeks of treatment completion to assess efficacy — never recommend waiting longer than 4 weeks between washes under any circumstances.`
     : '';
 
   const prompt = `You are VMSP (VarroaMate Smart Planner), an expert advisor for Australian beekeepers planning their Varroa management season.
@@ -3188,7 +3188,7 @@ Please give a concise, warm, practical analysis of their plan. Structure your re
 1. **Overall Assessment** — 2 sentences on the plan quality. If the safety cap is active (raw score was higher than overall), explicitly state that the overall rating has been capped due to critically low Colony Survival — explain what this means and what needs to change to lift the cap
 2. **What's Working Well** — 2-3 specific positives
 3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. IMPORTANT: only recommend additional treatments if mite pressure warrants it — do not recommend prophylactic treatments. When flagging missing windows: (a) the winter broodless OA window (Jun–Jul) — only mention this if mite pressure is elevated (≥3 mites/300 bees) AND the beekeeper has no treatment in the preceding autumn window. If you do mention it, frame it as conditional: "consider OA in June/July only if mite pressure has not dropped below threshold by end of May — check with an alcohol wash first"; (b) the autumn treatment window (Feb–Apr) — only flag if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment; (c) the spring treatment window (Aug–Oct) — only flag if the plan has no spring coverage and mite pressure is above threshold. Also check monitoring cadence — if the plan has alcohol wash checks scheduled more than 4 weeks apart, flag this and recommend checking at least every 4 weeks.
-4. **Key Recommendation** — one clear, prioritised action. If mite pressure is currently low, the recommendation should focus on monitoring cadence, not adding treatments. ALWAYS reinforce: never start a treatment without a mite count first — this is non-negotiable best practice
+4. **Key Recommendation** — one clear, prioritised action. If mite pressure is currently low, the recommendation should focus on monitoring cadence, not adding treatments. ALWAYS reinforce: never start a treatment without a mite count first — this is non-negotiable best practice. NEVER recommend scheduling an alcohol wash more than 4 weeks in the future — 4 weeks is an absolute maximum interval regardless of the situation, treatment status, or mite pressure level
 
 Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
 
@@ -3475,7 +3475,7 @@ Key rules:
 - Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
 - If there is a RECENT treatment in the history (within 8 weeks), factor it into the plan as if it were the first treatment — do not suggest a duplicate or overlapping treatment, and count it toward the ~2 chemical or ~2 mechanical slots accordingly
 - NEVER suggest a treatment without a preceding mite count check — always include alcohol wash checks in the rationale and space them no more than 4 weeks apart. If the beekeeper has no recent mite count, the rationale must recommend an alcohol wash BEFORE starting any treatment
-- Alcohol wash monitoring checks should be scheduled at least every 4 weeks throughout the active season — flag this in the rationale if the plan gaps exceed 4 weeks between checks
+- Alcohol wash monitoring checks MUST be scheduled at least every 4 weeks throughout the active season — this is a hard rule with no exceptions. Never suggest a wash interval longer than 4 weeks. Flag any gap > 4 weeks as a critical monitoring failure
 - Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred where available
 - OA treatments and heat are supers-compatible
 PLAN QUALITY — your suggested plan will be scored on these dimensions. Aim for a plan that would score 'Good' (70%+) or better on each:
@@ -3509,7 +3509,7 @@ Please suggest a plan for the next 12 months (from ${todayLabel}) using only the
 Target approximately 2 chemical + 2 mechanical/physical treatments for a full year.
 If a recent treatment appears in the history (within last 8 weeks), count it toward the plan slots — do not re-suggest it.
 NEVER suggest starting a treatment without a mite count first. Space alcohol wash monitoring checks no more than 4 weeks apart.
-Do not recommend alcohol wash checks further than 4 weeks into the future without a check in between.
+NEVER recommend an alcohol wash more than 4 weeks in the future — 4 weeks is an absolute hard maximum interval, no exceptions, regardless of treatment status or mite pressure.
 Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
 Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul).
 Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale.`;
