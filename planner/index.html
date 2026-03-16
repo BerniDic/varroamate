@@ -3550,11 +3550,13 @@ Southern hemisphere seasons: Spring=Aug–Oct, Summer=Nov–Jan, Autumn=Feb–Ap
 TODAY IS: ${todayLabel} (month index ${todayMonth}, year ${todayYear}).
 Key rules:
 - NEVER suggest any treatment before today — all treatments must be in ${todayLabel} or later
-- NEVER suggest any treatments during winter months (May, Jun, Jul) — no exceptions. Winter is a rest period. The only legitimate winter treatment is emergency OA (if mites are critically high due to an unusual heat spell keeping brood present), but you should NOT proactively suggest this. Leave winter months completely empty in your plan.
+- NEVER suggest any treatments during winter months (May, Jun, Jul) — no exceptions. Winter is a rest period. May is the FIRST winter month — do not suggest any treatment in May. The only legitimate winter treatment is emergency OA (if mites are critically high due to an unusual heat spell keeping brood present), but you should NOT proactively suggest this. Leave winter months completely empty in your plan.
+- Brood Interruption (brood-int) is ONLY valid in spring (Aug–Oct) or summer (Nov–Jan). It is NEVER valid in autumn (Feb–Apr) or winter (May–Jul). May, June, July, February, March, April are all forbidden months for brood interruption.
 - Respect supersOff:true — don't place those treatments in spring/summer flow months (Aug–Jan)
 - Respect NEVER USE IN seasons — each treatment lists its forbidden seasons explicitly. NEVER suggest a treatment in a forbidden season under any circumstances (e.g. drone comb removal is NEVER valid in autumn or winter — drones are not being reared)
 - Ensure MoA rotation for chemical treatments — don't repeat the same MoA consecutively
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
+- SPRING PRIORITY: If the plan includes any post-winter months (August onwards), the first treatment after winter MUST be in September (month index 8). September is the highest-priority treatment window — brood nest is at its smallest, mite concentration per frame is highest, and early intervention prevents exponential mite growth. Never place the first post-winter treatment in October or later.
 - Target approximately 2 chemical treatments + approximately 2 mechanical/physical treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
 - LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol, OA/formic) to a maximum of 2 per plan, and only include them when warranted by mite pressure
 - Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
@@ -3597,7 +3599,8 @@ NEVER suggest starting a treatment without a mite count first. Space alcohol was
 NEVER recommend an alcohol wash more than 4 weeks in the future — 4 weeks is an absolute hard maximum interval, no exceptions, regardless of treatment status or mite pressure.
 Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
 Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul).
-Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale.`;
+Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale.
+SPRING RULE: If the plan spans across a winter period (May–Jul), always include a treatment in September (month 8) — the first full spring month — not later. September is the critical early-spring window when the brood nest is smallest and mite concentration is highest. Never skip September in favour of October or later if the plan covers post-winter months.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
 
