@@ -2977,7 +2977,7 @@ function scorePlan(){
           latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents};
 }
 
-function renderSurvivalGauge(score, safetyCapActive, result){
+function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
   const el = document.getElementById('survivalGauge');
   if(!el) return;
   if(score === null || score === undefined){
@@ -3020,6 +3020,14 @@ function renderSurvivalGauge(score, safetyCapActive, result){
     if(result.overdueEvents?.length > 0)
       reasons.push(`${result.overdueEvents.length} planned treatment${result.overdueEvents.length>1?'s':''} not completed — protection gap already occurred`);
 
+    // Pending treatment outcome — most important special case
+    const hasPendingHighPressure = recentTx?.length > 0 &&
+      (pressure === 'high' || pressure === 'critical');
+    if(hasPendingHighPressure){
+      const txNames = recentTx.map(e=>TREATMENTS[e.treatId]?.name||e.treatId).join(', ');
+      reasons.unshift(`Treatment outcome pending — ${txNames} applied recently but efficacy not yet confirmed. The cap reflects your last mite count (${mites} mites/300 bees) and may lift once a follow-up alcohol wash confirms mite pressure has dropped`);
+    }
+
     const reasonText = reasons.length
       ? reasons.map(r => `<li style="margin:2px 0;">${r}</li>`).join('')
       : `<li style="margin:2px 0;">Colony Survival score (${colRisk}%) is below the safety threshold</li>`;
@@ -3027,7 +3035,7 @@ function renderSurvivalGauge(score, safetyCapActive, result){
     capNote = `<div style="margin-top:8px;padding:8px 10px;background:rgba(184,58,26,0.08);border:1.5px solid rgba(184,58,26,0.30);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:#9A2A0A;margin-bottom:4px;">⚠ Overall rating capped at ${result.overall}% — here's why:</div>
       <ul style="margin:0;padding-left:16px;font-size:11px;color:#7A2A0A;line-height:1.5;">${reasonText}</ul>
-      <div style="font-size:10px;color:#9A4A2A;margin-top:5px;">A high score in other dimensions cannot mask a colony at risk of collapse. Fix the issues above to lift the cap.</div>
+      <div style="font-size:10px;color:#9A4A2A;margin-top:5px;">${hasPendingHighPressure ? 'Do a follow-up alcohol wash within 4 weeks to confirm efficacy — the cap will reassess once new mite count data is available.' : 'A high score in other dimensions cannot mask a colony at risk of collapse. Address the issues above to lift the cap.'}</div>
     </div>`;
   }
   el.innerHTML = `<div class="survival-gauge">
@@ -3088,7 +3096,7 @@ function renderRating(){
   if(!dimRows) return;
 
   if(!result){
-    renderSurvivalGauge(null, false);
+    renderSurvivalGauge(null, false, null, []);
     dimRows.innerHTML = DIMS.map(d=>`
       <div class="dim-row">
         <div class="dim-name">${d.label}</div>
@@ -3099,7 +3107,15 @@ function renderRating(){
   }
 
   // Render survival gauge prominently above dim rows
-  renderSurvivalGauge(result.scores.colonyRisk, result.safetyCapActive, result);
+  // Check for recent treatments (within 8 weeks) with outcome not yet confirmed
+  const _ratingNow = new Date();
+  const _ratingRecentTx = _filteredHistory().filter(e=>{
+    if(e.type!=='treatment') return false;
+    const eDate = new Date(e.year, e.month, 1);
+    const weeksAgo = (_ratingNow - eDate) / (7*24*60*60*1000);
+    return weeksAgo >= 0 && weeksAgo <= 8;
+  });
+  renderSurvivalGauge(result.scores.colonyRisk, result.safetyCapActive, result, _ratingRecentTx);
 
   // Dim rows — plan quality dimensions (colony survival is in the gauge above)
   dimRows.innerHTML = DIMS.map(d=>{
