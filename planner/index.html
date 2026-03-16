@@ -3038,10 +3038,14 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
       <div style="font-size:10px;color:#9A4A2A;margin-top:5px;">${hasPendingHighPressure ? 'Do a follow-up alcohol wash within 4 weeks to confirm efficacy — the cap will reassess once new mite count data is available.' : 'A high score in other dimensions cannot mask a colony at risk of collapse. Address the issues above to lift the cap.'}</div>
     </div>`;
   }
+  const overallColor = result && result.overall>=70?'#3A7A42':result && result.overall>=40?'#996000':'#8B1A1A';
+  const survivalLabel = safetyCapActive && result
+    ? 'Colony Survival Chance &nbsp;·&nbsp; Overall Plan Rating: <strong style="color:' + overallColor + '">' + result.overall + '%</strong>'
+    : 'Colony Survival Chance';
   el.innerHTML = `<div class="survival-gauge">
     <div class="survival-light">${light}</div>
     <div class="survival-right">
-      <div class="survival-label">Colony Survival Chance${safetyCapActive && result ? ` · Overall Plan Rating: <strong style="color:${result.overall>=70?'#3A7A42':result.overall>=40?'#996000':'#8B1A1A'}">${result.overall}%</strong>` : ''}</div>
+      <div class="survival-label">${survivalLabel}</div>
       <div class="survival-verdict" style="color:${barColor}">${verdict}</div>
       <div class="survival-sub">${sub}</div>
       <div class="survival-bar-wrap">
