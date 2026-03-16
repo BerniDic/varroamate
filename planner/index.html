@@ -3238,19 +3238,7 @@ async function getAIAdvice(){
       }).join('; ')
     : 'No treatments planned yet';
 
-  // Build a clear, unambiguous score summary — individual dim scores omitted to prevent AI hallucination
-  const weakDims = result ? [
-    result.scores.philosophy  < 70 ? `Philosophy alignment (${Math.round(result.scores.philosophy)}%)` : null,
-    result.scores.seasonality < 70 ? `Seasonality (${Math.round(result.scores.seasonality)}%)` : null,
-    result.scores.rotation    < 70 ? `MoA rotation (${Math.round(result.scores.rotation)}%)` : null,
-    result.scores.coverage    < 70 ? `Season coverage (${Math.round(result.scores.coverage)}%)` : null,
-    result.scores.colonyRisk  < 70 ? `Colony Survival (${Math.round(result.scores.colonyRisk)}%)` : null,
-  ].filter(Boolean) : [];
-
-  const scores = result
-    ? `OVERALL PLAN RATING: ${result.overall}%${result.safetyCapActive ? ` [CAPPED — raw score was ${result.rawOverall}% before safety cap due to low Colony Survival (${Math.round(result.scores.colonyRisk)}%); you MUST acknowledge this cap in your assessment]` : ''}.
-${ratingWord(result.overall)} plan.${weakDims.length ? ` Dimensions scoring below 70% (needs attention): ${weakDims.join(', ')}.` : ' All dimensions scoring well.'}`
-    : 'No plan to score yet';
+  // scores var no longer sent to AI — scoreHeadline replaces it with words-only
 
   const conflictNote = result?.conflictCount>0
     ? `IMPORTANT: ${result.conflictCount} chemical treatment(s) have overlapping duration bars with the same MoA — this is a resistance risk. Penalty severity depends on MoA: synthetics (pyrethroids, amitraz) carry the highest resistance risk and largest penalty; essential oils (thymol) are medium; organic acids (OA, formic) are lowest risk and carry a smaller penalty.`
@@ -3276,11 +3264,25 @@ ${ratingWord(result.overall)} plan.${weakDims.length ? ` Dimensions scoring belo
     ? `IMPORTANT: The beekeeper recently applied the following treatment(s) within the last 8 weeks — the outcome is not yet fully known and a follow-up mite count has not been done yet: ${_recentTx.map(e=>{const t=TREATMENTS[e.treatId]||{};return `${t.name||e.label} (${MONTHS[e.month]} ${e.year})`;}).join(', ')}. Do NOT penalise the plan rating or recommend additional treatments solely because of low mite counts without this context — the recent treatment may still be working. Recommend a follow-up alcohol wash within 4 weeks of treatment completion to assess efficacy — never recommend waiting longer than 4 weeks between washes under any circumstances.`
     : '';
 
-  // Score sent as plain prose — no numbers the AI can misread as the overall score
+  // Score sent as words only — NO percentages anywhere to prevent hallucination
+  const weakDimWords = result ? [
+    result.scores.philosophy  < 70 ? 'Philosophy alignment (needs work)' : null,
+    result.scores.seasonality < 70 ? 'Seasonality (needs work)' : null,
+    result.scores.rotation    < 70 ? 'MoA rotation (needs work)' : null,
+    result.scores.coverage    < 70 ? 'Season coverage (needs work)' : null,
+    result.scores.colonyRisk  < 70 ? 'Colony Survival (needs work)' : null,
+  ].filter(Boolean) : [];
+
+  const scoreWord = ratingWord(result?.overall ?? 0);
+  const capWord   = result?.safetyCapActive
+    ? ' The score has been safety-capped downward because Colony Survival is critically low.'
+    : '';
+  const dimWord   = weakDimWords.length
+    ? ' Areas needing attention: ' + weakDimWords.join(', ') + '.'
+    : ' All dimensions are scoring well.';
+
   const scoreHeadline = result
-    ? 'The VarroaMate rating engine has scored this plan at ' + result.overall + '% (' + ratingWord(result.overall) + ').' +
-      (result.safetyCapActive ? ' The score was safety-capped from ' + result.rawOverall + '% to ' + result.overall + '% due to critically low Colony Survival (' + Math.round(result.scores.colonyRisk) + '%).' : '') +
-      (weakDims.length ? ' Dimensions needing attention: ' + weakDims.join(', ') + '.' : ' All dimensions are scoring well.')
+    ? 'The VarroaMate rating engine rates this plan as: ' + scoreWord + '.' + capWord + dimWord
     : 'No score available.';
 
   const prompt = `You are VMSP (VarroaMate Smart Planner), an expert advisor for Australian beekeepers planning their Varroa management season.
