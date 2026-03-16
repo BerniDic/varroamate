@@ -3649,7 +3649,25 @@ function _renderProposals(treatments, rationale, systemPrompt){
   container.style.gap = '10px';
 
   // Add new proposals (keeping any already rendered)
-  treatments.forEach(item => {
+  // Hard-filter: silently drop any treatment the AI placed in a forbidden season
+  // This is a safety net — the prompt should already prevent this but doesn't always
+  const validTreatments = treatments.filter(item => {
+    const t = TREATMENTS[item.treatId];
+    if(!t) return false;
+    const season = getSeason(item.month);
+    // Reject if placed in a bad season
+    if(t.badSeasons && t.badSeasons.includes(season)){
+      console.warn(`VMSP: AI suggested ${t.name} in ${MONTHS[item.month]} (${season}) — rejected (badSeasons: ${t.badSeasons.join(',')})`);
+      return false;
+    }
+    // Reject winter treatments (May=4, Jun=5, Jul=6) — belt and braces
+    if(item.month >= 4 && item.month <= 6 && item.treatId !== 'oxalic' && item.treatId !== 'oxalic-dribble'){
+      console.warn(`VMSP: AI suggested ${t.name} in winter month ${MONTHS[item.month]} — rejected`);
+      return false;
+    }
+    return true;
+  });
+  validTreatments.forEach(item => {
     const id = _suggestNextId++;
     const t = TREATMENTS[item.treatId];
     if(!t) return;
@@ -3674,6 +3692,15 @@ function _renderProposals(treatments, rationale, systemPrompt){
       </div>`;
     container.appendChild(div);
   });
+
+  // If any treatments were filtered (bad season), show a note
+  const filteredCount = treatments.length - validTreatments.length;
+  if(filteredCount > 0){
+    const filtNote = document.createElement('div');
+    filtNote.style.cssText = 'padding:7px 10px;background:rgba(212,130,10,0.08);border:1px solid rgba(212,130,10,0.25);border-radius:6px;font-size:12px;color:#996000;';
+    filtNote.innerHTML = `⚠ ${filteredCount} suggestion${filteredCount>1?'s were':' was'} removed — placed in a biologically invalid season (e.g. drone comb removal in autumn, brood interruption in winter). These have been filtered out automatically.`;
+    container.appendChild(filtNote);
+  }
 
   // Show overall rationale — insert at TOP of proposals list
   if(rationale && !container.querySelector('.suggest-rationale')){
