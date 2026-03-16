@@ -6297,7 +6297,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // Init palette open state
   const pbw = document.getElementById('paletteBodyWrap');
   if(pbw) pbw.style.maxHeight = pbw.scrollHeight + 'px';
-  gotoScreen('screen-mission');
+  // If returning user has already acknowledged the disclaimer, go straight to the planner
+  gotoScreen(_discAcked ? 'screen-planner' : 'screen-mission');
 });
 
 function renderHeatPlanner(){
