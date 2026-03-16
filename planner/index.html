@@ -2909,7 +2909,21 @@ function scorePlan(){
   const hasChem      = moaClassesUsed.has('organic') || moaClassesUsed.has('essential') || moaClassesUsed.has('amitraz') || moaClassesUsed.has('pyrethroid');
   const hasMech      = moaClassesUsed.has('mechanical');
   const hasPhys      = moaClassesUsed.has('physical');
-  const mechOnly     = scoringEvents.length > 0 && !hasChem && !hasPhys && hasMech;
+  // mechOnly: check ALL planEvents (not just scoring window) — a plan is mechanical-only
+  // if there are genuinely no chemical or physical treatments anywhere in it
+  const allMoAs = new Set(planEvents.map(e => {
+    const moa = TREATMENTS[e.treatId]?.moa || '';
+    if(moa.includes('Organic'))    return 'organic';
+    if(moa.includes('Essential'))  return 'essential';
+    if(moa.includes('Amitraz'))    return 'amitraz';
+    if(moa.includes('Pyrethroid')) return 'pyrethroid';
+    if(moa === 'Physical')         return 'physical';
+    if(moa === 'Mechanical')       return 'mechanical';
+    return 'other';
+  }));
+  const planHasChem = allMoAs.has('organic') || allMoAs.has('essential') || allMoAs.has('amitraz') || allMoAs.has('pyrethroid');
+  const planHasPhys = allMoAs.has('physical');
+  const mechOnly     = scoringEvents.length > 0 && !planHasChem && !planHasPhys && hasMech;
   const fullSpectrum = hasChem && (hasMech || hasPhys) && moaClassesUsed.size >= 3;
 
   const seasonBest = {};
@@ -2974,7 +2988,7 @@ function scorePlan(){
   const safetyCapActive = overall < rawOverall;
 
   return {scores, overall, rawOverall, safetyCapActive, sorted, conflictCount,
-          latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents};
+          latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents, planHasChem};
 }
 
 function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
@@ -3012,6 +3026,8 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
 
     if(result.mechOnly)
       reasons.push('Mechanical-only plan — cannot bring down a high infestation without chemical or physical treatment');
+    else if(!result.planHasChem && result.scores.colonyRisk < 60)
+      reasons.push('No chemical or physical treatments fall within the current 12-month scoring window — treatments placed further ahead do not yet count toward colony survival score');
 
     const covScore = Math.round(result.scores.coverage);
     if(covScore < 40)
