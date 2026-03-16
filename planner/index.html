@@ -1658,10 +1658,10 @@ const PREFS = [
    allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
   {id:'organic',      icon:'🍃',  name:'Organic-Only Strategy',
    desc:'Organic acids exclusively. No synthetic chemicals.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex','apitraz','apistan']},
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
   {id:'mech-organic', icon:'🔩',  name:'Mechanical + Organic Strategy',
    desc:'Mechanical/heat combined with organic acids. No synthetics.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex','apitraz','apistan']},
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
   {id:'mechanical',   icon:'🔧',  name:'Mechanical Strategy Only',
    desc:'Mechanical/heat only. Zero chemicals of any kind.',
    allowed:['drone-comb','brood-int','heat','duplex','apitraz','apistan']},
@@ -3625,7 +3625,8 @@ NEVER suggest starting a treatment without a mite count first. Space alcohol was
 NEVER recommend an alcohol wash more than 4 weeks in the future — 4 weeks is an absolute hard maximum interval, no exceptions, regardless of treatment status or mite pressure.
 Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
 Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul).
-Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale.
+Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale honestly — do not suggest an ineffective plan and score it as good.
+ORGANIC-ONLY PHILOSOPHY: If the philosophy is organic-only, the strongest available treatments are OA vaporisation (spring/winter), Formic PRO (spring/autumn), Aluen CAP (spring/summer/autumn), and Apiguard/ApiLife (spring/summer). Pair these with mechanical options (drone comb removal, brood interruption in Jan–Feb). OA vap in September is the critical spring treatment — always include it. If mite pressure is critical and organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers emergency synthetic treatment.
 SPRING RULE: If the plan spans across a winter period (May–Jul), always include a treatment in September (month 8) — the first full spring month — not later. September is the critical early-spring window when the brood nest is smallest and mite concentration is highest. Never skip September in favour of October or later if the plan covers post-winter months.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
@@ -3672,18 +3673,26 @@ function _renderProposals(treatments, rationale, systemPrompt){
   // Add new proposals (keeping any already rendered)
   // Hard-filter: silently drop any treatment the AI placed in a forbidden season
   // This is a safety net — the prompt should already prevent this but doesn't always
+  const _nowForFilter = new Date();
+  const _todayFracFilter = (_nowForFilter.getFullYear()-2024)*12 + _nowForFilter.getMonth();
   const validTreatments = treatments.filter(item => {
     const t = TREATMENTS[item.treatId];
     if(!t) return false;
     const season = getSeason(item.month);
+    // Reject if in the past (year/month before today)
+    const itemFrac = (item.year-2024)*12 + item.month;
+    if(itemFrac < _todayFracFilter){
+      console.warn(`VMSP: AI suggested ${t.name} in ${MONTHS[item.month]} ${item.year} — rejected (in the past)`);
+      return false;
+    }
     // Reject if placed in a bad season
     if(t.badSeasons && t.badSeasons.includes(season)){
-      console.warn(`VMSP: AI suggested ${t.name} in ${MONTHS[item.month]} (${season}) — rejected (badSeasons: ${t.badSeasons.join(',')})`);
+      console.warn(`VMSP: AI suggested ${t.name} in ${MONTHS[item.month]} ${item.year} (${season}) — rejected (badSeasons: ${t.badSeasons.join(',')})`);
       return false;
     }
     // Reject winter treatments (May=4, Jun=5, Jul=6) — belt and braces
     if(item.month >= 4 && item.month <= 6 && item.treatId !== 'oxalic' && item.treatId !== 'oxalic-dribble'){
-      console.warn(`VMSP: AI suggested ${t.name} in winter month ${MONTHS[item.month]} — rejected`);
+      console.warn(`VMSP: AI suggested ${t.name} in winter month ${MONTHS[item.month]} ${item.year} — rejected`);
       return false;
     }
     return true;
