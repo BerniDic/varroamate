@@ -435,7 +435,9 @@ canvas.drop-blocked{cursor:not-allowed;}
 .dayplan-content{margin-top:20px;display:none;}
 .dayplan-content.active{display:block;}
 
-@media(max-width:600px){.main{padding:14px 14px 80px;}.pref-banner{flex-wrap:wrap;gap:10px;}.dp-two-col{grid-template-columns:1fr!important;}}
+@media(max-width:600px){.main{padding:14px 14px 80px;}.pref-banner{flex-wrap:wrap;gap:10px;}.dp-two-col{grid-template-columns:1fr!important;}.dp-frame-inner{grid-template-columns:1fr!important;}}
+.dp-frame-row{grid-template-columns:1fr 280px;}
+@media(max-width:700px){.dp-frame-row{grid-template-columns:1fr!important;}}
 .mobile-nudge{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#2A4A9A,#1C3D2E);color:white;border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);}
 .mobile-nudge-icon{font-size:28px;flex-shrink:0;}
 .mobile-nudge-body{flex:1;font-size:13px;line-height:1.5;}
@@ -986,12 +988,12 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div><!-- end canvas+date row -->
 
         <!-- Row 3: Frame options + Further learning side by side -->
-        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;">
+        <div style="display:grid;gap:16px;align-items:start;" class="dp-two-col dp-frame-row">
 
           <!-- Frame type diagrams -->
           <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px 16px;">
             <div style="font-size:13px;font-weight:700;color:var(--forest);margin-bottom:12px;">🖼 Drone frame options — choose what suits your setup</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" class="dp-frame-inner">
 
               <div style="border:1.5px solid #5A9E60;border-radius:8px;overflow:hidden;">
                 <div style="background:#5A9E60;padding:6px 10px;font-size:11px;font-weight:700;color:white;">① Plastic drone frame (green)</div>
@@ -1547,9 +1549,9 @@ canvas.drop-blocked{cursor:not-allowed;}
             </div>
             <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);">
               <div style="font-weight:600;color:var(--forest);margin-bottom:8px;font-size:14px;">📚 Resources</div>
-              <a href="https://varroacontroller.com" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
-                <span style="font-size:16px;">🌡️</span>
-                <div><div>VarroaController.com</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Official device info, instructions and research</div></div>
+              <a href="https://www.varroa-controller.com/wp-content/uploads/2020/05/Handbook-of-heat-treatment-against-the-Varroa.pdf" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
+                <span style="font-size:16px;">📖</span>
+                <div><div>Varroa Controller — Heat Treatment Handbook</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Official handbook: hyperthermia science, protocols &amp; method (PDF)</div></div>
               </a>
             </div>
           </div>
@@ -2104,10 +2106,12 @@ function _rebuildPlanDropdown(scopeKey){
 
 function switchPlan(planName){
   savePlan(currentScopeKey, currentPlanName);
+  _resetProposalUI(); // clear AI suggestions — they belong to the previous plan
   currentPlanName = planName;
   loadPlan(currentScopeKey, planName);
   updateAll();
   _updatePlanSelName();
+  redraw();
 }
 
 function promptNewPlan(){
@@ -2312,6 +2316,8 @@ function selectPlanScope(key){
   } else {
     currentPlanName = 'Plan 1';
   }
+  // Reset AI proposals when switching hive or plan — they belong to the previous scope
+  _resetProposalUI();
   loadPlan(key, currentPlanName);
   _rebuildPlanDropdown(key);
   _updatePlanSelName();
@@ -3137,7 +3143,7 @@ async function getAIAdvice(){
     : 'No treatments planned yet';
 
   const scores = result
-    ? `Philosophy: ${Math.round(result.scores.philosophy)}%, Seasonality: ${Math.round(result.scores.seasonality)}%, MoA rotation: ${Math.round(result.scores.rotation)}%, Season coverage: ${Math.round(result.scores.coverage)}%, Overall: ${result.overall}%`
+    ? `Philosophy: ${Math.round(result.scores.philosophy)}%, Seasonality: ${Math.round(result.scores.seasonality)}%, MoA rotation: ${Math.round(result.scores.rotation)}%, Season coverage: ${Math.round(result.scores.coverage)}%, Overall: ${result.overall}%${result.safetyCapActive ? ` (RAW score was ${result.rawOverall}% — capped down to ${result.overall}% because Colony Survival score is critically low; this cap must be explicitly acknowledged in your assessment)` : ''}`
     : 'No plan to score yet';
 
   const conflictNote = result?.conflictCount>0
@@ -3150,7 +3156,19 @@ async function getAIAdvice(){
   const _latestCount = _adviceCounts[0];
   const mitePressureContext = _latestCount
     ? `Latest mite count: ${_latestCount.count} mites/300 bees (${MONTHS[_latestCount.month]} ${_latestCount.year}). Mite pressure is ${_latestCount.count>=15?'CRITICAL':_latestCount.count>=8?'HIGH':_latestCount.count>=3?'ELEVATED (action threshold)':'LOW — below action threshold'}. Only recommend additional treatments if the current mite pressure level warrants it.`
-    : 'No mite count data available for this hive — advise the beekeeper to do an alcohol wash before planning any treatments.';
+    : 'No mite count data available for this hive — the beekeeper MUST do an alcohol wash before planning or starting any treatments. Reinforce this as a key recommendation.';
+
+  // Check for very recent treatments (within 8 weeks) — outcome not yet clear
+  const _todayObj = new Date();
+  const _recentTx = _filteredHistory().filter(e=>{
+    if(e.type!=='treatment') return false;
+    const eDate = new Date(e.year, e.month, 1);
+    const weeksAgo = (_todayObj - eDate) / (7*24*60*60*1000);
+    return weeksAgo >= 0 && weeksAgo <= 8;
+  });
+  const recentTxContext = _recentTx.length
+    ? `IMPORTANT: The beekeeper recently applied the following treatment(s) within the last 8 weeks — the outcome is not yet fully known and a follow-up mite count has not been done yet: ${_recentTx.map(e=>{const t=TREATMENTS[e.treatId]||{};return `${t.name||e.label} (${MONTHS[e.month]} ${e.year})`;}).join(', ')}. Do NOT penalise the plan rating or recommend additional treatments solely because of low mite counts without this context — the recent treatment may still be working. Recommend a follow-up alcohol wash 4–6 weeks after treatment completion to assess efficacy.`
+    : '';
 
   const prompt = `You are VMSP (VarroaMate Smart Planner), an expert advisor for Australian beekeepers planning their Varroa management season.
 
@@ -3164,11 +3182,13 @@ ${conflictNote}
 
 Current mite pressure: ${mitePressureContext}
 
+${recentTxContext}
+
 Please give a concise, warm, practical analysis of their plan. Structure your response with these sections using markdown headers:
-1. **Overall Assessment** — 2 sentences on the plan quality
+1. **Overall Assessment** — 2 sentences on the plan quality. If the safety cap is active (raw score was higher than overall), explicitly state that the overall rating has been capped due to critically low Colony Survival — explain what this means and what needs to change to lift the cap
 2. **What's Working Well** — 2-3 specific positives
-3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. IMPORTANT: only recommend additional treatments if mite pressure warrants it — do not recommend prophylactic treatments. When flagging missing windows: (a) the winter broodless OA window (Jun–Jul) — only mention this if mite pressure is elevated (≥3 mites/300 bees) AND the beekeeper has no treatment in the preceding autumn window. If you do mention it, frame it as conditional: "consider OA in June/July only if mite pressure has not dropped below threshold by end of May — check with an alcohol wash first"; (b) the autumn treatment window (Feb–Apr) — only flag if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment; (c) the spring treatment window (Aug–Oct) — only flag if the plan has no spring coverage and mite pressure is above threshold.
-4. **Key Recommendation** — one clear, prioritised action. If mite pressure is currently low, the recommendation should focus on monitoring cadence, not adding treatments
+3. **What to Improve** — focus on the lowest-scoring dimensions and any MoA conflicts, give specific actionable suggestions. IMPORTANT: only recommend additional treatments if mite pressure warrants it — do not recommend prophylactic treatments. When flagging missing windows: (a) the winter broodless OA window (Jun–Jul) — only mention this if mite pressure is elevated (≥3 mites/300 bees) AND the beekeeper has no treatment in the preceding autumn window. If you do mention it, frame it as conditional: "consider OA in June/July only if mite pressure has not dropped below threshold by end of May — check with an alcohol wash first"; (b) the autumn treatment window (Feb–Apr) — only flag if mite pressure is elevated (latest count ≥3 mites/300 bees). If mite counts are low or zero, do not recommend prophylactic treatment; (c) the spring treatment window (Aug–Oct) — only flag if the plan has no spring coverage and mite pressure is above threshold. Also check monitoring cadence — if the plan has alcohol wash checks scheduled more than 4 weeks apart, flag this and recommend checking at least every 4 weeks.
+4. **Key Recommendation** — one clear, prioritised action. If mite pressure is currently low, the recommendation should focus on monitoring cadence, not adding treatments. ALWAYS reinforce: never start a treatment without a mite count first — this is non-negotiable best practice
 
 Keep it under 300 words. Be specific about treatment names, timing, duration, and MoA. Never mention MAQS — always say Formic PRO.`;
 
@@ -3348,22 +3368,30 @@ function toggleSuggestCard(){
   document.getElementById('suggestChevron').style.transform = _suggestCardOpen ? '' : 'rotate(-90deg)';
 }
 
-function cancelSuggest(){
-  // Reset all suggestion state and collapse proposals
+function _resetProposalUI(){
+  // Shared reset — called on scope/plan switch AND cancel
   _proposals = [];
   _suggestHistory = [];
   _suggestNextId = 1;
-  document.getElementById('suggestProposals').innerHTML = '';
-  document.getElementById('suggestProposals').style.display = 'none';
-  document.getElementById('suggestApplyAll').style.display = 'none';
-  document.getElementById('suggestRatingPreview').style.display = 'none';
-  document.getElementById('suggestActiveBar').style.display = 'none';
+  const container = document.getElementById('suggestProposals');
+  if(container){ container.innerHTML = ''; container.style.display = 'none'; }
+  const applyAll = document.getElementById('suggestApplyAll');
+  if(applyAll) applyAll.style.display = 'none';
+  const ratingPrev = document.getElementById('suggestRatingPreview');
+  if(ratingPrev) ratingPrev.style.display = 'none';
+  const activeBar = document.getElementById('suggestActiveBar');
+  if(activeBar) activeBar.style.display = 'none';
+  const ratBelow = document.getElementById('suggestRationaleBelow');
+  if(ratBelow){ ratBelow.textContent = ''; ratBelow.style.display = 'none'; }
   const btn = document.getElementById('suggestBtn');
-  btn.disabled = false;
-  btn.innerHTML = '✨ Suggest a Plan for Me';
-  btn.style.display = 'flex';
+  if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; btn.style.display = 'flex'; }
   _setPaletteVisible(true);
-  document.getElementById('suggestPicker').style.display = '';
+  const picker = document.getElementById('suggestPicker');
+  if(picker) picker.style.display = '';
+}
+
+function cancelSuggest(){
+  _resetProposalUI();
   redraw(); // clear ghost bars from timeline
 }
 
@@ -3397,10 +3425,36 @@ async function suggestPlan(){
     return `${id}: ${t.name} (MoA: ${t.moa}, duration: ${t.duration}d, seasons: ${t.season.join('/')}, supersOff: ${t.supersOff})`;
   }).join('\n');
 
-  const historyContext = _filteredHistory().filter(e=>e.type==='treatment').map(e=>{
-    const t = TREATMENTS[e.treatId]||{};
-    return `${t.name||e.label} in ${MONTHS[e.month]} ${e.year}`;
-  }).join(', ') || 'No treatment history';
+  // Build treatment history — include recent past treatments with completion status
+  const allTreatHistory = _filteredHistory().filter(e=>e.type==='treatment');
+  const todayDateObj = new Date(todayYear, todayMonth, 1);
+
+  // Separate recent (within last 8 weeks) from older history
+  const recentTreatments = allTreatHistory.filter(e=>{
+    const eDate = new Date(e.year, e.month, 1);
+    const weeksAgo = (todayDateObj - eDate) / (7*24*60*60*1000);
+    return weeksAgo >= 0 && weeksAgo <= 8;
+  });
+  const olderTreatments = allTreatHistory.filter(e=>{
+    const eDate = new Date(e.year, e.month, 1);
+    const weeksAgo = (todayDateObj - eDate) / (7*24*60*60*1000);
+    return weeksAgo > 8;
+  });
+
+  const historyContext = [
+    recentTreatments.length
+      ? `RECENT TREATMENTS (within last 8 weeks — outcome not yet fully known): ${recentTreatments.map(e=>{
+          const t=TREATMENTS[e.treatId]||{};
+          const dur = t.duration||0;
+          const endDate = new Date(e.year, e.month + Math.floor(dur/30), 1);
+          const stillActive = endDate >= todayDateObj;
+          return `${t.name||e.label} in ${MONTHS[e.month]} ${e.year}${stillActive?' [STILL ACTIVE — do not overlap]':''}`;
+        }).join(', ')}`
+      : '',
+    olderTreatments.length
+      ? `Older history: ${olderTreatments.map(e=>{const t=TREATMENTS[e.treatId]||{};return `${t.name||e.label} in ${MONTHS[e.month]} ${e.year}`;}).join(', ')}`
+      : ''
+  ].filter(Boolean).join('. ') || 'No treatment history';
 
   const systemPrompt = `You are VMSP, an expert Varroa management planner for southern-hemisphere (Australian) beekeepers.
 You suggest treatment plans as structured JSON only — no prose outside the JSON object.
@@ -3416,10 +3470,22 @@ Key rules:
 - Respect supersOff:true — don't place those treatments in spring/summer flow months (Aug–Jan)
 - Ensure MoA rotation for chemical treatments — don't repeat the same MoA consecutively
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
-- Target 3–4 treatments total. Only go to 5–6 if mechanical/physical options (drone comb removal, brood break, heat, duplex) fill those extra slots — they carry no resistance risk
-- LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol) to a maximum of 2 per plan, and only include them when organic or mechanical options are insufficient
+- Target approximately 2 chemical treatments + approximately 2 mechanical/physical treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
+- LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol, OA/formic) to a maximum of 2 per plan, and only include them when warranted by mite pressure
+- Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
+- If there is a RECENT treatment in the history (within 8 weeks), factor it into the plan as if it were the first treatment — do not suggest a duplicate or overlapping treatment, and count it toward the ~2 chemical or ~2 mechanical slots accordingly
+- NEVER suggest a treatment without a preceding mite count check — always include alcohol wash checks in the rationale and space them no more than 4 weeks apart. If the beekeeper has no recent mite count, the rationale must recommend an alcohol wash BEFORE starting any treatment
+- Alcohol wash monitoring checks should be scheduled at least every 4 weeks throughout the active season — flag this in the rationale if the plan gaps exceed 4 weeks between checks
 - Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred where available
 - OA treatments and heat are supers-compatible
+PLAN QUALITY — your suggested plan will be scored on these dimensions. Aim for a plan that would score 'Good' (70%+) or better on each:
+- Philosophy alignment: use only the treatments allowed for the beekeeper's philosophy
+- Seasonality: place treatments in their correct seasonal windows (spring Aug–Oct, autumn Feb–Apr)
+- MoA rotation: never repeat the same MoA consecutively — rotate between chemical classes
+- Season coverage: cover at least 2 of the 3 active seasons (spring, summer, autumn)
+- Supers compatibility: do not place supersOff treatments during flow months (Aug–Jan)
+- Colony survival: include enough effective treatments to meaningfully reduce mite load, especially if pressure is elevated
+A plan with no treatments, only mechanical treatments when mite pressure is high, or treatments all in the same MoA will score poorly. Be honest if the situation is truly dire (e.g. critically high mite pressure with very few allowed treatments) — in that case explain clearly why the score may still be limited. But in most cases a well-constructed plan should score 70%+ and your goal is to produce one.
 Respond ONLY with valid JSON in this exact shape, no markdown fences:
 {
   "rationale": "2-3 sentence explanation of the overall plan strategy",
@@ -3429,8 +3495,24 @@ Respond ONLY with valid JSON in this exact shape, no markdown fences:
 }
 month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${todayLabel}.`;
 
-  const userMsg = `Today is ${todayLabel}. The beekeeper's recent treatment history: ${historyContext}.
-Please suggest a minimal but effective treatment plan for the next 12 months (from ${todayLabel} onwards) using only their allowed treatments. Aim for 3–4 treatments total — quality over quantity. If drone comb removal or brood break are available, include them as they reduce the need for chemical treatments. Cap chemical treatments at 2 unless there is a compelling resistance-rotation reason for a third. Cover the key risk windows — if mite pressure is elevated (≥3 mites/300 bees), include an autumn treatment (Feb–Apr) to reduce mite load before the untreatable winter period. Do not recommend autumn treatment prophylactically if mite counts are at or near zero. Also cover the spring build-up window. Do not over-treat. Do not suggest anything before ${todayLabel}.`;
+  // Build mite count context for suggest prompt
+  const _suggestCounts = _filteredHistory().filter(e=>e.type==='count'&&e.count!=null)
+    .sort((a,b)=>(b.year*12+b.month)-(a.year*12+a.month));
+  const _suggestLatestCount = _suggestCounts[0];
+  const suggestMiteContext = _suggestLatestCount
+    ? `Latest mite count: ${_suggestLatestCount.count} mites/300 bees (${MONTHS[_suggestLatestCount.month]} ${_suggestLatestCount.year}) — pressure is ${_suggestLatestCount.count>=15?'CRITICAL':_suggestLatestCount.count>=8?'HIGH':_suggestLatestCount.count>=3?'ELEVATED':'LOW'}.`
+    : 'No mite count on record — IMPORTANT: recommend an alcohol wash BEFORE starting any treatment. Do not suggest treating without a count.';
+
+  const userMsg = `Today is ${todayLabel}. ${suggestMiteContext}
+The beekeeper's treatment history: ${historyContext}.
+Please suggest a plan for the next 12 months (from ${todayLabel}) using only their allowed treatments.
+Target approximately 2 chemical + 2 mechanical/physical treatments for a full year.
+If a recent treatment appears in the history (within last 8 weeks), count it toward the plan slots — do not re-suggest it.
+NEVER suggest starting a treatment without a mite count first. Space alcohol wash monitoring checks no more than 4 weeks apart.
+Do not recommend alcohol wash checks further than 4 weeks into the future without a check in between.
+Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
+Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul).
+Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
 
@@ -4463,23 +4545,52 @@ function drawTimeline(){
   if(visibleCounts.length>=2){
     const pts=visibleCounts.map(e=>({x:fracToX(monthFrac(e.year,e.month),PAD_L,TW),y:countToY(e.count),n:e.count}));
     ctx.save();ctx.beginPath();ctx.rect(PAD_L,cRy,TW,countH);ctx.clip();
+    // Monotone cubic interpolation — smooth but always moves forward in X
+    // Uses Fritsch-Carlson tangent constraints so the curve never swings back
+    function monotoneTangents(pts){
+      const n=pts.length, d=[], m=[], a=[], b=[], t=[];
+      for(let i=0;i<n-1;i++) d[i]=(pts[i+1].y-pts[i].y)/(pts[i+1].x-pts[i].x||1e-10);
+      m[0]=d[0];
+      for(let i=1;i<n-1;i++) m[i]=(d[i-1]+d[i])/2;
+      m[n-1]=d[n-2];
+      for(let i=0;i<n-1;i++){
+        if(Math.abs(d[i])<1e-10){m[i]=m[i+1]=0;continue;}
+        a[i]=m[i]/d[i]; b[i]=m[i+1]/d[i];
+        const s=a[i]*a[i]+b[i]*b[i];
+        if(s>9){const sc=3/Math.sqrt(s);m[i]=sc*a[i]*d[i];m[i+1]=sc*b[i]*d[i];}
+      }
+      return m;
+    }
+    const tang = monotoneTangents(pts);
     for(let i=0;i<pts.length-1;i++){
-      const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+      const p1=pts[i], p2=pts[i+1];
       const avg=(p1.n+p2.n)/2;
       const mo=((Math.round(windowStart+i)%12)+12)%12;
       const az=ACTION_ZONE_BY_MONTH[mo]||{lo:3,hi:5};
       const thresh=LOSS_THRESHOLD_BY_MONTH[mo]??15;
       const lc=avg>=thresh?'#B85C38':avg>=az.lo?'#D4820A':'#5A9E60';
-      const cp1x=p1.x+(p2.x-p0.x)/6,cp1y=p1.y+(p2.y-p0.y)/6;
-      const cp2x=p2.x-(p3.x-p1.x)/6,cp2y=p2.y-(p3.y-p1.y)/6;
-      ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p2.x,p2.y);
+      const dx=(p2.x-p1.x)/3;
+      // Control points constrained so X always advances — no backward swing
+      const cp1x=p1.x+dx, cp1y=p1.y+tang[i]*dx;
+      const cp2x=p2.x-dx, cp2y=p2.y-tang[i+1]*dx;
+      ctx.beginPath();ctx.moveTo(p1.x,p1.y);
+      ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p2.x,p2.y);
       ctx.strokeStyle=lc+'CC';ctx.lineWidth=2.5;ctx.stroke();
     }
     // Area fill under trend
     const grad=ctx.createLinearGradient(pts[0].x,cRy,pts[pts.length-1].x,cRy);
     grad.addColorStop(0,'rgba(90,158,96,0.07)');grad.addColorStop(0.5,'rgba(212,130,10,0.07)');grad.addColorStop(1,'rgba(184,92,56,0.12)');
     ctx.beginPath();ctx.moveTo(pts[0].x,cRy+countH);
-    pts.forEach((p,i)=>{if(i===0){ctx.lineTo(p.x,p.y);}else{const pp=pts[i-1];const cpx=(pp.x+p.x)/2;ctx.bezierCurveTo(cpx,pp.y,cpx,p.y,p.x,p.y);}});
+    pts.forEach((p,i)=>{
+      if(i===0){ctx.lineTo(p.x,p.y);}
+      else{
+        const pp=pts[i-1];
+        const dx=(p.x-pp.x)/3;
+        const cp1x=pp.x+dx,cp1y=pp.y+tang[i-1]*dx;
+        const cp2x=p.x-dx, cp2y=p.y-tang[i]*dx;
+        ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p.x,p.y);
+      }
+    });
     ctx.lineTo(pts[pts.length-1].x,cRy+countH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
     ctx.restore();
   }
