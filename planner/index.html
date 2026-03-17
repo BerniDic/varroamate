@@ -3747,6 +3747,7 @@ Key rules:
 - Ensure MoA rotation for chemical treatments — don't repeat the same MoA consecutively
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
 - SPRING PRIORITY: If the plan includes any post-winter months (August onwards), the first treatment after winter MUST be in September (month index 8). September is the highest-priority treatment window — brood nest is at its smallest, mite concentration per frame is highest, and early intervention prevents exponential mite growth. Never place the first post-winter treatment in October or later.
+- 12-MONTH HARD LIMIT: NEVER suggest any treatment more than 12 months from today (${todayLabel}). Any treatment beyond this window is meaningless for current planning, will not be visible in the timeline, and will not count toward the plan score. If the plan spans a winter gap, the full 12 months from today is your planning horizon — stay within it.
 - Target approximately 2 chemical treatments + approximately 2 mechanical/physical treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
 - LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol, OA/formic) to a maximum of 2 per plan, and only include them when warranted by mite pressure
 - Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
@@ -3788,7 +3789,7 @@ If a recent treatment appears in the history (within last 8 weeks), count it tow
 NEVER suggest starting a treatment without a mite count first. Space alcohol wash monitoring checks no more than 4 weeks apart.
 NEVER recommend an alcohol wash more than 4 weeks in the future — 4 weeks is an absolute hard maximum interval, no exceptions, regardless of treatment status or mite pressure.
 Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
-Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul).
+Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul). Do not suggest anything more than 12 months from today — the planning horizon ends at ${MONTHS[(todayMonth+12)%12]} ${todayMonth >= 0 ? todayYear + Math.floor((todayMonth+12)/12) : todayYear+1}. Any treatment beyond this will be rejected and will not appear in the timeline.
 Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale honestly — do not suggest an ineffective plan and score it as good.
 ORGANIC-ONLY PHILOSOPHY: If the philosophy is organic-only, the strongest available treatments are OA vaporisation (spring/winter), Formic PRO (spring/autumn), Aluen CAP (spring/summer/autumn), and Apiguard/ApiLife (spring/summer). Pair these with mechanical options (drone comb removal, brood interruption in Jan–Feb). OA vap in September is the critical spring treatment — always include it. If mite pressure is critical and organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers emergency synthetic treatment.
 SPRING RULE: If the plan spans across a winter period (May–Jul), always include a treatment in September (month 8) — the first full spring month — not later. September is the critical early-spring window when the brood nest is smallest and mite concentration is highest. Never skip September in favour of October or later if the plan covers post-winter months.`;
@@ -3852,6 +3853,11 @@ function _renderProposals(treatments, rationale, systemPrompt){
     const itemFrac = (item.year-2024)*12 + item.month;
     if(itemFrac < _todayFracFilter){
       console.warn(`VMSP: AI suggested ${t.name} in ${MONTHS[item.month]} ${item.year} — rejected (in the past)`);
+      return false;
+    }
+    // Reject if more than 12 months ahead — not meaningful to plan that far
+    if(itemFrac > _todayFracFilter + 12){
+      console.warn(`VMSP: AI suggested ${t.name} in ${MONTHS[item.month]} ${item.year} — rejected (more than 12 months ahead)`);
       return false;
     }
     // Reject if placed in a bad season
