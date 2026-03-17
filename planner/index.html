@@ -3410,11 +3410,13 @@ async function getAIAdvice(){
   panel.scrollIntoView({behavior:'smooth', block:'nearest'});
   btn.classList.add('loading');
 
+  try {
   const planSummary = planEvents.length
     ? planEvents.map(e=>{
         const t=TREATMENTS[e.treatId];
+        if(!t) return null;
         return `${t.name} (${MONTHS[e.month]} ${e.year}, MoA: ${t.moa}, season: ${getSeason(e.month)})`;
-      }).join('; ')
+      }).filter(Boolean).join('; ') || 'No treatments planned yet'
     : 'No treatments planned yet';
 
   // scores var no longer sent to AI — scoreHeadline replaces it with words-only
@@ -3498,7 +3500,6 @@ Always use MoA from the plan summary — never infer from context.`;
     const {data} = await _anthropicFetch({model:CLAUDE_MODEL, max_tokens:600, messages:[{role:'user', content:prompt}]});
     if(data.error){
       body.innerHTML = `<p style="color:var(--rust)">⚠️ AI error: <code style="font-size:11px;">${JSON.stringify(data.error).substring(0,300)}</code></p>` + localAdvice(result);
-      btn.classList.remove('loading');
       return;
     }
     const text = data.content?.map(b=>b.text||'').join('') || 'Unable to load advice.';
@@ -3510,7 +3511,12 @@ Always use MoA from the plan summary — never infer from context.`;
   } catch(e) {
     body.innerHTML = `<p style="color:var(--rust)">⚠️ Connection error: <code style="font-size:11px;">${e.message}</code></p>` + localAdvice(result);
   }
-  btn.classList.remove('loading');
+
+  } catch(outerErr) {
+    body.innerHTML = `<p style="color:var(--rust)">⚠️ Error preparing analysis: <code style="font-size:11px;">${outerErr.message}</code></p>` + localAdvice(result);
+  } finally {
+    btn.classList.remove('loading');
+  }
 }
 
 function localAdvice(result){
