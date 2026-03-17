@@ -2107,6 +2107,7 @@ function _rebuildPlanDropdown(scopeKey){
 function switchPlan(planName){
   savePlan(currentScopeKey, currentPlanName);
   _resetProposalUI(); // clear AI suggestions — they belong to the previous plan
+  _resetAdvicePanel(); // clear AI advice — it belongs to the previous plan
   currentPlanName = planName;
   loadPlan(currentScopeKey, planName);
   updateAll();
@@ -2316,8 +2317,9 @@ function selectPlanScope(key){
   } else {
     currentPlanName = 'Plan 1';
   }
-  // Reset AI proposals when switching hive or plan — they belong to the previous scope
+  // Reset AI proposals and advice panel when switching hive — they belong to the previous scope
   _resetProposalUI();
+  _resetAdvicePanel();
   loadPlan(key, currentPlanName);
   _rebuildPlanDropdown(key);
   _updatePlanSelName();
@@ -2734,6 +2736,7 @@ function removeEvent(id){
 function clearPlan(){
   planEvents = [];
   _resetProposalUI();
+  _resetAdvicePanel();
   updateAll();
 }
 
@@ -3488,6 +3491,13 @@ function toggleSuggestCard(){
   document.getElementById('suggestChevron').style.transform = _suggestCardOpen ? '' : 'rotate(-90deg)';
 }
 
+function _resetAdvicePanel(){
+  const panel = document.getElementById('aiPanel');
+  const body  = document.getElementById('aiPanelBody');
+  if(panel) panel.classList.remove('open');
+  if(body)  body.innerHTML = '';
+}
+
 function _resetProposalUI(){
   // Shared reset — called on scope/plan switch AND cancel
   _proposals = [];
@@ -3603,6 +3613,7 @@ Key rules:
 - Respect supersOff:true — don't place those treatments in spring/summer flow months (Aug–Jan)
 - Respect NEVER USE IN seasons — each treatment lists its forbidden seasons explicitly. NEVER suggest a treatment in a forbidden season under any circumstances (e.g. drone comb removal is NEVER valid in autumn or winter — drones are not being reared)
 - HEAT TREATMENT SEASON RULE: Heat Treatment (heat) is ONLY valid in spring (Aug–Oct, southern hemisphere) when the brood nest is small. NEVER suggest heat in summer months (Nov, Dec, Jan) — the brood nest is fully expanded making it impractical. For summer heat treatment, suggest Duplex-Framebox (duplex) instead, which is specifically designed for the expanded summer brood nest and is best timed around Dec–Jan
+- DRONE COMB + HEAT REDUNDANCY RULE: Do NOT suggest Drone Comb Removal (drone-comb) in the same plan as Heat Treatment (heat) or Duplex-Framebox (duplex). Heat treatment and the Duplex-Framebox already target capped brood frames far more effectively than drone comb trapping — combining them is redundant and wastes the beekeeper's effort. If heat or duplex is in the plan, omit drone-comb entirely
 - Ensure MoA rotation for chemical treatments — don't repeat the same MoA consecutively
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
 - SPRING PRIORITY: If the plan includes any post-winter months (August onwards), the first treatment after winter MUST be in September (month index 8). September is the highest-priority treatment window — brood nest is at its smallest, mite concentration per frame is highest, and early intervention prevents exponential mite growth. Never place the first post-winter treatment in October or later.
@@ -3698,6 +3709,11 @@ function _renderProposals(treatments, rationale, systemPrompt){
   // This is a safety net — the prompt should already prevent this but doesn't always
   const _nowForFilter = new Date();
   const _todayFracFilter = (_nowForFilter.getFullYear()-2024)*12 + _nowForFilter.getMonth();
+  // Check if heat or duplex already exists in the plan or in accepted proposals
+  const _hasHeatOrDuplex =
+    planEvents.some(e => e.treatId === 'heat' || e.treatId === 'duplex') ||
+    _proposals.filter(p => p.status === 'accepted').some(p => p.treatId === 'heat' || p.treatId === 'duplex') ||
+    treatments.some(t => t.treatId === 'heat' || t.treatId === 'duplex');
   const validTreatments = treatments.filter(item => {
     const t = TREATMENTS[item.treatId];
     if(!t) return false;
@@ -3716,6 +3732,11 @@ function _renderProposals(treatments, rationale, systemPrompt){
     // Reject winter treatments (May=4, Jun=5, Jul=6) — belt and braces
     if(item.month >= 4 && item.month <= 6 && item.treatId !== 'oxalic' && item.treatId !== 'oxalic-dribble'){
       console.warn(`VMSP: AI suggested ${t.name} in winter month ${MONTHS[item.month]} ${item.year} — rejected`);
+      return false;
+    }
+    // Reject drone-comb if heat or duplex is already in the plan — redundant
+    if(item.treatId === 'drone-comb' && _hasHeatOrDuplex){
+      console.warn('VMSP: drone-comb rejected — heat/duplex already in plan (redundant)');
       return false;
     }
     return true;
@@ -3751,7 +3772,7 @@ function _renderProposals(treatments, rationale, systemPrompt){
   if(filteredCount > 0){
     const filtNote = document.createElement('div');
     filtNote.style.cssText = 'padding:7px 10px;background:rgba(212,130,10,0.08);border:1px solid rgba(212,130,10,0.25);border-radius:6px;font-size:12px;color:#996000;';
-    filtNote.innerHTML = `⚠ ${filteredCount} suggestion${filteredCount>1?'s were':' was'} removed — placed in a biologically invalid season (e.g. drone comb removal in autumn, brood interruption in winter). These have been filtered out automatically.`;
+    filtNote.innerHTML = `⚠ ${filteredCount} suggestion${filteredCount>1?'s were':' was'} removed — either placed in a biologically invalid season, or redundant alongside heat/duplex treatment already in your plan.`;
     container.appendChild(filtNote);
   }
 
