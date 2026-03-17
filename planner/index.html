@@ -968,7 +968,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           <button onclick="document.getElementById('aiPanel').classList.remove('open')" style="margin-left:auto;background:none;border:none;color:var(--sage-light);font-size:18px;cursor:pointer;">×</button>
         </div>
         <div class="ai-panel-body" id="aiPanelBody">
-          <div class="ai-dot-loading"><div class="dot-pulse"><span></span><span></span><span></span></div> Analysing your plan…</div>
+          <p style="color:var(--text3);font-size:13px;">Click the button above to get AI analysis of your plan.</p>
         </div>
         <div style="padding:10px 18px 12px;border-top:1px solid var(--border);background:var(--cream);display:flex;align-items:flex-start;gap:8px;">
           <span style="font-size:15px;flex-shrink:0;">💡</span>
@@ -3478,7 +3478,18 @@ Always use MoA from the plan summary — never infer from context.`;
         messages:[{role:'user', content:prompt}]
       })
     });
+    if(!r.ok){
+      const errText = await r.text();
+      body.innerHTML = `<p style="color:var(--rust)">⚠️ AI request failed (HTTP ${r.status}). Details: <code style="font-size:11px;">${errText.substring(0,300)}</code></p>` + localAdvice(result);
+      btn.classList.remove('loading');
+      return;
+    }
     const data = await r.json();
+    if(data.error){
+      body.innerHTML = `<p style="color:var(--rust)">⚠️ AI error: <code style="font-size:11px;">${JSON.stringify(data.error).substring(0,300)}</code></p>` + localAdvice(result);
+      btn.classList.remove('loading');
+      return;
+    }
     const text = data.content?.map(b=>b.text||'').join('') || 'Unable to load advice.';
     // Simple markdown render
     body.innerHTML = text
@@ -3487,7 +3498,7 @@ Always use MoA from the plan summary — never infer from context.`;
       .replace(/\n\n/g,'<br><br>')
       .replace(/\n/g,'<br>');
   } catch(e) {
-    body.innerHTML = `<p style="color:var(--text2)">Unable to connect to AI. Here's a quick analysis based on your scores:</p>` + localAdvice(result);
+    body.innerHTML = `<p style="color:var(--rust)">⚠️ Connection error: <code style="font-size:11px;">${e.message}</code></p>` + localAdvice(result);
   }
   btn.classList.remove('loading');
 }
@@ -3834,7 +3845,22 @@ async function _callSuggestAPI(systemPrompt, btn){
         messages: _suggestHistory
       })
     });
+    if(!r.ok){
+      const errText = await r.text();
+      document.getElementById('suggestProposals').style.display = 'flex';
+      document.getElementById('suggestProposals').innerHTML =
+        `<div style="color:var(--rust);font-size:13px;padding:8px 0;">⚠ Request failed (HTTP ${r.status}): <code style="font-size:11px;">${errText.substring(0,300)}</code></div>`;
+      if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; }
+      return;
+    }
     const data = await r.json();
+    if(data.error){
+      document.getElementById('suggestProposals').style.display = 'flex';
+      document.getElementById('suggestProposals').innerHTML =
+        `<div style="color:var(--rust);font-size:13px;padding:8px 0;">⚠ AI error: <code style="font-size:11px;">${JSON.stringify(data.error).substring(0,300)}</code></div>`;
+      if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; }
+      return;
+    }
     const raw = data.content?.map(b=>b.text||'').join('') || '';
     const cleaned = raw.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(cleaned);
@@ -3847,7 +3873,7 @@ async function _callSuggestAPI(systemPrompt, btn){
   } catch(e) {
     document.getElementById('suggestProposals').style.display = 'flex';
     document.getElementById('suggestProposals').innerHTML =
-      `<div style="color:var(--rust);font-size:13px;padding:8px 0;">⚠ Could not generate suggestions. Check your connection and try again.</div>`;
+      `<div style="color:var(--rust);font-size:13px;padding:8px 0;">⚠ Could not generate suggestions: <code style="font-size:11px;">${e.message}</code></div>`;
   }
   if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; }
 }
