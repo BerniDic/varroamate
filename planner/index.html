@@ -293,18 +293,14 @@ canvas#tlCanvas{display:block;width:100%;cursor:default;}
 .suggest-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--forest) 0%,var(--forest-mid) 100%);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;}
 .suggest-btn:hover{opacity:0.9;}
 .suggest-btn:disabled{opacity:0.6;cursor:wait;}
-.suggest-proposals{margin-top:14px;display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:4px;}
-.suggest-proposals::-webkit-scrollbar{width:4px;}
-.suggest-proposals::-webkit-scrollbar-track{background:rgba(28,56,41,0.04);}
-.suggest-proposals::-webkit-scrollbar-thumb{background:rgba(28,56,41,0.2);border-radius:2px;}
-.suggest-proposals::-webkit-scrollbar-thumb:hover{background:rgba(28,56,41,0.35);}
+.suggest-proposals{margin-top:14px;display:flex;flex-direction:column;gap:10px;padding-right:4px;}
 .proposal-card{border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:all 0.2s;}
 .proposal-card.accepted{border-color:#3A8C52;background:rgba(58,140,82,0.04);}
 .proposal-card.rejected{opacity:0.45;border-style:dashed;}
-.proposal-head{padding:10px 14px;display:flex;align-items:center;gap:10px;background:var(--cream);}
-.proposal-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
-.proposal-name{font-weight:600;font-size:13px;color:var(--text);flex:1;}
-.proposal-season{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+.proposal-head{padding:10px 14px;display:flex;align-items:flex-start;gap:10px;background:var(--cream);flex-wrap:wrap;}
+.proposal-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.proposal-name{font-weight:600;font-size:13px;color:var(--text);flex:1;min-width:120px;}
+.proposal-season{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap;margin-top:2px;}
 .proposal-body{padding:8px 14px 10px;font-size:12px;color:var(--text2);line-height:1.55;border-top:1px solid var(--border);}
 .proposal-actions{padding:8px 14px;display:flex;gap:8px;border-top:1px solid var(--border);background:rgba(0,0,0,0.015);}
 .proposal-accept{flex:1;padding:7px;background:var(--forest);color:white;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;}
@@ -4003,12 +3999,6 @@ function _renderProposals(treatments, rationale, systemPrompt){
     rat.className = 'suggest-rationale';
     rat.innerHTML = `<strong>Plan strategy:</strong> ${rationale}`;
     container.insertBefore(rat, container.firstChild);
-  }
-  // Also show rationale below the apply-all button so it's always visible
-  const rationaleBelow = document.getElementById('suggestRationaleBelow');
-  if(rationaleBelow && rationale){
-    rationaleBelow.textContent = rationale;
-    rationaleBelow.style.display = 'block';
   }
 }
 
