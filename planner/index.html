@@ -1782,7 +1782,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 // ══════════════════════════════════════════════
 // CONFIG — update CLAUDE_MODEL here when Anthropic releases a new version
 // ══════════════════════════════════════════════
-const CLAUDE_MODEL = 'claude-sonnet-4-6';
+const CLAUDE_MODEL = 'claude-opus-4-6';
 
 // Retry-aware Anthropic proxy fetch — retries on overload with exponential backoff
 async function _anthropicFetch(payload, maxRetries=3, baseDelay=4000){
