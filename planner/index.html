@@ -3086,32 +3086,42 @@ function scorePlan(){
     ? seasonCeilings.reduce((a,b)=>a+b,0) / seasonCeilings.length : 0;
 
   let colonyScore = avgCeiling;
-  if(mechOnly)     colonyScore = Math.min(colonyScore, 42);
+
+  // Philosophy ceiling — the best a plan can do is limited by what tools are available
+  // Mechanical-only hard cap: even a perfect mechanical plan can't exceed 42% efficacy
+  // Physical-only is better but still limited without chemical backup at high pressure
+  if(mechOnly) colonyScore = Math.min(colonyScore, 42);
   if(fullSpectrum) colonyScore = Math.min(100, colonyScore + 12);
   if(moaClassesUsed.size === 1 && seasonsUsed.size <= 1) colonyScore -= 15;
 
-  // Overdue penalty — each skipped treatment is a protection gap that already happened.
-  // The mite population was growing unchecked during that window.
-  // Penalty scales with efficacy ceiling of what was skipped × pressure level.
+  // Overdue penalty — capped more gently; primarily informational not score-crushing
+  // A user who is new to the planner shouldn't be crushed for past gaps they couldn't control
   if(scoringOverdue.length > 0){
     const overduePenalties = scoringOverdue.map(e => {
       const ceiling = getCeiling(e.treatId);
-      const base = (ceiling / 100) * 20; // up to 20pts per skipped high-efficacy treatment
-      const pressureMult = {low:0.5, moderate:0.8, high:1.2, critical:1.6}[pressure] ?? 1;
+      const base = (ceiling / 100) * 12; // reduced from 20 — less punishing for past gaps
+      const pressureMult = {low:0.3, moderate:0.5, high:0.8, critical:1.0}[pressure] ?? 0.5;
       return base * pressureMult;
     });
-    colonyScore -= Math.min(45, overduePenalties.reduce((a,b)=>a+b,0));
+    colonyScore -= Math.min(25, overduePenalties.reduce((a,b)=>a+b,0)); // max -25 not -45
   }
 
-  // Mite pressure — strong plans absorb pressure; weak ones don't
-  // mechOnly plans at elevated pressure get a direct penalty — they cannot reduce mite loads
-  if(mechOnly && (pressure === 'high' || pressure === 'critical' || pressure === 'moderate')){
+  // Mite pressure — applied based on plan strength
+  // mechOnly: direct hard penalty — these tools genuinely cannot reduce high mite loads
+  // other plans: absorption-based — better plans absorb more pressure
+  if(mechOnly){
+    // At high pressure, mechOnly is genuinely dangerous — steep direct penalty
     colonyScore = cap(colonyScore - (pressurePenaltyMechOnly[pressure] ?? 0));
   } else if(pressure === 'high' || pressure === 'critical'){
-    const absorbFactor = fullSpectrum ? 0.85 : 0.45;
+    // Non-mechOnly plans get pressure absorbed based on plan quality
+    // fullSpectrum plans absorb most pressure; single-MoA plans absorb less
+    const absorbFactor = fullSpectrum ? 0.85 : planHasChem ? 0.55 : 0.25;
     const absorbedMultiplierLoss = (1 - pressureMultiplier[pressure]) * (colonyScore / 100) * absorbFactor * 100;
     const absorbedPenalty        = pressurePenalty[pressure] * (1 - (colonyScore / 100) * absorbFactor);
     colonyScore = colonyScore - absorbedMultiplierLoss - absorbedPenalty;
+  } else if(pressure === 'moderate'){
+    // Moderate pressure: small penalty for plans without chemical coverage
+    if(!planHasChem) colonyScore = cap(colonyScore - 10);
   }
 
   scores.colonyRisk = cap(Math.round(colonyScore));
