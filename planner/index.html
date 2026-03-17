@@ -3468,7 +3468,7 @@ Always use MoA from the plan summary — never infer from context.`;
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5-20251001',
         max_tokens:600,
         messages:[{role:'user', content:prompt}]
       })
@@ -3823,7 +3823,7 @@ async function _callSuggestAPI(systemPrompt, btn){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5-20251001',
         max_tokens:900,
         system: systemPrompt,
         messages: _suggestHistory
@@ -3987,7 +3987,7 @@ Respond with JSON in this exact shape, no markdown:
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5-20251001',
         max_tokens:400,
         system: p.systemPrompt,
         messages: _suggestHistory
@@ -6696,7 +6696,7 @@ async function vmspSendChat(){
     const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
       method:'POST', headers,
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        model:'claude-sonnet-4-5-20251001', max_tokens:1000,
         system:`You are the VarroaMate Smart Planner assistant, an expert advisor for Australian beekeepers. Help users build effective Varroa treatment plans. Focus on: treatment timing and windows, resistance rotation, organic vs chemical strategies, honey flow compatibility, seasonal planning for southern hemisphere, and how to interpret plan scores. Always use "Formic PRO" not "MAQS". Keep answers concise and practical.`,
         messages: vmspChatHistory
       })
