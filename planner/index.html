@@ -3747,20 +3747,44 @@ async function suggestPlan(){
     return weeksAgo > 8;
   });
 
+  // Helper: get the actual end date of a treatment given its start month/year
+  const getTreatEndDate = (e) => {
+    const t = TREATMENTS[e.treatId] || {};
+    const dur = t.duration || 0;
+    const startDate = new Date(e.year, e.month, 1);
+    return new Date(startDate.getTime() + dur * 24 * 60 * 60 * 1000);
+  };
+
   const historyContext = [
     recentTreatments.length
       ? `RECENT TREATMENTS (within last 8 weeks — outcome not yet fully known): ${recentTreatments.map(e=>{
           const t=TREATMENTS[e.treatId]||{};
-          const dur = t.duration||0;
-          const endDate = new Date(e.year, e.month + Math.floor(dur/30), 1);
+          const endDate = getTreatEndDate(e);
           const stillActive = endDate >= todayDateObj;
-          return `${t.name||e.label} in ${MONTHS[e.month]} ${e.year}${stillActive?' [STILL ACTIVE — do not overlap]':''}`;
-        }).join(', ')}`
+          const endLabel = stillActive ? `ends ~${MONTHS[endDate.getMonth()]} ${endDate.getFullYear()}` : 'completed';
+          return `${t.name||e.label} started ${MONTHS[e.month]} ${e.year} [${stillActive?`STILL ACTIVE — ${endLabel} — do not suggest this treatment or any same-MoA treatment until it finishes`:'recently completed — outcome not yet confirmed'}]`;
+        }).join('; ')}`
       : '',
     olderTreatments.length
       ? `Older history: ${olderTreatments.map(e=>{const t=TREATMENTS[e.treatId]||{};return `${t.name||e.label} in ${MONTHS[e.month]} ${e.year}`;}).join(', ')}`
       : ''
   ].filter(Boolean).join('. ') || 'No treatment history';
+
+  // Also build a list of currently active planned treatments (from planEvents) so the AI doesn't duplicate them
+  const activePlanned = planEvents.filter(e => {
+    const t = TREATMENTS[e.treatId] || {};
+    const dur = t.duration || 0;
+    const startDate = new Date(e.year, e.month, 1);
+    const endDate = new Date(startDate.getTime() + dur * 24 * 60 * 60 * 1000);
+    return startDate <= todayDateObj && endDate >= todayDateObj;
+  });
+  const activePlannedContext = activePlanned.length
+    ? `\nCURRENTLY ACTIVE PLANNED TREATMENTS (already in the plan and still running — do NOT suggest these again or any same-MoA treatment until they finish): ${activePlanned.map(e=>{
+        const t=TREATMENTS[e.treatId]||{};
+        const endDate = getTreatEndDate(e);
+        return `${t.name||e.label} (started ${MONTHS[e.month]} ${e.year}, ends ~${MONTHS[endDate.getMonth()]} ${endDate.getFullYear()})`;
+      }).join('; ')}`
+    : '';
 
   const systemPrompt = `You are VMSP, an expert Varroa management planner for southern-hemisphere (Australian) beekeepers.
 You suggest treatment plans as structured JSON only — no prose outside the JSON object.
@@ -3816,7 +3840,7 @@ month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${
     : 'No mite count on record — IMPORTANT: recommend an alcohol wash BEFORE starting any treatment. Do not suggest treating without a count.';
 
   const userMsg = `Today is ${todayLabel}. ${suggestMiteContext}
-The beekeeper's treatment history: ${historyContext}.
+The beekeeper's treatment history: ${historyContext}.${activePlannedContext}
 Please suggest a plan for the next 12 months (from ${todayLabel}) using only their allowed treatments.
 Target approximately 2 chemical + 2 mechanical/physical treatments for a full year.
 If a recent treatment appears in the history (within last 8 weeks), count it toward the plan slots — do not re-suggest it.
@@ -4114,6 +4138,10 @@ function applyAllAccepted(){
       planned:true
     });
   });
+  // Force immediate save (don't rely on debounced autoSave which may skip if scope not set)
+  if(currentScopeKey && currentScopeKey.startsWith('hive:')){
+    savePlan(currentScopeKey, currentPlanName);
+  }
   updateAll(); // redraw timeline — proposals already marked 'applied' so no ghost duplication
   document.getElementById('suggestApplyAll').style.display = 'none';
   document.getElementById('suggestRatingPreview').style.display = 'none';
