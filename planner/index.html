@@ -404,6 +404,29 @@ canvas.drop-blocked{cursor:not-allowed;}
 .pillar-text h3{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:4px;}
 .pillar-text p{font-size:13px;color:var(--text2);line-height:1.6;}
 .mission-cta{text-align:center;}
+
+/* How to Use */
+.how-to-use{background:white;border:1px solid var(--border);border-radius:14px;padding:24px 24px 20px;margin-bottom:32px;box-shadow:var(--shadow);}
+.htu-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--forest);margin-bottom:18px;}
+.htu-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.htu-step{display:flex;align-items:flex-start;gap:12px;}
+.htu-step-sm{gap:10px;}
+.htu-num{width:26px;height:26px;border-radius:50%;background:var(--forest);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.htu-num-sm{width:22px;height:22px;font-size:11px;}
+.htu-body{font-size:13px;color:var(--text2);line-height:1.55;}
+.htu-body strong{color:var(--text1);font-weight:600;}
+.htu-body span{color:var(--text3);}
+.htu-branch-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+@media(max-width:580px){.htu-branch-wrap{grid-template-columns:1fr;}}
+.htu-branch{border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.htu-branch-ai{background:rgba(28,56,41,0.05);border:1.5px solid rgba(28,56,41,0.18);}
+.htu-branch-manual{background:rgba(212,130,10,0.05);border:1.5px solid rgba(212,130,10,0.22);}
+.htu-branch-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.htu-branch-icon{font-size:18px;}
+.htu-branch-label{font-size:13px;font-weight:700;color:var(--text1);}
+.htu-branch-steps{display:flex;flex-direction:column;gap:8px;}
+.htu-tip{background:rgba(212,160,48,0.10);border:1px solid rgba(212,160,48,0.30);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text2);line-height:1.55;}
+.htu-tip strong{color:var(--text1);}
 .mission-cta-btn{display:inline-block;background:linear-gradient(135deg,var(--forest) 0%,var(--forest-mid) 100%);color:white;font-family:'Playfair Display',serif;font-size:18px;font-style:italic;font-weight:700;padding:16px 40px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(28,56,41,0.25);transition:transform 0.2s,box-shadow 0.2s;}
 .mission-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(28,56,41,0.32);}
 
@@ -572,6 +595,105 @@ canvas.drop-blocked{cursor:not-allowed;}
         </div>
       </div>
     </div>
+    <!-- How to Use guide -->
+    <div class="how-to-use">
+      <div class="htu-title">📋 How to Use the Smart Planner</div>
+
+      <!-- Shared steps 1-4 -->
+      <div class="htu-steps">
+        <div class="htu-step">
+          <div class="htu-num">1</div>
+          <div class="htu-body">
+            <strong>Sign in &amp; sync with VarroaMate</strong>
+            <span>Your apiaries and hives load automatically once you're signed in to VarroaMate on the same browser. If your hives aren't showing, open <a href="/app/" target="_blank" style="color:var(--forest);font-weight:600;">VarroaMate</a> first and sign in there.</span>
+          </div>
+        </div>
+        <div class="htu-step">
+          <div class="htu-num">2</div>
+          <div class="htu-body">
+            <strong>Choose your treatment philosophy</strong>
+            <span>Select the approach that best matches your values — organic-only, integrated, mechanical, or a combination. This filters what treatments the planner can suggest and scores your plan accordingly.</span>
+          </div>
+        </div>
+        <div class="htu-step">
+          <div class="htu-num">3</div>
+          <div class="htu-body">
+            <strong>Select your hive</strong>
+            <span>Pick the apiary and hive you want to plan for. Each hive has its own independent plan and timeline.</span>
+          </div>
+        </div>
+        <div class="htu-step">
+          <div class="htu-num">4</div>
+          <div class="htu-body">
+            <strong>Choose or create a plan</strong>
+            <span>Use the default Plan 1 or create multiple plans for the same hive to compare options. Plans are saved automatically.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two branches -->
+      <div class="htu-branch-wrap">
+
+        <!-- Branch A: AI -->
+        <div class="htu-branch htu-branch-ai">
+          <div class="htu-branch-head">
+            <span class="htu-branch-icon">✨</span>
+            <span class="htu-branch-label">Option A — Let AI build your plan</span>
+          </div>
+          <div class="htu-branch-steps">
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">5a</div>
+              <div class="htu-body"><strong>Pre-select treatments</strong> <span>(optional) — tick the treatments you'd like included; unticked ones won't be suggested.</span></div>
+            </div>
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">6a</div>
+              <div class="htu-body"><strong>Tap "Suggest a Plan for Me"</strong> <span>— the AI generates a season-long plan tailored to your hive's mite history and philosophy.</span></div>
+            </div>
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">7a</div>
+              <div class="htu-body"><strong>Accept or reject each suggestion</strong> <span>— rejected treatments prompt the AI to offer an alternative.</span></div>
+            </div>
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">8a</div>
+              <div class="htu-body"><strong>Apply accepted treatments to your timeline</strong> <span>— tap "Apply all accepted" to lock them in.</span></div>
+            </div>
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">9a</div>
+              <div class="htu-body"><strong>Get AI advice on your plan</strong> <span>— tap "Get AI Advice" in the rating panel for a personalised assessment of your plan's strengths and gaps.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Branch B: Manual -->
+        <div class="htu-branch htu-branch-manual">
+          <div class="htu-branch-head">
+            <span class="htu-branch-icon">🖐</span>
+            <span class="htu-branch-label">Option B — Build your plan manually</span>
+          </div>
+          <div class="htu-branch-steps">
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">5b</div>
+              <div class="htu-body"><strong>Use the treatment palette</strong> <span>— on desktop, drag treatments onto the timeline. On mobile, tap a treatment then tap the month where you want to place it.</span></div>
+            </div>
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">6b</div>
+              <div class="htu-body"><strong>Watch the plan rating update live</strong> <span>— the Colony Survival gauge and dimension scores update as you add treatments, guiding you toward a stronger plan.</span></div>
+            </div>
+            <div class="htu-step htu-step-sm">
+              <div class="htu-num htu-num-sm">7b</div>
+              <div class="htu-body"><strong>Get AI advice on your plan</strong> <span>— tap "Get AI Advice" in the rating panel for a personalised assessment with specific suggestions to improve your score.</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /htu-branch-wrap -->
+
+      <div class="htu-tip">
+        💡 <strong>Tip:</strong> Always do an alcohol wash before starting any treatment — never treat without measuring first. The planner works best when your mite count history in VarroaMate is up to date.
+      </div>
+
+    </div><!-- /how-to-use -->
+
     <div class="mission-cta">
       <button class="mission-cta-btn" onclick="gotoScreen('screen-disclaimer')">Get Started →</button>
     </div>
