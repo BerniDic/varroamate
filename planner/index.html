@@ -2929,7 +2929,10 @@ function scorePlan(){
                  : latestMites >= 8  ? 'high'
                  : latestMites >= 3  ? 'moderate'
                  : 'low';
+  // Pressure penalties — mechOnly plans get steeper penalties since they can't
+  // chemically reduce mite loads and are genuinely insufficient at high/critical pressure
   const pressurePenalty = {low:0, moderate:0, high:15, critical:35};
+  const pressurePenaltyMechOnly = {low:0, moderate:10, high:35, critical:55};
   const pressureMultiplier = {low:1, moderate:1, high:0.85, critical:0.65};
 
   // 1. Philosophy alignment — score against all plan events (intended choices)
@@ -3101,8 +3104,11 @@ function scorePlan(){
   }
 
   // Mite pressure — strong plans absorb pressure; weak ones don't
-  if(pressure === 'high' || pressure === 'critical'){
-    const absorbFactor = fullSpectrum ? 0.85 : mechOnly ? 0.0 : 0.45;
+  // mechOnly plans at elevated pressure get a direct penalty — they cannot reduce mite loads
+  if(mechOnly && (pressure === 'high' || pressure === 'critical' || pressure === 'moderate')){
+    colonyScore = cap(colonyScore - (pressurePenaltyMechOnly[pressure] ?? 0));
+  } else if(pressure === 'high' || pressure === 'critical'){
+    const absorbFactor = fullSpectrum ? 0.85 : 0.45;
     const absorbedMultiplierLoss = (1 - pressureMultiplier[pressure]) * (colonyScore / 100) * absorbFactor * 100;
     const absorbedPenalty        = pressurePenalty[pressure] * (1 - (colonyScore / 100) * absorbFactor);
     colonyScore = colonyScore - absorbedMultiplierLoss - absorbedPenalty;
@@ -3418,7 +3424,9 @@ async function getAIAdvice(){
     ? 'The VarroaMate rating engine rates this plan as: ' + scoreWord + '.' + capWord + dimWord
     : 'No score available.';
 
+  const adviceTodayLabel = `${MONTHS[todayMonth]} ${todayYear}`;
   const prompt = `You are VMSP (VarroaMate Smart Planner), an expert advisor for Australian beekeepers planning their Varroa management season.
+TODAY'S DATE IS: ${adviceTodayLabel}. NEVER recommend any action, treatment, alcohol wash, or monitoring check scheduled before ${adviceTodayLabel}. All recommendations must be from ${adviceTodayLabel} onwards.
 
 The beekeeper's treatment philosophy is: "${currentPref.name}" — ${currentPref.desc}
 
