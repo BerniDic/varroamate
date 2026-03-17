@@ -3721,8 +3721,12 @@ async function suggestPlan(){
   _proposals = [];
   _suggestHistory = [];
   _suggestNextId = 1;
-  document.getElementById('suggestProposals').style.display = 'none';
+  const suggestProposalsEl = document.getElementById('suggestProposals');
+  suggestProposalsEl.innerHTML = '';
+  suggestProposalsEl.style.display = 'none';
   document.getElementById('suggestApplyAll').style.display = 'none';
+  document.getElementById('suggestRationaleBelow').textContent = '';
+  document.getElementById('suggestRationaleBelow').style.display = 'none';
 
   // Hide palette and picker while AI mode is active
   _setPaletteVisible(false);
@@ -3911,6 +3915,7 @@ async function _callSuggestAPI(systemPrompt, btn){
 
 function _renderProposals(treatments, rationale, systemPrompt){
   const container = document.getElementById('suggestProposals');
+  container.innerHTML = '';
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
   container.style.gap = '10px';
