@@ -3840,7 +3840,7 @@ async function _callSuggestAPI(systemPrompt, btn){
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:CLAUDE_MODEL,
-        max_tokens:900,
+        max_tokens:2000,
         system: systemPrompt,
         messages: _suggestHistory
       })
@@ -3863,7 +3863,16 @@ async function _callSuggestAPI(systemPrompt, btn){
     }
     const raw = data.content?.map(b=>b.text||'').join('') || '';
     const cleaned = raw.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(cleaned);
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch(jsonErr) {
+      document.getElementById('suggestProposals').style.display = 'flex';
+      document.getElementById('suggestProposals').innerHTML =
+        `<div style="color:var(--rust);font-size:13px;padding:8px 0;">⚠ AI response was malformed (${jsonErr.message}). Please try again.</div>`;
+      if(btn){ btn.disabled = false; btn.innerHTML = '✨ Suggest a Plan for Me'; }
+      return;
+    }
     _suggestHistory.push({role:'assistant', content: raw});
     _renderProposals(parsed.treatments||[], parsed.rationale||'', systemPrompt);
     // Show active bar now proposals are visible
@@ -4019,7 +4028,7 @@ Respond with JSON in this exact shape, no markdown:
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:CLAUDE_MODEL,
-        max_tokens:400,
+        max_tokens:800,
         system: p.systemPrompt,
         messages: _suggestHistory
       })
