@@ -3466,7 +3466,7 @@ async function getAIAdvice(){
     ? 'The VarroaMate rating engine rates this plan as: ' + scoreWord + '.' + capWord + dimWord
     : 'No score available.';
 
-  const adviceTodayLabel = `${MONTHS[todayMonth]} ${todayYear}`;
+  const adviceTodayLabel = `${MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}`;
   const prompt = `You are VMSP (VarroaMate Smart Planner), an expert advisor for Australian beekeepers planning their Varroa management season.
 TODAY'S DATE IS: ${adviceTodayLabel}. NEVER recommend any action, treatment, alcohol wash, or monitoring check scheduled before ${adviceTodayLabel}. All recommendations must be from ${adviceTodayLabel} onwards.
 
