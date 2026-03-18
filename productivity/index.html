@@ -832,8 +832,82 @@ body::before{
 .screen.active .year-bar-row{animation:fadeUp 0.4s ease both;}
 
 /* ══════════════════════════════════════════════
-   RESPONSIVE
+   💀 COLONY LOSS & APIARY HEALTH
 ══════════════════════════════════════════════ */
+.loss-item{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;
+  cursor:pointer;transition:background 0.1s;
+}
+.loss-item:last-child{border-bottom:none;}
+.loss-item:active{background:var(--cream);}
+.loss-icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  background:#FDE8E8;
+}
+.loss-icon.abscond{background:#FFF4E0;}
+.loss-info{flex:1;min-width:0;}
+.loss-hive{font-size:14px;font-weight:600;color:var(--text1);}
+.loss-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.loss-cause{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:10px;
+  font-size:11px;font-weight:600;
+  background:#FDE8E8;color:#8A1010;
+  border:1px solid #F0C0C0;
+  margin-top:4px;
+}
+.loss-cause.abscond{background:#FFF4E0;color:#8A5010;border-color:#F0D090;}
+.loss-cause.unknown{background:#F0EFE8;color:var(--text2);border-color:var(--border);}
+
+/* Apiary health card */
+.health-apiary-header{
+  padding:10px 16px 6px;
+  background:var(--cream);
+  border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:700;
+  color:var(--terra-deep);letter-spacing:0.8px;text-transform:uppercase;
+}
+.health-hive-row{
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.health-hive-row:last-child{border-bottom:none;}
+.health-hive-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+}
+.health-hive-name{font-size:13px;font-weight:600;color:var(--text1);flex:1;}
+.health-hive-status{font-size:12px;color:var(--text2);}
+.health-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
+.health-badge{
+  display:inline-flex;align-items:center;
+  padding:1px 7px;border-radius:10px;
+  font-size:11px;font-weight:600;
+}
+.health-badge.ok{background:#EEF8F1;color:#256030;}
+.health-badge.warn{background:#FFF4E0;color:#8A5010;}
+.health-badge.bad{background:#FDE8E8;color:#8A1010;}
+.health-badge.lost{background:#EEE;color:#666;text-decoration:line-through;}
+
+/* Loss summary strip */
+.loss-summary-strip{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:12px 16px;
+  background:var(--cream);
+  border-bottom:1px solid var(--border);
+}
+.loss-summary-chip{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  background:var(--paper);border:1px solid var(--border);
+  color:var(--text2);
+}
+
 @media(min-width:600px){
   .content-area{padding:20px 24px 90px;}
   .stat-grid{grid-template-columns:repeat(4,1fr);}
@@ -1079,6 +1153,19 @@ body::before{
       <div id="insightsContent"></div>
     </div>
 
+    <!-- 💀 COLONY LOSSES -->
+    <div class="screen" id="screen-losses">
+      <div class="page-title">💀 Colony Losses</div>
+      <div class="page-sub">Record dead-outs and abscondings with cause.</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📋 Loss log</div>
+          <button class="btn btn-honey btn-sm" onclick="openLossModal()">+ Record loss</button>
+        </div>
+        <div id="lossList"><div class="loading-spinner"><div class="spinner"></div>Loading…</div></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Bottom nav -->
@@ -1095,6 +1182,10 @@ body::before{
     <button class="nav-tab" onclick="switchTab('queens')" id="tab-queens">
       <span class="nav-tab-icon">👑</span>
       <span class="nav-tab-label">Queens</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('losses')" id="tab-losses">
+      <span class="nav-tab-icon">💀</span>
+      <span class="nav-tab-label">Losses</span>
     </button>
     <button class="nav-tab" onclick="switchTab('insights')" id="tab-insights">
       <span class="nav-tab-icon">📊</span>
@@ -1349,7 +1440,106 @@ body::before{
   </div>
 </div>
 
-<!-- Queen modal -->
+<!-- Colony Loss modal -->
+<div class="modal-overlay" id="lossModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="lossModalTitle">💀 Record Colony Loss</div>
+      <button class="modal-close" onclick="closeModal('lossModal')">✕</button>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Hive <span style="color:var(--terra)">*</span></label>
+      <select class="form-select" id="lHive" onchange="updateLossHiveLabel()"></select>
+      <div id="lHiveLabel" style="font-size:11px;color:var(--text3);margin-top:4px;padding-left:2px;"></div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Date discovered <span style="color:var(--terra)">*</span></label>
+      <input class="form-input" type="date" id="lDate">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Loss type <span style="color:var(--terra)">*</span></label>
+      <div class="rating-group" id="lTypeGroup">
+        <div class="rating-opt" data-val="deadout"   onclick="selectRating(this,'lTypeGroup')">💀 Dead-out</div>
+        <div class="rating-opt" data-val="abscond"   onclick="selectRating(this,'lTypeGroup')">🏃 Absconded</div>
+        <div class="rating-opt" data-val="absconded-swarm" onclick="selectRating(this,'lTypeGroup')">🐝 Swarm loss</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Suspected / confirmed cause</label>
+      <select class="form-select" id="lCause" onchange="onLossCauseChange()">
+        <option value="">Unknown / not determined</option>
+        <optgroup label="Varroa-related">
+          <option value="varroa_collapse">Varroa mite collapse</option>
+          <option value="varroa_virus">Varroa + associated viruses (DWV, sacbrood…)</option>
+          <option value="varroa_treatment_failure">Treatment failure</option>
+        </optgroup>
+        <optgroup label="Disease">
+          <option value="afb">American foulbrood (AFB)</option>
+          <option value="efb">European foulbrood (EFB)</option>
+          <option value="nosema">Nosema</option>
+          <option value="chalkbrood">Chalkbrood</option>
+          <option value="sacbrood">Sacbrood</option>
+        </optgroup>
+        <optgroup label="Queen failure">
+          <option value="queenless">Queenless — failed to requeen</option>
+          <option value="drone_layer">Drone layer</option>
+          <option value="laying_worker">Laying workers</option>
+        </optgroup>
+        <optgroup label="Environmental / other">
+          <option value="starvation">Starvation</option>
+          <option value="pesticide">Pesticide exposure</option>
+          <option value="predator">Predator (small hive beetle, ants…)</option>
+          <option value="weather">Extreme weather / flood / fire</option>
+          <option value="absconding_cause">Disturbance / poor site (absconding)</option>
+          <option value="other">Other</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Notifiable cause warning -->
+    <div id="lossNotifiableWarning" class="notifiable-warning" style="display:none;">
+      ⚠️ <strong>Notifiable disease.</strong> AFB and EFB must be reported to your state agriculture authority immediately. In Victoria: <a href="https://agriculture.vic.gov.au/biosecurity" target="_blank" style="color:var(--terra-deep);font-weight:600;">agriculture.vic.gov.au/biosecurity</a>
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <label class="form-label">Confirmation status</label>
+      <div class="rating-group" id="lConfirmGroup">
+        <div class="rating-opt" data-val="suspected"  onclick="selectRating(this,'lConfirmGroup')">🤔 Suspected</div>
+        <div class="rating-opt" data-val="confirmed"  onclick="selectRating(this,'lConfirmGroup')">✅ Confirmed</div>
+        <div class="rating-opt" data-val="investigated" onclick="selectRating(this,'lConfirmGroup')">🔬 Investigated</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Colony strength at last inspection</label>
+      <div class="rating-group" id="lStrengthGroup">
+        <div class="rating-opt" data-val="strong" onclick="selectRating(this,'lStrengthGroup')">💪 Strong</div>
+        <div class="rating-opt" data-val="medium" onclick="selectRating(this,'lStrengthGroup')">👌 Medium</div>
+        <div class="rating-opt" data-val="weak"   onclick="selectRating(this,'lStrengthGroup')">📉 Weak</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="lNotes"
+        placeholder="What did you observe? Any signs of disease, unusual behaviour, recent treatments…" rows="3"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn btn-outline" id="lossDeleteBtn" onclick="deleteLoss()"
+        style="display:none;color:#B03030;border-color:#E0B0B0;">🗑 Delete</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-outline" onclick="closeModal('lossModal')">Cancel</button>
+        <button class="btn btn-honey" onclick="saveLoss()" id="lossSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="queenModal">
   <div class="modal">
     <div class="modal-head">
@@ -1448,10 +1638,12 @@ let _treatments = [];
 let _harvests   = [];
 let _inspections= [];
 let _queens     = [];
+let _losses     = [];
 let _currentTab = 'harvest';
 let _filterHive = 'all'; // 'all' or hive id string
 let _editingHarvestId = null;
 let _editingInspId    = null;
+let _editingLossId    = null;
 
 // ── Hive code helpers (matches VM's makeHiveCode exactly) ──
 function makeHiveCode(id){
@@ -1511,7 +1703,7 @@ _sb.auth.onAuthStateChange((event, session)=>{
   // Reload data on sign-in, clear on sign-out
   if(event==='SIGNED_IN') loadAllData();
   if(event==='SIGNED_OUT'){
-    _harvests=[];_inspections=[];_queens=[];
+    _harvests=[];_inspections=[];_queens=[];_losses=[];
     _apiaries=[];_hives=[];_mite_counts=[];_treatments=[];
     renderAll();
   }
@@ -1554,7 +1746,7 @@ async function loadAllData(){
   // If no user session, clear data and render empty states
   if(!_user){
     _apiaries=[];_hives=[];_mite_counts=[];_treatments=[];
-    _harvests=[];_inspections=[];_queens=[];
+    _harvests=[];_inspections=[];_queens=[];_losses=[];
     _tablesReady = false;
     populateHiveSelectors();
     renderAll();
@@ -1593,10 +1785,11 @@ async function loadAllData(){
   };
 
   _tablesReady = true; // assume true; safeQuery sets false if any table missing
-  [_harvests, _inspections, _queens] = await Promise.all([
+  [_harvests, _inspections, _queens, _losses] = await Promise.all([
     safeQuery(_sb.from('harvests').select('*').eq('user_id',uid).order('date',{ascending:false}), 'harvests'),
     safeQuery(_sb.from('inspections').select('*').eq('user_id',uid).order('date',{ascending:false}), 'inspections'),
     safeQuery(_sb.from('queens').select('*').eq('user_id',uid).order('created_at',{ascending:false}), 'queens'),
+    safeQuery(_sb.from('colony_losses').select('*').eq('user_id',uid).order('date',{ascending:false}), 'colony_losses'),
   ]);
 
   populateHiveSelectors();
@@ -1656,7 +1849,7 @@ function populateHiveSelectors(){
   }
 
   // Modal selects (no "All hives" option)
-  ['hHive','iHive','qHive'].forEach(id=>{
+  ['hHive','iHive','qHive','lHive'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.innerHTML = groupedOptions(false);
   });
@@ -1684,6 +1877,7 @@ function renderAll(){
   renderHarvest();
   if(_currentTab==='inspections') renderInspections();
   if(_currentTab==='queens') renderQueens();
+  if(_currentTab==='losses') renderLosses();
   if(_currentTab==='insights') renderInsights();
 }
 
@@ -1703,6 +1897,7 @@ function switchTab(tab){
 
   if(tab==='inspections') renderInspections();
   if(tab==='queens') renderQueens();
+  if(tab==='losses') renderLosses();
   if(tab==='insights') renderInsights();
 }
 
@@ -1710,6 +1905,7 @@ function onFab(){
   if(_currentTab==='harvest') openHarvestModal();
   else if(_currentTab==='inspections') openInspModal(null, _filterHive!=='all'?_filterHive:null);
   else if(_currentTab==='queens') openQueenModal();
+  else if(_currentTab==='losses') openLossModal();
 }
 
 // ══════════════════════════════════════════════
@@ -2290,6 +2486,187 @@ function statusIcon(v){
 }
 
 // ══════════════════════════════════════════════
+// 💀 COLONY LOSSES RENDER
+// ══════════════════════════════════════════════
+const LOSS_CAUSE_LABELS = {
+  varroa_collapse:'Varroa collapse', varroa_virus:'Varroa + viruses',
+  varroa_treatment_failure:'Treatment failure',
+  afb:'American foulbrood', efb:'European foulbrood',
+  nosema:'Nosema', chalkbrood:'Chalkbrood', sacbrood:'Sacbrood',
+  queenless:'Queenless', drone_layer:'Drone layer', laying_worker:'Laying workers',
+  starvation:'Starvation', pesticide:'Pesticide', predator:'Predator',
+  weather:'Weather event', absconding_cause:'Absconding — disturbance',
+  other:'Other',
+};
+const LOSS_NOTIFIABLE = ['afb','efb'];
+
+function renderLosses(){
+  const list = document.getElementById('lossList');
+  if(!_tablesReady){
+    list.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🗄️</div>
+      Database tables not set up yet.</div>`;
+    return;
+  }
+  const data = _filterHive==='all' ? _losses :
+    _losses.filter(l=>String(l.hive_id)===String(_filterHive));
+
+  if(data.length===0){
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-state-icon">💀</div>
+      No colony losses recorded.<br>
+      <span style="font-size:12px;color:var(--text3);">Record a dead-out or absconding to track causes over time.</span>
+    </div>`;
+    return;
+  }
+
+  // Loss summary strip
+  const deadouts  = data.filter(l=>l.loss_type==='deadout').length;
+  const absconds  = data.filter(l=>l.loss_type==='abscond'||l.loss_type==='absconded-swarm').length;
+  const varroa    = data.filter(l=>l.cause?.startsWith('varroa')).length;
+  const notifiable= data.filter(l=>LOSS_NOTIFIABLE.includes(l.cause)).length;
+
+  let summaryHtml = `<div class="loss-summary-strip">
+    <div class="loss-summary-chip">💀 ${deadouts} dead-out${deadouts!==1?'s':''}</div>
+    <div class="loss-summary-chip">🏃 ${absconds} abscond${absconds!==1?'s':''}</div>
+    ${varroa>0?`<div class="loss-summary-chip" style="background:#FDE8E8;border-color:#F0C0C0;color:#8A1010;">🕷 ${varroa} varroa-related</div>`:''}
+    ${notifiable>0?`<div class="loss-summary-chip" style="background:#FDD;border-color:#E00;color:#900;">⚠️ ${notifiable} notifiable</div>`:''}
+  </div>`;
+
+  // Group by apiary
+  const byApiary = {};
+  data.forEach(l=>{
+    const hive = _hives.find(h=>String(h.id)===String(l.hive_id));
+    const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+    const key  = String(ap?.id||'other');
+    if(!byApiary[key]) byApiary[key]={ap, items:[]};
+    byApiary[key].items.push({l, hive, ap});
+  });
+
+  const multiAp = Object.keys(byApiary).length > 1;
+  let html = summaryHtml;
+
+  Object.values(byApiary).sort((a,b)=>{
+    if(!a.ap) return 1; if(!b.ap) return -1;
+    return a.ap.name.localeCompare(b.ap.name);
+  }).forEach(({ap, items})=>{
+    if(multiAp){
+      html += `<div class="health-apiary-header">📍 ${ap?.name||'Other'}</div>`;
+    }
+    items.forEach(({l, hive, ap})=>{
+      const dt = l.date ? new Date(l.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+      const isAbscond = l.loss_type==='abscond'||l.loss_type==='absconded-swarm';
+      const typeLabel = {deadout:'💀 Dead-out', abscond:'🏃 Absconded', 'absconded-swarm':'🐝 Swarm loss'}[l.loss_type]||l.loss_type;
+      const causeLabel = l.cause ? (LOSS_CAUSE_LABELS[l.cause]||l.cause) : 'Unknown cause';
+      const causeClass = isAbscond ? 'abscond' : (!l.cause ? 'unknown' : '');
+      const confirmLabel = {suspected:'🤔 Suspected',confirmed:'✅ Confirmed',investigated:'🔬 Investigated'}[l.confirmation]||'';
+      const isNotifiable = LOSS_NOTIFIABLE.includes(l.cause);
+      const hiveName = hive?.name||'Unknown hive';
+      const apLabel  = ap?.name ? `📍 ${ap.name}` : '';
+
+      html += `<div class="loss-item" onclick="openLossModal('${l.id}')">
+        <div class="loss-icon ${isAbscond?'abscond':''}">${isAbscond?'🏃':'💀'}</div>
+        <div class="loss-info">
+          <div class="loss-hive">${hiveName}${multiAp?'':apLabel?' · '+apLabel:''}</div>
+          <div class="loss-meta">${dt} · ${typeLabel}${confirmLabel?' · '+confirmLabel:''}</div>
+          <div><span class="loss-cause ${causeClass}">${isNotifiable?'⚠️ ':''}${causeLabel}</span></div>
+          ${l.notes?`<div style="font-size:12px;color:var(--text3);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${l.notes}</div>`:''}
+        </div>
+      </div>`;
+    });
+  });
+
+  list.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// 💀 COLONY LOSS MODAL
+// ══════════════════════════════════════════════
+function openLossModal(editId=null){
+  _editingLossId = editId;
+  document.getElementById('lossModalTitle').textContent = editId ? '💀 Edit Colony Loss' : '💀 Record Colony Loss';
+  document.getElementById('lDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('lCause').value = '';
+  document.getElementById('lNotes').value = '';
+  document.getElementById('lHiveLabel').textContent = '';
+  document.getElementById('lossDeleteBtn').style.display = editId ? 'inline-flex' : 'none';
+  document.getElementById('lossNotifiableWarning').style.display = 'none';
+  ['lTypeGroup','lConfirmGroup','lStrengthGroup'].forEach(clearRatings);
+
+  if(editId){
+    const l = _losses.find(x=>String(x.id)===String(editId));
+    if(l){
+      document.getElementById('lHive').value = l.hive_id;
+      document.getElementById('lDate').value = l.date||'';
+      document.getElementById('lCause').value = l.cause||'';
+      document.getElementById('lNotes').value = l.notes||'';
+      if(l.loss_type)    preSelectRating('lTypeGroup',    l.loss_type);
+      if(l.confirmation) preSelectRating('lConfirmGroup', l.confirmation);
+      if(l.last_strength)preSelectRating('lStrengthGroup',l.last_strength);
+      if(LOSS_NOTIFIABLE.includes(l.cause))
+        document.getElementById('lossNotifiableWarning').style.display = 'block';
+    }
+  }
+  updateLossHiveLabel();
+  openModal('lossModal');
+}
+
+function updateLossHiveLabel(){
+  const hiveId = document.getElementById('lHive').value;
+  const hive   = _hives.find(h=>String(h.id)===String(hiveId));
+  const ap     = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+  document.getElementById('lHiveLabel').textContent = ap ? '📍 '+ap.name+(ap.address?' · '+ap.address:'') : '';
+}
+
+function onLossCauseChange(){
+  const cause = document.getElementById('lCause').value;
+  document.getElementById('lossNotifiableWarning').style.display =
+    LOSS_NOTIFIABLE.includes(cause) ? 'block' : 'none';
+}
+
+async function deleteLoss(){
+  if(!_editingLossId) return;
+  const l = _losses.find(x=>String(x.id)===String(_editingLossId));
+  const hive = _hives.find(h=>String(h.id)===String(l?.hive_id));
+  if(!confirm(`Delete loss record for ${hive?.name||'this hive'} on ${l?.date||'?'}?\nThis cannot be undone.`)) return;
+  const {error} = await _sb.from('colony_losses').delete().eq('id',_editingLossId).eq('user_id',_user.id);
+  if(error){showToast('Error: '+error.message);return;}
+  closeModal('lossModal');
+  showToast('Loss record deleted');
+  await loadAllData();
+}
+
+async function saveLoss(){
+  if(!_user){showToast('Please sign in to save data.');return;}
+  const hive_id   = document.getElementById('lHive').value;
+  const date      = document.getElementById('lDate').value;
+  const loss_type = getRating('lTypeGroup');
+  if(!hive_id||!date||!loss_type){showToast('Please fill in hive, date and loss type.');return;}
+  const btn = document.getElementById('lossSaveBtn');
+  btn.textContent='Saving…';btn.disabled=true;
+  const payload = {
+    user_id:      _user.id,
+    hive_id,
+    date,
+    loss_type,
+    cause:        document.getElementById('lCause').value||null,
+    confirmation: getRating('lConfirmGroup')||null,
+    last_strength:getRating('lStrengthGroup')||null,
+    notes:        document.getElementById('lNotes').value||null,
+  };
+  let err;
+  if(_editingLossId){
+    ({error:err}=await _sb.from('colony_losses').update(payload).eq('id',_editingLossId).eq('user_id',_user.id));
+  } else {
+    ({error:err}=await _sb.from('colony_losses').insert(payload));
+  }
+  btn.textContent='Save';btn.disabled=false;
+  if(err){showToast('Error: '+err.message);return;}
+  closeModal('lossModal');
+  showToast(_editingLossId?'Loss record updated ✓':'Colony loss recorded 💀');
+  await loadAllData();
+}
+
+// ══════════════════════════════════════════════
 // 📊 INSIGHTS RENDER
 // ══════════════════════════════════════════════
 function renderInsights(){
@@ -2378,6 +2755,12 @@ function renderInsights(){
       <div class="stat-value">${_mite_counts.filter(m=>m.date?.startsWith(YEAR+'')).length}<span class="stat-unit"></span></div>
       <div class="stat-delta" style="color:var(--text3)">alcohol washes</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-label">Colony losses</div>
+      <div class="stat-value" style="color:${_losses.filter(l=>l.date?.startsWith(YEAR+'')).length>0?'#C04040':'var(--text1)'}">
+        ${_losses.filter(l=>l.date?.startsWith(YEAR+'')).length}<span class="stat-unit"></span></div>
+      <div class="stat-delta" style="color:var(--text3)">this season</div>
+    </div>
   </div>
 
   <!-- Yield per hive bar chart -->
@@ -2463,6 +2846,130 @@ function renderInsights(){
       }).join('')}
     </div>
   </div>`:''}
+
+  <!-- Apiary Health -->
+  <div class="insight-section-title">🏥 Apiary health</div>
+  ${(()=>{
+    // Per-hive health summary
+    const lossSet = new Set(_losses.map(l=>String(l.hive_id)));
+    const recentInspMap = {};
+    _inspections.forEach(i=>{
+      const key = String(i.hive_id);
+      if(!recentInspMap[key]) recentInspMap[key] = [];
+      if(recentInspMap[key].length < 3) recentInspMap[key].push(i);
+    });
+    const latestMiteMap = {};
+    _mite_counts.forEach(m=>{
+      const key = String(m.hive_id);
+      if(!latestMiteMap[key]) latestMiteMap[key] = m; // already sorted date desc
+    });
+
+    // Group hives by apiary
+    const sections = _apiaries.map(ap=>{
+      const apHives = _hives.filter(h=>h.apiary_id===ap.id);
+      return {ap, hives:apHives};
+    }).filter(s=>s.hives.length>0);
+    const orphans = _hives.filter(h=>!_apiaries.some(a=>a.id===h.apiary_id));
+    if(orphans.length) sections.push({ap:null, hives:orphans});
+    if(sections.length===0) return `<div class="card"><div class="card-body"><div class="insight-no-data">No hive data yet.</div></div></div>`;
+
+    // Loss summary for this year
+    const yearLosses = _losses.filter(l=>l.date?.startsWith(YEAR+''));
+    const causeCounts = {};
+    yearLosses.forEach(l=>{ const c=l.cause||'unknown'; causeCounts[c]=(causeCounts[c]||0)+1; });
+    const causeList = Object.entries(causeCounts).sort((a,b)=>b[1]-a[1]);
+
+    const lossSection = yearLosses.length>0 ? `
+      <div class="insight-section-title" style="margin-top:14px;">💀 Colony losses · ${YEAR}</div>
+      <div class="card">
+        <div class="loss-summary-strip">
+          <div class="loss-summary-chip">Total: ${yearLosses.length} hive${yearLosses.length!==1?'s':''}</div>
+          ${yearLosses.filter(l=>l.loss_type==='deadout').length>0?`<div class="loss-summary-chip">💀 ${yearLosses.filter(l=>l.loss_type==='deadout').length} dead-out${yearLosses.filter(l=>l.loss_type==='deadout').length!==1?'s':''}</div>`:''}
+          ${yearLosses.filter(l=>l.loss_type!=='deadout').length>0?`<div class="loss-summary-chip">🏃 ${yearLosses.filter(l=>l.loss_type!=='deadout').length} abscond${yearLosses.filter(l=>l.loss_type!=='deadout').length!==1?'s':''}</div>`:''}
+        </div>
+        <div class="card-body" style="padding-top:10px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;">Causes</div>
+          ${causeList.map(([cause,count])=>{
+            const label = LOSS_CAUSE_LABELS[cause]||cause;
+            const isNotifiable = LOSS_NOTIFIABLE.includes(cause);
+            return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span style="font-size:13px;color:${isNotifiable?'#900':'var(--text1)'};">${isNotifiable?'⚠️ ':''}${label}</span>
+              <span style="font-size:13px;font-weight:700;color:var(--terra-deep);">${count}</span>
+            </div>`;
+          }).join('')}
+          <div style="margin-top:10px;">
+            <button class="btn btn-outline btn-sm" onclick="switchTab('losses')" style="width:100%;justify-content:center;">View all loss records →</button>
+          </div>
+        </div>
+      </div>` : '';
+
+    const hiveRows = sections.map(({ap, hives})=>{
+      const rows = hives.map(hive=>{
+        const hid = String(hive.id);
+        const isLost = lossSet.has(hid);
+        const lossRec = _losses.find(l=>String(l.hive_id)===hid);
+        const inspections = recentInspMap[hid]||[];
+        const latestMite  = latestMiteMap[hid];
+        const q = _queens.find(qu=>String(qu.hive_id)===hid);
+
+        // Build health badges
+        const badges = [];
+        if(isLost){
+          const causeLabel = lossRec?.cause ? (LOSS_CAUSE_LABELS[lossRec.cause]||lossRec.cause) : 'Unknown cause';
+          badges.push({cls:'bad', label:`💀 ${lossRec?.loss_type==='abscond'?'Absconded':'Dead-out'} · ${causeLabel}`});
+        } else {
+          // Mite pressure
+          if(latestMite){
+            const v = latestMite.value;
+            const dt = latestMite.date ? new Date(latestMite.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'}) : '';
+            badges.push({
+              cls: v>=15?'bad':v>=8?'warn':v>=3?'warn':'ok',
+              label:`🔬 ${v}/300 (${dt})`
+            });
+          } else {
+            badges.push({cls:'warn', label:'🔬 No mite count'});
+          }
+          // Queen
+          if(q){
+            const age = q.year_introduced ? (YEAR-parseInt(q.year_introduced)) : null;
+            if(q.status==='lost') badges.push({cls:'bad', label:'👑 Queen lost'});
+            else if(q.status==='suspect') badges.push({cls:'warn', label:'👑 Queen suspect'});
+            else if(age>=3) badges.push({cls:'bad', label:`👑 Queen ${age} yrs`});
+            else if(age===2) badges.push({cls:'warn', label:`👑 Queen ${age} yrs`});
+          } else {
+            badges.push({cls:'warn', label:'👑 No queen record'});
+          }
+          // Recent brood / swarm signals
+          if(inspections.length>0){
+            const lastInsp = inspections[0];
+            if(lastInsp.swarm==='sealed') badges.push({cls:'bad', label:'⚠️ Sealed swarm cells'});
+            else if(lastInsp.swarm==='play') badges.push({cls:'warn', label:'🔔 Play cups'});
+            if(lastInsp.brood==='poor') badges.push({cls:'bad', label:'🔴 Poor brood'});
+            else if(lastInsp.brood==='patchy') badges.push({cls:'warn', label:'🟡 Patchy brood'});
+          } else {
+            badges.push({cls:'warn', label:'🔍 No inspections'});
+          }
+        }
+
+        const dotColor = isLost ? '#999' : badges.some(b=>b.cls==='bad') ? '#C04040' : badges.some(b=>b.cls==='warn') ? '#C08020' : '#2A8C50';
+
+        return `<div class="health-hive-row">
+          <div class="health-hive-dot" style="background:${dotColor};${isLost?'opacity:0.4':''}"></div>
+          <div style="flex:1;">
+            <div class="health-hive-name" style="${isLost?'text-decoration:line-through;opacity:0.5':''}">${hive.name}</div>
+            <div class="health-badges">
+              ${badges.map(b=>`<span class="health-badge ${isLost?'lost':b.cls}">${b.label}</span>`).join('')}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      const header = ap ? `<div class="health-apiary-header">📍 ${ap.name}${ap.address?' · '+ap.address:''}</div>` : '';
+      return `<div class="card" style="margin-bottom:14px;">${header}${rows}</div>`;
+    }).join('');
+
+    return hiveRows + lossSection;
+  })()}
   `;
 }
 
