@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>VarroaMate · Productivity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,22 +66,37 @@
    RESET
 ══════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
-html{height:-webkit-fill-available;}
+
+/* iOS Safari: use fill-available so the app fills the real visible viewport */
+html{
+  height:100%;
+  height:-webkit-fill-available;
+}
 body{
   font-family:'Bitter',serif;
   background:var(--cream);
   color:var(--text1);
   -webkit-font-smoothing:antialiased;
-  min-height:-webkit-fill-available;
-}
-#app{
-  display:none;
-  flex-direction:column;
+  /* Do NOT set overflow:hidden on body — blocks iOS touch scroll */
   height:100%;
   height:-webkit-fill-available;
 }
+
+/* ══════════════════════════════════════════════
+   LAYOUT SHELL
+══════════════════════════════════════════════ */
+#app{
+  display:none;
+  flex-direction:column;
+  /* Fixed height shell — scrolling happens inside .content-area only */
+  height:100%;
+  height:-webkit-fill-available;
+  overflow:hidden;
+  position:fixed;
+  inset:0;
+}
 #app.ready{display:flex;}
+
 .auth-input{
   width:100%;padding:8px 11px;
   border:1.5px solid var(--border);
@@ -93,15 +108,6 @@ body{
 .auth-input:focus{border-color:var(--terra);}
 .auth-err{color:#C04040;}
 
-/* ══════════════════════════════════════════════
-   LAYOUT SHELL
-══════════════════════════════════════════════ */
-#app{
-  display:none;
-  flex-direction:column;
-  height:100%;
-}
-#app.ready{display:flex;}
 body::before{
   content:'';
   position:fixed;inset:0;
@@ -174,8 +180,9 @@ body::before{
   flex:1;
   overflow-y:auto;
   overflow-x:hidden;
-  padding:16px 16px 80px;
-  -webkit-overflow-scrolling:touch;
+  -webkit-overflow-scrolling:touch;  /* momentum scroll on iOS */
+  overscroll-behavior-y:contain;
+  padding:16px 16px 24px;
 }
 
 /* BOTTOM NAV */
@@ -184,21 +191,22 @@ body::before{
   background:var(--cream);
   border-top:2px solid var(--border-mid);
   display:flex;
-  /* Height grows to include safe area so tabs aren't squashed */
+  flex-direction:row;
+  /* Safe area: pad the content up, let bar extend into the safe zone with bg colour */
   padding-bottom:env(safe-area-inset-bottom,0px);
-  min-height:calc(64px + env(safe-area-inset-bottom,0px));
 }
 .nav-tab{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:4px;
   cursor:pointer;
-  padding:10px 4px;
-  /* Minimum 44px tap target (Apple HIG) */
+  padding:12px 4px;
+  /* 44px minimum tap target (Apple HIG) */
   min-height:44px;
   transition:all 0.15s;
   border:none;background:transparent;
   color:var(--text3);
   -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
 .nav-tab.active{color:var(--terra);}
 .nav-tab-icon{font-size:24px;line-height:1;}
@@ -337,7 +345,9 @@ body::before{
 
 /* Toast */
 #toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  position:fixed;
+  bottom:calc(64px + env(safe-area-inset-bottom,0px) + 12px);
+  left:50%;transform:translateX(-50%) translateY(20px);
   background:var(--plum);color:white;
   padding:11px 20px;border-radius:20px;
   font-size:14px;font-weight:500;
@@ -471,7 +481,7 @@ body::before{
 .fab{
   position:fixed;
   right:18px;
-  bottom:calc(var(--nav-h) + 14px + env(safe-area-inset-bottom,0px));
+  bottom:calc(64px + env(safe-area-inset-bottom,0px) + 14px);
   width:52px;height:52px;
   border-radius:50%;
   background:linear-gradient(135deg,var(--terra),var(--terra-deep));
