@@ -4214,7 +4214,7 @@ async function testProxy(){
     const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
-      body:JSON.stringify({model:'claude-opus-4-6',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
     });
     const text = await resp.text();
     console.log('[ProxyTest] status:', resp.status, 'body:', text.slice(0,200));
@@ -4234,7 +4234,7 @@ async function extractFromVoice(){
   btn.textContent='✨ Extracting…'; btn.disabled=true;
 
   const payload = {
-    model:'claude-opus-4-6',
+    model:'claude-haiku-4-5-20251001',
     max_tokens:400,
     system:`You extract beehive inspection data from a beekeeper's spoken notes.
 Return ONLY valid JSON with these exact keys (all optional, use null if not mentioned):
