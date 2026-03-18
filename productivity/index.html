@@ -4233,7 +4233,12 @@ No markdown, no explanation, just the JSON object.`,
         messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
       })
     });
+    if(!resp.ok){
+      const errText = await resp.text();
+      throw new Error(`HTTP ${resp.status}: ${errText.slice(0,200)}`);
+    }
     const data = await resp.json();
+    console.log('[VoiceExtract] proxy response:', JSON.stringify(data).slice(0,300));
     // Proxy returns raw Anthropic response — check for errors first
     if(data.error || data.type==='error'){
       throw new Error('API error: '+(data.error?.message||data.message||JSON.stringify(data)));
@@ -4287,8 +4292,9 @@ No markdown, no explanation, just the JSON object.`,
     document.getElementById('voiceHint').textContent=`Extracted ${filled} field${filled!==1?'s':''} — review and save`;
   } catch(e){
     btn.textContent='✨ Fill fields'; btn.disabled=false;
-    showToast('Could not extract — check your connection.');
-    console.error(e);
+    const msg = e?.message || String(e);
+    showToast('Extract failed: '+msg.slice(0,80), 5000);
+    console.error('[VoiceExtract] error:', e);
   }
 }
 
@@ -4357,11 +4363,11 @@ async function saveQueen(){
 // TOAST
 // ══════════════════════════════════════════════
 let _toastTimer=null;
-function showToast(msg){
+function showToast(msg, dur=2800){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   clearTimeout(_toastTimer);
-  _toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),dur);
 }
 
 // Keyboard: close modals on Escape
