@@ -3737,15 +3737,15 @@ async function saveInspection(){
     if(!isNaN(miteCount) && miteCount >= 0){
       const editMiteId = document.getElementById('iMiteCount').dataset.editMiteId;
       const mitePayload = {
-        user_id:   _user.id,
-        hive_id,
+        user_id:      _user.id,
+        hive_id:      parseInt(hive_id), // VM expects integer
         date,
-        value:     miteCount,
-        method:    document.getElementById('iMiteMethod').value || 'alcohol_wash',
+        value:        miteCount,
         hive_strength: getRating('iMiteStrengthGroup') || 'Good',
-        diseases:  getInspDiseases(),
-        notes:     document.getElementById('iMiteNotes').value || null,
-        source:    'vmp',
+        diseases:     getInspDiseases(),
+        notes:        document.getElementById('iMiteNotes').value || null,
+        method:       document.getElementById('iMiteMethod').value || 'alcohol_wash',
+        source:       'vmp',
       };
       let miteErr;
       if(editMiteId){
@@ -3753,7 +3753,20 @@ async function saveInspection(){
       } else {
         ({error:miteErr} = await _sb.from('mite_counts').insert(mitePayload));
       }
-      if(miteErr) showToast('Inspection saved but mite count failed: '+miteErr.message);
+      if(miteErr){
+        // If error is about missing column (method/source not yet added), retry without them
+        if(miteErr.message?.includes('method')||miteErr.message?.includes('source')){
+          const {user_id,hive_id:hid,date:d,value,hive_strength,diseases,notes} = mitePayload;
+          const fallback = {user_id,hive_id:hid,date:d,value,hive_strength,diseases,notes};
+          const {error:miteErr2} = editMiteId
+            ? await _sb.from('mite_counts').update(fallback).eq('id',editMiteId).eq('user_id',_user.id)
+            : await _sb.from('mite_counts').insert(fallback);
+          if(miteErr2) showToast('Mite count failed: '+miteErr2.message+' — run the SQL migration in Supabase.');
+          else showToast('Mite count saved ✓ (run SQL migration to enable method/source tracking)');
+        } else {
+          showToast('Mite count failed: '+miteErr.message);
+        }
+      }
     }
   } else if(document.getElementById('iMiteCount').dataset.editMiteId){
     // Count was cleared during edit — delete the linked mite count record
