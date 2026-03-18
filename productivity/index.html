@@ -172,8 +172,8 @@ body::before{
 .bottom-nav{
   flex-shrink:0;
   height:var(--nav-h);
-  background:var(--paper);
-  border-top:1.5px solid var(--border);
+  background:var(--cream);
+  border-top:2px solid var(--border-mid);
   display:flex;
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -208,7 +208,7 @@ body::before{
   margin-bottom:4px;
 }
 .page-sub{
-  font-size:14px;color:var(--text3);
+  font-size:14px;color:var(--text2);
   margin-bottom:20px;
 }
 .card{
@@ -227,7 +227,7 @@ body::before{
 }
 .card-title{
   font-size:15px;font-weight:700;
-  color:var(--text2);
+  color:var(--text1);
   letter-spacing:0.2px;
   display:flex;align-items:center;gap:6px;
 }
@@ -416,7 +416,7 @@ body::before{
   background:var(--terra-pale);
   box-shadow:0 0 0 3px rgba(193,89,58,0.12);
 }
-.year-bar-year{font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;}
+.year-bar-year{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;}
 .year-bar-track{
   height:6px;background:var(--border);
   border-radius:3px;margin-bottom:4px;overflow:hidden;
@@ -444,15 +444,15 @@ body::before{
   font-size:18px;flex-shrink:0;
 }
 .harvest-info{flex:1;min-width:0;}
-.harvest-date{font-size:13px;color:var(--text3);}
+.harvest-date{font-size:13px;color:var(--text2);}
 .harvest-label{font-size:15px;font-weight:600;color:var(--text1);}
-.harvest-detail{font-size:11px;color:var(--text3);}
+.harvest-detail{font-size:13px;color:var(--text2);}
 .harvest-kg{
   font-family:'Cormorant Garamond',serif;
   font-size:20px;font-weight:700;color:var(--terra-deep);
   text-align:right;flex-shrink:0;
 }
-.harvest-kg-unit{font-size:10px;font-weight:400;color:var(--text3);}
+.harvest-kg-unit{font-size:12px;font-weight:400;color:var(--text2);}
 
 /* Add harvest FAB */
 .fab{
@@ -483,7 +483,7 @@ body::before{
 .insp-item:last-child{border-bottom:none;}
 .insp-item:active{background:var(--cream);}
 .insp-row1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;}
-.insp-date{font-size:13px;color:var(--text3);}
+.insp-date{font-size:13px;color:var(--text2);}
 .insp-hive{font-size:16px;font-weight:600;color:var(--text1);}
 .insp-ratings{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
 .rating-pill{
@@ -664,7 +664,7 @@ body::before{
   transition:all 0.15s;
 }
 .queen-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--terra);}
-.queen-card-hive{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.queen-card-hive{font-size:13px;color:var(--text2);margin-bottom:4px;}
 .queen-card-name{font-size:14px;font-weight:700;color:var(--timber);margin-bottom:8px;}
 .queen-dot-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
 .queen-dot{
@@ -941,18 +941,18 @@ body::before{
   .side-logo{
     padding:0 20px 24px;
     font-family:'Cormorant Garamond',serif;
-    font-size:18px;font-weight:700;
+    font-size:20px;font-weight:700;
     color:var(--timber);
     display:block;
     border-bottom:1px solid var(--border);
     margin-bottom:16px;
   }
-  .side-logo span{color:var(--terra);}
+  .side-logo em{color:var(--terra);font-style:normal;}
   .side-logo-sub{
-    font-size:10px;font-weight:500;
-    color:var(--text3);letter-spacing:1px;
+    font-size:11px;font-weight:600;
+    color:var(--text3);letter-spacing:1.2px;
     text-transform:uppercase;display:block;
-    margin-top:2px;
+    margin-top:3px;
   }
   .nav-tab{
     flex-direction:row;justify-content:flex-start;
@@ -1425,7 +1425,7 @@ body::before{
 
   <!-- Bottom nav -->
   <nav class="bottom-nav" id="bottomNav">
-    <div class="side-logo" style="display:none;">Varroa<span>Mate</span>™<span class="side-logo-sub">Productivity</span></div>
+    <div class="side-logo">🐝 Varroa<em>Mate</em>™<span class="side-logo-sub">Productivity</span></div>
     <button class="nav-tab active" onclick="switchTab('harvest')" id="tab-harvest">
       <span class="nav-tab-icon">🍯</span>
       <span class="nav-tab-label">Harvest</span>
