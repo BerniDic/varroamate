@@ -4233,14 +4233,10 @@ async function extractFromVoice(){
   const btn = document.getElementById('voiceExtractBtn');
   btn.textContent='✨ Extracting…'; btn.disabled=true;
 
-  try{
-    const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
-      body:JSON.stringify({
-        model:'claude-opus-4-6',
-        max_tokens:400,
-        system:`You extract beehive inspection data from a beekeeper's spoken notes.
+  const payload = {
+    model:'claude-opus-4-6',
+    max_tokens:400,
+    system:`You extract beehive inspection data from a beekeeper's spoken notes.
 Return ONLY valid JSON with these exact keys (all optional, use null if not mentioned):
 queen: "yes"|"eggs"|"no"
 brood: "solid"|"patchy"|"poor"
@@ -4248,81 +4244,90 @@ stores: "full"|"ok"|"low"
 mood: "calm"|"active"|"defensive"
 swarm: "none"|"play"|"sealed"
 strength: "strong"|"medium"|"weak"
-mite_count: integer (the mite number from an alcohol wash or count — extract if they say "count 50", "mite count 5", "3 mites", "five per 300" etc. — null if not mentioned)
-mite_method: "alcohol_wash"|"sugar_shake"|"drone_uncapping" (default "alcohol_wash" unless they explicitly mention another method)
-notes: string (ONLY observations not captured by any other field above — do NOT repeat the mite count, queen status, brood, stores, mood, swarm or strength here — null if nothing remains)
+mite_count: integer (mite number from an alcohol wash — extract if they say "count 50", "mite count 5", "3 mites" etc. — null if not mentioned)
+mite_method: "alcohol_wash"|"sugar_shake"|"drone_uncapping" (default "alcohol_wash" unless they explicitly say otherwise)
+notes: string (ONLY observations not in any field above — do NOT repeat mite count, queen, brood, stores, mood, swarm or strength — null if nothing remains)
 No markdown, no explanation, just the JSON object.`,
-        messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
-      })
-    });
-    if(!resp.ok){
-      const errText = await resp.text().catch(()=>'');
-      throw new Error(`HTTP ${resp.status}: ${errText.slice(0,150)}`);
-    }
-    const data = await resp.json();
-    console.log('[VoiceExtract] proxy response:', JSON.stringify(data).slice(0,300));
-    // Anthropic overload — could retry but just surface the error for now
-    if(data.error?.type==='overloaded_error'){
-      throw new Error('Anthropic is busy — please try again in a moment');
-    }
-    if(data.error || data.type==='error'){
-      const detail = data.error?.message || data.error?.type || data.message || JSON.stringify(data).slice(0,150);
-      console.error('[VoiceExtract] API error detail:', JSON.stringify(data));
-      throw new Error('API error: '+detail);
-    }
-    const text = data.content?.find(b=>b.type==='text')?.text||'{}';
-    const extracted = JSON.parse(text.replace(/```json|```/g,'').trim());
-    console.log('[VoiceExtract] raw text:', text);
-    console.log('[VoiceExtract] extracted:', JSON.stringify(extracted));
+    messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
+  };
 
-    // Apply inspection rating fields
-    const fieldMap={
-      queen:'iQueenGroup', brood:'iBroodGroup', stores:'iStoresGroup',
-      mood:'iMoodGroup', swarm:'iSwarmGroup', strength:'iStrengthGroup'
-    };
-    let filled=0;
-    Object.entries(fieldMap).forEach(([key,groupId])=>{
-      if(extracted[key]){ preSelectRating(groupId, extracted[key]); filled++; }
-    });
-
-    // Apply mite count if detected
-    if(extracted.mite_count !== null && extracted.mite_count !== undefined && !isNaN(parseInt(extracted.mite_count))){
-      const miteField   = document.getElementById('iMiteCount');
-      const miteSection = document.getElementById('iMiteCountFields');
-      if(miteField){ miteField.value = parseInt(extracted.mite_count); filled++; }
-      if(miteSection) miteSection.style.display = 'block';
-      if(extracted.mite_method){
-        const methodField = document.getElementById('iMiteMethod');
-        if(methodField) methodField.value = extracted.mite_method;
+  // Retry up to 3 times with backoff for overload errors (same as VM)
+  const delays=[0,4000,8000];
+  let lastErr;
+  for(let attempt=0;attempt<3;attempt++){
+    if(attempt>0){
+      btn.textContent=`⏳ Retry ${attempt}/2…`;
+      await new Promise(r=>setTimeout(r,delays[attempt]));
+    }
+    try{
+      const resp=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+        body:JSON.stringify(payload)
+      });
+      if(!resp.ok){
+        const errText=await resp.text().catch(()=>'');
+        throw new Error(`HTTP ${resp.status}: ${errText.slice(0,120)}`);
       }
-      onMiteCountInput();
-    }
-
-    if(extracted.notes){
-      // Strip any mite count mention from notes — it has its own field
-      let cleanNotes = extracted.notes
-        .replace(/\bmite\s*count\s*[:\-]?\s*\d+\s*(\/?\s*300)?/gi, '')
-        .replace(/\bcount\s*[:\-]?\s*\d+\s*(\/?\s*300)?/gi, '')
-        .replace(/\b\d+\s*mites?\s*(per|\/?\s*300)?/gi, '')
-        .replace(/^[,;.\s]+|[,;.\s]+$/g, '')
-        .trim();
-      if(cleanNotes){
-        const existing = document.getElementById('iNotes').value;
-        document.getElementById('iNotes').value = existing ? existing+'\n'+cleanNotes : cleanNotes;
+      const data=await resp.json();
+      console.log('[VoiceExtract] response:',JSON.stringify(data).slice(0,200));
+      if(data.error?.type==='overloaded_error'){
+        lastErr=new Error('Anthropic busy — retrying…');
+        continue;
       }
-    }
+      if(data.error||data.type==='error'){
+        throw new Error('API: '+(data.error?.message||data.error?.type||JSON.stringify(data).slice(0,100)));
+      }
+      const text=data.content?.find(b=>b.type==='text')?.text||'{}';
+      const extracted=JSON.parse(text.replace(/\`\`\`json|\`\`\`/g,'').trim());
+      console.log('[VoiceExtract] extracted:',JSON.stringify(extracted));
 
-    const miteNote = (extracted.mite_count !== null && extracted.mite_count !== undefined && !isNaN(parseInt(extracted.mite_count)))
-      ? ` + mite count ${extracted.mite_count}/300` : '';
-    showToast(`✨ Filled ${filled} field${filled!==1?'s':''}${miteNote}`);
-    btn.textContent='✨ Fill fields'; btn.disabled=false;
-    document.getElementById('voiceHint').textContent=`Extracted ${filled} field${filled!==1?'s':''} — review and save`;
-  } catch(e){
-    btn.textContent='✨ Fill fields'; btn.disabled=false;
-    const msg = e?.message || String(e);
-    showToast('Extract failed: '+msg.slice(0,80), 5000);
-    console.error('[VoiceExtract] error:', e);
+      // Rating fields
+      const fieldMap={queen:'iQueenGroup',brood:'iBroodGroup',stores:'iStoresGroup',
+        mood:'iMoodGroup',swarm:'iSwarmGroup',strength:'iStrengthGroup'};
+      let filled=0;
+      Object.entries(fieldMap).forEach(([key,groupId])=>{
+        if(extracted[key]){preSelectRating(groupId,extracted[key]);filled++;}
+      });
+
+      // Mite count
+      if(extracted.mite_count!=null&&extracted.mite_count!==undefined&&!isNaN(parseInt(extracted.mite_count))){
+        const mf=document.getElementById('iMiteCount');
+        const ms=document.getElementById('iMiteCountFields');
+        if(mf){mf.value=parseInt(extracted.mite_count);filled++;}
+        if(ms)ms.style.display='block';
+        if(extracted.mite_method){const mm=document.getElementById('iMiteMethod');if(mm)mm.value=extracted.mite_method;}
+        onMiteCountInput();
+      }
+
+      // Notes — strip anything already captured in a field
+      if(extracted.notes){
+        let n=extracted.notes
+          .replace(/mite\s*count\s*[:\-]?\s*\d+(\/?\s*300)?/gi,'')
+          .replace(/count\s*[:\-]?\s*\d+(\/?\s*300)?/gi,'')
+          .replace(/\d+\s*mites?\s*(per|\/?\s*300)?/gi,'')
+          .replace(/^[,;.\s]+|[,;.\s]+$/g,'').trim();
+        if(n){
+          const el=document.getElementById('iNotes');
+          el.value=el.value?el.value+'\n'+n:n;
+        }
+      }
+
+      const mn=(extracted.mite_count!=null&&!isNaN(parseInt(extracted.mite_count)))?` + mite count ${extracted.mite_count}/300`:'';
+      showToast(`✨ Filled ${filled} field${filled!==1?'s':''}${mn}`);
+      btn.textContent='✨ Fill fields';btn.disabled=false;
+      document.getElementById('voiceHint').textContent=`Extracted ${filled} field${filled!==1?'s':''} — review and save`;
+      return;
+
+    }catch(e){
+      lastErr=e;
+      if(!e.message?.includes('busy')&&!e.message?.includes('overloaded'))break;
+    }
   }
+
+  btn.textContent='✨ Fill fields';btn.disabled=false;
+  showToast('Extract failed: '+(lastErr?.message||'unknown').slice(0,80),5000);
+  console.error('[VoiceExtract] failed:',lastErr);
 }
 
 // ══════════════════════════════════════════════
