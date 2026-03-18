@@ -4051,9 +4051,9 @@ stores: "full"|"ok"|"low"
 mood: "calm"|"active"|"defensive"
 swarm: "none"|"play"|"sealed"
 strength: "strong"|"medium"|"weak"
-mite_count: integer (mites per 300 bees from an alcohol wash — extract the number if they say "3 mites", "count of 5", "five per 300" etc. — null if not mentioned)
+mite_count: integer (the mite number from an alcohol wash or count — extract if they say "count 50", "mite count 5", "3 mites", "five per 300" etc. — null if not mentioned)
 mite_method: "alcohol_wash"|"sugar_roll"|"sticky_board" (null if not mentioned)
-notes: string (any additional observations, cleaned up)
+notes: string (ONLY observations not captured by any other field above — do NOT repeat the mite count, queen status, brood, stores, mood, swarm or strength here — null if nothing remains)
 No markdown, no explanation, just the JSON object.`,
         messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
       })
@@ -4065,6 +4065,8 @@ No markdown, no explanation, just the JSON object.`,
     }
     const text = data.content?.find(b=>b.type==='text')?.text||'{}';
     const extracted = JSON.parse(text.replace(/```json|```/g,'').trim());
+    console.log('[VoiceExtract] raw text:', text);
+    console.log('[VoiceExtract] extracted:', JSON.stringify(extracted));
 
     // Apply inspection rating fields
     const fieldMap={
@@ -4090,8 +4092,17 @@ No markdown, no explanation, just the JSON object.`,
     }
 
     if(extracted.notes){
-      const existing = document.getElementById('iNotes').value;
-      document.getElementById('iNotes').value = existing ? existing+'\n'+extracted.notes : extracted.notes;
+      // Strip any mite count mention from notes — it has its own field
+      let cleanNotes = extracted.notes
+        .replace(/\bmite\s*count\s*[:\-]?\s*\d+\s*(\/?\s*300)?/gi, '')
+        .replace(/\bcount\s*[:\-]?\s*\d+\s*(\/?\s*300)?/gi, '')
+        .replace(/\b\d+\s*mites?\s*(per|\/?\s*300)?/gi, '')
+        .replace(/^[,;.\s]+|[,;.\s]+$/g, '')
+        .trim();
+      if(cleanNotes){
+        const existing = document.getElementById('iNotes').value;
+        document.getElementById('iNotes').value = existing ? existing+'\n'+cleanNotes : cleanNotes;
+      }
     }
 
     const miteNote = (extracted.mite_count !== null && extracted.mite_count !== undefined && !isNaN(parseInt(extracted.mite_count)))
