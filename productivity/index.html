@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>VarroaMate · Productivity</title>
+<title>VarroaMate · Productivity v1.14</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Bitter:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1622,6 +1622,8 @@ body::before{
         </button>
         <button class="btn btn-sm btn-outline" id="voiceExtractBtn" onclick="extractFromVoice()"
           style="display:none;">✨ Fill fields</button>
+        <button class="btn btn-sm btn-outline" id="proxyTestBtn" onclick="testProxy()"
+          style="font-size:11px;color:var(--text3);padding:4px 8px;">🔌 Test AI</button>
       </div>
       <div id="voiceTranscript" style="width:100%;font-size:12px;color:var(--text2);font-style:italic;display:none;padding-top:4px;border-top:1px solid var(--border);margin-top:4px;"></div>
     </div>
@@ -4203,6 +4205,26 @@ function stopVoice(){
   if(_voiceTranscript.trim()){
     document.getElementById('voiceExtractBtn').style.display='inline-flex';
   }
+}
+
+async function testProxy(){
+  const btn = document.getElementById('proxyTestBtn');
+  btn.textContent='⏳ Testing…'; btn.disabled=true;
+  try{
+    const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-opus-4-6',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
+    });
+    const text = await resp.text();
+    console.log('[ProxyTest] status:', resp.status, 'body:', text.slice(0,200));
+    if(resp.ok) showToast(`✅ Proxy OK (${resp.status}) — ${text.slice(0,60)}`, 5000);
+    else showToast(`❌ Proxy ${resp.status}: ${text.slice(0,80)}`, 6000);
+  }catch(e){
+    showToast(`❌ Network error: ${e.message}`, 6000);
+    console.error('[ProxyTest]', e);
+  }
+  btn.textContent='🔌 Test AI'; btn.disabled=false;
 }
 
 async function extractFromVoice(){
