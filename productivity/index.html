@@ -528,8 +528,81 @@ body::before{
   background:var(--terra-deep) !important;
 }
 
-/* Pagination */
-.pagination{
+/* Hive subgroup header inside inspection list */
+.insp-hive-header{
+  padding:8px 16px 5px;
+  background:var(--wax-pale);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:baseline;gap:8px;
+  cursor:pointer;
+  user-select:none;
+}
+.insp-hive-header-name{
+  font-size:12px;font-weight:700;
+  color:var(--timber);letter-spacing:0.2px;
+}
+.insp-hive-header-meta{
+  font-size:11px;color:var(--text3);flex:1;
+}
+.insp-hive-header-chevron{
+  font-size:11px;color:var(--text3);
+  transition:transform 0.2s;
+}
+.insp-hive-group.collapsed .insp-hive-header-chevron{transform:rotate(-90deg);}
+.insp-hive-group.collapsed .insp-hive-items{display:none;}
+
+/* Mite count pill on inspection list item */
+.mite-pill{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 8px;border-radius:20px;
+  font-size:11px;font-weight:600;
+  background:#FFF0E0;border:1px solid #F0C080;
+  color:#8A4800;
+}
+.mite-pill.high{background:#FDE8E8;border-color:#F0A0A0;color:#8A1010;}
+.mite-pill.critical{background:#FDD;border-color:#E00;color:#900;font-weight:700;}
+
+/* Disease buttons in inspection modal */
+.disease-toggle-btn{
+  padding:7px 12px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);
+  background:var(--paper);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.disease-toggle-btn.active{
+  background:#FDE8E8;border-color:#E08080;color:#8A1010;
+}
+.disease-toggle-btn.active-none{
+  background:#EEF8F1;border-color:#A8D4B0;color:#256030;
+}
+.disease-toggle-btn.notifiable{
+  border-style:dashed;
+}
+.disease-toggle-btn.notifiable.active{
+  border-style:solid;border-color:#CC0000;
+  background:#FDD;color:#900;
+}
+
+/* Source badge */
+.source-badge{
+  display:inline-flex;align-items:center;
+  padding:1px 6px;border-radius:10px;
+  font-size:10px;font-weight:600;letter-spacing:0.3px;
+  background:rgba(74,37,69,0.08);
+  color:var(--plum-mid);
+  border:1px solid rgba(74,37,69,0.15);
+}
+
+/* Notifiable disease warning banner */
+.notifiable-warning{
+  margin-top:10px;padding:9px 12px;
+  background:#FEF3CD;border:1.5px solid #F0C040;
+  border-radius:var(--radius-sm);
+  font-size:12px;color:#7A4A00;line-height:1.5;
+}
+.notifiable-warning strong{color:#9A2000;}
+
   display:flex;align-items:center;justify-content:center;
   gap:6px;padding:12px 16px;
   border-top:1px solid var(--border);
@@ -937,6 +1010,38 @@ body::before{
       <div class="page-title">🔍 Inspections</div>
       <div class="page-sub">Quick field notes — glove-friendly.</div>
 
+      <!-- Sync explainer -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-head" onclick="toggleInspExplainer()" style="cursor:pointer;user-select:none;">
+          <div class="card-title">ℹ️ How inspections &amp; mite counts sync</div>
+          <span id="inspExplainerChevron" style="font-size:12px;color:var(--text3);transition:transform 0.2s;">▾</span>
+        </div>
+        <div id="inspExplainerBody" style="display:none;padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="font-size:20px;flex-shrink:0;">📱</div>
+              <div><strong style="color:var(--timber);">VarroaMate (VM)</strong> is the source of truth for mite counts. Counts entered via the green field button or red regular entry button in VM are stored in the <em>mite_counts</em> table and appear here as <span class="mite-pill" style="font-size:11px;display:inline-flex;">🔬 3/300</span> pills on the matching inspection.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="font-size:20px;flex-shrink:0;">🔍</div>
+              <div><strong style="color:var(--timber);">VarroaMate Productivity (VMP)</strong> adds a <em>Mite Count</em> section to the inspection modal. If you enter a count here, it is written directly to VM's <em>mite_counts</em> table and becomes visible in VM immediately — no duplication, same data.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="font-size:20px;flex-shrink:0;">🏷️</div>
+              <div>Entries made in VMP are tagged with a <span class="source-badge" style="display:inline-flex;">VMP</span> badge so you can tell them apart from VM entries at a glance.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="font-size:20px;flex-shrink:0;">🔗</div>
+              <div>A mite count pill appears on an inspection when a count exists for the <strong>same hive within ±1 day</strong> of the inspection date — whether that count was entered in VM or VMP.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="font-size:20px;flex-shrink:0;">⚠️</div>
+              <div>AFB and EFB are <strong style="color:#9A2000;">nationally notifiable pests</strong>. If you select these in the disease observations, VMP will show a biosecurity alert with a link to your state authority. Always report positive detections promptly.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Last inspection summary strip -->
       <div class="card" id="lastInspCard" style="display:none;">
         <div class="card-body" style="display:flex;gap:12px;align-items:center;">
@@ -1181,6 +1286,58 @@ body::before{
       <textarea class="form-textarea" id="iNotes" placeholder="Observations, actions taken, anything unusual…" rows="3"></textarea>
     </div>
 
+    <!-- ── Mite count (optional — writes to VM's mite_counts table) ── -->
+    <div style="margin-top:14px;padding:12px 14px;background:var(--wax-pale);border:1.5px solid var(--border);border-radius:var(--radius-sm);">
+      <div style="font-size:12px;font-weight:700;color:var(--timber);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+        🔬 Mite Count <span style="font-weight:400;color:var(--text3);font-size:11px;">(optional — syncs to VarroaMate)</span>
+      </div>
+      <div class="form-row-2" style="margin-bottom:10px;">
+        <div>
+          <label class="form-label">Count (mites/300 bees)</label>
+          <input class="form-input" type="number" id="iMiteCount" placeholder="e.g. 3" min="0" max="300" step="1"
+            oninput="onMiteCountInput()">
+        </div>
+        <div>
+          <label class="form-label">Method</label>
+          <select class="form-select" id="iMiteMethod">
+            <option value="alcohol_wash">🧪 Alcohol wash</option>
+            <option value="sugar_shake">🍬 Sugar shake</option>
+            <option value="drone_uncapping">🐝 Drone uncapping</option>
+          </select>
+        </div>
+      </div>
+      <div id="iMiteCountFields" style="display:none;">
+        <div class="form-row" style="margin-bottom:10px;">
+          <label class="form-label">Hive strength</label>
+          <div class="rating-group" id="iMiteStrengthGroup">
+            <div class="rating-opt" data-val="Poor"   onclick="selectRating(this,'iMiteStrengthGroup')">📉 Poor</div>
+            <div class="rating-opt" data-val="Fair"   onclick="selectRating(this,'iMiteStrengthGroup')">👌 Fair</div>
+            <div class="rating-opt" data-val="Good"   onclick="selectRating(this,'iMiteStrengthGroup')">💪 Good</div>
+            <div class="rating-opt" data-val="Strong" onclick="selectRating(this,'iMiteStrengthGroup')">🌟 Strong</div>
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom:6px;">
+          <label class="form-label">Disease / Pest Observations <span style="font-size:10px;color:var(--text3);">— for BeeMAX</span></label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;" id="iDiseaseBtns">
+            <button type="button" class="disease-toggle-btn active-none" data-disease="No Disease Present" onclick="toggleInspDisease(this)">✅ No Disease</button>
+            <button type="button" class="disease-toggle-btn" data-disease="Varroa"              onclick="toggleInspDisease(this)">🕷 Varroa</button>
+            <button type="button" class="disease-toggle-btn notifiable" data-disease="American foulbrood" onclick="toggleInspDisease(this)">⚠️ AFB</button>
+            <button type="button" class="disease-toggle-btn" data-disease="Chalkbrood"          onclick="toggleInspDisease(this)">🍄 Chalkbrood</button>
+            <button type="button" class="disease-toggle-btn notifiable" data-disease="European foulbrood" onclick="toggleInspDisease(this)">⚠️ EFB</button>
+            <button type="button" class="disease-toggle-btn" data-disease="Nosema"              onclick="toggleInspDisease(this)">🦠 Nosema</button>
+            <button type="button" class="disease-toggle-btn" data-disease="Braula fly"          onclick="toggleInspDisease(this)">🪰 Braula fly</button>
+          </div>
+        </div>
+        <div id="iNotifiableWarning" class="notifiable-warning" style="display:none;">
+          ⚠️ <strong>Notifiable disease selected.</strong> AFB and EFB are nationally notifiable pests. You must report positive detections to your state agriculture authority immediately. In Victoria: <a href="https://agriculture.vic.gov.au/biosecurity" target="_blank" style="color:var(--terra-deep);font-weight:600;">agriculture.vic.gov.au/biosecurity</a>
+        </div>
+        <div class="form-row" style="margin-top:8px;margin-bottom:0;">
+          <label class="form-label">Mite count notes <span style="font-weight:400;color:var(--text3);">(optional)</span></label>
+          <input class="form-input" type="text" id="iMiteNotes" placeholder="e.g. post-treatment check, bees from super frame…">
+        </div>
+      </div>
+    </div>
+
     <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap;">
       <button class="btn btn-outline" id="inspDeleteBtn" onclick="deleteInspection()"
         style="display:none;color:#B03030;border-color:#E0B0B0;">🗑 Delete</button>
@@ -1409,7 +1566,7 @@ async function loadAllData(){
   const [apRes, hvRes, mcRes, txRes] = await Promise.all([
     _sb.from('apiaries').select('*').eq('user_id',uid).order('created_at'),
     _sb.from('hives').select('*').eq('user_id',uid).order('created_at'),
-    _sb.from('mite_counts').select('*').eq('user_id',uid).order('date',{ascending:false}),
+    _sb.from('mite_counts').select('id,hive_id,date,value,hive_strength,diseases,notes,method,source').eq('user_id',uid).order('date',{ascending:false}),
     _sb.from('treatments').select('*').eq('user_id',uid).order('date',{ascending:false}),
   ]);
   _apiaries    = apRes.data  || [];
@@ -1745,73 +1902,147 @@ function renderInspections(){
     return;
   }
 
-  // Group by apiary for clarity
+  // Build mite count lookup: hive_id → array of {date, value, source}
+  const miteByHive = {};
+  _mite_counts.forEach(m=>{
+    const key = String(m.hive_id);
+    if(!miteByHive[key]) miteByHive[key] = [];
+    miteByHive[key].push(m);
+  });
+
+  // Find linked mite count for an inspection (same hive, within ±1 day)
+  function linkedMite(insp){
+    const counts = miteByHive[String(insp.hive_id)] || [];
+    const iDate = insp.date ? new Date(insp.date) : null;
+    if(!iDate) return null;
+    return counts.find(m=>{
+      if(!m.date) return false;
+      const diff = Math.abs(new Date(m.date) - iDate) / (1000*60*60*24);
+      return diff <= 1;
+    }) || null;
+  }
+
+  // Group: apiary → hive → inspections sorted date desc
   const byApiary = {};
   data.forEach(i=>{
     const hive = _hives.find(h=>String(h.id)===String(i.hive_id));
     const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
-    const key  = ap?.id||'other';
-    if(!byApiary[key]) byApiary[key]={ap, items:[]};
-    byApiary[key].items.push({i, hive, ap});
+    const apKey  = String(ap?.id||'other');
+    const hiveKey = String(hive?.id||'unknown');
+    if(!byApiary[apKey]) byApiary[apKey] = {ap, byHive:{}};
+    if(!byApiary[apKey].byHive[hiveKey]) byApiary[apKey].byHive[hiveKey] = {hive, items:[]};
+    byApiary[apKey].byHive[hiveKey].items.push({i, hive, ap});
   });
 
-  // Flatten all items sorted by date desc for pagination
-  const allInspItems = [];
-  const groups = Object.values(byApiary).sort((a,b)=>{
+  // Sort apiaries alphabetically
+  const apGroups = Object.values(byApiary).sort((a,b)=>{
     if(!a.ap) return 1; if(!b.ap) return -1;
     return a.ap.name.localeCompare(b.ap.name);
   });
-  groups.forEach(({items})=> items.forEach(item=> allInspItems.push(item)));
 
-  const totalPages = Math.ceil(allInspItems.length / PAGE_SIZE);
-  if(_inspPage >= totalPages) _inspPage = Math.max(0, totalPages-1);
-  const pageItems = allInspItems.slice(_inspPage * PAGE_SIZE, (_inspPage+1) * PAGE_SIZE);
-
+  const multiApiary = apGroups.length > 1;
   let html = '';
-  let lastApId = null;
-  pageItems.forEach(({i, hive, ap})=>{
-    // Show apiary header when group changes (only if multiple apiaries)
-    if(Object.keys(byApiary).length > 1 && ap?.id !== lastApId){
-      lastApId = ap?.id;
-      html+=`<div style="padding:8px 16px 4px;background:var(--cream);border-bottom:1px solid var(--border);
+
+  apGroups.forEach(({ap, byHive})=>{
+    if(multiApiary){
+      html += `<div style="padding:8px 16px 4px;background:var(--cream);border-bottom:1px solid var(--border);
         font-size:11px;font-weight:700;color:var(--terra-deep);letter-spacing:0.8px;text-transform:uppercase;">
         📍 ${ap?.name||'Other'}
       </div>`;
     }
-    const dt = i.date ? new Date(i.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
-    const location = [ap?.name, hive?.name].filter(Boolean).join(' · ') || 'Unknown hive';
-    const pills=[
-      i.queen   ? ratingPill(i.queen,  'queen')   : '',
-      i.brood   ? ratingPill(i.brood,  'brood')   : '',
-      i.stores  ? ratingPill(i.stores, 'stores')  : '',
-      i.mood    ? ratingPill(i.mood,   'mood')    : '',
-      i.strength? ratingPill(i.strength,'strength'): '',
-    ].filter(Boolean).join('');
-    html+=`<div class="insp-item" onclick="openInspModal('${i.id}')">
-      <div class="insp-row1">
-        <div>
-          <div class="insp-date">${dt}</div>
-          <div class="insp-hive">${location}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-          ${i.swarm&&i.swarm!=='none'?'<span class="tag tag-red">⚠️ Swarm</span>':''}
-          <span style="font-size:10px;color:var(--text3);">tap to edit</span>
-        </div>
-      </div>
-      <div class="insp-ratings">${pills}</div>
-      ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
-    </div>`;
+
+    // Sort hives by name
+    const hiveGroups = Object.values(byHive).sort((a,b)=>{
+      return (a.hive?.name||'').localeCompare(b.hive?.name||'');
+    });
+
+    hiveGroups.forEach(({hive, items})=>{
+      // Sort items date desc
+      items.sort((a,b)=>(b.i.date||'').localeCompare(a.i.date||''));
+      const lastDt = items[0]?.i.date
+        ? new Date(items[0].i.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})
+        : '';
+      const hiveGroupId = `hive-group-${hive?.id||'unknown'}`;
+      const multiHive = hiveGroups.length > 1;
+
+      if(multiHive){
+        html += `<div class="insp-hive-group" id="${hiveGroupId}">
+          <div class="insp-hive-header" onclick="toggleHiveGroup('${hiveGroupId}')">
+            <span class="insp-hive-header-name">🐝 ${hive?.name||'Unknown hive'}</span>
+            <span class="insp-hive-header-meta">${items.length} inspection${items.length!==1?'s':''} · last ${lastDt}</span>
+            <span class="insp-hive-header-chevron">▾</span>
+          </div>
+          <div class="insp-hive-items">`;
+      }
+
+      items.forEach(({i})=>{
+        const dt = i.date ? new Date(i.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+        const hiveName = hive?.name || 'Unknown hive';
+        const apName   = ap?.name || '';
+        const location = multiApiary
+          ? hiveName
+          : [apName, hiveName].filter(Boolean).join(' · ');
+
+        const pills=[
+          i.queen   ? ratingPill(i.queen,  'queen')   : '',
+          i.brood   ? ratingPill(i.brood,  'brood')   : '',
+          i.stores  ? ratingPill(i.stores, 'stores')  : '',
+          i.mood    ? ratingPill(i.mood,   'mood')    : '',
+          i.strength? ratingPill(i.strength,'strength'): '',
+        ].filter(Boolean).join('');
+
+        // Linked mite count pill
+        const mc = linkedMite(i);
+        let mitePillHtml = '';
+        if(mc){
+          const v = mc.value;
+          const cls = v>=15?'critical':v>=8?'high':'';
+          const src = mc.source==='vmp' ? ' <span class="source-badge">VMP</span>' : '';
+          mitePillHtml = `<span class="mite-pill ${cls}">🔬 ${v}/300${src}</span>`;
+        }
+
+        // Source badge for the inspection itself
+        const srcBadge = i.source==='vmp'
+          ? '<span class="source-badge" style="margin-left:4px;">VMP</span>' : '';
+
+        html+=`<div class="insp-item" onclick="openInspModal('${i.id}')">
+          <div class="insp-row1">
+            <div>
+              <div class="insp-date">${dt}${srcBadge}</div>
+              <div class="insp-hive">${location}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              ${i.swarm&&i.swarm!=='none'?'<span class="tag tag-red">⚠️ Swarm</span>':''}
+              <span style="font-size:10px;color:var(--text3);">tap to edit</span>
+            </div>
+          </div>
+          <div class="insp-ratings">${pills}${mitePillHtml}</div>
+          ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
+        </div>`;
+      });
+
+      if(multiHive){
+        html += `</div></div>`; // close insp-hive-items + insp-hive-group
+      }
+    });
   });
 
-  const pagination = totalPages > 1 ? `
-    <div class="pagination">
-      <button class="page-btn" onclick="_inspPage--;renderInspections()" ${_inspPage===0?'disabled':''}>← Prev</button>
-      <span class="page-info">Page ${_inspPage+1} of ${totalPages}</span>
-      <button class="page-btn" onclick="_inspPage++;renderInspections()" ${_inspPage>=totalPages-1?'disabled':''}>Next →</button>
-    </div>` : '';
-
-  list.innerHTML = html + pagination;
+  list.innerHTML = html || `<div class="empty-state">No inspections match the current filter.</div>`;
 }
+
+function toggleHiveGroup(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('collapsed');
+}
+
+function toggleInspExplainer(){
+  const body  = document.getElementById('inspExplainerBody');
+  const chev  = document.getElementById('inspExplainerChevron');
+  const open  = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  chev.style.transform = open ? 'rotate(180deg)' : '';
+}
+
 
 function ratingLabel(val, type){
   const map = {
@@ -2388,6 +2619,7 @@ function openInspModal(editId=null, preselectedHiveId=null){
   ['iQueenGroup','iBroodGroup','iStoresGroup','iMoodGroup','iSwarmGroup','iStrengthGroup']
     .forEach(clearRatings);
   resetVoice();
+  resetMiteCountFields();
 
   if(editId){
     const i=_inspections.find(x=>String(x.id)===String(editId));
@@ -2401,6 +2633,24 @@ function openInspModal(editId=null, preselectedHiveId=null){
       if(i.mood)    preSelectRating('iMoodGroup',      i.mood);
       if(i.swarm)   preSelectRating('iSwarmGroup',     i.swarm);
       if(i.strength)preSelectRating('iStrengthGroup',  i.strength);
+
+      // Load linked mite count if one exists (same hive, same date)
+      const mc = _mite_counts.find(m=>
+        String(m.hive_id)===String(i.hive_id) &&
+        m.date === i.date &&
+        m.source === 'vmp'
+      );
+      if(mc){
+        document.getElementById('iMiteCount').value = mc.value ?? '';
+        document.getElementById('iMiteMethod').value = mc.method || 'alcohol_wash';
+        document.getElementById('iMiteCountFields').style.display = 'block';
+        document.getElementById('iMiteNotes').value = mc.notes || '';
+        if(mc.hive_strength) preSelectRating('iMiteStrengthGroup', mc.hive_strength);
+        if(mc.diseases && !mc.diseases.includes('No Disease Present'))
+          setInspDiseases(mc.diseases);
+        // Store the mite count id for update
+        document.getElementById('iMiteCount').dataset.editMiteId = mc.id;
+      }
     }
   } else if(preselectedHiveId){
     document.getElementById('iHive').value = preselectedHiveId;
@@ -2430,6 +2680,11 @@ async function deleteInspection(){
   if(!confirm(`Delete inspection of ${label} on ${i?.date||'?'}?\nThis cannot be undone.`)) return;
   const {error} = await _sb.from('inspections').delete().eq('id',_editingInspId).eq('user_id',_user.id);
   if(error){showToast('Error: '+error.message);return;}
+  // Also delete linked VMP mite count if one exists
+  const editMiteId = document.getElementById('iMiteCount').dataset.editMiteId;
+  if(editMiteId){
+    await _sb.from('mite_counts').delete().eq('id',editMiteId).eq('user_id',_user.id).eq('source','vmp');
+  }
   closeModal('inspModal');
   showToast('Inspection deleted');
   await loadAllData();
@@ -2442,6 +2697,7 @@ async function saveInspection(){
   if(!hive_id||!date){showToast('Please select a hive and date.');return;}
   const btn = document.getElementById('inspSaveBtn');
   btn.textContent='Saving…';btn.disabled=true;
+
   const payload={
     user_id:_user.id, hive_id, date,
     queen:   getRating('iQueenGroup'),
@@ -2451,18 +2707,120 @@ async function saveInspection(){
     swarm:   getRating('iSwarmGroup'),
     strength:getRating('iStrengthGroup'),
     notes:   document.getElementById('iNotes').value||null,
+    source:  'vmp',
   };
+
   let err;
   if(_editingInspId){
     ({error:err}=await _sb.from('inspections').update(payload).eq('id',_editingInspId).eq('user_id',_user.id));
   } else {
     ({error:err}=await _sb.from('inspections').insert(payload));
   }
+  if(err){btn.textContent='Save';btn.disabled=false;showToast('Error: '+err.message);return;}
+
+  // Write mite count to mite_counts if a count was entered
+  const miteVal = document.getElementById('iMiteCount').value.trim();
+  if(miteVal !== ''){
+    const miteCount = parseInt(miteVal);
+    if(!isNaN(miteCount) && miteCount >= 0){
+      const editMiteId = document.getElementById('iMiteCount').dataset.editMiteId;
+      const mitePayload = {
+        user_id:   _user.id,
+        hive_id,
+        date,
+        value:     miteCount,
+        method:    document.getElementById('iMiteMethod').value || 'alcohol_wash',
+        hive_strength: getRating('iMiteStrengthGroup') || 'Good',
+        diseases:  getInspDiseases(),
+        notes:     document.getElementById('iMiteNotes').value || null,
+        source:    'vmp',
+      };
+      let miteErr;
+      if(editMiteId){
+        ({error:miteErr} = await _sb.from('mite_counts').update(mitePayload).eq('id',editMiteId).eq('user_id',_user.id));
+      } else {
+        ({error:miteErr} = await _sb.from('mite_counts').insert(mitePayload));
+      }
+      if(miteErr) showToast('Inspection saved but mite count failed: '+miteErr.message);
+    }
+  } else if(document.getElementById('iMiteCount').dataset.editMiteId){
+    // Count was cleared during edit — delete the linked mite count record
+    const editMiteId = document.getElementById('iMiteCount').dataset.editMiteId;
+    await _sb.from('mite_counts').delete().eq('id',editMiteId).eq('user_id',_user.id);
+  }
+
   btn.textContent='Save';btn.disabled=false;
-  if(err){showToast('Error: '+err.message);return;}
   closeModal('inspModal');
   showToast(_editingInspId ? 'Inspection updated ✓' : 'Inspection saved ✓');
   await loadAllData();
+}
+
+// ── Mite count field helpers ──
+function onMiteCountInput(){
+  const val = document.getElementById('iMiteCount').value.trim();
+  document.getElementById('iMiteCountFields').style.display = val !== '' ? 'block' : 'none';
+}
+
+function toggleInspDisease(btn){
+  const disease = btn.dataset.disease;
+  const allBtns = document.querySelectorAll('#iDiseaseBtns .disease-toggle-btn');
+  if(disease === 'No Disease Present'){
+    // Selecting "No Disease" clears all others
+    allBtns.forEach(b=>{ b.classList.remove('active','active-none'); });
+    btn.classList.add('active-none');
+  } else {
+    // Deselect "No Disease Present" when selecting a disease
+    const noneBtn = document.querySelector('#iDiseaseBtns [data-disease="No Disease Present"]');
+    if(noneBtn) noneBtn.classList.remove('active-none');
+    btn.classList.toggle('active');
+    // If nothing selected, re-select "No Disease"
+    const anyActive = [...allBtns].some(b=>b.classList.contains('active'));
+    if(!anyActive && noneBtn) noneBtn.classList.add('active-none');
+  }
+  // Show notifiable warning if AFB or EFB is selected
+  const notifiable = [...allBtns].some(b=>
+    b.classList.contains('active') &&
+    (b.dataset.disease==='American foulbrood' || b.dataset.disease==='European foulbrood')
+  );
+  document.getElementById('iNotifiableWarning').style.display = notifiable ? 'block' : 'none';
+}
+
+function getInspDiseases(){
+  const btns = document.querySelectorAll('#iDiseaseBtns .disease-toggle-btn');
+  const active = [...btns].filter(b=>b.classList.contains('active')||b.classList.contains('active-none'));
+  if(active.length===0) return ['No Disease Present'];
+  return active.map(b=>b.dataset.disease);
+}
+
+function resetInspDiseases(){
+  const btns = document.querySelectorAll('#iDiseaseBtns .disease-toggle-btn');
+  btns.forEach(b=>{ b.classList.remove('active','active-none'); });
+  const noneBtn = document.querySelector('#iDiseaseBtns [data-disease="No Disease Present"]');
+  if(noneBtn) noneBtn.classList.add('active-none');
+  document.getElementById('iNotifiableWarning').style.display = 'none';
+}
+
+function setInspDiseases(diseases){
+  resetInspDiseases();
+  if(!diseases||!diseases.length) return;
+  const btns = document.querySelectorAll('#iDiseaseBtns .disease-toggle-btn');
+  const noneBtn = document.querySelector('#iDiseaseBtns [data-disease="No Disease Present"]');
+  if(diseases.includes('No Disease Present')||diseases.length===0) return; // already set
+  if(noneBtn) noneBtn.classList.remove('active-none');
+  btns.forEach(b=>{
+    if(diseases.includes(b.dataset.disease)) b.classList.add('active');
+  });
+  const notifiable = diseases.includes('American foulbrood')||diseases.includes('European foulbrood');
+  document.getElementById('iNotifiableWarning').style.display = notifiable ? 'block' : 'none';
+}
+
+function resetMiteCountFields(){
+  document.getElementById('iMiteCount').value = '';
+  document.getElementById('iMiteMethod').value = 'alcohol_wash';
+  document.getElementById('iMiteCountFields').style.display = 'none';
+  document.getElementById('iMiteNotes').value = '';
+  clearRatings('iMiteStrengthGroup');
+  resetInspDiseases();
 }
 
 // ── Voice entry ──
@@ -2543,7 +2901,7 @@ async function extractFromVoice(){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-opus-4-6',
         max_tokens:400,
         system:`You extract beehive inspection data from a beekeeper's spoken notes.
 Return ONLY valid JSON with these exact keys (all optional, use null if not mentioned):
