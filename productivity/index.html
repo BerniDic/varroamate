@@ -3965,7 +3965,9 @@ function setInspDiseases(diseases){
 }
 
 function resetMiteCountFields(){
-  document.getElementById('iMiteCount').value = '';
+  const miteField = document.getElementById('iMiteCount');
+  miteField.value = '';
+  miteField.dataset.editMiteId = ''; // clear any linked record ID
   document.getElementById('iMiteMethod').value = 'alcohol_wash';
   document.getElementById('iMiteCountFields').style.display = 'none';
   document.getElementById('iMiteNotes').value = '';
