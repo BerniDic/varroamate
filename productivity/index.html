@@ -4213,12 +4213,12 @@ async function testProxy(){
   try{
     const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body:JSON.stringify({model:'claude-opus-4-6',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
     });
     const text = await resp.text();
     console.log('[ProxyTest] status:', resp.status, 'body:', text.slice(0,200));
-    if(resp.ok) showToast(`✅ Proxy OK (${resp.status}) — ${text.slice(0,60)}`, 5000);
+    if(resp.ok) showToast(`✅ Proxy OK (${resp.status})`, 4000);
     else showToast(`❌ Proxy ${resp.status}: ${text.slice(0,80)}`, 6000);
   }catch(e){
     showToast(`❌ Network error: ${e.message}`, 6000);
@@ -4236,7 +4236,7 @@ async function extractFromVoice(){
   try{
     const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body:JSON.stringify({
         model:'claude-opus-4-6',
         max_tokens:400,
@@ -4256,14 +4256,17 @@ No markdown, no explanation, just the JSON object.`,
       })
     });
     if(!resp.ok){
-      const errText = await resp.text();
-      throw new Error(`HTTP ${resp.status}: ${errText.slice(0,200)}`);
+      const errText = await resp.text().catch(()=>'');
+      throw new Error(`HTTP ${resp.status}: ${errText.slice(0,150)}`);
     }
     const data = await resp.json();
     console.log('[VoiceExtract] proxy response:', JSON.stringify(data).slice(0,300));
-    // Proxy returns raw Anthropic response — check for errors first
+    // Anthropic overload — could retry but just surface the error for now
+    if(data.error?.type==='overloaded_error'){
+      throw new Error('Anthropic is busy — please try again in a moment');
+    }
     if(data.error || data.type==='error'){
-      const detail = data.error?.message || data.error?.type || data.message || JSON.stringify(data);
+      const detail = data.error?.message || data.error?.type || data.message || JSON.stringify(data).slice(0,150);
       console.error('[VoiceExtract] API error detail:', JSON.stringify(data));
       throw new Error('API error: '+detail);
     }
