@@ -3842,6 +3842,11 @@ async function saveInspection(){
     ({error:err}=await _sb.from('inspections').update(payload).eq('id',_editingInspId).eq('user_id',_user.id));
   } else {
     ({error:err}=await _sb.from('inspections').insert(payload));
+    // If insert fails, retry without 'source' column (may not exist yet)
+    if(err && (err.message?.includes('source') || err.message?.includes('violates row-level security') || err.message?.includes('column'))){
+      const {source:_s, ...payloadNoSource} = payload;
+      ({error:err}=await _sb.from('inspections').insert(payloadNoSource));
+    }
   }
   if(err){btn.textContent='Save';btn.disabled=false;showToast('Error: '+err.message);return;}
 
