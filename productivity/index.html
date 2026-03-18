@@ -1651,11 +1651,14 @@ body::before{
         </div>
         <div>
           <label class="form-label">Method</label>
-          <select class="form-select" id="iMiteMethod">
+          <select class="form-select" id="iMiteMethod" onchange="onMiteMethodChange()">
             <option value="alcohol_wash">🧪 Alcohol wash</option>
             <option value="sugar_shake">🍬 Sugar shake</option>
             <option value="drone_uncapping">🐝 Drone uncapping</option>
           </select>
+          <div id="miteMethodHint" style="font-size:11px;color:var(--text3);margin-top:4px;display:none;">
+            Saved to inspection notes only — not synced to VarroaMate
+          </div>
         </div>
       </div>
       <div id="iMiteCountFields" style="display:none;">
@@ -3855,41 +3858,66 @@ async function saveInspection(){
   }
   if(err){btn.textContent='Save';btn.disabled=false;showToast('Error: '+err.message);return;}
 
-  // Write mite count to mite_counts if a count was entered
-  const miteVal = document.getElementById('iMiteCount').value.trim();
+  // Write mite count — alcohol wash syncs to mite_counts (VM); other methods stay in inspection only
+  const miteVal    = document.getElementById('iMiteCount').value.trim();
+  const miteMethod = document.getElementById('iMiteMethod').value || 'alcohol_wash';
   if(miteVal !== ''){
     const miteCount = parseInt(miteVal);
     if(!isNaN(miteCount) && miteCount >= 0){
-      const editMiteId = document.getElementById('iMiteCount').dataset.editMiteId;
-      const mitePayload = {
-        user_id:      _user.id,
-        hive_id:      parseInt(hive_id), // VM expects integer
-        date,
-        value:        miteCount,
-        hive_strength: getRating('iMiteStrengthGroup') || 'Good',
-        diseases:     getInspDiseases(),
-        notes:        document.getElementById('iMiteNotes').value || null,
-        method:       document.getElementById('iMiteMethod').value || 'alcohol_wash',
-        source:       'vmp',
-      };
-      let miteErr;
-      if(editMiteId){
-        ({error:miteErr} = await _sb.from('mite_counts').update(mitePayload).eq('id',editMiteId).eq('user_id',_user.id));
-      } else {
-        ({error:miteErr} = await _sb.from('mite_counts').insert(mitePayload));
-      }
-      if(miteErr){
-        // If error is about missing column (method/source not yet added), retry without them
-        if(miteErr.message?.includes('method')||miteErr.message?.includes('source')){
-          const {user_id,hive_id:hid,date:d,value,hive_strength,diseases,notes} = mitePayload;
-          const fallback = {user_id,hive_id:hid,date:d,value,hive_strength,diseases,notes};
-          const {error:miteErr2} = editMiteId
-            ? await _sb.from('mite_counts').update(fallback).eq('id',editMiteId).eq('user_id',_user.id)
-            : await _sb.from('mite_counts').insert(fallback);
-          if(miteErr2) showToast('Mite count failed: '+miteErr2.message+' — run the SQL migration in Supabase.');
-          else showToast('Mite count saved ✓ (run SQL migration to enable method/source tracking)');
+
+      if(miteMethod === 'alcohol_wash'){
+        // ── Alcohol wash → sync to shared mite_counts table (visible in VM) ──
+        const editMiteId = document.getElementById('iMiteCount').dataset.editMiteId;
+        const mitePayload = {
+          user_id:      _user.id,
+          hive_id:      parseInt(hive_id),
+          date,
+          value:        miteCount,
+          hive_strength: getRating('iMiteStrengthGroup') || 'Good',
+          diseases:     getInspDiseases(),
+          notes:        document.getElementById('iMiteNotes').value || null,
+          method:       'alcohol_wash',
+          source:       'vmp',
+        };
+        let miteErr;
+        if(editMiteId){
+          ({error:miteErr} = await _sb.from('mite_counts').update(mitePayload).eq('id',editMiteId).eq('user_id',_user.id));
         } else {
-          showToast('Mite count failed: '+miteErr.message);
+          ({error:miteErr} = await _sb.from('mite_counts').insert(mitePayload));
+        }
+        if(miteErr){
+          // Retry without optional columns if migration not yet run
+          if(miteErr.message?.includes('method')||miteErr.message?.includes('source')){
+            const {user_id,hive_id:hid,date:d,value,hive_strength,diseases,notes} = mitePayload;
+            const fallback = {user_id,hive_id:hid,date:d,value,hive_strength,diseases,notes};
+            const {error:miteErr2} = editMiteId
+              ? await _sb.from('mite_counts').update(fallback).eq('id',editMiteId).eq('user_id',_user.id)
+              : await _sb.from('mite_counts').insert(fallback);
+            if(miteErr2) showToast('Mite count failed: '+miteErr2.message);
+          } else {
+            showToast('Mite count failed: '+miteErr.message);
+          }
+        }
+      } else {
+        // ── Non-alcohol-wash → append to inspection notes only, do not sync to VM ──
+        const methodLabel = {'sugar_shake':'Sugar shake','drone_uncapping':'Drone uncapping'}[miteMethod] || miteMethod;
+        const countNote = `${methodLabel}: ${miteCount} mites`;
+        const notesEl = document.getElementById('iNotes');
+        const existing = notesEl.value.trim();
+        notesEl.value = existing ? existing + '\n' + countNote : countNote;
+        // Update the payload notes field too (payload was already built above)
+        payload.notes = notesEl.value || null;
+        // Re-save inspection with updated notes
+        if(_editingInspId){
+          await _sb.from('inspections').update({notes: payload.notes}).eq('id',_editingInspId).eq('user_id',_user.id);
+        } else {
+          // Inspection was just inserted — find it by date+hive and update notes
+          const {data:newInsp} = await _sb.from('inspections')
+            .select('id').eq('user_id',_user.id).eq('hive_id',hive_id).eq('date',date)
+            .order('created_at',{ascending:false}).limit(1);
+          if(newInsp?.[0]?.id){
+            await _sb.from('inspections').update({notes: payload.notes}).eq('id',newInsp[0].id).eq('user_id',_user.id);
+          }
         }
       }
     }
@@ -3909,6 +3937,13 @@ async function saveInspection(){
 function onMiteCountInput(){
   const val = document.getElementById('iMiteCount').value.trim();
   document.getElementById('iMiteCountFields').style.display = val !== '' ? 'block' : 'none';
+  onMiteMethodChange();
+}
+
+function onMiteMethodChange(){
+  const method = document.getElementById('iMiteMethod')?.value;
+  const hint   = document.getElementById('miteMethodHint');
+  if(hint) hint.style.display = (method && method !== 'alcohol_wash') ? 'block' : 'none';
 }
 
 function toggleInspDisease(btn){
@@ -4072,7 +4107,7 @@ mood: "calm"|"active"|"defensive"
 swarm: "none"|"play"|"sealed"
 strength: "strong"|"medium"|"weak"
 mite_count: integer (the mite number from an alcohol wash or count — extract if they say "count 50", "mite count 5", "3 mites", "five per 300" etc. — null if not mentioned)
-mite_method: "alcohol_wash"|"sugar_roll"|"sticky_board" (null if not mentioned)
+mite_method: "alcohol_wash"|"sugar_shake"|"drone_uncapping" (default "alcohol_wash" unless they explicitly mention another method)
 notes: string (ONLY observations not captured by any other field above — do NOT repeat the mite count, queen status, brood, stores, mood, swarm or strength here — null if nothing remains)
 No markdown, no explanation, just the JSON object.`,
         messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
