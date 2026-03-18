@@ -4039,7 +4039,7 @@ async function extractFromVoice(){
   try{
     const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body:JSON.stringify({
         model:'claude-opus-4-6',
         max_tokens:400,
@@ -4059,6 +4059,10 @@ No markdown, no explanation, just the JSON object.`,
       })
     });
     const data = await resp.json();
+    // Proxy returns raw Anthropic response — check for errors first
+    if(data.error || data.type==='error'){
+      throw new Error('API error: '+(data.error?.message||data.message||JSON.stringify(data)));
+    }
     const text = data.content?.find(b=>b.type==='text')?.text||'{}';
     const extracted = JSON.parse(text.replace(/```json|```/g,'').trim());
 
