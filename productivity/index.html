@@ -4037,7 +4037,7 @@ async function extractFromVoice(){
   btn.textContent='✨ Extracting…'; btn.disabled=true;
 
   try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -4051,7 +4051,9 @@ stores: "full"|"ok"|"low"
 mood: "calm"|"active"|"defensive"
 swarm: "none"|"play"|"sealed"
 strength: "strong"|"medium"|"weak"
-notes: string (any additional observations not covered above, cleaned up)
+mite_count: integer (mites per 300 bees from an alcohol wash — extract the number if they say "3 mites", "count of 5", "five per 300" etc. — null if not mentioned)
+mite_method: "alcohol_wash"|"sugar_roll"|"sticky_board" (null if not mentioned)
+notes: string (any additional observations, cleaned up)
 No markdown, no explanation, just the JSON object.`,
         messages:[{role:'user',content:`Spoken inspection notes: "${transcript}"`}]
       })
@@ -4060,28 +4062,42 @@ No markdown, no explanation, just the JSON object.`,
     const text = data.content?.find(b=>b.type==='text')?.text||'{}';
     const extracted = JSON.parse(text.replace(/```json|```/g,'').trim());
 
-    // Apply extracted values
+    // Apply inspection rating fields
     const fieldMap={
       queen:'iQueenGroup', brood:'iBroodGroup', stores:'iStoresGroup',
       mood:'iMoodGroup', swarm:'iSwarmGroup', strength:'iStrengthGroup'
     };
     let filled=0;
     Object.entries(fieldMap).forEach(([key,groupId])=>{
-      if(extracted[key]){
-        preSelectRating(groupId, extracted[key]);
-        filled++;
-      }
+      if(extracted[key]){ preSelectRating(groupId, extracted[key]); filled++; }
     });
+
+    // Apply mite count if detected
+    if(extracted.mite_count !== null && extracted.mite_count !== undefined && !isNaN(parseInt(extracted.mite_count))){
+      const miteField   = document.getElementById('iMiteCount');
+      const miteSection = document.getElementById('iMiteCountFields');
+      if(miteField){ miteField.value = parseInt(extracted.mite_count); filled++; }
+      if(miteSection) miteSection.style.display = 'block';
+      if(extracted.mite_method){
+        const methodField = document.getElementById('iMiteMethod');
+        if(methodField) methodField.value = extracted.mite_method;
+      }
+      onMiteCountInput();
+    }
+
     if(extracted.notes){
       const existing = document.getElementById('iNotes').value;
       document.getElementById('iNotes').value = existing ? existing+'\n'+extracted.notes : extracted.notes;
     }
-    showToast(`✨ Filled ${filled} field${filled!==1?'s':''} from voice`);
+
+    const miteNote = (extracted.mite_count !== null && extracted.mite_count !== undefined && !isNaN(parseInt(extracted.mite_count)))
+      ? ` + mite count ${extracted.mite_count}/300` : '';
+    showToast(`✨ Filled ${filled} field${filled!==1?'s':''}${miteNote}`);
     btn.textContent='✨ Fill fields'; btn.disabled=false;
-    document.getElementById('voiceHint').textContent=`Extracted ${filled} field${filled!==1?'s':''} — review and adjust`;
+    document.getElementById('voiceHint').textContent=`Extracted ${filled} field${filled!==1?'s':''} — review and save`;
   } catch(e){
     btn.textContent='✨ Fill fields'; btn.disabled=false;
-    showToast('Could not extract — check your internet connection.');
+    showToast('Could not extract — check your connection.');
     console.error(e);
   }
 }
