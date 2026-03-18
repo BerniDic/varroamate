@@ -138,7 +138,10 @@ body::before{
   color:white;letter-spacing:-0.2px;
   text-decoration:none;
   display:flex;align-items:center;gap:6px;
-  flex-shrink:0;
+  flex-shrink:1;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
 }
 .top-logo em{
   color:var(--wax);
@@ -150,7 +153,7 @@ body::before{
   color:var(--plum-light);letter-spacing:1.4px;text-transform:uppercase;
   margin-left:2px;
 }
-.top-right{display:flex;align-items:center;gap:10px;}
+.top-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .hive-selector{
   display:flex;align-items:center;gap:6px;
   background:rgba(255,255,255,0.10);
@@ -212,6 +215,9 @@ body::before{
 .nav-tab-icon{font-size:24px;line-height:1;}
 .nav-tab-label{font-size:11px;font-weight:600;letter-spacing:0.3px;}
 .nav-tab.active .nav-tab-label{color:var(--terra);}
+
+/* side-logo only shown in desktop sidebar — hidden on mobile */
+.side-logo{display:none;}
 
 /* ══════════════════════════════════════════════
    SCREEN SYSTEM
