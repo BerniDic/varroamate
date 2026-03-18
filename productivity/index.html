@@ -8,10 +8,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Bitter:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>
-// QR deep-link: ?h=HIVECODE opens inspection modal for that hive immediately
+// QR deep-link: ?h=HIVECODE or ?vmp=HIVECODE — opens inspection modal for that hive
 (function(){
-  var p = new URLSearchParams(window.location.search).get('h');
-  if(p) window._qrHiveCode = p.toUpperCase();
+  var params = new URLSearchParams(window.location.search);
+  var p = params.get('h') || params.get('vmp');
+  if(p){
+    window._qrHiveCode = p.toUpperCase();
+    document.addEventListener('DOMContentLoaded', function(){
+      var banner = document.createElement('div');
+      banner.id = 'qrScanBanner';
+      banner.style.cssText = 'position:fixed;top:56px;left:0;right:0;z-index:500;background:#4A7A58;color:white;padding:10px 16px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
+      banner.innerHTML = '<div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);border-top-color:white;animation:spin 0.8s linear infinite;flex-shrink:0;"></div><span>Loading hive <strong>' + p.toUpperCase() + '</strong> — opening inspection…</span>';
+      document.body.prepend(banner);
+    });
+  }
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
@@ -2094,11 +2104,22 @@ async function loadAllData(){
 
   // QR deep-link: auto-open inspection modal for scanned hive
   if(window._qrHiveCode){
-    const hive = getHiveByCode(window._qrHiveCode);
+    const code = window._qrHiveCode;
+    const hive = getHiveByCode(code);
+    // Remove loading banner
+    const banner = document.getElementById('qrScanBanner');
+    if(banner) banner.remove();
     if(hive){
       window._qrHiveCode = null; // consume
       switchTab('inspections');
-      setTimeout(()=>openInspModal(null, String(hive.id)), 300);
+      setTimeout(()=>{
+        openInspModal(null, String(hive.id));
+        showToast(`📋 Opening inspection for ${hive.name}`);
+      }, 300);
+    } else {
+      // Hive code not found — show clear error
+      window._qrHiveCode = null;
+      showToast(`QR code "${code}" — hive not found. Is this the right account?`, 4000);
     }
   }
 }
