@@ -219,6 +219,24 @@ body::before{
 /* side-logo only shown in desktop sidebar — hidden on mobile */
 .side-logo{display:none;}
 
+/* PULL TO REFRESH */
+.ptr-indicator{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  height:0;overflow:hidden;
+  transition:height 0.2s;
+  font-size:13px;color:var(--text3);
+  background:var(--cream);
+  flex-shrink:0;
+}
+.ptr-indicator.visible{height:44px;}
+.ptr-spinner{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid var(--border);
+  border-top-color:var(--terra);
+  animation:spin 0.7s linear infinite;
+}
+.ptr-spinner.paused{animation:none;border-top-color:var(--terra);}
+
 /* ══════════════════════════════════════════════
    SCREEN SYSTEM
 ══════════════════════════════════════════════ */
@@ -1318,6 +1336,12 @@ body::before{
     </div>
   </div>
 
+  <!-- Pull-to-refresh indicator -->
+  <div class="ptr-indicator" id="ptrIndicator">
+    <div class="ptr-spinner paused" id="ptrSpinner"></div>
+    <span id="ptrLabel">Pull to refresh</span>
+  </div>
+
   <!-- Content -->
   <div class="content-area" id="contentArea">
 
@@ -2011,6 +2035,73 @@ const CURRENT_YEAR = new Date().getFullYear();
 // ══════════════════════════════════════════════
 // Auth — app always visible; session shared from VM on same domain
 document.getElementById('app').classList.add('ready');
+
+// ─── PULL TO REFRESH ───────────────────────────
+(function(){
+  const area     = document.getElementById('contentArea');
+  const indicator= document.getElementById('ptrIndicator');
+  const spinner  = document.getElementById('ptrSpinner');
+  const label    = document.getElementById('ptrLabel');
+  let startY=0, pulling=false, triggered=false;
+  const THRESHOLD = 72; // px of pull needed to trigger
+
+  area.addEventListener('touchstart', e=>{
+    if(area.scrollTop===0) startY = e.touches[0].clientY;
+  },{passive:true});
+
+  area.addEventListener('touchmove', e=>{
+    if(!startY) return;
+    const dy = e.touches[0].clientY - startY;
+    if(dy>0 && area.scrollTop===0){
+      pulling = true;
+      const progress = Math.min(dy/THRESHOLD, 1);
+      if(progress>0.1){
+        indicator.classList.add('visible');
+        if(progress<1){
+          spinner.classList.add('paused');
+          label.textContent = 'Pull to refresh';
+        } else {
+          spinner.classList.remove('paused');
+          label.textContent = 'Release to refresh';
+        }
+      }
+    }
+  },{passive:true});
+
+  area.addEventListener('touchend', e=>{
+    if(!pulling){startY=0;return;}
+    const dy = e.changedTouches[0].clientY - startY;
+    pulling=false; startY=0;
+    if(dy>=THRESHOLD && !triggered){
+      triggered=true;
+      spinner.classList.remove('paused');
+      label.textContent='Refreshing…';
+      loadAllData().then(()=>{
+        indicator.classList.remove('visible');
+        triggered=false;
+        showToast('Data refreshed ✓');
+      });
+    } else {
+      indicator.classList.remove('visible');
+    }
+  },{passive:true});
+})();
+
+// ─── VISIBILITY REFRESH ────────────────────────
+// When user switches back to this tab/app, reload data silently
+// This catches changes made in VM (e.g. deleted mite counts)
+let _lastVisible = Date.now();
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible'){
+    const away = Date.now() - _lastVisible;
+    // Only reload if away for more than 30 seconds
+    if(away > 30000 && _user){
+      loadAllData();
+    }
+  } else {
+    _lastVisible = Date.now();
+  }
+});
 
 function applySession(session){
   if(session?.user){
