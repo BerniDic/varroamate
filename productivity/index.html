@@ -3984,6 +3984,14 @@ function toggleVoice(){
     showToast('Voice not supported on this browser. Try Chrome or Safari.');
     return;
   }
+
+  // Clear previous transcript so each recording starts fresh
+  _voiceTranscript = '';
+  const tx = document.getElementById('voiceTranscript');
+  if(tx){ tx.textContent=''; tx.style.display='none'; }
+  document.getElementById('voiceExtractBtn').style.display='none';
+  document.getElementById('voiceHint').textContent='Listening… speak your inspection notes';
+
   _recognition = new SR();
   _recognition.continuous = true;
   _recognition.interimResults = true;
