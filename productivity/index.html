@@ -1003,7 +1003,9 @@ body::before{
     display:block;
     border-bottom:1px solid var(--border);
     margin-bottom:16px;
+    text-decoration:none;
   }
+  .side-logo:hover{color:var(--terra);}
   .side-logo em{color:var(--terra);font-style:normal;}
   .side-logo-sub{
     font-size:11px;font-weight:600;
@@ -1487,7 +1489,7 @@ body::before{
 
   <!-- Bottom nav -->
   <nav class="bottom-nav" id="bottomNav">
-    <div class="side-logo">🐝 Varroa<em>Mate</em>™<span class="side-logo-sub">Productivity</span></div>
+    <a class="side-logo" href="/" title="Back to VarroaMate home">🐝 Varroa<em>Mate</em>™<span class="side-logo-sub">Productivity</span></a>
     <button class="nav-tab active" onclick="switchTab('harvest')" id="tab-harvest">
       <span class="nav-tab-icon">🍯</span>
       <span class="nav-tab-label">Harvest</span>
@@ -1508,6 +1510,11 @@ body::before{
       <span class="nav-tab-icon">📊</span>
       <span class="nav-tab-label">Insights</span>
     </button>
+    <a class="nav-tab" href="/" title="Back to VarroaMate home"
+       style="text-decoration:none;margin-top:auto;">
+      <span class="nav-tab-icon">🏠</span>
+      <span class="nav-tab-label">Home</span>
+    </a>
   </nav>
 
 </div>
