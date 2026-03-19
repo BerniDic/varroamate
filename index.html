@@ -328,7 +328,7 @@ html, body {
 /* ── WORDMARK ── */
 #wordmark {
   position: absolute;
-  top: clamp(18px, 8vh, 60px);
+  top: clamp(100px, 24vh, 200px);
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -1380,8 +1380,8 @@ html, body {
     </div>
 
     <!-- Hive 3: Productivity (coming soon) — slightly weathered look -->
-    <div class="hive-wrapper coming-soon" id="hive-prod" data-app="prod" role="button" tabindex="0"
-         aria-label="VarroaMate Productivity — coming soon">
+    <div class="hive-wrapper" id="hive-prod" data-app="prod" role="button" tabindex="0"
+         aria-label="VarroaMate Productivity — inspections, harvests and queens">
       <div class="hive-glow"></div>
       <div class="hive-svg-wrap">
         <svg width="88" height="118" viewBox="0 0 88 118" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1417,7 +1417,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">Productivity</div>
         <div class="hive-label-sub">hive records & tasks</div>
-        <div class="status-badge soon"><span class="dot"></span>coming soon</div>
+        <div class="status-badge release"><span class="dot"></span>now live</div>
       </div>
     </div>
 
@@ -1568,14 +1568,14 @@ function dismissBanner(){
 const APP_URLS = {
   vm:     '/app/',
   vmsp:   '/planner/',
-  prod:   null,
+  prod:   '/productivity/',
   health: null,
 };
 
 const APP_TOASTS = {
   vm:     '🟢 VarroaMate — full release imminent, stay tuned!',
   vmsp:   '🔵 Smart Planner — now in beta! Give it a try 🐝',
-  prod:   '🐝 Productivity — this hive is still being built!',
+  prod:   '📋 VarroaMate Productivity — now live! Tap to open.',
   health: '🐝 Bee Health — this hive is still being built!',
 };
 
@@ -2046,7 +2046,7 @@ function showToast(msg){
 const APP_INFO = {
   vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: 'full release imminent', url: '/app/' },
   vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'beta',    badgeText: 'beta — try it now',    url: '/planner/' },
-  prod:   { title: 'Productivity',        sub: 'hive records & tasks',        badge: 'soon',    badgeText: 'coming soon',          url: null },
+  prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: 'now live',            url: '/productivity/' },
   health: { title: 'Bee Health',          sub: 'colony diagnostics',          badge: 'soon',    badgeText: 'coming soon',          url: null },
 };
 let _popupApp = null;
