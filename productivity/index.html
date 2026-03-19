@@ -1631,8 +1631,7 @@ body::before{
         </button>
         <button class="btn btn-sm btn-outline" id="voiceExtractBtn" onclick="extractFromVoice()"
           style="display:none;">✨ Fill fields</button>
-        <button class="btn btn-sm btn-outline" id="proxyTestBtn" onclick="testProxy()"
-          style="font-size:11px;color:var(--text3);padding:4px 8px;">🔌 Test AI</button>
+
       </div>
       <div id="voiceTranscript" style="width:100%;font-size:12px;color:var(--text2);font-style:italic;display:none;padding-top:4px;border-top:1px solid var(--border);margin-top:4px;"></div>
     </div>
@@ -4212,26 +4211,6 @@ function stopVoice(){
   }
 }
 
-async function testProxy(){
-  const btn = document.getElementById('proxyTestBtn');
-  btn.textContent='⏳ Testing…'; btn.disabled=true;
-  try{
-    const resp = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
-    });
-    const text = await resp.text();
-    console.log('[ProxyTest] status:', resp.status, 'body:', text.slice(0,200));
-    if(resp.ok) showToast(`✅ Proxy OK (${resp.status})`, 4000);
-    else showToast(`❌ Proxy ${resp.status}: ${text.slice(0,80)}`, 6000);
-  }catch(e){
-    showToast(`❌ Network error: ${e.message}`, 6000);
-    console.error('[ProxyTest]', e);
-  }
-  btn.textContent='🔌 Test AI'; btn.disabled=false;
-}
-
 async function extractFromVoice(){
   const transcript = _voiceTranscript.trim();
   if(!transcript){ showToast('No transcript to extract from.'); return; }
@@ -4275,7 +4254,6 @@ No markdown, no explanation, just the JSON object.`,
         throw new Error(`HTTP ${resp.status}: ${errText.slice(0,120)}`);
       }
       const data=await resp.json();
-      console.log('[VoiceExtract] response:',JSON.stringify(data).slice(0,200));
       if(data.error?.type==='overloaded_error'){
         lastErr=new Error('Anthropic busy — retrying…');
         continue;
@@ -4285,7 +4263,6 @@ No markdown, no explanation, just the JSON object.`,
       }
       const text=data.content?.find(b=>b.type==='text')?.text||'{}';
       const extracted=JSON.parse(text.replace(/\`\`\`json|\`\`\`/g,'').trim());
-      console.log('[VoiceExtract] extracted:',JSON.stringify(extracted));
 
       // Rating fields
       const fieldMap={queen:'iQueenGroup',brood:'iBroodGroup',stores:'iStoresGroup',
@@ -4332,7 +4309,6 @@ No markdown, no explanation, just the JSON object.`,
 
   btn.textContent='✨ Fill fields';btn.disabled=false;
   showToast('Extract failed: '+(lastErr?.message||'unknown').slice(0,80),5000);
-  console.error('[VoiceExtract] failed:',lastErr);
 }
 
 // ══════════════════════════════════════════════
