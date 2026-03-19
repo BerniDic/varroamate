@@ -138,7 +138,10 @@ body::before{
   color:white;letter-spacing:-0.2px;
   text-decoration:none;
   display:flex;align-items:center;gap:5px;
-  flex-shrink:0;   /* never compress the logo */
+  flex-shrink:0;
+  white-space:nowrap;
+}
+.top-logo-brand{
   white-space:nowrap;
 }
 /* Hide "Productivity" subtitle on narrow phones — logo alone fits fine */
@@ -1327,7 +1330,7 @@ body::before{
 
   <!-- Top bar (mobile/tablet) -->
   <div class="top-bar">
-    <a class="top-logo" href="/">🐝 Varroa<em>Mate</em>™ <span class="top-logo-sub">Productivity</span></a>
+    <a class="top-logo" href="/">🐝 <span class="top-logo-brand">Varroa<em>Mate</em>™</span> <span class="top-logo-sub">Productivity</span></a>
     <div class="top-right">
       <div class="hive-selector">
         <select id="topHiveSelect" onchange="onTopHiveChange()">
