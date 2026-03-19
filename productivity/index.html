@@ -158,15 +158,17 @@ body::before{
   display:flex;align-items:center;gap:6px;
   background:rgba(255,255,255,0.10);
   border:1px solid rgba(255,255,255,0.20);
-  border-radius:8px;padding:7px 12px;
+  border-radius:8px;padding:6px 10px;
   cursor:pointer;
-  min-height:38px;
+  min-height:36px;
+  max-width:130px;
 }
 .hive-selector select{
   background:transparent;border:none;outline:none;
   color:white;font-family:'Bitter',serif;
   font-size:13px;cursor:pointer;
-  max-width:140px;
+  max-width:110px;
+  min-width:0;
 }
 .hive-selector select option{background:var(--plum);color:white;}
 .top-user{
@@ -1323,7 +1325,6 @@ body::before{
     <a class="top-logo" href="/">🐝 Varroa<em>Mate</em>™ <span class="top-logo-sub">Productivity</span></a>
     <div class="top-right">
       <div class="hive-selector">
-        🏠
         <select id="topHiveSelect" onchange="onTopHiveChange()">
           <option value="all">All hives</option>
         </select>
@@ -2260,7 +2261,7 @@ async function loadAllData(){
 function populateHiveSelectors(){
   // Build grouped options — one <optgroup> per apiary
   function groupedOptions(includeAll=false){
-    let html = includeAll ? '<option value="all">🏠 All hives</option>' : '';
+    let html = includeAll ? '<option value="all">All hives</option>' : '';
     if(_apiaries.length===0 && _hives.length===0){
       return html + '<option value="" disabled>No hives found — open VarroaMate first</option>';
     }
@@ -2559,13 +2560,9 @@ function renderInspections(){
   // Find linked mite count for an inspection (same hive, within ±1 day)
   function linkedMite(insp){
     const counts = miteByHive[String(insp.hive_id)] || [];
-    const iDate = insp.date ? new Date(insp.date) : null;
-    if(!iDate) return null;
-    return counts.find(m=>{
-      if(!m.date) return false;
-      const diff = Math.abs(new Date(m.date) - iDate) / (1000*60*60*24);
-      return diff <= 1;
-    }) || null;
+    if(!insp.date) return null;
+    // Exact date match only — ±1 day caused adjacent counts to bleed across
+    return counts.find(m=> m.date === insp.date) || null;
   }
 
   // Group: apiary → hive → inspections sorted date desc
