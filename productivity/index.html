@@ -124,11 +124,11 @@ body::before{
 .top-bar{
   flex-shrink:0;
   background:linear-gradient(135deg,var(--plum) 0%,var(--plum-mid) 100%);
-  padding:0 16px;
+  padding:0 10px 0 16px;
   padding-top:env(safe-area-inset-top,0px);
   height:calc(58px + env(safe-area-inset-top,0px));
   display:flex;align-items:center;justify-content:space-between;
-  gap:12px;
+  gap:8px;
   box-shadow:0 2px 12px rgba(30,10,30,0.35);
   border-bottom:2px solid rgba(242,217,138,0.25);
 }
@@ -159,11 +159,12 @@ body::before{
   color:var(--plum-light);letter-spacing:1.4px;text-transform:uppercase;
   margin-left:2px;
 }
-.top-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.top-right{display:flex;align-items:center;gap:5px;flex-shrink:0;}
 /* Hide info and refresh buttons on small phones to keep Apps button visible */
 @media(max-width:420px){
   #topInfoBtn{display:none!important;}
   #topRefreshBtn{display:none!important;}
+  #vmp-apps-wrap button{padding:5px 8px;font-size:11px;}
 }
 .hive-selector{
   display:flex;align-items:center;
