@@ -1235,6 +1235,77 @@ async function _anthropicFetch(payload, maxRetries=3, baseDelay=4000){
 }
 let _sbUser = null;
 
+// ── Plan state ──────────────────────────────────────────────
+// Loaded from Supabase subscriptions table after sign-in
+const PLAN_LIMITS = {
+  free:      { hives: 3,   ai: false, voice: false, planner: false, academyTier: 1 },
+  free_ai:   { hives: 3,   ai: true,  voice: true,  planner: true,  academyTier: 2 },
+  hobbyist:  { hives: 15,  ai: true,  voice: true,  planner: true,  academyTier: 2 },
+  beekeeper: { hives: 100, ai: true,  voice: true,  planner: true,  academyTier: 2 },
+};
+let _plan = 'free'; // current plan name
+let _planLimits = PLAN_LIMITS.free; // current limits object
+let _planStatus = 'active'; // 'active' | 'past_due' | 'cancelled'
+
+async function loadPlan(){
+  if(!_sbUser) return;
+  try{
+    const { data, error } = await _sb
+      .from('subscriptions')
+      .select('plan, status, current_period_end, cancel_at_period_end')
+      .eq('user_id', _sbUser.id)
+      .single();
+    if(error || !data){
+      // No row yet — insert a free row and use defaults
+      await _sb.from('subscriptions').upsert(
+        { user_id: _sbUser.id, plan: 'free', status: 'active' },
+        { onConflict: 'user_id' }
+      );
+      _plan = 'free';
+      _planStatus = 'active';
+    } else {
+      _plan = data.plan || 'free';
+      _planStatus = data.status || 'active';
+      // Treat past_due as still active (grace period) — downgrade if cancelled
+      if(_planStatus === 'cancelled') _plan = 'free';
+    }
+    _planLimits = PLAN_LIMITS[_plan] || PLAN_LIMITS.free;
+    applyPlanUI();
+  } catch(e){ console.warn('loadPlan:', e); }
+}
+
+function applyPlanUI(){
+  // Update Plans screen to show current plan
+  const planNames = { free:'Free', free_ai:'Free + AI', hobbyist:'Hobbyist', beekeeper:'Beekeeper' };
+  const badge = document.getElementById('current-plan-badge');
+  if(badge) badge.textContent = planNames[_plan] || 'Free';
+  // Show/hide upgrade prompts
+  document.querySelectorAll('[data-requires-plan]').forEach(el=>{
+    const req = el.dataset.requiresPlan;
+    const allowed = PLAN_LIMITS[_plan]?.[req] ?? false;
+    el.style.display = allowed ? '' : 'none';
+  });
+  // Show/hide AI upgrade nudges
+  document.querySelectorAll('.ai-upgrade-nudge').forEach(el=>{
+    el.style.display = _planLimits.ai ? 'none' : '';
+  });
+  // Past due warning
+  const pdWarn = document.getElementById('past-due-warning');
+  if(pdWarn) pdWarn.style.display = _planStatus === 'past_due' ? 'block' : 'none';
+}
+
+function canAddHive(){
+  const total = Object.values(hives).flat().length;
+  return total < _planLimits.hives;
+}
+
+function requireAI(action){
+  if(_planLimits.ai) return true;
+  showToast('AI features require a paid plan — see Plans & Pricing 🐝');
+  goto('s-subscription');
+  return false;
+}
+
 let apiaries = [];
 let hives = {};
 let miteCountsByHive = {};
@@ -1861,6 +1932,15 @@ function showHiveLimitModal(){
 }
 
 function tryAddHive(){
+  if(!canAddHive()){
+    const planNames={free:'Free',free_ai:'Free + AI',hobbyist:'Hobbyist',beekeeper:'Beekeeper'};
+    showToast(`Hive limit reached for ${planNames[_plan]} plan (${_planLimits.hives} hives) — upgrade to add more 🐝`);
+    goto('s-subscription');
+    return;
+  }
+  _tryAddHive();
+}
+function _tryAddHive(){
   const plan = getUserPlan();
   const totalHives = Object.values(hives).flat().length;
   if(plan === 'free' || plan === 'free-ai'){
@@ -2521,6 +2601,7 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
 async function loadSection(elId,prompt,prefProfile){
   const el=document.getElementById(elId);if(!el)return;
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
+  if(!requireAI('guidance')) return;
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
 CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.
@@ -2546,6 +2627,7 @@ async function sendChat(){
   input.value='';
   addChatMsg(msg,'user');chatHistory.push({role:'user',content:msg});
   const loading=addChatMsg('…','bot');
+  if(!requireAI('chat')) return;
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
@@ -4107,6 +4189,7 @@ document.addEventListener('DOMContentLoaded', async function(){
       } else {
         // Normal boot — load everything then navigate
         await loadDataFromSupabase();
+        await loadPlan();
         currentApiaryId=apiaries[0]?.id??0;
         if(ls)ls.classList.remove('active');
         goto('s-apiaries');
