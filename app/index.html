@@ -1238,7 +1238,7 @@ let _sbUser = null;
 // ── Plan state ──────────────────────────────────────────────
 // Loaded from Supabase subscriptions table after sign-in
 const PLAN_LIMITS = {
-  free:      { hives: 3,   ai: false, voice: false, planner: false, academyTier: 1 },
+  free:      { hives: 3,   ai: true,  voice: true,  planner: true,  academyTier: 2 }, // TODO: restrict when Stripe is live
   free_ai:   { hives: 3,   ai: true,  voice: true,  planner: true,  academyTier: 2 },
   hobbyist:  { hives: 15,  ai: true,  voice: true,  planner: true,  academyTier: 2 },
   beekeeper: { hives: 100, ai: true,  voice: true,  planner: true,  academyTier: 2 },
