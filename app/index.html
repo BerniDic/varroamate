@@ -551,6 +551,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <span class="nav-info-wrap"><button class="nav-btn" onclick="exportBeeMAX()">🐝 BeeMAX</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-beemax')" title="About BeeMAX export">?</button><div class="nav-info-popover" id="pop-beemax"><strong style="color:var(--amber-dark);">🐝 BeeMAX Export</strong><br>Opens a printable summary of all your mite count records formatted for entry into BeeMAX — the Victorian government's compulsory varroa reporting system.<br><br>One page per mite count entry, showing all the fields BeeMAX requires: apiary, hive count, method, mite count, hive strength, and disease observations.<br><br>Victorian beekeepers must report positive varroa detections at <a href="https://bees.agriculture.vic.gov.au" target="_blank" style="color:var(--amber);">bees.agriculture.vic.gov.au</a></div></span>
       <span class="nav-info-wrap"><button class="nav-btn" onclick="printAllQR()">📱 QR Codes</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-qr')" title="About QR codes">?</button><div class="nav-info-popover" id="pop-qr"><strong style="color:var(--amber-dark);">📱 Hive QR Code Labels</strong><br>Generates a printable page of QR codes — one per hive, across all your apiaries.<br><br>Stick a label on each hive box. In the field, scan with your phone's camera app to jump straight to field entry for that hive — no navigation needed.<br><br><strong>Best results:</strong> Print on sticker paper and laminate, or cover with clear packing tape for weather resistance.</div></span>
       <button class="nav-btn" onclick="pendingApiary=null;openModal('modal-add-apiary');setTimeout(initMiniMap,100)">+ Apiary</button>
+      <span style="width:1px;height:20px;background:rgba(255,255,255,0.2);display:inline-block;margin:0 4px;"></span>
+      <a href="/productivity/" class="nav-btn" style="text-decoration:none;" title="VarroaMate Productivity — inspections, queens, harvests">📋 Productivity</a>
+      <a href="/planner/" class="nav-btn" style="text-decoration:none;" title="VarroaMate Smart Planner — treatment planning">🧠 Planner</a>
+      <a href="/academy/" class="nav-btn" style="text-decoration:none;" title="VarroaMate Beekeeper Academy">🎓 Academy</a>
       <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
     </span>
     <!-- Mobile overflow menu button (shown on ≤780px) -->
@@ -565,6 +569,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportCalendar()">📅 Calendar Reminders</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();backupData()">💾 Backup Data</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();document.getElementById('restore-input').click()">📂 Restore Data</div>
+    <div style="height:1px;background:rgba(255,255,255,0.15);margin:4px 0;"></div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();window.location.href='/productivity/'">📋 Productivity — inspections &amp; harvests</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();window.location.href='/planner/'">🧠 Smart Planner — treatment planning</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();window.location.href='/academy/'">🎓 Beekeeper Academy</div>
+    <div style="height:1px;background:rgba(255,255,255,0.15);margin:4px 0;"></div>
     <div class="nav-overflow-item danger" onclick="closeNavOverflow();logout()">Sign Out</div>
   </div>
   <div class="page-body">
@@ -973,7 +982,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px;">VarroaMate is currently developing solutions that suit the management, monitoring and reporting requirements of very large beekeeping operations — including multi-user access, bulk hive management, and integration with national reporting systems.</p>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;">We can also produce <strong>individual solutions for a single business</strong> — a custom design built around the specific needs of your operation, from hive tracking at scale to treatment planning and compliance reporting. If you run a beekeeping business and want to explore how VarroaMate can support your Varroa management, we'd love to hear from you.</p>
-      <a href="/cdn-cgi/l/email-protection#533b363f3f3c13253221213c323e3227367d303c3e6c202631393630276e053221213c321e322736766163163d27362123213a2036766163163d22263a212a" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
+      <a href="mailto:hello@varroamate.com" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
@@ -3468,6 +3477,7 @@ function printAllQR(){
   // Build the print window
   const win=window.open('','_blank','width=900,height=700');
   const base=window.location.origin+'/app/';
+  const baseVMP=window.location.origin+'/productivity/';
 
   win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — QR Labels</title>
 <style>
