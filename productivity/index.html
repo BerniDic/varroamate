@@ -159,7 +159,12 @@ body::before{
   color:var(--plum-light);letter-spacing:1.4px;text-transform:uppercase;
   margin-left:2px;
 }
-.top-right{display:flex;align-items:center;gap:8px;flex-shrink:1;min-width:0;}
+.top-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+/* Hide info and refresh buttons on small phones to keep Apps button visible */
+@media(max-width:420px){
+  #topInfoBtn{display:none!important;}
+  #topRefreshBtn{display:none!important;}
+}
 .hive-selector{
   display:flex;align-items:center;
   background:rgba(255,255,255,0.10);
@@ -995,6 +1000,8 @@ body::before{
     border-top:none;border-right:1.5px solid var(--border);
     padding:24px 0 24px;
   }
+  /* Desktop-only nav items — hidden on mobile */
+  .nav-tab-desktop-only{ display:flex; }
   .side-logo{
     padding:0 20px 24px;
     font-family:'Cormorant Garamond',serif;
@@ -1340,7 +1347,7 @@ body::before{
         </select>
       </div>
       <div class="top-user" id="topUser" onclick="signOut()" title="Sign out">?</div>
-      <button onclick="showSplash('splashMission')" title="About & Feedback"
+      <button id="topInfoBtn" onclick="showSplash('splashMission')" title="About & Feedback"
         style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);
         width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0;
         display:flex;align-items:center;justify-content:center;">ℹ</button>
@@ -1541,20 +1548,20 @@ body::before{
       <span class="nav-tab-icon">📊</span>
       <span class="nav-tab-label">Insights</span>
     </button>
-    <a class="nav-tab" href="/" title="Back to VarroaMate home"
-       style="text-decoration:none;margin-top:auto;">
+    <!-- Desktop sidebar only — hidden on mobile via CSS -->
+    <a class="nav-tab nav-tab-desktop-only" href="/" title="Back to VarroaMate home"
+       style="text-decoration:none;display:none;margin-top:auto;">
       <span class="nav-tab-icon">🏠</span>
       <span class="nav-tab-label">Home</span>
     </a>
-    <button class="nav-tab" onclick="refreshData()" title="Refresh data (or press R)"
-       style="border:none;background:transparent;cursor:pointer;">
+    <button class="nav-tab nav-tab-desktop-only" onclick="refreshData()" title="Refresh data (or press R)"
+       style="border:none;background:transparent;cursor:pointer;display:none;">
       <span class="nav-tab-icon">↻</span>
       <span class="nav-tab-label">Refresh</span>
     </button>
-    <!-- Apps switcher in sidebar -->
-    <div style="padding:8px 12px;border-top:1px solid var(--border);margin-top:4px;">
-      <a href="/app/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;transition:background 0.1s;" onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">📊 VarroaMate</a>
-      <a href="/planner/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;transition:background 0.1s;" onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">🧠 Smart Planner</a>
+    <div class="nav-tab-desktop-only" style="padding:8px 12px;border-top:1px solid var(--border);margin-top:4px;display:none;">
+      <a href="/app/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;">📊 VarroaMate</a>
+      <a href="/planner/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;">🧠 Smart Planner</a>
       <a href="#" onclick="event.preventDefault();showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;opacity:0.55;">🎓 Academy</a>
     </div>
   </nav>
