@@ -332,6 +332,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   .nav-overflow-btn{display:flex !important;}
   .nav-overflow-menu{top:58px;}
 }
+/* On desktop, hide the standalone overflow btn — it's inside nav-desktop-btns instead */
+@media(min-width:901px){
+  #nav-overflow-btn{display:none !important;}
+}
 @media(max-width:600px){
   .nav-overflow-menu{top:54px;}
 }
@@ -542,16 +546,9 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div>
     <span id="save-badge" style="font-size:12px;color:#FFE082;opacity:0;transition:opacity 0.4s;font-weight:600;">💾 saved</span>
     <!-- Desktop buttons (hidden on ≤780px) -->
-    <span class="nav-desktop-btns" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;overflow:visible;">
-      <span class="nav-info-wrap"><button class="nav-btn" onclick="exportAllCSV()">📥 CSV</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-csv')" title="What is CSV export?">?</button><div class="nav-info-popover" id="pop-csv"><strong style="color:var(--amber-dark);">📥 Export to CSV</strong><br>Downloads all your mite count data as a spreadsheet-ready <code>.csv</code> file — one row per count entry, across all apiaries and hives.<br><br>Open in Excel, Numbers, or Google Sheets to analyse trends or keep your own records.</div></span>
-      <span class="nav-info-wrap"><button class="nav-btn" onclick="exportCalendar()">📅 Cal</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-reminders')" title="What are Reminders?">?</button><div class="nav-info-popover" id="pop-reminders"><strong style="color:var(--amber-dark);">📅 Calendar Reminders</strong><br>Downloads an <code>.ics</code> calendar file you can import into Apple Calendar, Google Calendar, or Outlook.<br><br>Includes: 4-weekly alcohol wash reminders for each hive, and treatment removal deadlines for any active treatments.</div></span>
-      <span class="nav-info-wrap"><button class="nav-btn" onclick="backupData()">💾 Backup</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-backup')" title="What is Backup?">?</button><div class="nav-info-popover" id="pop-backup"><strong style="color:var(--amber-dark);">💾 Backup your data</strong><br>Downloads a <code>.json</code> file containing all your apiaries, hives, mite counts, treatments and notes.<br><br>Keep this file somewhere safe — it's your complete data snapshot. Use it to restore if you change devices or browsers, or as a regular safety copy.</div></span>
-      <span class="nav-info-wrap"><button class="nav-btn" onclick="document.getElementById('restore-input').click()">📂 Restore</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-restore')" title="What is Restore?">?</button><div class="nav-info-popover" id="pop-restore"><strong style="color:var(--amber-dark);">📂 Restore from backup</strong><br>Loads a previously saved <code>.json</code> backup file and replaces all current data with it.<br><br>⚠️ <strong>This will overwrite your current data.</strong> Only restore from a file you created with the Backup button.</div></span>
+    <!-- Desktop: just Apps dropdown + Sign Out. All utility actions in ⋮ overflow menu -->
+    <span class="nav-desktop-btns" style="display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;">
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
-      <span class="nav-info-wrap"><button class="nav-btn" onclick="exportBeeMAX()">🐝 BeeMAX</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-beemax')" title="About BeeMAX export">?</button><div class="nav-info-popover" id="pop-beemax"><strong style="color:var(--amber-dark);">🐝 BeeMAX Export</strong><br>Opens a printable summary of all your mite count records formatted for entry into BeeMAX — the Victorian government's compulsory varroa reporting system.<br><br>One page per mite count entry, showing all the fields BeeMAX requires: apiary, hive count, method, mite count, hive strength, and disease observations.<br><br>Victorian beekeepers must report positive varroa detections at <a href="https://bees.agriculture.vic.gov.au" target="_blank" style="color:var(--amber);">bees.agriculture.vic.gov.au</a></div></span>
-      <span class="nav-info-wrap"><button class="nav-btn" onclick="printAllQR()">📱 QR</button><button class="nav-info-btn" onclick="toggleInfoPop('pop-qr')" title="About QR codes">?</button><div class="nav-info-popover" id="pop-qr"><strong style="color:var(--amber-dark);">📱 Hive QR Code Labels</strong><br>Generates a printable page of QR codes — one per hive, across all your apiaries.<br><br>Stick a label on each hive box. In the field, scan with your phone's camera app to jump straight to field entry for that hive — no navigation needed.<br><br><strong>Best results:</strong> Print on sticker paper and laminate, or cover with clear packing tape for weather resistance.</div></span>
-      <button class="nav-btn" onclick="pendingApiary=null;openModal('modal-add-apiary');setTimeout(initMiniMap,100)">+ Apiary</button>
-      <span style="width:1px;height:20px;background:rgba(255,255,255,0.2);display:inline-block;margin:0 4px;flex-shrink:0;"></span>
       <div style="position:relative;display:inline-flex;flex-shrink:0;" id="apps-dropdown-wrap">
         <button class="nav-btn" onclick="toggleAppsDropdown()" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button>
         <div id="apps-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid var(--border);min-width:200px;overflow:hidden;z-index:1300;">
@@ -560,9 +557,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🎓 Academy <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
         </div>
       </div>
-      <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);flex-shrink:0;">Sign Out</button>
+      <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
+      <button class="nav-overflow-btn" id="nav-overflow-btn-desktop" onclick="toggleNavOverflow()" title="More options" style="display:flex;">⋮</button>
     </span>
-    <!-- Mobile overflow menu button (shown on ≤780px) -->
+    <!-- Mobile overflow menu button (shown on ≤900px, hidden on desktop via nav-desktop-btns logic) -->
     <button class="nav-overflow-btn" id="nav-overflow-btn" onclick="toggleNavOverflow()" title="Menu">⋮</button>
   </div></div>
   <!-- Mobile overflow dropdown -->
