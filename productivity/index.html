@@ -2058,6 +2058,55 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // STATE
 // ══════════════════════════════════════════════
 let _user       = null;
+
+// ── Plan state ──────────────────────────────────────────────
+const PLAN_LIMITS = {
+  free:      { hives: 3,   ai: false, voice: false, planner: false, academyTier: 1 },
+  free_ai:   { hives: 3,   ai: true,  voice: true,  planner: true,  academyTier: 2 },
+  hobbyist:  { hives: 15,  ai: true,  voice: true,  planner: true,  academyTier: 2 },
+  beekeeper: { hives: 100, ai: true,  voice: true,  planner: true,  academyTier: 2 },
+};
+let _plan = 'free';
+let _planLimits = PLAN_LIMITS.free;
+let _planStatus = 'active';
+
+async function loadPlan(){
+  if(!_user) return;
+  try{
+    const { data, error } = await _sb
+      .from('subscriptions')
+      .select('plan, status')
+      .eq('user_id', _user.id)
+      .single();
+    if(error || !data){
+      await _sb.from('subscriptions').upsert(
+        { user_id: _user.id, plan: 'free', status: 'active' },
+        { onConflict: 'user_id' }
+      );
+      _plan = 'free'; _planStatus = 'active';
+    } else {
+      _plan = data.plan || 'free';
+      _planStatus = data.status || 'active';
+      if(_planStatus === 'cancelled') _plan = 'free';
+    }
+    _planLimits = PLAN_LIMITS[_plan] || PLAN_LIMITS.free;
+    applyPlanUI();
+  } catch(e){ console.warn('loadPlan:', e); }
+}
+
+function applyPlanUI(){
+  const voiceBtn = document.getElementById('voiceBtn');
+  if(voiceBtn){
+    voiceBtn.title = _planLimits.voice ? 'Record voice inspection notes' : 'Voice extraction requires a paid plan';
+    voiceBtn.style.opacity = _planLimits.voice ? '' : '0.45';
+  }
+}
+
+function requireVoice(){
+  if(_planLimits.voice) return true;
+  showToast('🎤 Voice extraction requires a paid plan — upgrade in VarroaMate 🐝', 4000);
+  return false;
+}
 let _apiaries   = [];
 let _hives      = [];
 let _mite_counts= [];
@@ -2202,6 +2251,7 @@ document.addEventListener('visibilitychange', ()=>{
 function applySession(session){
   if(session?.user){
     _user = session.user;
+    loadPlan();
     const initials = (_user.email||'?')[0].toUpperCase();
     document.getElementById('topUser').textContent = initials;
     document.getElementById('topUser').title = _user.email||'';
@@ -4237,6 +4287,7 @@ function resetVoice(){
 }
 
 function toggleVoice(){
+  if(!_voiceActive && !requireVoice()) return;
   if(_voiceActive){ stopVoice(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
