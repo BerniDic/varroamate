@@ -797,12 +797,27 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <!-- QR CODE OVERLAY -->
 <div class="qr-overlay" id="qr-overlay" onclick="closeQR()">
-  <div class="qr-box" onclick="event.stopPropagation()">
+  <div class="qr-box" onclick="event.stopPropagation()" style="max-width:340px;">
     <div style="font-size:15px;font-weight:700;color:var(--amber-dark);letter-spacing:0.04em;margin-bottom:10px;padding-bottom:10px;border-bottom:2px solid var(--amber-pale);">🐝 VarroaMate<sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div>
     <div class="qr-hive-name" id="qr-hive-name"></div>
     <div class="qr-code-text" id="qr-code-text"></div>
-    <div id="qr-canvas" style="display:flex;justify-content:center;margin:10px 0;"></div>
-    <div style="font-size:13px;color:var(--text3);margin-top:8px;line-height:1.5;">Scan with your phone's <strong>camera app</strong> to jump straight to field entry for this hive.<br>Or type the code <strong id="qr-code-inline"></strong> on the Hives screen.<br><br>Print and attach to the hive box — laminate for weather resistance.</div>
+    <!-- App switcher tabs -->
+    <div style="display:flex;gap:6px;margin:10px 0 6px;">
+      <button id="qr-tab-vm" onclick="qrSwitchTab('vm')"
+        style="flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--amber-dark);background:var(--amber-dark);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">
+        📱 Field Entry (VM)
+      </button>
+      <button id="qr-tab-vmp" onclick="qrSwitchTab('vmp')"
+        style="flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;">
+        🔍 Inspection Log (VMP)
+      </button>
+    </div>
+    <div id="qr-canvas" style="display:flex;justify-content:center;margin:6px 0 4px;"></div>
+    <div id="qr-desc" style="font-size:12px;color:var(--text3);margin-top:6px;line-height:1.55;">
+      Scan to jump straight to <strong>mite count field entry</strong> for this hive in VarroaMate.<br>
+      Or type the code <strong id="qr-code-inline"></strong> on the Hives screen.
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">Print and attach to the hive box — laminate for weather resistance.</div>
     <button class="qr-print-btn" onclick="printQR()">🖨 Print Label</button>
     <button class="qr-close-btn" onclick="closeQR()">Close</button>
   </div>
@@ -958,7 +973,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px;">VarroaMate is currently developing solutions that suit the management, monitoring and reporting requirements of very large beekeeping operations — including multi-user access, bulk hive management, and integration with national reporting systems.</p>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;">We can also produce <strong>individual solutions for a single business</strong> — a custom design built around the specific needs of your operation, from hive tracking at scale to treatment planning and compliance reporting. If you run a beekeeping business and want to explore how VarroaMate can support your Varroa management, we'd love to hear from you.</p>
-      <a href="mailto:hello@varroamate.com?subject=VarroaMate%20Enterprise%20Enquiry" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
+      <a href="/cdn-cgi/l/email-protection#533b363f3f3c13253221213c323e3227367d303c3e6c202631393630276e053221213c321e322736766163163d27362123213a2036766163163d22263a212a" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
@@ -1136,7 +1151,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══ DATA — seed IDs use fixed large numbers to avoid collisions with Date.now() new entries ══
 const SEED = {
   apiaries:[
@@ -1172,6 +1187,26 @@ const SEED = {
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── AI CONFIG — update CLAUDE_MODEL here when Anthropic releases a new version ──
+const CLAUDE_MODEL = 'claude-opus-4-6';
+
+// Retry-aware Anthropic proxy fetch — retries on overload with exponential backoff
+async function _anthropicFetch(payload, maxRetries=3, baseDelay=4000){
+  for(let attempt=0; attempt<=maxRetries; attempt++){
+    const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+      body:JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if(data.error?.type==='overloaded_error' && attempt<maxRetries){
+      await new Promise(res=>setTimeout(res, baseDelay*Math.pow(2,attempt)));
+      continue;
+    }
+    return {r,data};
+  }
+}
 let _sbUser = null;
 
 let apiaries = [];
@@ -2465,12 +2500,9 @@ async function loadSection(elId,prompt,prefProfile){
 CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.
 PRODUCT NAMES: Always use "Formic PRO" — never use the outdated name "MAQS". Formic PRO is the current registered product name for formic acid strips in Australia.`;
   try{
-    const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
-    const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
-        system:systemPrompt,
-        messages:[{role:'user',content:prompt}]})});
-    const data=await r.json();
+    const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
+      system:systemPrompt,
+      messages:[{role:'user',content:prompt}]});
     if(data.error){el.innerHTML=`<span style="color:var(--red);">Error: ${data.error.message}</span>`;return;}
     el.innerHTML=(data.content?.map(b=>b.text||'').join('')||'Unable to load guidance.').replace(/\n/g,'<br>');
   }catch(e){el.innerHTML='<span style="color:var(--text3)">Unable to connect. Please check your internet connection.</span>';}
@@ -2490,12 +2522,9 @@ async function sendChat(){
   const loading=addChatMsg('…','bot');
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
-    const headers={'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`};
-    const r=await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy',{method:'POST',headers,
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
-        system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS".',
-        messages:chatHistory})});
-    const data=await r.json();
+    const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
+      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS".',
+      messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
     chatHistory.push({role:'assistant',content:reply});loading.textContent=reply;
   }catch(e){loading.textContent='Connection failed. Please try again.';}
@@ -3232,14 +3261,39 @@ function fieldStopVoice(){
 
 // ── QR CODE ──
 let qrInstance=null;
+let _qrActiveTab='vm'; // 'vm' | 'vmp'
+let _qrUrls={vm:'',vmp:''};
+
 function showQR(hiveId){
   const hive=Object.values(hives).flat().find(h=>h.id===hiveId);if(!hive)return;
   const code=makeHiveCode(hiveId);
-  const url=`${window.location.origin}/app/?h=${code}`;
+  _qrUrls.vm  = `${window.location.origin}/app/?h=${code}`;
+  _qrUrls.vmp = `${window.location.origin}/productivity/?h=${code}`;
   document.getElementById('qr-hive-name').textContent=hive.name;
   document.getElementById('qr-code-text').textContent=`Code: ${code}`;
   const inline=document.getElementById('qr-code-inline');
   if(inline)inline.textContent=code;
+  _qrActiveTab='vm';
+  qrRenderCanvas(_qrUrls.vm);
+  qrUpdateTabStyle();
+  document.getElementById('qr-overlay').classList.add('open');
+}
+
+function qrSwitchTab(tab){
+  _qrActiveTab=tab;
+  qrRenderCanvas(_qrUrls[tab]);
+  qrUpdateTabStyle();
+  const desc=document.getElementById('qr-desc');
+  if(desc){
+    if(tab==='vmp'){
+      desc.innerHTML='Scan to open the <strong>Inspection Log</strong> for this hive in VarroaMate Productivity (VMP).<br>Or type the code <strong>'+document.getElementById('qr-code-inline').textContent+'</strong> in VMP.';
+    } else {
+      desc.innerHTML='Scan to jump straight to <strong>mite count field entry</strong> for this hive in VarroaMate.<br>Or type the code <strong>'+document.getElementById('qr-code-inline').textContent+'</strong> on the Hives screen.';
+    }
+  }
+}
+
+function qrRenderCanvas(url){
   const canvas=document.getElementById('qr-canvas');
   canvas.innerHTML='';
   if(typeof QRCode!=='undefined'){
@@ -3247,7 +3301,19 @@ function showQR(hiveId){
   } else {
     canvas.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:20px;">QR library loading… try again in a moment.</div>`;
   }
-  document.getElementById('qr-overlay').classList.add('open');
+}
+
+function qrUpdateTabStyle(){
+  const vmBtn  = document.getElementById('qr-tab-vm');
+  const vmpBtn = document.getElementById('qr-tab-vmp');
+  if(!vmBtn||!vmpBtn) return;
+  if(_qrActiveTab==='vm'){
+    vmBtn.style.cssText ='flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--amber-dark);background:var(--amber-dark);color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
+    vmpBtn.style.cssText='flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;';
+  } else {
+    vmBtn.style.cssText ='flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;';
+    vmpBtn.style.cssText='flex:1;padding:7px;border-radius:8px;border:1.5px solid #4A7A58;background:#4A7A58;color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
+  }
 }
 function closeQR(){document.getElementById('qr-overlay').classList.remove('open');}
 function printQR(){
@@ -3282,7 +3348,7 @@ function printQR(){
       <div class="hive">${hiveName}</div>
       <div class="code">${code}</div>
       ${src?`<img src="${src}" width="180" height="180" alt="QR code">`:'<p style="color:#c00;font-size:12px;padding:10px;">QR image unavailable — close and reopen the QR modal then try again</p>'}
-      <div class="hint">Scan to open field entry in VarroaMate</div>
+      <div class="hint">Scan to open field entry in VarroaMate<br>or tap <strong>VMP</strong> tab for inspection log</div>
     </div>
     <br><button onclick="window.print()">🖨 Print</button>
   </body></html>`;
@@ -3461,6 +3527,7 @@ function printAllQR(){
 <script>
 const hiveData=${JSON.stringify(allHives)};
 const base=${JSON.stringify(base)};
+const baseVMP=${JSON.stringify(baseVMP)};
 const grid=document.getElementById('qr-grid');
 hiveData.forEach(({hive,apiary,code})=>{
   const url=base+'?h='+code;
@@ -3471,7 +3538,7 @@ hiveData.forEach(({hive,apiary,code})=>{
     <div class="label-hive">\${hive.name}</div>
     <div class="label-qr" id="qr-\${code}"></div>
     <div class="label-code">\${code}</div>
-    <div class="label-hint">Scan to log mite count</div>\`;
+    <div class="label-hint">VM: scan for mite count · VMP: inspection log</div>\`;
   grid.appendChild(div);
   new QRCode(document.getElementById('qr-'+code),{
     text:url,width:130,height:130,
@@ -3766,21 +3833,20 @@ function makeUID(){return 'varroamate-'+Date.now()+'-'+Math.random().toString(36
 function exportCalendar(){
   const today=new Date();today.setHours(0,0,0,0);
   const events=[];
+  const washDates=new Map(); // date string → Date — one alcohol wash reminder per day
 
   for(const a of apiaries){
     const hvList=hives[a.id]||[];
     for(const h of hvList){
 
       // Alcohol wash reminders: every 4 weeks for 16 weeks (4 counts)
+      // Collect dates first — deduplicated to one reminder per day across all hives
       for(let w=1;w<=4;w++){
         const d=new Date(today);d.setDate(d.getDate()+w*28);
-        events.push({
-          uid:makeUID(),
-          date:d,
-          summary:`🔬 Alcohol Wash — ${h.name} (${a.name})`,
-          description:`Varroa mite count (4-weekly) for ${h.name} at ${a.name}.\\nAlcohol wash ~300 bees (½ cup). Record result in VarroaMate.\\nGeneral guidance: count every 4 weeks when mite numbers are low and controlled; increase to fortnightly if counts are rising or after treatment.\\nAddress: ${a.address}`,
-          alarm:true
-        });
+        const dateKey=icsDate(d);
+        if(!washDates.has(dateKey)){
+          washDates.set(dateKey,d);
+        }
       }
 
       // Treatment removal reminders for all recorded treatments with a duration
@@ -3802,6 +3868,17 @@ function exportCalendar(){
         });
       }
     }
+  }
+
+  // Add one consolidated alcohol wash reminder per day (regardless of number of hives)
+  for(const [,d] of washDates){
+    events.push({
+      uid:makeUID(),
+      date:d,
+      summary:`🔬 Alcohol Wash — All Hives`,
+      description:`4-weekly Varroa mite count reminder.\\nAlcohol wash ~300 bees (½ cup) per hive. Record each result in VarroaMate.\\nGeneral guidance: count every 4 weeks when mite numbers are low and controlled; increase to fortnightly if counts are rising or after treatment.`,
+      alarm:true
+    });
   }
 
   if(!events.length){showToast('No reminders to export — add hives and treatments first.');return;}
@@ -3940,9 +4017,7 @@ async function loadHiveForQR(uid, hCode){
   ]);
   miteCountsByHive={};treatmentsByHive={};notesByHive={};
   if(cntRes.data) miteCountsByHive[hid]=cntRes.data.map(c=>({id:String(c.id),date:c.date,value:c.value,hiveStrength:c.hive_strength||'Good',diseases:c.diseases||['No Disease Present']}));
-  if(trtRes.data) treatmentsByHive[hid]=trtRes.data.map(t=>({id:String(t.id),date:t.date,product:t.product,notes:t.notes||''}));
-  if(noteRes.data) notesByHive[hid]=noteRes.data.map(n=>({id:String(n.id),date:n.date,text:n.text}));
-  // 4. Navigate straight to field entry
+  if(trtRes.data) treatmentsByHive[hid]=trtRes.data.reduce((acc,t)=>{if(!acc[hid])acc[hid]=[];acc[hid].push({id:String(t.id),date:t.date,product:t.product,notes:t.notes||''});return acc;},{[hid]:[]})[hid];
   currentHiveId=hid;
   for(const [aid,hvList] of Object.entries(hives)){
     if(hvList.some(hv=>hv.id===hid)){currentApiaryId=parseInt(aid);break;}
@@ -4134,4 +4209,12 @@ async function submitFeedback(){
   <div class="modal-box">
     <div class="modal-title">🐝 Hive Limit Reached <button class="modal-close" onclick="closeModal('modal-hive-limit')">✕</button></div>
     <div id="hive-limit-body"></div>
-    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="closeModal('modal-hive-limit');g
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn btn-outline btn-full" onclick="closeModal('modal-hive-limit')">Maybe later</button>
+      <button class="btn btn-primary btn-full" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans ✨</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
