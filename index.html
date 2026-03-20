@@ -797,14 +797,14 @@ html, body {
 /* ── Launch banner ── */
 .launch-banner {
   position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  background: linear-gradient(90deg, #1C3D2E 0%, #2A5A40 50%, #1C3D2E 100%);
+  background: linear-gradient(90deg, #8B4500 0%, #C46000 50%, #8B4500 100%);
   color: white; text-align: center;
-  padding: 9px 48px 9px 16px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.5;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  padding: 10px 48px 10px 16px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.35);
 }
-.launch-banner strong { color: #F5C842; }
-.launch-banner .sep { opacity: 0.4; margin: 0 8px; }
+.launch-banner strong { color: #FFE082; }
+.launch-banner .sep { opacity: 0.4; margin: 0 10px; }
 .launch-banner .banner-close {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
   background: none; border: none; color: rgba(255,255,255,0.6);
@@ -816,9 +816,11 @@ html, body {
 </head>
 <body>
 <div class="launch-banner" id="launchBanner">
-  🟢 <strong>Smart Planner is live!</strong> Treatment planning for every hive.
+  ⚠️ <strong>Scheduled maintenance — Monday 31 March, 6:00 pm to 10:00 pm AEDT.</strong>
   <span class="sep">|</span>
-  📋 <strong>Productivity</strong> is now live too — inspections, harvests &amp; queens.
+  All VarroaMate apps will be offline during this window.
+  <span class="sep">|</span>
+  🚀 <strong>All plans go live immediately after.</strong>
   <button class="banner-close" onclick="dismissBanner()" aria-label="Close">×</button>
 </div>
 <div id="scene">
