@@ -124,11 +124,11 @@ body::before{
 .top-bar{
   flex-shrink:0;
   background:linear-gradient(135deg,var(--plum) 0%,var(--plum-mid) 100%);
-  padding:0 10px 0 16px;
+  padding:0 6px 0 14px;
   padding-top:env(safe-area-inset-top,0px);
   height:calc(58px + env(safe-area-inset-top,0px));
   display:flex;align-items:center;justify-content:space-between;
-  gap:8px;
+  gap:6px;
   box-shadow:0 2px 12px rgba(30,10,30,0.35);
   border-bottom:2px solid rgba(242,217,138,0.25);
 }
@@ -145,7 +145,7 @@ body::before{
   white-space:nowrap;
 }
 /* Hide "Productivity" subtitle on narrow phones — logo alone fits fine */
-@media(max-width:380px){
+@media(max-width:430px){
   .top-logo-sub{display:none;}
   .top-logo{font-size:18px;}
 }
