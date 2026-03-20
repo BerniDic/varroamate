@@ -43,11 +43,11 @@ html{scroll-behavior:smooth;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
 /* ── HEADER ── */
-.header{background:var(--forest);padding:0;height:58px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,0.22);}.header-inner{padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between;}
+.header{background:var(--forest);padding:0;height:58px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,0.22);}.header-inner{padding:0 10px 0 14px;height:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;}
 .logo{font-family:'Playfair Display',serif;font-size:21px;color:var(--cream);}
 .logo em{color:var(--amber-light);font-style:italic;}
 .logo sup{font-size:9px;font-family:'DM Sans',sans-serif;vertical-align:super;color:var(--sage-light);}
-.logo-sub{font-size:12px;color:var(--sage);letter-spacing:1.2px;text-transform:uppercase;margin-left:10px;font-weight:300;}
+.logo-sub{font-size:12px;color:var(--sage);letter-spacing:1.2px;text-transform:uppercase;margin-left:10px;font-weight:300;}@media(max-width:430px){.logo-sub{display:none;}.logo{font-size:18px;}}
 .sync-pill{font-size:12px;background:rgba(90,158,96,0.18);color:var(--sage-light);border:1px solid rgba(90,158,96,0.28);border-radius:20px;padding:3px 10px;display:flex;align-items:center;gap:5px;}
 .sync-dot{width:6px;height:6px;background:#5A9E60;border-radius:50%;animation:pdot 2s infinite;}
 @keyframes pdot{0%,100%{opacity:1;}50%{opacity:0.25;}}
@@ -534,15 +534,15 @@ canvas.drop-blocked{cursor:not-allowed;}
 <header class="header">
 <div class="header-inner">
   <div style="display:flex;align-items:center;gap:0;">
-    <a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:20px;background:rgba(255,255,255,0.08);color:white;text-decoration:none;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+    <a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;gap:5px;padding:4px 8px 4px 4px;border-radius:20px;background:rgba(255,255,255,0.08);color:white;text-decoration:none;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
       <span style="font-size:15px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;">🏠</span>
       <div class="logo" style="pointer-events:none;">Varroa<em>Mate</em><sup>™</sup></div>
       <span class="logo-sub" style="pointer-events:none;">Smart Planner</span>
     </a>
   </div>
-  <span id="vmSyncBadge" style="font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.45);padding:2px 0;"></span>
+  <span id="vmSyncBadge" style="font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.45);padding:2px 0;display:none;"></span>
   <div style="position:relative;display:inline-flex;margin-left:auto;flex-shrink:0;" id="vmsp-apps-wrap">
-    <button onclick="toggleVmspApps()" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);color:white;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;white-space:nowrap;">🐝 Apps ▾</button>
+    <button onclick="toggleVmspApps()" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);color:white;padding:5px 9px;border-radius:14px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;">🐝 Apps ▾</button>
     <div id="vmsp-apps-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid #E0D0B0;min-width:210px;overflow:hidden;z-index:1300;">
       <a href="/app/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:#2C1A00;text-decoration:none;border-bottom:1px solid #F0E4CC;transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">📊 VarroaMate</a>
       <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:#2C1A00;text-decoration:none;border-bottom:1px solid #F0E4CC;transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">📋 Productivity</a>
