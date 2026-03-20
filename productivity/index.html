@@ -1344,6 +1344,37 @@ body::before{
         style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);
         width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0;
         display:flex;align-items:center;justify-content:center;">ℹ</button>
+      <button id="topRefreshBtn" onclick="refreshData()" title="Refresh data"
+        style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);
+        width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0;
+        display:flex;align-items:center;justify-content:center;">↻</button>
+      <!-- Apps dropdown -->
+      <div style="position:relative;display:inline-flex;flex-shrink:0;" id="vmp-apps-wrap">
+        <button onclick="toggleVmpApps()"
+          style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;
+          padding:5px 10px;border-radius:14px;cursor:pointer;font-size:12px;font-weight:600;
+          font-family:inherit;white-space:nowrap;flex-shrink:0;">🐝 Apps ▾</button>
+        <div id="vmp-apps-dropdown" style="display:none;position:fixed;top:64px;right:12px;
+          background:var(--paper);border-radius:10px;box-shadow:0 8px 32px rgba(70,35,10,0.22);
+          border:1.5px solid var(--border);min-width:210px;overflow:hidden;z-index:1300;">
+          <a href="/app/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;
+            font-size:14px;font-weight:600;color:var(--text1);text-decoration:none;
+            border-bottom:1px solid var(--border);transition:background 0.1s;"
+            onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">
+            📊 VarroaMate</a>
+          <a href="/planner/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;
+            font-size:14px;font-weight:600;color:var(--text1);text-decoration:none;
+            border-bottom:1px solid var(--border);transition:background 0.1s;"
+            onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">
+            🧠 Smart Planner</a>
+          <a href="#" onclick="event.preventDefault();document.getElementById('vmp-apps-dropdown').style.display='none';showToast('🎓 Beekeeper Academy — coming soon! 🐝')"
+            style="display:flex;align-items:center;gap:10px;padding:13px 16px;
+            font-size:14px;font-weight:600;color:var(--text1);text-decoration:none;
+            opacity:0.55;transition:background 0.1s;"
+            onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">
+            🎓 Academy <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1515,6 +1546,17 @@ body::before{
       <span class="nav-tab-icon">🏠</span>
       <span class="nav-tab-label">Home</span>
     </a>
+    <button class="nav-tab" onclick="refreshData()" title="Refresh data (or press R)"
+       style="border:none;background:transparent;cursor:pointer;">
+      <span class="nav-tab-icon">↻</span>
+      <span class="nav-tab-label">Refresh</span>
+    </button>
+    <!-- Apps switcher in sidebar -->
+    <div style="padding:8px 12px;border-top:1px solid var(--border);margin-top:4px;">
+      <a href="/app/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;transition:background 0.1s;" onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">📊 VarroaMate</a>
+      <a href="/planner/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;transition:background 0.1s;" onmouseenter="this.style.background='var(--cream)'" onmouseleave="this.style.background=''">🧠 Smart Planner</a>
+      <a href="#" onclick="event.preventDefault();showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;opacity:0.55;">🎓 Academy</a>
+    </div>
   </nav>
 
 </div>
@@ -2052,6 +2094,43 @@ const CURRENT_YEAR = new Date().getFullYear();
 // ══════════════════════════════════════════════
 // Auth — app always visible; session shared from VM on same domain
 document.getElementById('app').classList.add('ready');
+
+// ─── APPS DROPDOWN ─────────────────────────────
+function toggleVmpApps(){
+  const d = document.getElementById('vmp-apps-dropdown');
+  if(!d) return;
+  const open = d.style.display === 'block';
+  d.style.display = open ? 'none' : 'block';
+  if(!open){
+    setTimeout(()=>{
+      document.addEventListener('click', function closeVmpApps(e){
+        if(!document.getElementById('vmp-apps-wrap')?.contains(e.target)){
+          d.style.display = 'none';
+          document.removeEventListener('click', closeVmpApps);
+        }
+      });
+    }, 10);
+  }
+}
+
+// ─── REFRESH ───────────────────────────────────
+async function refreshData(){
+  const btn = document.getElementById('topRefreshBtn');
+  if(btn){ btn.style.transform='rotate(360deg)'; btn.style.transition='transform 0.5s'; }
+  showToast('Refreshing…');
+  await loadAllData();
+  showToast('Data refreshed ✓');
+  if(btn){ setTimeout(()=>{ btn.style.transform=''; btn.style.transition=''; }, 600); }
+}
+
+// R key to refresh (when not typing in an input)
+document.addEventListener('keydown', e=>{
+  if(e.key==='r' && !e.ctrlKey && !e.metaKey &&
+     !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
+    e.preventDefault();
+    refreshData();
+  }
+});
 
 // ─── PULL TO REFRESH ───────────────────────────
 (function(){
