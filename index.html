@@ -816,11 +816,9 @@ html, body {
 </head>
 <body>
 <div class="launch-banner" id="launchBanner">
-  🔵 <strong>Smart Planner beta is live!</strong> Try it now — tap the blue hive.
+  🟢 <strong>Smart Planner is live!</strong> Treatment planning for every hive.
   <span class="sep">|</span>
-  🚀 Official launch with all plans: <strong>1 April 2026</strong>
-  <span class="sep">|</span>
-  ⚠️ App offline <strong>31 March</strong> for updates.
+  📋 <strong>Productivity</strong> is now live too — inspections, harvests &amp; queens.
   <button class="banner-close" onclick="dismissBanner()" aria-label="Close">×</button>
 </div>
 <div id="scene">
@@ -1375,7 +1373,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">Smart Planner</div>
         <div class="hive-label-sub">seasonal treatment planning</div>
-        <div class="status-badge beta"><span class="dot"></span>beta — try it now</div>
+        <div class="status-badge release"><span class="dot"></span>now live</div>
       </div>
     </div>
 
@@ -1574,7 +1572,7 @@ const APP_URLS = {
 
 const APP_TOASTS = {
   vm:     '🟢 VarroaMate — full release imminent, stay tuned!',
-  vmsp:   '🔵 Smart Planner — now in beta! Give it a try 🐝',
+  vmsp:   '🧠 Smart Planner — live! Seasonal treatment planning 🐝',
   prod:   '📋 VarroaMate Productivity — now live! Tap to open.',
   health: '🎓 Beekeeper Academy — coming soon! 🐝',
 };
@@ -2045,7 +2043,7 @@ function showToast(msg){
 // ── MOBILE HIVE POPUP ────────────────────────────
 const APP_INFO = {
   vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: 'full release imminent', url: '/app/' },
-  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'beta',    badgeText: 'beta — try it now',    url: '/planner/' },
+  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'release', badgeText: 'now live',             url: '/planner/' },
   prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: 'now live',            url: '/productivity/' },
   health: { title: 'Beekeeper Academy',   sub: 'structured learning pathway', badge: 'soon',    badgeText: 'coming soon',          url: null },
 };
