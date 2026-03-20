@@ -1002,7 +1002,7 @@ body::before{
     padding:24px 0 24px;
   }
   /* Desktop-only nav items — hidden on mobile */
-  .nav-tab-desktop-only{ display:flex; }
+  .nav-tab-desktop-only{ display:flex !important; }
   .side-logo{
     padding:0 20px 24px;
     font-family:'Cormorant Garamond',serif;
@@ -1551,16 +1551,16 @@ body::before{
     </button>
     <!-- Desktop sidebar only — hidden on mobile via CSS -->
     <a class="nav-tab nav-tab-desktop-only" href="/" title="Back to VarroaMate home"
-       style="text-decoration:none;display:none;margin-top:auto;">
+       style="text-decoration:none;margin-top:auto;">
       <span class="nav-tab-icon">🏠</span>
       <span class="nav-tab-label">Home</span>
     </a>
     <button class="nav-tab nav-tab-desktop-only" onclick="refreshData()" title="Refresh data (or press R)"
-       style="border:none;background:transparent;cursor:pointer;display:none;">
+       style="border:none;background:transparent;cursor:pointer;">
       <span class="nav-tab-icon">↻</span>
       <span class="nav-tab-label">Refresh</span>
     </button>
-    <div class="nav-tab-desktop-only" style="padding:8px 12px;border-top:1px solid var(--border);margin-top:4px;display:none;">
+    <div class="nav-tab-desktop-only" style="padding:8px 12px;border-top:1px solid var(--border);margin-top:4px;">
       <a href="/app/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;">📊 VarroaMate</a>
       <a href="/planner/" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;">🧠 Smart Planner</a>
       <a href="#" onclick="event.preventDefault();showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;opacity:0.55;">🎓 Academy</a>
