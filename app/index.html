@@ -3014,7 +3014,7 @@ function toggleInfoPop(id){
 document.addEventListener('click',function(e){
   if(!e.target.closest('.nav-info-wrap'))
     document.querySelectorAll('.nav-info-popover.open').forEach(p=>p.classList.remove('open'));
-  if(!e.target.closest('#nav-overflow-menu')&&!e.target.closest('#nav-overflow-btn'))
+  if(!e.target.closest('#nav-overflow-menu')&&!e.target.closest('#nav-overflow-btn')&&!e.target.closest('#nav-overflow-btn-desktop'))
     document.getElementById('nav-overflow-menu')?.classList.remove('open');
 });
 // ══ FIELD ENTRY ══
