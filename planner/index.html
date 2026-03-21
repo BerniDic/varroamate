@@ -1878,6 +1878,7 @@ let _winNextId  = 7;
 // VMSP never writes to any table — select() only
 // ══════════════════════════════════════════════
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
+const CLAUDE_MODEL  = 'claude-opus-4-6';       // update here when Anthropic releases new models
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // ══════════════════════════════════════════════════════════════════
@@ -3500,7 +3501,7 @@ Always use MoA from the plan summary — never infer from context.`;
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
-        model:'claude-opus-4-6',
+        model:CLAUDE_MODEL,
         max_tokens:600,
         messages:[{role:'user', content:prompt}]
       })
@@ -3863,7 +3864,7 @@ async function _callSuggestAPI(systemPrompt, btn){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
-        model:'claude-opus-4-6',
+        model:CLAUDE_MODEL,
         max_tokens:900,
         system: systemPrompt,
         messages: _suggestHistory
@@ -4035,7 +4036,7 @@ Respond with JSON in this exact shape, no markdown:
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
-        model:'claude-opus-4-6',
+        model:CLAUDE_MODEL,
         max_tokens:400,
         system: p.systemPrompt,
         messages: _suggestHistory
@@ -6744,7 +6745,7 @@ async function vmspSendChat(){
     const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
       method:'POST', headers,
       body: JSON.stringify({
-        model:'claude-opus-4-6', max_tokens:1000,
+        model:CLAUDE_MODEL, max_tokens:1000,
         system:`You are the VarroaMate Smart Planner assistant, an expert advisor for Australian beekeepers. Help users build effective Varroa treatment plans. Focus on: treatment timing and windows, resistance rotation, organic vs chemical strategies, honey flow compatibility, seasonal planning for southern hemisphere, and how to interpret plan scores. Always use "Formic PRO" not "MAQS". Keep answers concise and practical.`,
         messages: vmspChatHistory
       })
