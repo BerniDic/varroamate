@@ -400,11 +400,22 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <h4>Recommended Resources</h4>
       <p>Visit your state agriculture department for current treatment and reporting requirements. The National Varroa Mite Management Program (<a href="https://www.varroa.org.au/" target="_blank">varroa.org.au</a>) has archived resources from the national response.</p>
     </div>
-    <div class="checkbox-row" onclick="document.getElementById('accept-chk').click()">
+    <div id="disc-ack-row" class="checkbox-row" onclick="document.getElementById('accept-chk').click()">
       <input type="checkbox" id="accept-chk" onclick="event.stopPropagation()" onchange="document.getElementById('enter-btn').disabled=!this.checked">
       <label for="accept-chk" onclick="event.stopPropagation()">I have read and accept the terms and disclaimer</label>
     </div>
     <button class="btn btn-primary btn-full" id="enter-btn" disabled onclick="acceptDisclaimer()">Enter VarroaMate →</button>
+    <script>
+    // If already accepted: hide checkbox, enable button with nav text
+    (function(){
+      if(localStorage.getItem('varroamate_disclaimer_accepted')==='1'){
+        var row = document.getElementById('disc-ack-row');
+        var btn = document.getElementById('enter-btn');
+        if(row) row.style.display='none';
+        if(btn){ btn.disabled=false; btn.textContent='Open VarroaMate →'; btn.onclick=function(){ goto('s-apiaries'); }; }
+      }
+    })();
+    </script>
   </div>
 </div>
 
@@ -1027,6 +1038,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="tab-item" id="tabnav-subscription" onclick="goto('s-subscription')"><div class="tab-icon">⭐</div><div>Plans</div></div>
     <div class="tab-item" id="tabnav-prefs" onclick="goto('s-prefs')"><div class="tab-icon">⚙️</div><div>Preferences</div></div>
     <div class="tab-item" id="tabnav-feedback" onclick="goto('s-feedback')"><div class="tab-icon">💬</div><div>Feedback</div></div>
+    <div class="tab-item" id="tabnav-disclaimer" onclick="goto('s-disclaimer')"><div class="tab-icon">📋</div><div>Terms</div></div>
   </div>
 </div>
 
@@ -1367,8 +1379,8 @@ let countsPage = 0, treatmentsPage = 0, notesPage = 0;
 const PAGE_SIZE = 5;
 
 // ══ NAVIGATION ══
-const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription'];
-const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription'};
+const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription','s-disclaimer'];
+const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription','s-disclaimer':'tabnav-disclaimer'};
 
 async function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
