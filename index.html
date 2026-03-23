@@ -944,12 +944,6 @@ html, body {
   <svg id="gum-trees" aria-hidden="true" viewBox="0 0 320 420" preserveAspectRatio="xMinYMax meet"
        xmlns="http://www.w3.org/2000/svg"
        style="position:absolute;bottom:28%;left:0;width:clamp(140px,18vw,280px);height:auto;pointer-events:none;z-index:1;">
-    <defs>
-      <clipPath id="tree-clip">
-        <rect x="-40" y="180" width="400" height="260"/>
-      </clipPath>
-    </defs>
-    <g clip-path="url(#tree-clip)">
 
     <!-- Tree 1: tallest, leftmost -->
     <!-- Trunk -->
@@ -979,27 +973,27 @@ html, body {
 
     <!-- Tree 2: slightly shorter, more to right -->
     <!-- Trunk -->
-    <path d="M195 420 L194 160 Q196 140 198 115" stroke="#C0AA88" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M115 420 L114 160 Q116 140 118 115" stroke="#C0AA88" stroke-width="6" stroke-linecap="round" fill="none"/>
     <!-- Bark -->
-    <path d="M193 360 Q197 348 194 336" stroke="#A89870" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.5"/>
-    <path d="M196 280 Q192 268 196 256" stroke="#A89870" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M113 360 Q117 348 114 336" stroke="#A89870" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M116 280 Q112 268 116 256" stroke="#A89870" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.5"/>
     <!-- Branches -->
-    <path d="M198 115 Q175 88 155 65" stroke="#B8A880" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-    <path d="M198 115 Q220 85 240 62" stroke="#B8A880" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <path d="M198 135 Q170 125 148 112" stroke="#B8A880" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <path d="M198 145 Q225 130 248 118" stroke="#B8A880" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-    <path d="M198 160 Q180 150 162 142" stroke="#B8A880" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <path d="M118 115 Q95 88 75 65" stroke="#B8A880" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M118 115 Q140 85 160 62" stroke="#B8A880" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M118 135 Q90 125 68 112" stroke="#B8A880" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M118 145 Q145 130 168 118" stroke="#B8A880" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M118 160 Q100 150 82 142" stroke="#B8A880" stroke-width="2" stroke-linecap="round" fill="none"/>
     <!-- Leaf clusters -->
-    <ellipse cx="154" cy="62" rx="15" ry="7" fill="#6A9060" opacity="0.80" transform="rotate(-15 154 62)"/>
-    <ellipse cx="154" cy="62" rx="9"  ry="4" fill="#80AA70" opacity="0.55" transform="rotate(20 154 62)"/>
-    <ellipse cx="240" cy="58" rx="14" ry="6" fill="#5A8050" opacity="0.78" transform="rotate(20 240 58)"/>
-    <ellipse cx="240" cy="58" rx="9"  ry="4" fill="#6A9A5A" opacity="0.50" transform="rotate(-15 240 58)"/>
-    <ellipse cx="147" cy="108" rx="12" ry="5" fill="#6A9060" opacity="0.68" transform="rotate(-20 147 108)"/>
-    <ellipse cx="248" cy="114" rx="13" ry="5" fill="#5A8050" opacity="0.65" transform="rotate(15 248 114)"/>
-    <ellipse cx="162" cy="138" rx="10" ry="5" fill="#7AAA6A" opacity="0.58" transform="rotate(-10 162 138)"/>
+    <ellipse cx="74" cy="62" rx="15" ry="7" fill="#6A9060" opacity="0.80" transform="rotate(-15 74 62)"/>
+    <ellipse cx="74" cy="62" rx="9"  ry="4" fill="#80AA70" opacity="0.55" transform="rotate(20 74 62)"/>
+    <ellipse cx="160" cy="58" rx="14" ry="6" fill="#5A8050" opacity="0.78" transform="rotate(20 160 58)"/>
+    <ellipse cx="160" cy="58" rx="9"  ry="4" fill="#6A9A5A" opacity="0.50" transform="rotate(-15 160 58)"/>
+    <ellipse cx="67" cy="108" rx="12" ry="5" fill="#6A9060" opacity="0.68" transform="rotate(-20 67 108)"/>
+    <ellipse cx="168" cy="114" rx="13" ry="5" fill="#5A8050" opacity="0.65" transform="rotate(15 168 114)"/>
+    <ellipse cx="82" cy="138" rx="10" ry="5" fill="#7AAA6A" opacity="0.58" transform="rotate(-10 82 138)"/>
     <!-- Hanging sprays -->
-    <path d="M154 66 Q150 80 148 90" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.55"/>
-    <path d="M240 62 Q245 76 243 88" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.55"/>
+    <path d="M74 66 Q70 80 68 90" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.55"/>
+    <path d="M160 62 Q165 76 163 88" stroke="#5A8050" stroke-width="1.5" fill="none" opacity="0.55"/>
 
     <!-- Tree 3: small, far left, very distant -->
     <path d="M-8 420 L-8 260 Q-6 248 -4 235" stroke="#C8B898" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.7"/>
@@ -1355,7 +1349,6 @@ html, body {
         <use href="#lv" transform="translate(0,-10)"/><use href="#lv" transform="translate(0,-4)"/>
       </g>
     </g>
-  </g>
   </svg>
 
   <!-- Hives -->
