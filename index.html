@@ -164,8 +164,8 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: clamp(30px, 6vw, 90px);
-  padding: 0 clamp(20px, 8vw, 140px);
+  gap: clamp(16px, 4vw, 70px);
+  padding: 0 clamp(10px, 4vw, 80px);
 }
 
 .hive-wrapper {
@@ -1462,6 +1462,43 @@ html, body {
       </div>
     </div>
 
+    <!-- Hive 5: Hive Hygiene (coming soon) — tiny, freshly built, slight lean right -->
+    <div class="hive-wrapper coming-soon" id="hive-hygiene" data-app="hygiene" role="button" tabindex="0"
+         aria-label="VarroaMate Hive Hygiene — coming soon">
+      <div class="hive-glow"></div>
+      <div class="hive-svg-wrap" style="transform: rotate(-1.5deg);">
+        <svg width="72" height="100" viewBox="0 0 72 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Stand -->
+          <rect x="8" y="92" width="6" height="8" rx="1" fill="#201608"/>
+          <rect x="58" y="92" width="6" height="8" rx="1" fill="#201608"/>
+          <rect x="4" y="88" width="64" height="5" rx="2" fill="#2A1C08"/>
+          <rect x="2" y="83" width="68" height="6" rx="2" fill="#362410"/>
+          <!-- Single box only — a new hive, just one super -->
+          <rect x="8" y="50" width="56" height="35" rx="2" fill="#3C2A10"/>
+          <rect x="8" y="50" width="56" height="35" rx="2" stroke="#201608" stroke-width="1.5"/>
+          <line x1="8" y1="60" x2="64" y2="60" stroke="#2A1C0A" stroke-width="0.7" opacity="0.6"/>
+          <line x1="8" y1="70" x2="64" y2="70" stroke="#2A1C0A" stroke-width="0.7" opacity="0.6"/>
+          <line x1="8" y1="80" x2="64" y2="80" stroke="#2A1C0A" stroke-width="0.7" opacity="0.6"/>
+          <rect x="1" y="63" width="7" height="5" rx="1" fill="#2A1C0A"/>
+          <rect x="64" y="63" width="7" height="5" rx="1" fill="#2A1C0A"/>
+          <!-- Roof — fresh, clean -->
+          <polygon points="0,52 36,28 72,52" fill="#241404"/>
+          <rect x="3" y="48" width="66" height="5" rx="1" fill="#3A2810"/>
+          <!-- Entrance -->
+          <rect x="18" y="77" width="36" height="6" rx="2" fill="#120E08"/>
+          <rect class="entrance-shine" x="18" y="77" width="36" height="6" rx="2" fill="rgba(255,150,20,0.6)" style="transition:opacity 0.5s;"/>
+          <!-- Small cleaning brush icon on side — subtle detail -->
+          <rect x="64" y="58" width="3" height="14" rx="1" fill="#4A3010" opacity="0.7"/>
+          <rect x="63" y="70" width="5" height="4" rx="1" fill="#6A4820" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="hive-label">
+        <div class="hive-label-name">Hygiene</div>
+        <div class="hive-label-sub">apiary health & sanitation</div>
+        <div class="status-badge soon"><span class="dot"></span>coming soon</div>
+      </div>
+    </div>
+
   </div><!-- end hives-container -->
 
   <!-- Bee -->
@@ -1570,6 +1607,7 @@ const APP_URLS = {
   vmsp:   '/planner/',
   prod:   '/productivity/',
   health: null,  // academy coming soon
+  hygiene: null,  // hygiene coming soon
 };
 
 const APP_TOASTS = {
@@ -1577,6 +1615,7 @@ const APP_TOASTS = {
   vmsp:   '🧠 Smart Planner — live! Seasonal treatment planning 🐝',
   prod:   '📋 VarroaMate Productivity — now live! Tap to open.',
   health: '🎓 Beekeeper Academy — coming soon! 🐝',
+  hygiene: '🧹 Hive Hygiene — a practical sanitation guide is coming! 🐝',
 };
 
 // ── BEE STATE ────────────────────────────────────
@@ -2047,7 +2086,8 @@ const APP_INFO = {
   vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: 'full release imminent', url: '/app/' },
   vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'release', badgeText: 'now live',             url: '/planner/' },
   prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: 'now live',            url: '/productivity/' },
-  health: { title: 'Beekeeper Academy',   sub: 'structured learning pathway', badge: 'soon',    badgeText: 'coming soon',          url: null },
+  health:   { title: 'Beekeeper Academy',   sub: 'structured learning pathway',  badge: 'soon', badgeText: 'coming soon', url: null },
+  hygiene:  { title: 'Hive Hygiene',           sub: 'apiary health & sanitation',   badge: 'soon', badgeText: 'coming soon', url: null },
 };
 let _popupApp = null;
 
