@@ -55,9 +55,13 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .tab-item.active{color:var(--amber-light);}
 .tab-item:hover{color:#fff;}
 @media(max-width:420px){
-  .tab-item{padding:6px 4px;font-size:11px;}
-  .tab-item .tab-icon{font-size:22px;}
-  .tabbar-inner{padding:0 4px;}
+  .tab-item{padding:5px 2px;font-size:10px;gap:2px;min-width:0;flex:1;}
+  .tab-item .tab-icon{font-size:20px;}
+  .tabbar-inner{padding:0 2px;}
+}
+@media(max-width:360px){
+  .tab-item{padding:4px 1px;font-size:9px;}
+  .tab-item .tab-icon{font-size:18px;}
 }
 .page-body{flex:1;padding:28px 32px calc(90px + env(safe-area-inset-bottom));max-width:960px;width:100%;margin:0 auto;}
 @media(max-width:600px){.page-body{padding:16px 14px calc(88px + env(safe-area-inset-bottom));}}
@@ -320,7 +324,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 /* ══ OVERFLOW MENU — Apiaries topnav ══ */
 .nav-overflow-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;display:none;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;line-height:1;}
 .nav-overflow-btn:hover{background:rgba(255,255,255,0.30);}
-.nav-overflow-menu{display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--border);z-index:1200;min-width:190px;overflow:hidden;}
+.nav-overflow-menu{display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--border);z-index:1200;min-width:190px;overflow-y:auto;max-height:calc(100dvh - 70px);}
 .nav-overflow-menu.open{display:block;}
 .nav-overflow-item{display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;}
 .nav-overflow-item:last-child{border-bottom:none;}
@@ -1014,7 +1018,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px;">VarroaMate is currently developing solutions that suit the management, monitoring and reporting requirements of very large beekeeping operations — including multi-user access, bulk hive management, and integration with national reporting systems.</p>
       <p style="font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;">We can also produce <strong>individual solutions for a single business</strong> — a custom design built around the specific needs of your operation, from hive tracking at scale to treatment planning and compliance reporting. If you run a beekeeping business and want to explore how VarroaMate can support your Varroa management, we'd love to hear from you.</p>
-      <!--email_off--><a href="mailto:hello@varroamate.com" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a><!--/email_off-->
+      <a href="mailto:hello@varroamate.com" class="btn btn-primary btn-full" style="display:block;text-align:center;text-decoration:none;font-size:15px;padding:13px;">📩 Contact us to explore options</a>
     </div>
 
     <div class="card" style="background:var(--bg2);border-color:var(--border);margin-bottom:16px;">
@@ -4360,6 +4364,11 @@ async function submitFeedback(){
       <button class="btn btn-outline btn-full" onclick="closeModal('modal-hive-limit')">Maybe later</button>
       <button class="btn btn-primary btn-full" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans ✨</button>
     </div>
+  </div>
+</div>
+
+</body>
+</html>
   </div>
 </div>
 
