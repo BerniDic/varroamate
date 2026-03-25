@@ -139,7 +139,9 @@ body::before{
   color:white;letter-spacing:-0.2px;
   text-decoration:none;
   display:flex;align-items:center;gap:5px;
-  flex-shrink:0;
+  flex-shrink:1;          /* allow logo text to shrink before top-right wraps */
+  min-width:0;
+  overflow:hidden;
   white-space:nowrap;
 }
 .top-logo-brand{
@@ -160,16 +162,15 @@ body::before{
   color:var(--plum-light);letter-spacing:1.4px;text-transform:uppercase;
   margin-left:2px;
 }
-.top-right{display:flex;align-items:center;gap:5px;flex-shrink:0;min-width:0;}
-/* Hide info and refresh buttons on small phones to keep Apps button visible */
-@media(max-width:420px){
+.top-right{display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:nowrap;overflow:visible;}
+/* On mobile: hide hive-selector, info & refresh to keep only avatar + Apps */
+@media(max-width:899px){
+  .hive-selector{display:none!important;}
   #topInfoBtn{display:none!important;}
   #topRefreshBtn{display:none!important;}
-  #vmp-apps-wrap button{padding:5px 8px;font-size:11px;}
 }
-/* On very narrow phones also shrink hive selector to guarantee Apps fits */
 @media(max-width:380px){
-  .hive-selector select{max-width:72px;font-size:12px;}
+  #vmp-apps-wrap button{padding:5px 8px;font-size:11px;}
   .top-user{width:30px;height:30px;min-width:30px;font-size:12px;}
 }
 .hive-selector{
@@ -217,38 +218,35 @@ body::before{
   border-top:2px solid var(--border-mid);
   display:flex;
   flex-direction:row;
-  /* Allow horizontal scroll so all tabs are reachable on narrow phones */
-  overflow-x:auto;
-  overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;          /* Firefox */
-  /* Safe area: pad the content up, let bar extend into the safe zone with bg colour */
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
-.bottom-nav::-webkit-scrollbar{display:none;} /* Chrome/Safari */
 .nav-tab{
-  flex:0 0 auto;               /* don't shrink — ensure each tab keeps its full width */
-  min-width:60px;              /* minimum tap width */
+  flex:1;                      /* equal share — all 6 tabs share the width */
   display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:4px;
+  align-items:center;justify-content:center;gap:2px;
   cursor:pointer;
-  padding:10px 8px;
-  /* 44px minimum tap target (Apple HIG) */
-  min-height:44px;
+  padding:8px 2px;
+  min-height:44px;             /* Apple HIG tap target */
   transition:all 0.15s;
   border:none;background:transparent;
   color:var(--text3);
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
+  overflow:hidden;
 }
 .nav-tab.active{color:var(--terra);}
-.nav-tab-icon{font-size:22px;line-height:1;}
-.nav-tab-label{font-size:10px;font-weight:600;letter-spacing:0.3px;white-space:nowrap;}
+.nav-tab-icon{font-size:22px;line-height:1;flex-shrink:0;}
+.nav-tab-label{
+  font-size:9px;font-weight:600;letter-spacing:0.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;text-align:center;
+}
 .nav-tab.active .nav-tab-label{color:var(--terra);}
-/* On phones ≤430px spread tabs evenly if they all fit; if not the scroll takes over */
-@media(max-width:430px){
-  .nav-tab{min-width:54px;padding:10px 6px;}
-  .nav-tab-icon{font-size:20px;}
+/* Very narrow phones (≤360px): icon only, no labels */
+@media(max-width:360px){
+  .nav-tab-label{display:none;}
+  .nav-tab{padding:10px 2px;}
+  .nav-tab-icon{font-size:24px;}
 }
 
 /* side-logo only shown in desktop sidebar — hidden on mobile */
@@ -1044,11 +1042,13 @@ body::before{
     margin-top:3px;
   }
   .nav-tab{
-    flex:1 1 auto;            /* restore normal flex on desktop sidebar */
+    flex:0 0 auto;            /* fixed size in vertical sidebar */
+    width:100%;
     flex-direction:row;justify-content:flex-start;
     padding:10px 20px;border-radius:0;
     gap:10px;
     min-width:0;
+    overflow:visible;
   }
   .nav-tab.active{
     background:var(--terra-pale);
