@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,6 +147,15 @@ body{
 .nav-tab-icon{font-size:18px;line-height:1;}
 .nav-tab-label{font-size:10px;font-weight:600;letter-spacing:0.1px;white-space:nowrap;}
 .nav-tab.active .nav-tab-label{color:#1A3A4A;}
+.more-menu-item{
+  display:flex;align-items:center;gap:14px;width:100%;
+  padding:13px 24px;border:none;background:transparent;
+  font-family:inherit;font-size:16px;font-weight:600;color:var(--text1);
+  cursor:pointer;text-align:left;
+}
+.more-menu-item:active{background:var(--cream);}
+.more-menu-item.active-more{color:#1A3A4A;}
+
 
 /* ══════════════════════════════════════════════
    SCREENS
@@ -533,7 +541,7 @@ body{
   <div class="top-bar">
     <a class="top-logo" href="/">🐝 <span class="top-logo-brand">Varroa<em>Mate</em>™</span> <span class="top-logo-sub">Hive Hygiene</span></a>
     <div class="top-right">
-      <div class="top-user" id="topUser" onclick="signOut()" title="Sign out">?</div>
+      <button class="top-user" id="topUser" onclick="signOut()" title="Sign out" style="font-size:11px;font-weight:700;letter-spacing:0.3px;cursor:pointer;">Sign out</button>
       <div style="position:relative;" id="vmhh-apps-wrap">
         <button class="top-icon-btn" onclick="toggleApps()" title="Switch app">🐝</button>
         <div id="vmhh-apps-dropdown">
@@ -769,10 +777,7 @@ body{
         <!-- Season alert banner -->
         <div id="seasonBanner" class="card" style="background:linear-gradient(135deg,#EEF6F0,#E0F0E8);border-color:#5A8A6A;"></div>
 
-        <div class="ai-panel" id="aiNarrative" style="display:none;">
-          <div class="ai-panel-title">🤖 Your personalised analysis</div>
-          <div class="ai-panel-body" id="aiNarrativeText">Generating…</div>
-        </div>
+
 
         <!-- Rule-based checklist -->
         <div class="card">
@@ -850,6 +855,10 @@ body{
             The AI analysis reads your profile answers, current season, and live hive data — including mite counts and any disease flags — and writes a short personalised narrative. It covers your current risk level, one clear action to take this week, and a specific equipment suggestion based on what you own.<br>
             <span style="color:var(--text3);font-style:italic;">AI output can contain errors. Always cross-check recommendations against authoritative sources.</span>
           </div>
+        </div>
+        <div class="ai-panel" id="aiNarrative" style="display:none;margin-bottom:12px;">
+          <div class="ai-panel-title">🤖 Your personalised analysis</div>
+          <div class="ai-panel-body" id="aiNarrativeText">Generating…</div>
         </div>
         <button class="btn btn-forest btn-sm" id="generateAiBtn" onclick="generateAiPlan()" style="margin-bottom:14px;width:100%;">✨ Generate AI Analysis</button>
 
@@ -1513,6 +1522,21 @@ body{
   </div><!-- end content-area -->
 
   <!-- BOTTOM NAV -->
+  <!-- Drop-up overlay -->
+  <div id="moreMenuOverlay" onclick="closeMoreMenu()" style="display:none;position:fixed;inset:0;z-index:199;"></div>
+  <!-- Drop-up menu -->
+  <div id="moreMenu" style="display:none;position:fixed;bottom:60px;right:0;left:0;z-index:200;background:var(--paper);border-top:1.5px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -4px 24px rgba(10,20,30,0.13);padding:8px 0 4px;">
+    <button class="more-menu-item" id="more-tab-pathogens" onclick="switchTabFromMore('pathogens')">
+      <span style="font-size:20px;">🦠</span><span>Pathogens</span>
+    </button>
+    <button class="more-menu-item" id="more-tab-refs" onclick="switchTabFromMore('refs')">
+      <span style="font-size:20px;">📚</span><span>Sources</span>
+    </button>
+    <button class="more-menu-item" id="more-tab-terms" onclick="switchTabFromMore('terms')">
+      <span style="font-size:20px;">⚖️</span><span>Terms</span>
+    </button>
+  </div>
+
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-tab active" onclick="switchTab('intro')" id="tab-intro">
       <span class="nav-tab-icon">🌿</span>
@@ -1524,7 +1548,7 @@ body{
     </button>
     <button class="nav-tab" onclick="switchTab('map')" id="tab-map">
       <span class="nav-tab-icon">🗺️</span>
-      <span class="nav-tab-label">Disease Map</span>
+      <span class="nav-tab-label">Map</span>
     </button>
     <button class="nav-tab" onclick="switchTab('toolkit')" id="tab-toolkit">
       <span class="nav-tab-icon">🧰</span>
@@ -1534,17 +1558,9 @@ body{
       <span class="nav-tab-icon">📅</span>
       <span class="nav-tab-label">Season</span>
     </button>
-    <button class="nav-tab" onclick="switchTab('pathogens')" id="tab-pathogens">
-      <span class="nav-tab-icon">🦠</span>
-      <span class="nav-tab-label">Pathogens</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('refs')" id="tab-refs">
-      <span class="nav-tab-icon">📚</span>
-      <span class="nav-tab-label">Sources</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('terms')" id="tab-terms">
-      <span class="nav-tab-icon">📋</span>
-      <span class="nav-tab-label">Terms</span>
+    <button class="nav-tab" id="tab-more" onclick="toggleMoreMenu()">
+      <span class="nav-tab-icon">•••</span>
+      <span class="nav-tab-label">More</span>
     </button>
   </nav>
 
@@ -1623,9 +1639,33 @@ const WIZARD_TOTAL = 4;
 // ══════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════
+function toggleMoreMenu(){
+  const menu = document.getElementById('moreMenu');
+  const overlay = document.getElementById('moreMenuOverlay');
+  const open = menu.style.display !== 'none';
+  menu.style.display = open ? 'none' : 'block';
+  overlay.style.display = open ? 'none' : 'block';
+  document.getElementById('tab-more').classList.toggle('active', !open);
+}
+
+function closeMoreMenu(){
+  document.getElementById('moreMenu').style.display = 'none';
+  document.getElementById('moreMenuOverlay').style.display = 'none';
+  document.getElementById('tab-more').classList.remove('active');
+}
+
+function switchTabFromMore(id){
+  closeMoreMenu();
+  switchTab(id);
+  document.getElementById('tab-more').classList.add('active');
+  document.querySelectorAll('.more-menu-item').forEach(el=>
+    el.classList.toggle('active-more', el.id === 'more-tab-'+id));
+}
+
 function switchTab(tab){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.more-menu-item').forEach(el=>el.classList.remove('active-more'));
   document.getElementById('screen-'+tab)?.classList.add('active');
   document.getElementById('tab-'+tab)?.classList.add('active');
   document.getElementById('contentArea').scrollTop = 0;
@@ -2801,7 +2841,7 @@ async function vmSignIn(){
     errEl.style.display='block'; return; }
   _user = data.user;
   const initials = (_user.email||'?')[0].toUpperCase();
-  document.getElementById('topUser').textContent = initials;
+  document.getElementById('topUser').textContent = 'Sign out';
   document.getElementById('topUser').title = _user.email||'';
   document.getElementById('vmSignInPrompt').style.display = 'none';
   // Show loading state in data card while fetching
@@ -2840,7 +2880,7 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
       _user = session.user;
       const initials = (_user.email||'?')[0].toUpperCase();
       const topUser = document.getElementById('topUser');
-      if(topUser){ topUser.textContent = initials; topUser.title = _user.email||''; }
+      if(topUser){ topUser.textContent = 'Sign out'; topUser.title = _user.email||''; }
       await loadHiveData();
     }
     // Generate plan or show wizard — after auth is resolved
