@@ -572,7 +572,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">📋 Productivity</a>
           <a href="/planner/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧠 Smart Planner</a>
           <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;border-bottom:1px solid var(--border);" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🎓 Academy <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
-          <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';showToast('🧹 Hive Hygiene — coming soon! 🐝')" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧹 Hygiene <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
+          <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';window.location.href='/hygiene/'" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧹 Hygiene</a>
         </div>
       </div>
       <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
@@ -594,7 +594,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="nav-overflow-item" onclick="closeNavOverflow();window.location.href='/productivity/'">📋 Productivity — inspections &amp; harvests</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();window.location.href='/planner/'">🧠 Smart Planner — treatment planning</div>
     <div class="nav-overflow-item" style="opacity:0.6;" onclick="closeNavOverflow();showToast('🎓 Beekeeper Academy — coming soon! 🐝')">🎓 Beekeeper Academy <span style="font-size:11px;color:var(--text3);">coming soon</span></div>
-    <div class="nav-overflow-item" style="opacity:0.6;" onclick="closeNavOverflow();showToast('🧹 Hive Hygiene — coming soon! 🐝')">🧹 Hive Hygiene <span style="font-size:11px;color:var(--text3);">coming soon</span></div>
+    <div class="nav-overflow-item" style="opacity:0.6;" onclick="closeNavOverflow();window.location.href='/hygiene/'">🧹 Hive Hygiene</div>
     <div style="height:1px;background:rgba(255,255,255,0.15);margin:4px 0;"></div>
     <div class="nav-overflow-item danger" onclick="closeNavOverflow();logout()">Sign Out</div>
   </div>
