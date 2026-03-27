@@ -2205,8 +2205,23 @@ async function generateAiPlan(){
 
   const win = getSeasonalWindow();
   const hiveCount = _hiveData.hives.length;
-  const recentCount = _hiveData.miteHistory[0];
-  const daysSince = recentCount ? Math.floor((Date.now()-new Date(recentCount.date))/(1000*60*60*24)) : null;
+  // Latest count per hive with status
+  const T_CRIT = 9, T_ACT = 3;
+  const latestMitePerHive = {};
+  (_hiveData.miteHistory||[]).forEach(c=>{
+    if(!latestMitePerHive[c.hive_id]||c.date>latestMitePerHive[c.hive_id].date) latestMitePerHive[c.hive_id]=c;
+  });
+  const miteEntries = Object.values(latestMitePerHive);
+  const criticalHives = miteEntries.filter(c=>c.value>=T_CRIT);
+  const aboveThreshHives = miteEntries.filter(c=>c.value>=T_ACT&&c.value<T_CRIT);
+  const managedHives = miteEntries.filter(c=>c.value<T_ACT);
+  const miteSummary = miteEntries.length === 0 ? 'No mite counts on record'
+    : miteEntries.map(c=>{
+        const hive = (_hiveData.hives.find(h=>h.id===c.hive_id)||{}).name||'Hive';
+        const status = c.value>=T_CRIT ? 'CRITICAL' : c.value>=T_ACT ? 'above threshold' : 'managed';
+        const days = Math.floor((Date.now()-new Date(c.date))/(1000*60*60*24));
+        return hive+': '+c.value+'/300 ('+status+', '+days+'d ago)';
+      }).join(' | ');
   const diseases = (_hiveData.diseaseHistory||[]).flatMap(i=>i.diseases||[]).filter(d=>d&&d!=='No Disease Present');
   const uniqueDiseases = [...new Set(diseases)];
 
@@ -2220,7 +2235,7 @@ Beekeeper profile:
 - Ozone/UV access: ${_profile.ozone || 'unknown'}
 - Primary concern: ${_profile.concern || 'general'}
 - Current season window: ${win.label} (${win.msg})
-${recentCount ? `- Last mite count: ${recentCount.value}/300 bees, ${daysSince} days ago` : '- No mite counts on record'}
+- Mite counts (latest per hive): ${miteSummary}${criticalHives.length>0 ? ' ⚠️ '+criticalHives.length+' hive(s) CRITICAL — treat now' : ''}
 ${uniqueDiseases.length > 0 ? `- Recent disease observations: ${uniqueDiseases.join(', ')}` : '- No recent disease observations'}
 ${_hiveData.colonyLosses.length > 0 ? `- Colony losses recorded: ${_hiveData.colonyLosses.length} total. Most recent: ${_hiveData.colonyLosses[0].date} (cause: ${_hiveData.colonyLosses[0].cause||'unspecified'}, last colony strength: ${_hiveData.colonyLosses[0].last_strength||'unknown'})` : '- No colony losses recorded'}
 ${(()=>{
