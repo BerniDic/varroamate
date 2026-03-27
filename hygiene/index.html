@@ -2226,7 +2226,7 @@ async function generateAiPlan(){
   const uniqueDiseases = [...new Set(diseases)];
 
   const prompt = `You are a practical Australian beekeeping hygiene advisor for VarroaMate. 
-Write a concise, warm, practical personalised hygiene analysis for this beekeeper. Use 150–200 words maximum.
+Write a concise, warm, practical personalised hygiene analysis for this beekeeper. Use 200–250 words maximum.
 
 Beekeeper profile:
 - Hives: ${hiveCount || 'unknown'}
@@ -2265,7 +2265,7 @@ Keep it direct, practical and Australian. Never mention MAQS — use Formic PRO.
       const resp = await fetch(`${SUPABASE_URL}/functions/v1/anthropic-proxy`,{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
-        body:JSON.stringify({model:CLAUDE_MODEL, max_tokens:300, messages:[{role:'user',content:prompt}]})
+        body:JSON.stringify({model:CLAUDE_MODEL, max_tokens:500, messages:[{role:'user',content:prompt}]})
       });
       if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
