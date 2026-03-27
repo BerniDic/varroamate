@@ -2262,6 +2262,7 @@ Keep it direct, practical and Australian. Never mention MAQS — use Formic PRO.
         .replace(/\n\n/g,'<br><br>')
         .replace(/\n/g,'<br>');
       btn.style.display = 'none';
+      setTimeout(()=>{ panel.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
       return;
     } catch(e){ lastErr=e; if(!e.message?.includes('busy')) break; }
   }
