@@ -2601,16 +2601,14 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
     if(tempBody&&!targetCanvas) tempBody.innerHTML='<span style="color:var(--text3);">Could not load forecast. Check internet connection.</span>';
   }
 }
-async async function loadSection(elId,prompt,prefProfile){
+async function loadSection(elId,prompt,prefProfile){
   const el=document.getElementById(elId);if(!el)return;
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
   if(!requireAI('guidance')) return;
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
 CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.
-PRODUCT NAMES: Always use "Formic PRO" — never use the outdated name "MAQS". Formic PRO is the current registered product name for formic acid strips in Australia.
-ALCOHOL WASH FREQUENCY: Do NOT recommend 4-weekly alcohol washes during winter (May–August in Australia). In winter, colonies are broodless or have minimal brood — the mite-to-bee ratio naturally rises but wash frequency should reduce to every 6–8 weeks or less. Recommending 4-weekly washes in winter is incorrect and stressful to colonies. Only recommend 4-weekly washes during the active season (September–April).
-FUTURE COUNTS: Do NOT mention upcoming, scheduled, or future alcohol washes. VarroaMate only records completed counts — there is no mechanism to log planned future inspections. Never say things like "your next wash is due" or "no future washes logged" — this data does not exist. Only refer to counts that have already been recorded.`;
+PRODUCT NAMES: Always use "Formic PRO" — never use the outdated name "MAQS". Formic PRO is the current registered product name for formic acid strips in Australia.`;
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
       system:systemPrompt,
