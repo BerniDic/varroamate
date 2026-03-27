@@ -2601,7 +2601,7 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
     if(tempBody&&!targetCanvas) tempBody.innerHTML='<span style="color:var(--text3);">Could not load forecast. Check internet connection.</span>';
   }
 }
-async function loadSection(elId,prompt,prefProfile){
+async async function loadSection(elId,prompt,prefProfile){
   const el=document.getElementById(elId);if(!el)return;
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
   if(!requireAI('guidance')) return;
