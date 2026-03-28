@@ -775,6 +775,75 @@ html, body {
 #popup-overlay.show { display: block; }
 
 /* ── Launch announcement banner ── */
+/* ── Frame bar ── */
+#frame-bar {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 50;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 12px;
+}
+.frame-btn {
+  background: rgba(255,248,220,0.88);
+  border: 1.5px solid rgba(160,110,30,0.35);
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6A4010;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  /* subtle frame lines top & bottom */
+  box-shadow: inset 0 2px 0 rgba(200,160,60,0.2), inset 0 -2px 0 rgba(200,160,60,0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.frame-btn:hover { background: rgba(255,245,200,0.97); border-color: rgba(160,110,30,0.6); }
+
+/* Frame modal overlay */
+#frame-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20,12,4,0.55);
+  z-index: 2000;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+#frame-overlay.open { display: flex; }
+#frame-modal {
+  background: #FFFDF5;
+  border-radius: 18px 18px 0 0;
+  border: 1.5px solid rgba(180,130,40,0.25);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 0 0 env(safe-area-inset-bottom, 20px);
+}
+#frame-modal-inner { padding: 20px 24px 28px; }
+.frame-modal-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(180,130,40,0.3); margin: 12px auto 0; }
+#frame-modal-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #3A2000; margin: 14px 0 4px; }
+#frame-modal-body { font-size: 15px; color: #5A3800; line-height: 1.75; }
+#frame-modal-body h3 { font-size: 16px; font-weight: 700; color: #3A2000; margin: 18px 0 6px; }
+#frame-modal-body ul { padding-left: 18px; margin: 6px 0; }
+#frame-modal-body a { color: #B07010; }
+#frame-modal-close { float: right; background: none; border: none; font-size: 20px; color: #9A7030; cursor: pointer; padding: 0; margin-top: 2px; }
+@media (max-width: 600px) {
+  #frame-bar { gap: 6px; }
+  .frame-btn { font-size: 10px; padding: 4px 9px; }
+}
+
 /* ── About Us button ── */
 #about-btn {
   position: absolute;
@@ -1613,14 +1682,15 @@ html, body {
   <!-- Hint -->
   <p id="hint" aria-hidden="true">click a hive to open the app</p>
 
-  <!-- About Us button -->
-  <button id="about-btn" onclick="openAbout()" aria-label="About us">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L14.4 8.26L21 9.27L16.5 13.64L17.77 20.22L12 17L6.23 20.22L7.5 13.64L3 9.27L9.6 8.26L12 2Z"
-        fill="#E8A020" stroke="#B07010" stroke-width="1.2" stroke-linejoin="round"/>
-    </svg>
-    About us
-  </button>
+  <!-- Frame bar -->
+  <div id="frame-bar">
+    <button class="frame-btn" onclick="openFrame('about')">⭐ About Us</button>
+    <button class="frame-btn" onclick="openFrame('pricing')">🍯 Pricing</button>
+    <button class="frame-btn" onclick="openFrame('faq')">❓ FAQ</button>
+    <button class="frame-btn" onclick="openFrame('contact')">✉️ Contact</button>
+    <button class="frame-btn" onclick="openFrame('privacy')">🔒 Privacy</button>
+    <button class="frame-btn" onclick="openFrame('terms')">📋 Terms</button>
+  </div>
 
 
 <!-- Mobile hive info popup -->
@@ -1661,6 +1731,123 @@ html, body {
 
 <script>
 // ── About Us modal ──────────────────────────────────
+
+// ── FRAME BAR ─────────────────────────────────────
+const FRAME_CONTENT = {
+  about: {
+    title: '⭐ About VarroaMate',
+    body: `<p>VarroaMate is an Australian beekeeping management platform built to help beekeepers monitor, manage and respond to Varroa destructor — and the broader disease ecology it brings.</p>
+<p>Built by beekeepers, for beekeepers. We are Nena &amp; Bernhard, based in the Yarra Valley, Victoria. 🐝</p>
+<h3>The Apps</h3>
+<ul>
+  <li><strong>VarroaMate</strong> — mite tracking, alcohol wash records, treatments and trend charts</li>
+  <li><strong>Smart Planner</strong> — seasonal treatment planning with AI-generated rotation schedules</li>
+  <li><strong>Productivity</strong> — hive inspections, harvests and queen records</li>
+  <li><strong>Hive Hygiene</strong> — personalised sanitation plans, disease transmission map and toolkit scoring</li>
+</ul>
+<p style="margin-top:14px;font-size:13px;color:#9A7030;">VarroaMate is actively developed. Feedback shapes what gets built next — <a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>`
+  },
+  pricing: {
+    title: '🍯 Plans & Pricing',
+    body: `<p>All plans include access to the core VarroaMate app. Paid plans unlock AI features across all apps.</p>
+<h3>🐝 Free — $0</h3>
+<ul>
+  <li>Up to 3 hives · mite counts · treatments · notes · CSV export</li>
+  <li>Productivity app (inspections, harvests, queens)</li>
+  <li>Facebook community access</li>
+</ul>
+<h3>🤖 Free + AI — $2.99/mo or $24.99/yr</h3>
+<ul>
+  <li>Everything in Free · AI guidance panels · AI chat · Smart Planner · Hive Hygiene AI analysis</li>
+</ul>
+<h3>🏡 Hobbyist — $4.99/mo or $41.99/yr</h3>
+<ul>
+  <li>Up to 15 hives · everything in Free + AI</li>
+</ul>
+<h3>🌿 Beekeeper — $9.99/mo or $84.99/yr</h3>
+<ul>
+  <li>Up to 100 hives · everything in Hobbyist</li>
+</ul>
+<p style="margin-top:14px;font-size:13px;color:#9A7030;">All prices in AUD. Annual plans save ~30%. Subscriptions managed via the VarroaMate app.</p>`
+  },
+  faq: {
+    title: '❓ Frequently Asked Questions',
+    body: `<h3>What is Varroa destructor?</h3>
+<p>Varroa is a parasitic mite that feeds on honey bees and vectors viruses. It arrived in Australia in 2022 and is now established. Untreated colonies typically collapse within 2–3 years.</p>
+<h3>Does VarroaMate work offline?</h3>
+<p>The core app works in modern browsers. AI features require an internet connection. Data is stored securely in the cloud via Supabase.</p>
+<h3>Which plan do I need?</h3>
+<p>Start with Free — it covers everything for up to 3 hives. If you want AI guidance, upgrade to Free + AI. Hobbyist and Beekeeper plans suit larger operations.</p>
+<h3>How do I cancel?</h3>
+<p>Subscriptions can be cancelled at any time from the Plans tab inside the VarroaMate app. You keep access until the end of your billing period.</p>
+<h3>Is my data private?</h3>
+<p>Yes. Your hive data is stored securely and never shared or sold. See our Privacy Policy for full details.</p>
+<h3>Can I use VarroaMate in any Australian state?</h3>
+<p>Yes. VarroaMate is aware of which states have confirmed Varroa detections and adjusts AI recommendations accordingly — including suppressing treatment advice in currently Varroa-free states.</p>`
+  },
+  contact: {
+    title: '✉️ Contact Us',
+    body: `<p>We'd love to hear from you — whether it's a bug report, a feature idea, or just a question about your bees.</p>
+<h3>General enquiries</h3>
+<p><a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>
+<h3>Feedback &amp; feature requests</h3>
+<p>Use the Feedback tab inside any VarroaMate app, or email us directly. User feedback directly shapes what gets built next.</p>
+<h3>Commercial &amp; partnership enquiries</h3>
+<p><a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>
+<p style="margin-top:14px;font-size:13px;color:#9A7030;">Based in the Yarra Valley, Victoria, Australia 🐝</p>`
+  },
+  privacy: {
+    title: '🔒 Privacy Policy',
+    body: `<p><em>Last updated: March 2026</em></p>
+<h3>What we collect</h3>
+<p>We collect the information you provide when creating an account (email address) and the beekeeping data you enter (hive records, mite counts, treatments, inspections, harvests). We do not collect payment card details — payments are processed securely by Stripe.</p>
+<h3>How we use your data</h3>
+<p>Your data is used solely to provide the VarroaMate service. We do not sell, share, or use your data for advertising purposes.</p>
+<h3>AI features</h3>
+<p>When you use AI guidance, your hive data is sent to Anthropic's Claude API to generate personalised advice. Data is processed in accordance with Anthropic's privacy policy and is not used to train AI models.</p>
+<h3>Data storage</h3>
+<p>Data is stored securely using Supabase (hosted on AWS in Australia). We use row-level security to ensure you can only access your own data.</p>
+<h3>Your rights</h3>
+<p>You may request deletion of your account and all associated data at any time by contacting <a href="mailto:hello@varroamate.com">hello@varroamate.com</a>.</p>
+<h3>Contact</h3>
+<p><a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>`
+  },
+  terms: {
+    title: '📋 Terms & Conditions',
+    body: `<p><em>Last updated: March 2026</em></p>
+<h3>Use of the service</h3>
+<p>VarroaMate is provided as a beekeeping management tool. You are responsible for your own beekeeping decisions. Information provided by VarroaMate, including AI-generated guidance, is for informational purposes only and does not constitute professional veterinary or agricultural advice.</p>
+<h3>AI guidance disclaimer</h3>
+<p>AI-generated content may contain errors. Always cross-check recommendations against authoritative sources including your state agriculture authority and registered product labels. Treatment decisions remain your responsibility.</p>
+<h3>Subscriptions</h3>
+<p>Paid subscriptions are billed monthly or annually. Cancellations take effect at the end of the current billing period. Refunds are not provided for partial periods.</p>
+<h3>Disease reporting</h3>
+<p>VarroaMate does not replace your legal obligations to report notifiable diseases (including AFB and EFB) to your state agriculture authority. Always comply with your state's biosecurity requirements.</p>
+<h3>Limitation of liability</h3>
+<p>VarroaMate is provided "as is". We are not liable for any losses arising from use of the service or reliance on AI-generated guidance.</p>
+<h3>Contact</h3>
+<p><a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>`
+  }
+};
+
+function openFrame(key){
+  const info = FRAME_CONTENT[key];
+  if(!info) return;
+  document.getElementById('frame-modal-title').textContent = info.title;
+  document.getElementById('frame-modal-body').innerHTML = info.body;
+  const overlay = document.getElementById('frame-overlay');
+  overlay.classList.add('open');
+  document.getElementById('frame-modal').scrollTop = 0;
+}
+
+function closeFrame(){
+  document.getElementById('frame-overlay').classList.remove('open');
+}
+
+function handleFrameOverlay(e){
+  if(e.target === document.getElementById('frame-overlay')) closeFrame();
+}
+
 function openAbout(){
   document.getElementById('about-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1673,7 +1860,7 @@ function handleAboutOverlayClick(e){
   if(e.target === document.getElementById('about-overlay')) closeAbout();
 }
 // Close on Escape
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAbout(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeAbout(); closeFrame(); } });
 
 // ── APP URLS ─────────────────────────────────────
 // ── Launch banner dismiss ────────────────────────
@@ -2218,6 +2405,18 @@ window.addEventListener('load', setup);
 window.addEventListener('resize', ()=>{
   if(!beeFlying) placeBeeAtRest();
 });
+
+<!-- Frame modal -->
+<div id="frame-overlay" onclick="handleFrameOverlay(event)">
+  <div id="frame-modal">
+    <div class="frame-modal-handle"></div>
+    <div id="frame-modal-inner">
+      <button id="frame-modal-close" onclick="closeFrame()">✕</button>
+      <div id="frame-modal-title"></div>
+      <div id="frame-modal-body"></div>
+    </div>
+  </div>
+</div>
 </script>
 </body>
 </html>
