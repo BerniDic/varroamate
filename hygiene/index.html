@@ -2513,7 +2513,7 @@ In 3–4 sentences, identify the single most important tool they should add next
       const resp = await fetch(`${SUPABASE_URL}/functions/v1/anthropic-proxy`,{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
-        body:JSON.stringify({model:CLAUDE_MODEL, max_tokens:250, messages:[{role:'user',content:prompt}]})
+        body:JSON.stringify({model:CLAUDE_MODEL, max_tokens:400, messages:[{role:'user',content:prompt}]})
       });
       if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
@@ -2749,9 +2749,12 @@ function renderHygieneScore(){
         <div style="color:#4A8A6A;font-weight:700;">+${t.points}</div>
       </div>`).join('') : '') +
     (missing.length > 0 ? `<div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-top:10px;margin-bottom:6px;">Not yet in your toolkit</div>` +
-      missing.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:14px;">
-        <div style="color:var(--text3);">${t.label} <span style="font-size:12px;color:var(--text3);">— ${t.reason}</span></div>
-        <div style="color:var(--text3);">+${t.points}</div>
+      missing.map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-size:14px;color:var(--text2);font-weight:600;">${t.label}</div>
+          <div style="font-size:13px;color:var(--text3);flex-shrink:0;margin-left:8px;">+${t.points}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5;">${t.reason}</div>
       </div>`).join('') : '<div style="font-size:14px;color:#4A8A6A;margin-top:8px;">🎉 Full toolkit — excellent hygiene capability!</div>') +
     (missing.length > 0 ? `<div style="font-size:13px;color:var(--text3);margin-top:10px;padding:8px;background:var(--amber-pale);border-radius:6px;border-left:3px solid var(--amber);">
       💡 Tap <strong>Improve my score</strong> below for a personalised recommendation on the best next addition for your situation.
