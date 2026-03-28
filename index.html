@@ -1727,13 +1727,13 @@ html, body {
 
 <!-- Frame bar — outside scene so it doesn't block hive clicks -->
 <div id="frame-bar">
-  <button class="frame-btn frame-btn-desktop" onclick="openFrame('about')">⭐ About Us</button>
-  <button class="frame-btn frame-btn-desktop" onclick="openFrame('pricing')">🍯 Pricing</button>
-  <button class="frame-btn frame-btn-desktop" onclick="openFrame('faq')">❓ FAQ</button>
-  <button class="frame-btn frame-btn-desktop" onclick="openFrame('contact')">✉️ Contact</button>
-  <button class="frame-btn frame-btn-desktop" onclick="openFrame('privacy')">🔒 Privacy</button>
-  <button class="frame-btn frame-btn-desktop" onclick="openFrame('terms')">📋 Terms</button>
-  <button class="frame-btn" id="frame-menu-btn" onclick="openFrame('menu')">🐝 Info ▾</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('about')">About Us</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('pricing')">Pricing</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('faq')">FAQ</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('contact')">Contact</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('privacy')">Privacy</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('terms')">Terms</button>
+  <button class="frame-btn" id="frame-menu-btn" onclick="openFrame('menu')">Info ▾</button>
 </div>
 
 <script>
@@ -1744,12 +1744,12 @@ const FRAME_CONTENT = {
   menu: {
     title: '🐝 VarroaMate Info',
     body: `<div style="display:grid;gap:10px;margin-top:8px;">
-      <button onclick="openFrame('about')"   style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">⭐ About Us</button>
-      <button onclick="openFrame('pricing')" style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">🍯 Pricing</button>
-      <button onclick="openFrame('faq')"     style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">❓ FAQ</button>
-      <button onclick="openFrame('contact')" style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">✉️ Contact</button>
-      <button onclick="openFrame('privacy')" style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">🔒 Privacy</button>
-      <button onclick="openFrame('terms')"   style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">📋 Terms & Conditions</button>
+      <button onclick="openFrame('about')"   style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">About Us</button>
+      <button onclick="openFrame('pricing')" style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">Pricing</button>
+      <button onclick="openFrame('faq')"     style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">FAQ</button>
+      <button onclick="openFrame('contact')" style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">Contact</button>
+      <button onclick="openFrame('privacy')" style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">Privacy</button>
+      <button onclick="openFrame('terms')"   style="width:100%;padding:13px 16px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#5A3800;cursor:pointer;text-align:left;">Terms & Conditions</button>
     </div>`
   },
   about: {
@@ -1807,7 +1807,7 @@ const FRAME_CONTENT = {
 <p>Yes. VarroaMate is aware of which states have confirmed Varroa detections and adjusts AI recommendations accordingly — including suppressing treatment advice in currently Varroa-free states.</p>`
   },
   contact: {
-    title: '✉️ Contact Us',
+    title: 'Contact Us',
     body: `<p>We'd love to hear from you — whether it's a bug report, a feature idea, or just a question about your bees.</p>
 <h3>General enquiries</h3>
 <p><a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>
@@ -1818,7 +1818,7 @@ const FRAME_CONTENT = {
 <p style="margin-top:14px;font-size:13px;color:#9A7030;">Based in the Yarra Valley, Victoria, Australia 🐝</p>`
   },
   privacy: {
-    title: '🔒 Privacy Policy',
+    title: 'Privacy Policy',
     body: `<p><em>Last updated: March 2026</em></p>
 <h3>What we collect</h3>
 <p>We collect the information you provide when creating an account (email address) and the beekeeping data you enter (hive records, mite counts, treatments, inspections, harvests). We do not collect payment card details — payments are processed securely by Stripe.</p>
@@ -1834,7 +1834,7 @@ const FRAME_CONTENT = {
 <p><a href="mailto:hello@varroamate.com">hello@varroamate.com</a></p>`
   },
   terms: {
-    title: '📋 Terms & Conditions',
+    title: 'Terms & Conditions',
     body: `<p><em>Last updated: March 2026</em></p>
 <h3>Use of the service</h3>
 <p>VarroaMate is provided as a beekeeping management tool. You are responsible for your own beekeeping decisions. Information provided by VarroaMate, including AI-generated guidance, is for informational purposes only and does not constitute professional veterinary or agricultural advice.</p>
