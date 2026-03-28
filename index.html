@@ -777,7 +777,7 @@ html, body {
 /* ── Launch announcement banner ── */
 /* ── Frame bar ── */
 #frame-bar {
-  position: absolute;
+  position: fixed;
   bottom: 14px;
   left: 50%;
   transform: translateX(-50%);
@@ -1682,15 +1682,7 @@ html, body {
   <!-- Hint -->
   <p id="hint" aria-hidden="true">click a hive to open the app</p>
 
-  <!-- Frame bar -->
-  <div id="frame-bar">
-    <button class="frame-btn" onclick="openFrame('about')">⭐ About Us</button>
-    <button class="frame-btn" onclick="openFrame('pricing')">🍯 Pricing</button>
-    <button class="frame-btn" onclick="openFrame('faq')">❓ FAQ</button>
-    <button class="frame-btn" onclick="openFrame('contact')">✉️ Contact</button>
-    <button class="frame-btn" onclick="openFrame('privacy')">🔒 Privacy</button>
-    <button class="frame-btn" onclick="openFrame('terms')">📋 Terms</button>
-  </div>
+
 
 
 <!-- Mobile hive info popup -->
@@ -1728,6 +1720,16 @@ html, body {
 </div>
 
 </div><!-- end scene -->
+
+<!-- Frame bar — outside scene so it doesn't block hive clicks -->
+<div id="frame-bar">
+  <button class="frame-btn" onclick="openFrame('about')">⭐ About Us</button>
+  <button class="frame-btn" onclick="openFrame('pricing')">🍯 Pricing</button>
+  <button class="frame-btn" onclick="openFrame('faq')">❓ FAQ</button>
+  <button class="frame-btn" onclick="openFrame('contact')">✉️ Contact</button>
+  <button class="frame-btn" onclick="openFrame('privacy')">🔒 Privacy</button>
+  <button class="frame-btn" onclick="openFrame('terms')">📋 Terms</button>
+</div>
 
 <script>
 // ── About Us modal ──────────────────────────────────
