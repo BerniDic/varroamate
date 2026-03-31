@@ -109,9 +109,10 @@ body{
 .top-icon-btn{
   background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
   color:rgba(255,255,255,0.85);
-  width:28px;height:28px;border-radius:50%;
-  cursor:pointer;font-size:15px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
+  height:32px;border-radius:16px;
+  padding:0 10px;gap:4px;
+  cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;
 }
 
 /* ══════════════════════════════════════════════
@@ -543,7 +544,7 @@ body{
     <div class="top-right">
       <button class="top-user" id="topUser" onclick="signOut()" title="Sign out" style="font-size:11px;font-weight:700;letter-spacing:0.3px;cursor:pointer;">Sign out</button>
       <div style="position:relative;" id="vmhh-apps-wrap">
-        <button class="top-icon-btn" onclick="toggleApps()" title="Switch app" style="display:flex;align-items:center;gap:4px;padding:6px 10px;font-size:13px;font-weight:700;">🐝 Apps ▾</button>
+        <button class="top-icon-btn" onclick="toggleApps()" title="Switch app">🐝 Apps ▾</button>
         <div id="vmhh-apps-dropdown">
           <a href="/app/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);"><svg width="20" height="14" viewBox="0 0 128 90" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="22" y1="44" x2="12" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="52" x2="8" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="60" x2="8" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="22" y1="68" x2="12" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="44" x2="100" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="52" x2="104" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="60" x2="104" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="68" x2="100" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="58" rx="38" ry="26" fill="#C8820A"/><ellipse cx="56" cy="54" rx="28" ry="17" fill="#A86808"/><ellipse cx="56" cy="37" rx="9" ry="6" fill="#B07008"/></svg> VarroaMate</a>
           <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">📋 Productivity</a>
