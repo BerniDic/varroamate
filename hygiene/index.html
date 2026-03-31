@@ -861,7 +861,7 @@ body{
           <div class="ai-panel-title">🤖 Your personalised analysis</div>
           <div class="ai-panel-body" id="aiNarrativeText">Generating…</div>
         </div>
-        <button class="btn btn-forest btn-sm" id="generateAiBtn" onclick="generateAiPlan()" style="margin-bottom:14px;width:100%;">✨ Generate AI Analysis</button>
+        <button class="btn btn-forest btn-sm" id="generateAiBtn" onclick="generateAiPlan()" style="margin-bottom:14px;width:100%;">✨ Hygiene Plan AI Analysis</button>
 
         <button class="btn btn-outline btn-sm" onclick="resetProfile()" style="margin-top:4px;">↩ Update my profile</button>
       </div>
@@ -2257,7 +2257,12 @@ Structure your response with these three sections only:
 2. **Top Priority Action** — one clear thing they should do this week
 3. **For Your Toolkit** — one practical improvement specific to their equipment situation
 
-Keep it direct, practical and Australian. Never mention MAQS — use Formic PRO. Do not repeat the checklist items.`;
+Keep it direct, practical and Australian. Never mention MAQS — use Formic PRO. Do not repeat the checklist items.
+
+CRITICAL FIELD HYGIENE RULES — you must follow these exactly:
+- NEVER recommend ozone or UV-C treatment between hives during an apiary inspection. Ozone generators and UV-C cabinets are home/shed equipment only — they require setup time and are completely impractical in the field.
+- For between-hive tool disinfection in the field, ALWAYS recommend carrying multiple hive tools and wiping with methylated spirits (≥70% ethanol) for rapid disinfection between hives. This is the correct, practical field method.
+- Only recommend ozone/UV-C for home use: treating stored comb, equipment between apiary visits, or gear stored in the shed.`;
 
   const delays = [0, 4000, 8000];
   let lastErr;
