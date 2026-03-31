@@ -36,8 +36,8 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .screen{display:none !important;min-height:100vh;flex-direction:column;}
 .screen.active{display:flex !important;}
 .topnav{background:var(--amber-dark);color:#fff;padding:0 32px;height:62px;display:flex;align-items:center;position:sticky;top:0;z-index:1100;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
-.topnav-inner{display:flex;align-items:center;gap:14px;max-width:960px;width:100%;margin:0 auto;}
-.logo{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;flex:1;}
+.topnav-inner{display:flex;align-items:center;gap:8px;max-width:960px;width:100%;margin:0 auto;overflow:hidden;}
+.logo{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .logo em{font-style:italic;color:var(--amber-light);}
 .nav-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;padding:9px 18px;border-radius:20px;cursor:pointer;font-size:17px;font-family:inherit;transition:background 0.2s;}
 .nav-info-wrap{position:relative;display:inline-flex;align-items:center;}
@@ -64,7 +64,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   .tab-item .tab-icon{font-size:18px;}
 }
 .page-body{flex:1;padding:28px 32px calc(90px + env(safe-area-inset-bottom));max-width:960px;width:100%;margin:0 auto;}
-@media(max-width:600px){.page-body{padding:16px 14px calc(88px + env(safe-area-inset-bottom));}}
+@media(max-width:600px){.logo{font-size:20px;} .page-body{padding:16px 14px calc(88px + env(safe-area-inset-bottom));}}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
 @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);}
@@ -561,7 +561,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <div id="s-apiaries" class="screen">
   <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a>
     <div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div>
-    <span id="save-badge" style="font-size:12px;color:#FFE082;opacity:0;transition:opacity 0.4s;font-weight:600;">💾 saved</span>
+    <span id="save-badge" style="font-size:12px;color:#FFE082;opacity:0;transition:opacity 0.4s;font-weight:600;flex-shrink:0;">💾 saved</span>
     <!-- Desktop buttons (hidden on ≤780px) -->
     <!-- Desktop: just Apps dropdown + Sign Out. All utility actions in ⋮ overflow menu -->
     <span class="nav-desktop-btns" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
