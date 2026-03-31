@@ -174,11 +174,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .star{transition:transform 0.15s;}.star:hover{transform:scale(1.2);}
 .star.active{color:var(--amber-light);}.star.inactive{color:var(--border);}
 /* CHAT */
-.chat-fab{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));right:16px;width:56px;height:56px;border-radius:50%;background:var(--amber-dark);color:#fff;font-size:26px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);z-index:1999;border:none;transition:all 0.2s;}
+.chat-fab{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));right:16px;width:56px;height:56px;border-radius:50%;background:var(--amber-dark);color:#fff;font-size:26px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);z-index:1501;border:none;transition:all 0.2s;}
 
 .chat-fab.visible{display:flex;}
 .chat-fab:hover{background:var(--amber);transform:scale(1.08);}
-.chat-panel{position:fixed;bottom:148px;right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border);z-index:299;display:none;flex-direction:column;max-height:420px;overflow:hidden;}
+.chat-panel{position:fixed;bottom:148px;right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border);z-index:1500;display:none;flex-direction:column;max-height:420px;overflow:hidden;}
 .chat-panel.open{display:flex;}
 .chat-header{background:var(--amber-dark);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-radius:18px 18px 0 0;flex-shrink:0;}
 .chat-header-info{flex:1;}
@@ -564,13 +564,14 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <span id="save-badge" style="font-size:12px;color:#FFE082;opacity:0;transition:opacity 0.4s;font-weight:600;">💾 saved</span>
     <!-- Desktop buttons (hidden on ≤780px) -->
     <!-- Desktop: just Apps dropdown + Sign Out. All utility actions in ⋮ overflow menu -->
-    <span class="nav-desktop-btns" style="display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;">
+    <span class="nav-desktop-btns" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
 
       <button class="nav-btn" onclick="logout()" title="Sign out" style="background:rgba(255,255,255,0.10);">Sign Out</button>
       <button class="nav-overflow-btn" id="nav-overflow-btn-desktop" onclick="toggleNavOverflow()" title="More options" style="display:flex;">⋮</button>
     </span>
-    <!-- Apps dropdown — always visible -->
+    <!-- Right nav group: always visible -->
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
     <div style="position:relative;display:inline-flex;flex-shrink:0;" id="apps-dropdown-wrap">
         <button class="nav-btn" onclick="toggleAppsDropdown()" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button>
         <div id="apps-dropdown" style="display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid var(--border);min-width:200px;overflow:hidden;z-index:1300;">
@@ -582,6 +583,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
     <!-- Mobile overflow menu button (shown on ≤900px, hidden on desktop via nav-desktop-btns logic) -->
     <button class="nav-overflow-btn" id="nav-overflow-btn" onclick="toggleNavOverflow()" title="Menu">⋮</button>
+    </div><!-- end right nav group -->
   </div></div>
   <!-- Mobile overflow dropdown -->
   <div class="nav-overflow-menu" id="nav-overflow-menu">
