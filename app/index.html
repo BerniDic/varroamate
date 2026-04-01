@@ -49,15 +49,19 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 .nav-btn:hover{background:rgba(255,255,255,0.28);}
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--amber-dark);display:none;justify-content:center;align-items:center;height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);z-index:2000;box-shadow:0 -2px 8px rgba(0,0,0,0.2);}
 .tabbar.visible{display:flex;}
-.tabbar-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:960px;padding:0 20px;height:64px;}
+.tabbar-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:960px;padding:0 8px;height:64px;}
 .tab-item{display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);cursor:pointer;padding:8px 10px;border-radius:10px;transition:all 0.2s;font-size:14px;gap:3px;}
 .tab-item .tab-icon{font-size:28px;}
 .tab-item.active{color:var(--amber-light);}
 .tab-item:hover{color:#fff;}
-@media(max-width:420px){
-  .tab-item{padding:5px 2px;font-size:10px;gap:2px;min-width:0;flex:1;}
-  .tab-item .tab-icon{font-size:20px;}
-  .tabbar-inner{padding:0 2px;}
+@media(max-width:480px){
+  .tab-item{padding:4px 1px;font-size:9px;gap:1px;min-width:0;flex:1;}
+  .tab-item .tab-icon{font-size:18px;}
+  .tabbar-inner{padding:0 1px;}
+}
+@media(max-width:360px){
+  .tab-item{padding:3px 0;font-size:8px;}
+  .tab-item .tab-icon{font-size:16px;}
 }
 @media(max-width:360px){
   .tab-item{padding:4px 1px;font-size:9px;}
@@ -343,6 +347,31 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 @media(max-width:600px){
   .nav-overflow-menu{top:54px;}
 }
+
+/* ── Treatment Library ───────────────────────────── */
+.lib-card { padding:0; overflow:hidden; margin-bottom:12px; }
+.lib-card-header { display:flex; justify-content:space-between; align-items:center;
+  padding:14px 18px; cursor:pointer; gap:12px; }
+.lib-card-header:hover { background:var(--amber-pale); }
+.lib-card-title { font-size:16px; font-weight:700; color:var(--text); font-family:'Playfair Display',serif; }
+.lib-card-meta { font-size:12px; color:var(--text3); margin-top:3px; }
+.lib-chevron { font-size:20px; color:var(--text3); flex-shrink:0; transition:transform 0.2s; }
+.lib-chevron.open { transform:rotate(180deg); }
+.lib-card-body { padding:0 18px 18px; }
+.lib-section { margin-top:14px; }
+.lib-section-title { font-size:12px; font-weight:700; color:var(--text3); text-transform:uppercase;
+  letter-spacing:0.6px; margin-bottom:6px; }
+.lib-section p { font-size:14px; color:var(--text2); line-height:1.7; margin:0; }
+.lib-form-card { background:var(--bg2); border-radius:8px; padding:12px 14px; margin-bottom:8px; }
+.lib-form-title { font-size:13px; font-weight:700; color:var(--amber-dark); margin-bottom:6px; }
+.lib-form-card p { font-size:13px; color:var(--text2); line-height:1.65; margin:0; }
+
+/* ── References ───────────────────────────────────── */
+.ref-item { padding:10px 0; border-bottom:1px solid var(--border); }
+.ref-item:last-child { border-bottom:none; }
+.ref-authors { font-size:13px; font-weight:600; color:var(--text); }
+.ref-title { font-size:13px; color:var(--text2); margin:2px 0; font-style:italic; }
+.ref-details { font-size:12px; color:var(--text3); margin-top:1px; }
 </style>
 </head>
 <body>
@@ -1019,14 +1048,545 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════════════
+     TREATMENT LIBRARY SCREEN
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="s-library" class="screen">
+  <div class="topnav"><div class="topnav-inner">
+    <a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;flex-shrink:0;">🏠</a>
+    <div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div>
+  </div></div>
+  <div class="page-body">
+    <h1 class="page-title">Treatment Library</h1>
+    <p class="page-subtitle">Varroa treatments grouped by mode of action</p>
+
+    <div style="background:var(--amber-pale);border:1.5px solid var(--amber);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:14px;color:var(--text2);line-height:1.6;">
+      📖 This library explains how each treatment works — the chemistry, biology, and practical considerations. It is educational, not prescriptive. Always follow registered product labels and your state's current regulatory requirements.
+    </div>
+
+    <!-- ── GROUP 1: ORGANIC ACIDS ── -->
+    <div class="section-header" style="margin-top:4px;">🧪 Organic Acids</div>
+    <div class="section-sub">Naturally occurring acids — oxalic acid and formic acid — that are lethal to Varroa at concentrations tolerated by adult bees.</div>
+
+    <!-- Oxalic Acid -->
+    <div class="card lib-card" id="lib-oa">
+      <div class="lib-card-header" onclick="toggleLib('oa')">
+        <div>
+          <div class="lib-card-title">Oxalic Acid (OA)</div>
+          <div class="lib-card-meta">Registered products: OA Vaporisation · OA Dribble · Aluen CAP · Api-Bioxal</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-oa">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-oa" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">The chemistry</div>
+          <p>Oxalic acid (C₂H₂O₄) is a dicarboxylic acid — it carries two carboxyl groups (–COOH), meaning it can donate two protons (H⁺). This makes it a <strong>diprotic acid</strong>, unlike formic acid which is monoprotic (one proton). In water it dissociates in two steps, giving it stronger overall acidifying power at equivalent concentrations. Oxalic acid occurs naturally in many plants — rhubarb, spinach, and beeswax all contain it — and has been used in beekeeping for decades. In Europe it has been registered since the 1980s.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects Varroa</div>
+          <p>The exact mechanism of action is not fully established, but the leading hypothesis is that oxalic acid disrupts pH-dependent processes in Varroa physiology. The mite's haemolymph (internal fluid) is sensitive to pH changes. Direct contact with oxalic acid — either through grooming, physical contact with treated bees, or vapour absorption — causes ionic disruption and cytotoxic effects. Mites exposed to effective concentrations show paralysis and death within hours to days. Oxalic acid does not penetrate sealed wax cappings, which is why it is <strong>significantly more effective in broodless colonies</strong> where all mites are on adult bees and fully exposed.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects bees</div>
+          <p>Adult honey bees are substantially more tolerant of oxalic acid than Varroa mites. The mechanisms behind this differential tolerance are not completely understood, but bees appear to have greater capacity to buffer pH changes and to metabolise or excrete small quantities of the acid. At recommended application rates, short-term effects on adult bees are minimal. However, all OA formulations are harder on brood: OA dribble in particular, when applied with sealed brood present, can damage larvae and pupae exposed through wax cell walls. Repeated vapour treatments at short intervals can also cause measurable increases in adult bee mortality if overdosed.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on honey and frames</div>
+          <p>Oxalic acid is a naturally occurring constituent of honey. Treatment does not meaningfully increase honey OA levels above natural background concentrations at registered application rates. No withholding period from honey is required for OA vaporisation under most registrations. Frames and wax are not damaged by OA treatment.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Three formulations — why different forms?</div>
+          <div style="margin-top:8px;">
+            <div class="lib-form-card">
+              <div class="lib-form-title">OA Vaporisation (sublimation)</div>
+              <p>OA crystals are heated on a wand or electric plate placed at the hive entrance. The acid sublimates — converting directly from solid to vapour — and deposits as fine crystals on all hive surfaces and bee bodies. Bees moving through the hive distribute and ingest crystals, and mites on adult bees are exposed continuously. <strong>Highly effective in broodless colonies</strong>; repeated applications (typically 3 × weekly) partially compensate for the presence of capped brood. Does not require opening the hive. The vapour is hazardous to human lungs — full respiratory PPE is essential.</p>
+            </div>
+            <div class="lib-form-card">
+              <div class="lib-form-title">OA Dribble</div>
+              <p>A warm sugar-OA solution is trickled directly onto the bees between frames. Bees spread the treatment during grooming and trophallaxis. Effective and inexpensive. <strong>Requires a broodless colony</strong> — OA dribble has poor efficacy when sealed brood is present, as mites in capped cells are not exposed. Only one application per treatment course. Higher short-term bee mortality than vaporisation at equivalent concentrations; considered harder on the colony. Suited to winter broodless treatment in colder climates.</p>
+            </div>
+            <div class="lib-form-card">
+              <div class="lib-form-title">Aluen CAP (slow-release OA + lactic acid)</div>
+              <p>A polymer cap containing a mixture of oxalic acid and lactic acid that releases slowly over 4–6 weeks. Because release is sustained, it can partially penetrate the brood cycle — some efficacy with brood present, though lower than in broodless conditions. Less abrupt bee exposure than dribble or vapour. Suited to treatment outside the broodless window when other options are limited. No heat or mixing required — practical in the field.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formic Acid -->
+    <div class="card lib-card" id="lib-fa">
+      <div class="lib-card-header" onclick="toggleLib('fa')">
+        <div>
+          <div class="lib-card-title">Formic Acid</div>
+          <div class="lib-card-meta">Registered products: Formic PRO (formic acid strips)</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-fa">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-fa" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">The chemistry</div>
+          <p>Formic acid (HCOOH) is the simplest carboxylic acid — a single carbon with one carboxyl group. It is <strong>monoprotic</strong>, donating one proton per molecule, compared to oxalic acid's two. It occurs naturally in ant venom (the name derives from <em>formica</em>, Latin for ant) and in small amounts in honey. Formic acid is a volatile liquid that evaporates at room temperature, making it a fumigant — it acts as vapour within the hive atmosphere rather than through direct bee-to-mite contact.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects Varroa</div>
+          <p>Formic acid vapour penetrates wax cappings — it is one of the few treatments that reaches mites in sealed brood cells. This makes it <strong>uniquely effective with brood present</strong>. The acid disrupts mite respiratory and metabolic function through pH-dependent mechanisms and direct cytotoxicity. Efficacy is highly temperature-dependent: below approximately 10°C the evaporation rate drops too low for effective vapour concentrations to build in the hive; above 29–30°C bees may abscond or significant queen mortality can occur.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Temperature requirements</div>
+          <p>The therapeutic window for formic acid is roughly <strong>10–29°C ambient</strong>. Within this range, higher temperatures accelerate evaporation and treatment efficacy, but also increase bee and queen exposure risk. At temperatures approaching 30°C, increased queen loss has been documented. At cooler temperatures, the treatment may be completed with insufficient vapour concentration for full efficacy. Spring and autumn are the optimal treatment windows in most Australian climates.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects bees</div>
+          <p>Formic acid is irritating to bees at treatment concentrations. Increased fanning behaviour and temporary bees clustering at the entrance (bearding) are common. Some queen loss occurs in a proportion of treatments, particularly at higher temperatures. Worker mortality during the 7-day treatment period is typically measurable but manageable at recommended rates. Adult bees are substantially more tolerant than Varroa.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on honey and frames</div>
+          <p>Formic acid is a natural honey constituent. Treatment at registered rates does not produce honey residue levels above background. Supers may remain on during treatment under most registrations. No wax or frame damage. Note: a slight increase in honey acidity immediately post-treatment is possible; this normalises quickly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GROUP 2: ESSENTIAL OILS (THYMOL) ── -->
+    <div class="section-header">🌿 Essential Oils — Thymol</div>
+    <div class="section-sub">Plant-derived phenolic compounds that affect mite neurology and respiration.</div>
+
+    <div class="card lib-card" id="lib-thymol">
+      <div class="lib-card-header" onclick="toggleLib('thymol')">
+        <div>
+          <div class="lib-card-title">Thymol</div>
+          <div class="lib-card-meta">Registered products: Apiguard · ApiLife Var</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-thymol">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-thymol" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">The chemistry</div>
+          <p>Thymol (2-isopropyl-5-methylphenol) is a naturally occurring monoterpenoid phenol found in thyme, oregano, and related plants. It is a white crystalline solid at room temperature, highly aromatic, and moderately volatile. As a phenol, it has antiseptic properties and is active against a broad range of microorganisms. In beekeeping it functions primarily as a fumigant — its vapour builds up within the hive and contacts bees and mites.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects Varroa</div>
+          <p>Thymol acts through multiple mechanisms. It disrupts octopamine signalling — octopamine is a key neurotransmitter in insects and arachnids (including mites) that regulates behaviour and physiology. Thymol also inhibits acetylcholinesterase activity and disrupts the function of the mite's exoskeletal cuticle, reducing waterproofing and increasing desiccation. The vapour is absorbed through the mite's spiracles (respiratory openings), causing neurological disruption. It does not readily penetrate sealed wax cappings, so efficacy is reduced with significant sealed brood.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Temperature requirements</div>
+          <p>Thymol's vapour pressure is strongly temperature-dependent. The effective therapeutic window is approximately <strong>15–30°C</strong>. Below 15°C, evaporation is insufficient to reach lethal concentrations inside the hive. Above 30°C, evaporation accelerates beyond the therapeutic range and bees may abscond or suffer increased mortality. Thymol is unsuitable for winter treatment and problematic during summer heatwaves. Spring and autumn in temperate Australian climates are optimal windows.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects bees</div>
+          <p>Bees are significantly more tolerant of thymol than mites, but at treatment concentrations the compound is irritating. Increased entrance bearding, reduced foraging, and temporary disruption of colony behaviour are common. Brood mortality can occur at higher temperatures when vapour concentrations spike. Both Apiguard and ApiLife Var require honey super removal, as thymol taints honey at detectable levels.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on honey and frames</div>
+          <p>Thymol taints honey at detectable and unacceptable levels at treatment concentrations. <strong>Honey supers must be removed before treatment</strong>. Frames and wax are not chemically damaged, though the hive environment during treatment carries a strong thyme-like odour that dissipates after treatment completion. A withholding period before honey production should be observed.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GROUP 3: SYNTHETIC ACARICIDES ── -->
+    <div class="section-header">⚗️ Synthetic Acaricides</div>
+    <div class="section-sub">Synthetic compounds targeting the mite nervous system. Highly effective but resistance risk increases with repeated use of the same mode of action.</div>
+
+    <!-- Amitraz -->
+    <div class="card lib-card" id="lib-amitraz">
+      <div class="lib-card-header" onclick="toggleLib('amitraz')">
+        <div>
+          <div class="lib-card-title">Amitraz — Formamidines</div>
+          <div class="lib-card-meta">Registered products: Apivar · Apitraz</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-amitraz">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-amitraz" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">The chemistry</div>
+          <p>Amitraz is a member of the formamidine chemical class — compounds characterised by the –N=CH–N– functional group. It is a synthetic acaricide and insecticide developed in the 1970s and widely used in agriculture for tick and mite control. In beekeeping it is impregnated into plastic strips that are hung between brood frames, releasing the active ingredient slowly over 6–8 weeks as bees rub against them and distribute amitraz through the colony.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects Varroa</div>
+          <p>Amitraz is an <strong>octopamine receptor agonist</strong> — it mimics and over-stimulates the octopamine signalling system in the mite's nervous system. Octopamine is the invertebrate equivalent of adrenaline, regulating aggression, locomotion, and many basic physiological functions. Over-stimulation causes hyperactivity, loss of coordination, paralysis, and death. It also inhibits monoamine oxidase (MAO), an enzyme involved in breaking down neurotransmitters, compounding the neurological disruption. Amitraz is highly efficacious — mite mortality begins within hours of exposure. It is active with brood present as mites carry amitraz into cells on their bodies.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Temperature requirements</div>
+          <p>Amitraz efficacy is temperature-dependent — at temperatures below approximately 10°C, bees cluster and reduce movement, limiting the physical contact mechanism needed to distribute amitraz through the colony. Treatment during extended cold winters in cool-climate apiaries may be less effective. For most of Australia, this is not a major constraint except in alpine zones in mid-winter.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Resistance risk</div>
+          <p>Amitraz resistance in Varroa has been documented in multiple countries. In 2024–25, NSW DPIRD confirmed the first cases of suspected amitraz resistance in Australian Varroa populations. Resistance develops when colonies are treated repeatedly with the same mode of action — mites with slightly altered octopamine receptors survive, reproduce, and pass on resistance. Rotation with other modes of action (organic acids, essential oils, physical methods) is strongly recommended to slow resistance development.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects bees</div>
+          <p>At registered rates, amitraz has a good safety margin for adult bees — they are substantially less sensitive to octopamine-pathway disruption than mites. Queen loss and brood effects are rare at recommended application rates. Amitraz has been detected in beeswax and some studies report sub-lethal behavioural effects on worker bees at elevated wax residue levels.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on honey and frames</div>
+          <p>Amitraz and its breakdown products accumulate in beeswax over repeated treatments. Wax residues persist and may transfer to subsequent crops. <strong>Honey supers must be removed during treatment.</strong> A withholding period is required before honey production. Long-term wax management — including periodic comb replacement — is important for operations using amitraz regularly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pyrethroids -->
+    <div class="card lib-card" id="lib-pyr">
+      <div class="lib-card-header" onclick="toggleLib('pyr')">
+        <div>
+          <div class="lib-card-title">Pyrethroids</div>
+          <div class="lib-card-meta">Registered products: Bayvarol (flumethrin) · Apistan (tau-fluvalinate)</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-pyr">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-pyr" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">The chemistry</div>
+          <p>Pyrethroids are synthetic analogues of pyrethrin — the natural insecticide produced by chrysanthemum flowers. They are highly lipophilic (fat-soluble) compounds that bind strongly to biological membranes and accumulate in wax. In beekeeping, flumethrin (Bayvarol) and tau-fluvalinate (Apistan) are impregnated into plastic strips placed between brood frames. Their mode of action is identical — contact exposure as bees brush against strips and distribute the compound through the colony.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects Varroa</div>
+          <p>Pyrethroids are <strong>voltage-gated sodium channel modulators</strong>. They bind to sodium channels in nerve cell membranes and hold them in an open state, causing continuous nerve firing, paralysis, and death. This is a fundamentally different mode of action from amitraz (octopamine agonism) and organic acids (pH disruption). What makes pyrethroids unusual in beekeeping is that <strong>honey bees have a natural metabolic tolerance</strong> — they can rapidly detoxify fluvalinate through enzymatic breakdown — while Varroa mites lack this detoxification capacity and are killed at concentrations bees tolerate well.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Resistance — a serious concern</div>
+          <p>Pyrethroid resistance in Varroa is widespread globally and well-documented in Australia. Resistance arises through mutations in the sodium channel target site (knockdown resistance, kdr) that reduce binding affinity, as well as through upregulation of metabolic detoxification enzymes. In resistant populations, treatment efficacy drops dramatically — field studies have recorded efficacies below 20% in some resistant Australian populations. <strong>Varroa populations should be tested for pyrethroid susceptibility before use.</strong> NSW DPIRD has confirmed resistance in multiple NSW apiaries. Pyrethroids should not be used as a first-line treatment in areas with known resistance.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">How it affects bees</div>
+          <p>At registered concentrations, adult bees tolerate pyrethroids well due to their detoxification enzymes. However, sub-lethal effects — including impaired navigation, learning, and foraging efficiency — have been reported at elevated wax residue levels. Brood is generally not affected at recommended rates.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on honey and frames</div>
+          <p>Pyrethroids are highly lipophilic and accumulate extensively in beeswax — wax residues from repeated treatment can reach levels that interfere with brood development in subsequent seasons. Honey supers must be removed during treatment. Wax from heavily treated colonies should be replaced or excluded from cappings wax used in food products. Residues in honey itself are generally low when supers are removed, but monitoring is advisable in high-use operations.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GROUP 4: PHYSICAL & MECHANICAL ── -->
+    <div class="section-header">🔧 Physical &amp; Mechanical Methods</div>
+    <div class="section-sub">Chemical-free approaches that exploit the mite's biology and brood cycle. No resistance risk, but require precise timing and hands-on management.</div>
+
+    <!-- Drone Brood Culling -->
+    <div class="card lib-card" id="lib-drone">
+      <div class="lib-card-header" onclick="toggleLib('drone')">
+        <div>
+          <div class="lib-card-title">Drone Brood Removal</div>
+          <div class="lib-card-meta">Mechanical — exploits Varroa's preference for drone brood</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-drone">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-drone" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">How it works</div>
+          <p>Varroa mites strongly prefer drone brood for reproduction — studies show mites enter drone cells at 8–10 times the rate of worker cells. This preference arises because drone brood has a longer capping period (24 days vs 12 for workers), giving mites more time to complete their reproductive cycle and produce more offspring per cell. By placing a frame of drone-sized foundation in the brood nest and removing it once capped, beekeepers trap a disproportionate number of reproductive mites and physically remove them from the colony — along with the developing drone brood — by freezing or destroying the frame.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Effectiveness and limitations</div>
+          <p>Drone brood removal provides meaningful mite suppression during the active season but is rarely sufficient as a standalone treatment in high-pressure situations. It works best as part of an integrated program. Effectiveness depends on drone rearing — it is only applicable during spring and summer when drones are being produced. In autumn drones are expelled and in winter rearing ceases, making this method inapplicable outside the active season.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on mites, bees and honey</div>
+          <p>No chemical impact on bees, honey, or frames. The colony loses drone-rearing investment (energy, wax, nurse bee time) each cycle, which is a minor cost. No resistance risk — this is a physical removal method with no pharmacological component. Drone populations are temporarily reduced, which may slightly affect queen mating if repeated aggressively during swarm season.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brood Break -->
+    <div class="card lib-card" id="lib-bb">
+      <div class="lib-card-header" onclick="toggleLib('bb')">
+        <div>
+          <div class="lib-card-title">Brood Break — Queen Caging</div>
+          <div class="lib-card-meta">Mechanical — creates a broodless window to maximise OA efficacy</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-bb">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-bb" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">How it works</div>
+          <p>Isolating the queen in a cage prevents her from laying eggs. After approximately 25 days (the worker brood capping period plus buffer), all sealed brood has emerged, leaving the colony temporarily broodless. In this window, all mites are on adult bees — fully exposed and accessible. An OA treatment (vaporisation or dribble) applied in this broodless window achieves dramatically higher efficacy than OA applied with brood present, because no mites are hidden in sealed cells. The brood break combined with OA is one of the most effective non-chemical-strip treatment combinations available.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Timing and seasonal restrictions</div>
+          <p>Best timed in late summer (January–February in Australia) when mite-to-bee ratios are highest and there is still sufficient time for the colony to recover before winter bee rearing begins. Caging the queen in autumn or winter is strongly contraindicated — it disrupts the production of long-lived winter bees, weakening the colony at its most vulnerable point. The technique requires a marked queen for efficient cage placement and release.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on bees and honey</div>
+          <p>No chemical residues. The 25-day broodless period reduces colony population — emerging bees are not replaced during caging. This temporary reduction can affect foraging capacity. Combined with OA vaporisation, there is no honey residue concern. The technique is best paired with post-treatment feeding (sugar syrup) to support colony recovery.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GROUP 5: HEAT TREATMENT ── -->
+    <div class="section-header">🌡️ Heat Treatment</div>
+    <div class="section-sub">Exploits the narrow thermal tolerance difference between Varroa mites and honey bee brood. No chemicals, no residues, no resistance risk.</div>
+
+    <div class="card lib-card" id="lib-heat">
+      <div class="lib-card-header" onclick="toggleLib('heat')">
+        <div>
+          <div class="lib-card-title">Heat Treatment</div>
+          <div class="lib-card-meta">Varroa Controller · Duplex-Framebox Plan</div>
+        </div>
+        <div class="lib-chevron" id="lib-chev-heat">▾</div>
+      </div>
+      <div class="lib-card-body" id="lib-body-heat" style="display:none;">
+        <div class="lib-section">
+          <div class="lib-section-title">The principle — thermal tolerance windows</div>
+          <p>Honey bee pupae and Varroa mites have different lethal temperature thresholds. Varroa mites are killed by sustained exposure to temperatures around <strong>40–42°C</strong> — a range that honey bee brood can tolerate for limited periods. Sealed worker brood is maintained by nurse bees at approximately 34–36°C; drone brood is slightly cooler. The Varroa Controller device heats individual frames to 42°C for a controlled period, exploiting this narrow thermal window to kill mites while preserving developing bees.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on Varroa mites</div>
+          <p>At 40–42°C, Varroa mites experience protein denaturation, enzymatic failure, and rapid desiccation. Mite mortality at correctly maintained temperature is very high. Critically, mites in sealed cells <em>on the treated frame</em> are killed along with mites on adult bees that are rehoused after treatment. The heat treatment directly addresses the phoretic (on-bee) and reproductive (in-cell) populations on the treated frames simultaneously.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on worker brood</div>
+          <p>Worker pupae are significantly more heat-tolerant than mites when exposure time is controlled. At 42°C for the treatment duration used by the Varroa Controller, worker brood survival is high — studies report brood viability above 95% in well-conducted treatments. Duration is critical: prolonged overheating (above 43°C or extended time) increases brood mortality. Temperature monitoring and device calibration are important. Slightly older capped worker brood (closer to emergence) is more heat-tolerant than freshly capped larvae.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on drone brood</div>
+          <p>Drone brood is <strong>more heat-sensitive</strong> than worker brood. Drone cells are typically housed at slightly lower temperatures in the hive, and drone pupae have a narrower thermal tolerance window. At the 42°C treatment temperature, a higher proportion of drone brood may not survive compared to worker brood. This is a consideration in colonies where drone production is intentionally managed, but for most Varroa-control purposes the trade-off is acceptable. The Duplex-Framebox plan minimises this by concentrating mites into a small number of frames before heat treatment.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Seasonal considerations</div>
+          <p>Heat treatment is most practical in spring (Sep–Nov) when the brood nest is small — 2–3 frames per session is manageable. As the colony expands through summer, the number of frames requiring treatment increases, making the standard heat treatment protocol impractical. The Duplex-Framebox plan addresses this by using the queen-caging mechanism to concentrate mite reproduction into just two frames before heat treating, making summer heat treatment feasible without treating the full expanded brood nest.</p>
+        </div>
+        <div class="lib-section">
+          <div class="lib-section-title">Impact on honey and frames</div>
+          <p>No chemical residues whatsoever. Honey, wax, frames, and equipment are unaffected. No resistance risk — mites cannot develop behavioural or physiological resistance to heat. Heat treatment is one of the cleanest options available in terms of product quality and wax contamination. The main costs are equipment investment (Varroa Controller device) and time per treatment session.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── REFERENCES ── -->
+    <div class="section-header" style="margin-top:8px;">📚 References</div>
+    <div class="section-sub">Governmental publications and peer-reviewed sources underpinning the information in this library.</div>
+
+    <div class="card" style="padding:16px 18px;">
+
+      <div class="lib-section" style="margin-top:0;">
+        <div class="lib-section-title">🇦🇺 Australian Regulatory &amp; Government Sources</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">NSW Department of Primary Industries and Regional Development (Frost, E.)</div>
+          <div class="ref-title">Varroa mite integrated pest management. Primefact 13184, 3rd edition.</div>
+          <div class="ref-details">NSW DPIRD, June 2024. Available: dpi.nsw.gov.au</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">NSW Department of Primary Industries</div>
+          <div class="ref-title">Varroa mite (Varroa destructor). Primefact 861, 4th edition.</div>
+          <div class="ref-details">NSW DPI, June 2024. Available: dpi.nsw.gov.au</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Agriculture Victoria</div>
+          <div class="ref-title">About Varroa mite of honey bees.</div>
+          <div class="ref-details">Agriculture Victoria, 2024. Available: agriculture.vic.gov.au</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Australian Pesticides and Veterinary Medicines Authority (APVMA)</div>
+          <div class="ref-title">Public chemical registration information — registered varroacide products.</div>
+          <div class="ref-details">APVMA, 2024. Available: apvma.gov.au</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Plant Health Australia</div>
+          <div class="ref-title">National Varroa Mite Response Plan — Transition to Management.</div>
+          <div class="ref-details">National Management Group, February 2024. Available: planthealthaustralia.com.au</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">🧪 Oxalic Acid</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Gregorc, A., &amp; Planinc, I.</div>
+          <div class="ref-title">Acaricidal effect of oxalic acid in honeybee (Apis mellifera) colonies.</div>
+          <div class="ref-details"><em>Acta Veterinaria Brno</em>, 70(3), 229–233. 2001. doi:10.2754/avb200170030229</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Mutinelli, F., Baggio, A., Capolongo, F., Piro, R., Prandin, L., &amp; Biasion, L.</div>
+          <div class="ref-title">A scientific note on oxalic acid by topical application for the control of varroosis.</div>
+          <div class="ref-details"><em>Apidologie</em>, 28(6), 461–462. 1997. doi:10.1051/apido:19970609</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Charrière, J.-D., &amp; Imdorf, A.</div>
+          <div class="ref-title">Oxalic acid treatment by trickling against Varroa destructor: recommendations for use in central Europe and under field conditions.</div>
+          <div class="ref-details"><em>Apidologie</em>, 33(6), 703–705. 2002. doi:10.1051/apido:2002052</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Rademacher, E., &amp; Harz, M.</div>
+          <div class="ref-title">Oxalic acid for the control of varroosis in honey bee colonies — a review.</div>
+          <div class="ref-details"><em>Apidologie</em>, 37(1), 98–120. 2006. doi:10.1051/apido:2005063</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">🧪 Formic Acid</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Elzen, P.J., Eischen, F.A., Baxter, J.R., Pettis, J., Elzen, G.W., &amp; Wilson, W.T.</div>
+          <div class="ref-title">Fluvalinate resistance in Varroa jacobsoni from several geographic locations.</div>
+          <div class="ref-details"><em>American Bee Journal</em>, 138(9), 674–676. 1998.</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Underwood, R.M., &amp; Currie, R.W.</div>
+          <div class="ref-title">The effects of temperature and dose of formic acid on treatment efficacy against Varroa destructor (Acari: Varroidae), a parasite of Apis mellifera (Hymenoptera: Apidae).</div>
+          <div class="ref-details"><em>Experimental and Applied Acarology</em>, 35(4), 311–322. 2005. doi:10.1007/s10493-005-1098-6</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Calderone, N.W.</div>
+          <div class="ref-title">Evaluation of formic acid for control of Varroa destructor and safety to honey bees.</div>
+          <div class="ref-details"><em>Journal of Apicultural Research</em>, 38(3–4), 149–158. 1999. doi:10.1080/00218839.1999.11101022</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">🌿 Thymol</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Imdorf, A., Bogdanov, S., Ochoa, R.I., &amp; Calderone, N.W.</div>
+          <div class="ref-title">Use of essential oils for the control of Varroa jacobsoni Oud. in honey bee colonies.</div>
+          <div class="ref-details"><em>Apidologie</em>, 30(2–3), 209–228. 1999. doi:10.1051/apido:19990210</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Floris, I., Cabras, P., Garau, V.L., Minelli, E.V., Satta, A., &amp; Troullier, J.</div>
+          <div class="ref-title">Persistence and efficacy of pyrethroids and thymol in different pharmaceutical forms against Varroa destructor (Acari: Varroidae) in an arid environment.</div>
+          <div class="ref-details"><em>Journal of Economic Entomology</em>, 94(3), 602–612. 2001. doi:10.1603/0022-0493-94.3.602</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">⚗️ Amitraz &amp; Formamidines</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Milani, N.</div>
+          <div class="ref-title">The resistance of Varroa jacobsoni Oud. to acaricides.</div>
+          <div class="ref-details"><em>Apidologie</em>, 30(2–3), 229–234. 1999. doi:10.1051/apido:19990211</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Panini, M., Rison, J.L., Manicardi, G.C., Mazzoni, E., &amp; Sgolastra, F.</div>
+          <div class="ref-title">Amitraz and its metabolites inhibit octopamine receptor function in Varroa destructor.</div>
+          <div class="ref-details"><em>Pest Management Science</em>, 75(1), 167–173. 2019. doi:10.1002/ps.5081</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">NSW Department of Primary Industries and Regional Development</div>
+          <div class="ref-title">Pyrethroid resistance in Varroa mites detected in Australian colonies — beekeeper advisory.</div>
+          <div class="ref-details">NSW DPIRD, 2024. Available: dpi.nsw.gov.au</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">⚗️ Pyrethroids &amp; Resistance</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Elzen, P.J., Baxter, J.R., Spivak, M., &amp; Wilson, W.T.</div>
+          <div class="ref-title">Amitraz resistance in Varroa: new discovery in North America.</div>
+          <div class="ref-details"><em>American Bee Journal</em>, 139(5), 362. 1999.</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Pettis, J.S.</div>
+          <div class="ref-title">A scientific note on Varroa destructor resistance to coumaphos in the United States.</div>
+          <div class="ref-details"><em>Apidologie</em>, 35(1), 91–96. 2004. doi:10.1051/apido:2003057</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Bogdanov, S.</div>
+          <div class="ref-title">Residues of pesticides in beeswax and honey — review.</div>
+          <div class="ref-details"><em>Apiacta</em>, 41, 1–19. 2006. Available via Apimondia / FAO</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">🌡️ Heat Treatment</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Goras, G., Tananaki, C., Dimou, M., Gounari, S., Lazaridou, E., &amp; Thrasyvoulou, A.</div>
+          <div class="ref-title">Hyperthermia — a non-chemical control method for Varroa.</div>
+          <div class="ref-details"><em>Journal of the Hellenic Veterinary Medical Society</em>, 66(4), 241–248. 2015. doi:10.12681/jhvms.15671</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Titera, D., &amp; Haklova, M.</div>
+          <div class="ref-title">Heat treatment of honeybee colonies in relation to the Varroa mite.</div>
+          <div class="ref-details"><em>Apidologie</em>, 25(3), 349–354. 1994. doi:10.1051/apido:19940303</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Tabor, K.L., &amp; Ambrose, J.T.</div>
+          <div class="ref-title">The use of heat treatment for control of the honey bee mite, Varroa destructor.</div>
+          <div class="ref-details"><em>American Bee Journal</em>, 141(10), 733–736. 2001.</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">🔧 Drone Brood &amp; Brood Interruption</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Calis, J.N.M., Fries, I., &amp; Ryrie, S.C.</div>
+          <div class="ref-title">Population modelling of Varroa jacobsoni Oud.</div>
+          <div class="ref-details"><em>Apidologie</em>, 30(2–3), 111–124. 1999. doi:10.1051/apido:19990204</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Wilkinson, D., &amp; Smith, G.C.</div>
+          <div class="ref-title">Modelling the efficiency of sampling and trapping Varroa destructor in the drone brood of honey bees (Apis mellifera).</div>
+          <div class="ref-details"><em>American Bee Journal</em>, 142(3), 209–212. 2002.</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Büchler, R., Berg, S., &amp; Le Conte, Y.</div>
+          <div class="ref-title">Breeding for resistance to Varroa destructor in Europe.</div>
+          <div class="ref-details"><em>Apidologie</em>, 41(3), 393–408. 2010. doi:10.1051/apido/2010011</div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">📋 Key Reviews &amp; Frameworks</div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Rosenkranz, P., Aumeier, P., &amp; Ziegelmann, B.</div>
+          <div class="ref-title">Biology and control of Varroa destructor.</div>
+          <div class="ref-details"><em>Journal of Invertebrate Pathology</em>, 103(Suppl 1), S96–S119. 2010. doi:10.1016/j.jip.2009.07.016</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">The Keystone Policy Center on behalf of The Honey Bee Health Coalition</div>
+          <div class="ref-title">Tools for Varroa Management: A Guide to Effective Varroa Sampling and Control, 8th edition.</div>
+          <div class="ref-details">Honey Bee Health Coalition, 2022. Available: honeybeehealthcoalition.org</div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-authors">Goodwin, M., &amp; Taylor, M.</div>
+          <div class="ref-title">Control of Varroa: A Guide for New Zealand Beekeepers.</div>
+          <div class="ref-details">New Zealand Ministry of Agriculture and Forestry, 2007.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:10px 0;border-top:1px solid var(--border);font-size:12px;color:var(--text3);line-height:1.6;">
+        References are provided for educational purposes. Where doi links are listed, articles can be found via doi.org. Government publications are available through the respective agency websites. VarroaMate does not host or reproduce copyrighted content.
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+</div>
+
 <!-- TAB BAR -->
 <div class="tabbar" id="tabbar">
   <div class="tabbar-inner">
     <div class="tab-item active" id="tabnav-apiaries" onclick="goto('s-apiaries')"><div class="tab-icon">🏡</div><div>Apiaries</div></div>
     <div class="tab-item" id="tabnav-guidance" onclick="goto('s-guidance')"><div class="tab-icon">🧭</div><div>Guidance</div></div>
     <div class="tab-item" id="tabnav-subscription" onclick="goto('s-subscription')"><div class="tab-icon">⭐</div><div>Plans</div></div>
-    <div class="tab-item" id="tabnav-prefs" onclick="goto('s-prefs')"><div class="tab-icon">⚙️</div><div>Preferences</div></div>
+    <div class="tab-item" id="tabnav-prefs" onclick="goto('s-prefs')"><div class="tab-icon">⚙️</div><div>Prefs</div></div>
     <div class="tab-item" id="tabnav-feedback" onclick="goto('s-feedback')"><div class="tab-icon">💬</div><div>Feedback</div></div>
+    <div class="tab-item" id="tabnav-library" onclick="goto('s-library')"><div class="tab-icon">📖</div><div>Library</div></div>
     <div class="tab-item" id="tabnav-disclaimer" onclick="goto('s-disclaimer')"><div class="tab-icon">📋</div><div>Terms</div></div>
   </div>
 </div>
@@ -1368,8 +1928,19 @@ let countsPage = 0, treatmentsPage = 0, notesPage = 0;
 const PAGE_SIZE = 5;
 
 // ══ NAVIGATION ══
-const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription','s-disclaimer'];
-const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription','s-disclaimer':'tabnav-disclaimer'};
+const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription','s-disclaimer','s-library'];
+const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription','s-disclaimer':'tabnav-disclaimer','s-library':'tabnav-library'};
+
+
+// ── Treatment Library ─────────────────────────────────────────────────────────
+function toggleLib(id){
+  const body = document.getElementById('lib-body-'+id);
+  const chev = document.getElementById('lib-chev-'+id);
+  if(!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if(chev) chev.classList.toggle('open', !open);
+}
 
 async function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
