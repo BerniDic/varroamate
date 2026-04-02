@@ -807,6 +807,14 @@ html, body {
   -webkit-backdrop-filter: blur(4px);
 }
 .frame-btn:hover { background: rgba(255,245,200,0.97); border-color: rgba(160,110,30,0.6); }
+/* Desktop: show individual buttons, hide Info ▾ */
+.frame-btn-desktop { display: inline-block; }
+#frame-menu-btn    { display: none; }
+/* Mobile: hide individual buttons, show Info ▾ only */
+@media (max-width: 640px) {
+  .frame-btn-desktop { display: none; }
+  #frame-menu-btn    { display: inline-block; }
+}
 
 /* Frame modal overlay */
 #frame-overlay {
