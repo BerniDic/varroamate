@@ -1272,6 +1272,12 @@ body::before{
       <strong>No liability.</strong> No liability is accepted for any loss of colonies, honey, income, or other loss arising from use of this application or reliance on data recorded within it.
     </div>
 
+    <div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:14px;line-height:1.7;">
+      Full legal documents available in the <strong>Terms</strong> tab, or at
+      <a href="https://varroamate.com" target="_blank" style="color:var(--forest);text-decoration:underline;">varroamate.com</a><br>
+      VarroaMate Pty Ltd ACN 696 739 732 · Last updated 1 April 2026
+    </div>
+
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:18px;padding:12px 14px;background:var(--terra-pale);border-radius:var(--radius-sm);border:1.5px solid var(--border);">
       <input type="checkbox" id="discAckCheck" style="margin-top:3px;accent-color:var(--terra);width:16px;height:16px;flex-shrink:0;cursor:pointer;"
         onchange="document.getElementById('discProceedBtn').disabled=!this.checked">
@@ -2557,7 +2563,7 @@ function vmpAckDisclaimer(){
   var btn = document.getElementById('vmp-disc-btn');
   if(row) row.style.display='none';
   if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='Open Productivity →'; btn.onclick=function(){ switchTab('harvest'); }; }
-  switchTab('harvest');
+  // Do not auto-navigate — let user scroll to read legal docs, then tap the button
 }
 function ackDisclaimer(){
   localStorage.setItem('vmp_disc_acked','1');
