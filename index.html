@@ -995,34 +995,6 @@ html, body {
 </style>
 </head>
 <body>
-<!-- ══ MAINTENANCE OVERLAY ══ -->
-<div id="maintenance-overlay" style="
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(15,10,4,0.88);
-  display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
-  <div style="
-    background:#FFFDF5;border-radius:20px;
-    border:2px solid rgba(200,140,30,0.35);
-    box-shadow:0 24px 80px rgba(0,0,0,0.4);
-    padding:40px 36px;max-width:420px;width:90%;
-    text-align:center;font-family:'DM Sans',sans-serif;">
-    <div style="font-size:48px;margin-bottom:16px;cursor:pointer;" id="maint-icon" onclick="maintClick()">🔧</div>
-    <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;
-      color:#3A2000;margin-bottom:12px;">Down for Maintenance</div>
-    <p style="font-size:15px;color:#6A4A20;line-height:1.7;margin-bottom:20px;">
-      VarroaMate is currently offline for scheduled maintenance.<br>
-      We'll be back very soon — thank you for your patience! 🐝
-    </p>
-    <div style="background:#FFF3D0;border-radius:10px;padding:14px 18px;
-      font-size:13px;color:#8A5A00;line-height:1.6;">
-      For urgent enquiries contact us at<br>
-      <a href="mailto:hello@varroamate.com" style="color:#C8820A;font-weight:600;">
-        hello@varroamate.com</a>
-    </div>
-  </div>
-</div>
-
 
 <div class="launch-banner" id="launchBanner">
   ⚠️ <strong>Scheduled maintenance — Monday 31 March, 6:00 pm to 10:00 pm AEDT.</strong>
@@ -2773,26 +2745,5 @@ window.addEventListener('resize', ()=>{
 <p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:bernhard@varroamate.com">bernhard@varroamate.com</a></p>
 <p class="legal-updated">Our Cookies Policy was last updated on 1 April 2026.</p></script>
 
-<script>
-// Maintenance overlay — secret dismiss
-var _maintClicks = 0;
-function maintClick(){
-  _maintClicks++;
-  if(_maintClicks >= 3){
-    document.getElementById('maintenance-overlay').style.display='none';
-    _maintClicks = 0;
-  }
-}
-// Keyboard: type "bee" to dismiss
-var _maintKeys = '';
-document.addEventListener('keydown', function(e){
-  _maintKeys += e.key.toLowerCase();
-  if(_maintKeys.includes('bee')){
-    document.getElementById('maintenance-overlay').style.display='none';
-    _maintKeys = '';
-  }
-  if(_maintKeys.length > 10) _maintKeys = _maintKeys.slice(-10);
-});
-</script>
 </body>
 </html>
