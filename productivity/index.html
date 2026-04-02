@@ -1268,10 +1268,6 @@ body::before{
       <strong>No liability.</strong> No liability is accepted for any loss of colonies, honey, income, or other loss arising from use of this application or reliance on data recorded within it.
     </div>
 
-    <div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:14px;line-height:1.7;">
-      Full legal documents in the <strong>Terms</strong> tab · <a href="https://varroamate.com" target="_blank" style="color:var(--forest);">varroamate.com</a><br>
-      VarroaMate Pty Ltd ACN 696 739 732 · Last updated 1 April 2026
-    </div>
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:18px;padding:12px 14px;background:var(--terra-pale);border-radius:var(--radius-sm);border:1.5px solid var(--border);">
       <input type="checkbox" id="discAckCheck" style="margin-top:3px;accent-color:var(--terra);width:16px;height:16px;flex-shrink:0;cursor:pointer;"
         onchange="document.getElementById('discProceedBtn').disabled=!this.checked">
@@ -1570,6 +1566,11 @@ body::before{
         <div id="lossList"><div class="loading-spinner"><div class="spinner"></div>Loading…</div></div>
       </div>
     </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  
     <!-- ══ SCREEN: DISCLAIMER ══ -->
     <div class="screen" id="screen-disclaimer">
       <div style="padding:20px 16px 100px;">
@@ -1613,10 +1614,9 @@ body::before{
           I understand — open Productivity
         </button>
 
-        <!-- Legal documents -->
+        <!-- Legal Documents -->
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
           <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:14px;">⚖️ Legal Documents</div>
-
           <div class="legal-doc" style="background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
             <h3 class="legal-h3" style="margin-top:0;">Terms &amp; Conditions</h3>
 <h2 class="legal-h2">Terms and Conditions</h2>
@@ -1897,7 +1897,6 @@ body::before{
 </table>
 <p class="legal-updated">Last updated: 1 April 2026</p>
           </div>
-
           <div class="legal-doc" style="background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
             <h3 class="legal-h3" style="margin-top:0;">Privacy Policy</h3>
 
@@ -2001,12 +2000,11 @@ body::before{
 <h3 class="legal-h3">Contact Us</h3>
 <ol class="legal-ol" start="14">
 <li>For further information about our privacy policy or practices, or to access or correct your personal information, or make a complaint, please contact us using the details set out below:
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#7d1f180f13151c0f193d0b1c0f0f121c101c0918531e1210"><span class="__cf_email__" data-cfemail="8eecebfce0e6effceacef8effcfce1efe3effaeba0ede1e3">[email&#160;protected]</span></a></p>
+<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:bernhard@varroamate.com">bernhard@varroamate.com</a></p>
 </li>
 </ol>
 <p class="legal-updated">Our privacy policy was last updated on 1 April 2026.</p>
           </div>
-
           <div class="legal-doc" style="background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
             <h3 class="legal-h3" style="margin-top:0;">Cookies Policy</h3>
 
@@ -2046,7 +2044,7 @@ body::before{
 
 <h3 class="legal-h3">Contact Us</h3>
 <p>For further information about our Cookies Policy or practices, please contact us using the details set out below:</p>
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#1c7e796e72747d6e785c6a7d6e6e737d717d6879327f7371"><span class="__cf_email__" data-cfemail="4b292e3925232a392f0b3d2a3939242a262a3f2e65282426">[email&#160;protected]</span></a></p>
+<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:bernhard@varroamate.com">bernhard@varroamate.com</a></p>
 <p class="legal-updated">Our Cookies Policy was last updated on 1 April 2026.</p>
           </div>
         </div>
@@ -2535,7 +2533,7 @@ body::before{
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ══════════════════════════════════════════════
 // SPLASH / MISSION / DISCLAIMER / FEEDBACK
 // ══════════════════════════════════════════════
@@ -2551,6 +2549,7 @@ function vmpAckDisclaimer(){
   var btn = document.getElementById('vmp-disc-btn');
   if(row) row.style.display='none';
   if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='Open Productivity →'; btn.onclick=function(){ switchTab('harvest'); }; }
+  switchTab('harvest');
 }
 function ackDisclaimer(){
   localStorage.setItem('vmp_disc_acked','1');
@@ -5072,9 +5071,18 @@ async function saveQueen(){
 // ══════════════════════════════════════════════
 let _toastTimer=null;
 function showToast(msg, dur=2800){
-  const t=docume
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),dur);
+}
 
-  </div>
-
-  <!-- Bottom nav -->
-  n
+// Keyboard: close modals on Escape
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
