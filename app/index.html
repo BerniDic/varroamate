@@ -1423,7 +1423,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ <strong>Hive Hygiene</strong> <span style="font-size:11px;color:var(--green);font-weight:600;">AI analysis included</span></li>
           <li>✅ <a href="https://www.facebook.com/profile.php?id=61587815465422" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
-        <button class="btn btn-primary btn-full btn-sm sub-btn" data-mo="$2.99/mo" data-yr="$24.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
+        <button class="btn btn-primary btn-full btn-sm sub-btn" data-mo="$2.99/mo" data-yr="$24.99/yr" onclick="startCheckout('freeai')">Subscribe</button>
       </div>
 
       <!-- HOBBYIST -->
@@ -1445,7 +1445,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ <strong>Hive Hygiene</strong> <span style="font-size:11px;color:var(--green);font-weight:600;">AI analysis included</span></li>
           <li>✅ <a href="https://www.facebook.com/profile.php?id=61587815465422" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
-        <button class="btn btn-outline btn-full btn-sm sub-btn" data-mo="$4.99/mo" data-yr="$41.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
+        <button class="btn btn-outline btn-full btn-sm sub-btn" data-mo="$4.99/mo" data-yr="$41.99/yr" onclick="startCheckout('hobbyist')">Subscribe</button>
       </div>
 
       <!-- BEEKEEPER -->
@@ -1468,7 +1468,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           <li>✅ <strong>Hive Hygiene</strong> <span style="font-size:11px;color:var(--green);font-weight:600;">AI analysis included</span></li>
           <li>✅ <a href="https://www.facebook.com/profile.php?id=61587815465422" target="_blank" style="color:var(--amber-dark);font-weight:600;">Facebook community</a></li>
         </ul>
-        <button class="btn btn-primary btn-full btn-sm sub-btn" data-mo="$9.99/mo" data-yr="$84.99/yr" onclick="showToast('Subscription coming soon! 🐝')">Subscribe</button>
+        <button class="btn btn-primary btn-full btn-sm sub-btn" data-mo="$9.99/mo" data-yr="$84.99/yr" onclick="startCheckout('beekeeper')">Subscribe</button>
       </div>
 
     </div>
@@ -2376,6 +2376,67 @@ function toggleLib(id){
   body.style.display = open ? 'none' : 'block';
   if(chev) chev.classList.toggle('open', !open);
 }
+
+
+// ── Stripe Checkout ───────────────────────────────────────────────────────────
+const STRIPE_PRICES = {
+  freeai:    { monthly: 'price_1THbQDBTHUgFRMZplmHLuXKM', annual: 'price_1THdiDBTHUgFRMZp6qJ81WLY' },
+  hobbyist:  { monthly: 'price_1THdjfBTHUgFRMZpx6hJVDAh', annual: 'price_1THdk8BTHUgFRMZpWAFaCdA7' },
+  beekeeper: { monthly: 'price_1THdkdBTHUgFRMZpNEntFpEp', annual: 'price_1THdkzBTHUgFRMZpKp2bbiSI' },
+};
+
+async function startCheckout(tier) {
+  // Get current user session
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) {
+    showToast('Please sign in to subscribe 🐝');
+    goto('s-signin');
+    return;
+  }
+
+  const priceId = STRIPE_PRICES[tier][_billingAnnual ? 'annual' : 'monthly'];
+  if (!priceId || priceId.startsWith('PRICE_')) {
+    showToast('Subscription coming soon! 🐝');
+    return;
+  }
+
+  showToast('Opening checkout… 🐝');
+
+  try {
+    const res = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/create-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
+      body: JSON.stringify({ price_id: priceId }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      showToast('Checkout error: ' + (data.error || 'unknown'));
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Checkout failed — please try again');
+  }
+}
+
+// Handle return from Stripe Checkout
+(function checkCheckoutReturn() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('checkout') === 'success') {
+    showToast('🎉 Subscription activated! Welcome to VarroaMate.');
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+    // Reload subscription status
+    setTimeout(() => loadSection && loadSection(), 1000);
+  } else if (params.get('checkout') === 'cancelled') {
+    showToast('Checkout cancelled — no charge made.');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
 
 async function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
