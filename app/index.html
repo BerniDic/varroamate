@@ -832,7 +832,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <h3 class="legal-h3">Contact Us</h3>
 <ol class="legal-ol" start="14">
 <li>For further information about our privacy policy or practices, or to access or correct your personal information, or make a complaint, please contact us using the details set out below:
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#bcded9ced2d4ddced8fccaddceced3ddd1ddc8d992dfd3d1"><span class="__cf_email__" data-cfemail="bddfd8cfd3d5dccfd9fdcbdccfcfd2dcd0dcc9d893ded2d0">[email&#160;protected]</span></a></p>
+<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:Bernhard@varroamate.com">Bernhard@varroamate.com</a></p>
 </li>
 </ol>
 <p class="legal-updated">Our privacy policy was last updated on 1 April 2026.</p>
@@ -880,12 +880,28 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <h3 class="legal-h3">Contact Us</h3>
 <p>For further information about our Cookies Policy or practices, please contact us using the details set out below:</p>
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#3a585f4854525b485e7a4c5b4848555b575b4e5f14595557"><span class="__cf_email__" data-cfemail="4a282f3824222b382e0a3c2b3838252b272b3e2f64292527">[email&#160;protected]</span></a></p>
+<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:Bernhard@varroamate.com">Bernhard@varroamate.com</a></p>
 <p class="legal-updated">Our Cookies Policy was last updated on 1 April 2026.</p>
       </div>
     </div>
 
     <div style="height:20px;"></div>
+
+    <!-- Accept row — shown only until first acceptance -->
+    <div id="disc-accept-row" style="margin:0 0 24px;">
+      <div style="background:var(--amber-pale);border:1.5px solid var(--amber);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+          <input type="checkbox" id="accept-chk" onchange="toggleAccept()" style="margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:var(--amber-dark);cursor:pointer;">
+          <span style="font-size:13px;color:var(--text);line-height:1.65;">
+            I have read and agree to VarroaMate's <strong>Terms &amp; Conditions</strong>, <strong>Privacy Policy</strong> and <strong>Cookies Policy</strong>.
+          </span>
+        </label>
+      </div>
+      <button id="enter-btn" disabled onclick="acceptAndEnter()" class="btn btn-primary btn-full" style="opacity:0.45;transition:opacity 0.2s;font-size:15px;padding:14px;">
+        I Accept — Enter VarroaMate 🐝
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -2710,9 +2726,32 @@ function acceptDisclaimer(){
 function hasAcceptedDisclaimer(){
   try{return localStorage.getItem('varroamate_disclaimer_accepted')==='1';}catch(e){return false;}
 }
+// Hide accept row on load if already accepted
+(function(){
+  if(hasAcceptedDisclaimer()){
+    const row=document.getElementById('disc-accept-row');
+    if(row) row.style.display='none';
+  }
+})();
 function toggleAccept(){
   const c=document.getElementById('accept-chk');
-  document.getElementById('enter-btn').disabled=!c.checked;
+  const btn=document.getElementById('enter-btn');
+  btn.disabled=!c.checked;
+  btn.style.opacity=c.checked?'1':'0.45';
+}
+function acceptAndEnter(){
+  try{localStorage.setItem('varroamate_disclaimer_accepted','1');}catch(e){}
+  // Also record in Supabase if user is signed in
+  if(_sbUser){
+    _sb.from('subscriptions').upsert(
+      {user_id:_sbUser.id, terms_accepted_at: new Date().toISOString()},
+      {onConflict:'user_id'}
+    ).then(()=>{});
+  }
+  // Hide the accept row permanently
+  const row=document.getElementById('disc-accept-row');
+  if(row) row.style.display='none';
+  goto('s-apiaries');
 }
 function selectPref(card){
   document.querySelectorAll('.pref-card').forEach(c=>c.classList.remove('selected'));
