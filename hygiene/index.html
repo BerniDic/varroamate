@@ -1,30 +1,4 @@
-<div class="screen" id="screen-terms">
-      <div class="section-header">⚖️ Terms &amp; Legal</div>
-      <div class="section-sub">Legal documentation and AI disclaimer for VarroaMate Hive Hygiene.</div>
-
-      <div class="card" style="border-color:#C0402A;background:#FFF8F7;">
-        <div class="card-title" style="color:#C0402A;">⚠️ AI Disclaimer</div>
-        <p style="font-size:14px;color:var(--text2);line-height:1.65;">AI-generated content in this app is provided for general informational purposes only. It does not constitute professional, veterinary, agricultural, or biosecurity advice. Always cross-check recommendations against authoritative sources and product labels. Treatment decisions remain your responsibility.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📋 About This App</div>
-        <p style="font-size:14px;color:var(--text2);line-height:1.65;">VarroaMate Hive Hygiene provides practical, evidence-based guidance on apiary sanitation and disease prevention for Australian beekeepers. Content is based on peer-reviewed research and guidance from Plant Health Australia, Agriculture Victoria, and the National Varroa Management Program.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">⚖️ Legal Documents</div>
-        <p style="font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:14px;">Our full Terms &amp; Conditions, Privacy Policy, and Cookies Policy are available on the VarroaMate website.</p>
-        <a href="https://varroamate.com" target="_blank" class="btn btn-outline btn-sm btn-full" style="margin-bottom:8px;display:block;text-align:center;text-decoration:none;">📋 Terms &amp; Conditions</a>
-        <a href="https://varroamate.com" target="_blank" class="btn btn-outline btn-sm btn-full" style="margin-bottom:8px;display:block;text-align:center;text-decoration:none;">🔒 Privacy Policy</a>
-        <a href="https://varroamate.com" target="_blank" class="btn btn-outline btn-sm btn-full" style="display:block;text-align:center;text-decoration:none;">🍪 Cookies Policy</a>
-        <p style="font-size:12px;color:var(--text3);margin-top:12px;">VarroaMate Pty Ltd ABN 32 696 739 732 · Last updated 1 April 2026</p>
-      </div>
-
-      <div style="height:20px;"></div>
-    </div>
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -522,15 +496,6 @@ body{
 .disc-btn.enabled{opacity:1;pointer-events:auto;}
 .disc-btn.enabled:hover{background:#F0CC6A;}
 
-
-/* ── Legal content ───────────────────────────────── */
-.legal-doc{font-size:14px;color:var(--text2);line-height:1.75;}
-.legal-doc h2.legal-h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);margin:0 0 4px;}
-.legal-entity{font-size:12px;color:var(--text3);margin:0 0 18px;}
-.legal-doc h3.legal-h3{font-size:13px;font-weight:700;color:var(--text);margin:16px 0 5px;text-transform:uppercase;letter-spacing:0.4px;}
-.legal-doc p{margin:0 0 9px;}
-.legal-doc a{color:var(--amber-dark);}
-.legal-updated{font-size:12px;color:var(--text3);margin-top:14px;border-top:1px solid var(--border);padding-top:8px;}
 </style>
 </head>
 <body>
@@ -687,7 +652,7 @@ body{
         <div style="font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:12px;">
           Hive Hygiene is actively developed as part of the VarroaMate ecosystem. If something isn't clear, if you spot an error, or if there's a topic you'd like to see covered — we'd love to hear from you. Your feedback directly shapes what gets built next.
         </div>
-        <a href="/cdn-cgi/l/email-protection#2b434e4747446b5d4a5959444a464a5f4e0548444614585e49414e485f167d6663630e191b6d4e4e4f494a4840" class="btn btn-forest btn-full" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <a href="mailto:hello@varroamate.com?subject=VMHH%20Feedback" class="btn btn-forest btn-full" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
           ✉️ Send Feedback
         </a>
       </div>
@@ -1631,7 +1596,7 @@ body{
 
 <div id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 
 // ══════════════════════════════════════════════
 // DISCLAIMER (one-time)
@@ -2955,14 +2920,10 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
       // Show skip banner if partial profile saved
       const hasSaved = Object.keys(_profile).length > 0;
       const skipBanner = document.getElementById('wizardSkipBanner');
-      {
-        skipBanner.style.display = 'flex';
-      }
+      if(skipBanner && hasSaved) skipBanner.style.display = 'block';
     }
-  } catch(err){
-    console.error('Init error:', err);
-  }
-});
+  } catch(e){ console.error('Init error:', e); }
+}).catch(e => console.error('Session error:', e));
 </script>
 </body>
 </html>
