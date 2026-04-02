@@ -1538,7 +1538,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">VarroaMate</div>
         <div class="hive-label-sub">mite tracking & treatments</div>
-        <div class="status-badge release"><span class="dot"></span>full release imminent</div>
+        
       </div>
     </div>
 
@@ -1584,7 +1584,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">Smart Planner</div>
         <div class="hive-label-sub">seasonal treatment planning</div>
-        <div class="status-badge release"><span class="dot"></span>now live</div>
+        
       </div>
     </div>
 
@@ -1626,7 +1626,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">Productivity</div>
         <div class="hive-label-sub">hive records & tasks</div>
-        <div class="status-badge release"><span class="dot"></span>now live</div>
+        
       </div>
     </div>
 
@@ -1704,7 +1704,7 @@ html, body {
       <div class="hive-label">
         <div class="hive-label-name">Hygiene</div>
         <div class="hive-label-sub">apiary health & sanitation</div>
-        <div class="status-badge release"><span class="dot"></span>now live</div>
+        
       </div>
     </div>
 
@@ -1969,11 +1969,11 @@ const APP_URLS = {
 };
 
 const APP_TOASTS = {
-  vm:     '🟢 VarroaMate — full release imminent, stay tuned!',
-  vmsp:   '🧠 Smart Planner — live! Seasonal treatment planning 🐝',
-  prod:   '📋 VarroaMate Productivity — now live! Tap to open.',
+  vm:     '🐝 Opening VarroaMate…',
+  vmsp:   '🧠 Opening Smart Planner…',
+  prod:   '📋 Opening Productivity…',
   health: '🎓 Beekeeper Academy — coming soon! 🐝',
-  hygiene: '🧹 Hive Hygiene — now live! Opening… 🐝',
+  hygiene: '🧹 Opening Hive Hygiene…',
 };
 
 // ── BEE STATE ────────────────────────────────────
@@ -2441,11 +2441,11 @@ function showToast(msg){
 
 // ── MOBILE HIVE POPUP ────────────────────────────
 const APP_INFO = {
-  vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: 'full release imminent', url: '/app/' },
-  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'release', badgeText: 'now live',             url: '/planner/' },
-  prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: 'now live',            url: '/productivity/' },
+  vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: '', url: '/app/' },
+  vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'release', badgeText: '',             url: '/planner/' },
+  prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: '',            url: '/productivity/' },
   health:   { title: 'Beekeeper Academy',   sub: 'structured learning pathway',  badge: 'soon', badgeText: 'coming soon', url: null },
-  hygiene:  { title: 'Hive Hygiene',           sub: 'apiary health & sanitation',   badge: 'release', badgeText: 'now live', url: '/hygiene/' },
+  hygiene:  { title: 'Hive Hygiene',           sub: 'apiary health & sanitation',   badge: 'release', badgeText: '', url: '/hygiene/' },
 };
 let _popupApp = null;
 
