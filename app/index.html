@@ -2401,6 +2401,19 @@ async function startCheckout(tier) {
 
   showToast('Opening checkout… 🐝');
 
+  // Quick connectivity test
+  try {
+    const ping = await fetch(SUPABASE_URL + '/functions/v1/create-checkout', {
+      method: 'OPTIONS',
+      headers: { 'apikey': SUPABASE_ANON },
+    });
+    console.log('Ping status:', ping.status, ping.headers.get('access-control-allow-origin'));
+  } catch(pingErr) {
+    console.error('Ping failed:', pingErr);
+    showToast('Cannot reach server: ' + (pingErr.message || pingErr));
+    return;
+  }
+
   try {
     // Direct fetch with apikey header — avoids CORS preflight
     const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout', {
@@ -2425,8 +2438,9 @@ async function startCheckout(tier) {
       showToast('Checkout error: ' + (data?.error || 'unknown'));
     }
   } catch (err) {
-    console.error('Checkout error:', err);
-    showToast('Checkout error: ' + (err.message || err));
+    console.error('Checkout error full:', err, JSON.stringify(err));
+    const msg = err?.message || err?.cause?.message || String(err) || 'load failed';
+    showToast('Checkout error: ' + msg);
   }
 }
 
