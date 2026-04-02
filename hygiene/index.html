@@ -1622,6 +1622,7 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // ══════════════════════════════════════════════
 let _user = null;
 let _profile = {}; // beekeeper hygiene profile
+let _userPlan = 'free'; // subscription plan
 let _hiveData = { hives:[], miteHistory:[], diseaseHistory:[], colonyLosses:[], inspections:[] };
 let _toolkit = {}; // which tools the beekeeper owns
 let _wizardStep = 1;
@@ -2186,6 +2187,7 @@ async function generatePlan(){
 // AI PLAN NARRATIVE
 // ══════════════════════════════════════════════
 async function generateAiPlan(){
+  if(!requireAIPlan()) return;
   const btn = document.getElementById('generateAiBtn');
   const panel = document.getElementById('aiNarrative');
   const text = document.getElementById('aiNarrativeText');
@@ -2869,6 +2871,30 @@ async function vmSignIn(){
   });
 }
 
+async function loadSubscription(){
+  if(!_user) return;
+  try {
+    const { data } = await _sb
+      .from('subscriptions')
+      .select('plan, status')
+      .eq('user_id', _user.id)
+      .maybeSingle();
+    if(data && data.status !== 'canceled') {
+      _userPlan = data.plan || 'free';
+    } else {
+      _userPlan = 'free';
+    }
+    console.log('VMHH plan:', _userPlan);
+  } catch(e){ console.warn('loadSubscription:', e); }
+}
+
+function requireAIPlan(){
+  const paid = ['free_ai','hobbyist','beekeeper'];
+  if(paid.includes(_userPlan)) return true;
+  alert('AI features require a paid VarroaMate plan.\n\nPlease subscribe at varroamate.com/app/ to access AI hygiene analysis.');
+  return false;
+}
+
 function signOut(){
   if(!confirm('Sign out?')) return;
   _sb.auth.signOut().then(()=>{ window.location.href='/'; });
@@ -2893,6 +2919,7 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
   try {
     if(session){
       _user = session.user;
+      await loadSubscription();
       const initials = (_user.email||'?')[0].toUpperCase();
       const topUser = document.getElementById('topUser');
       if(topUser){ topUser.textContent = 'Sign out'; topUser.title = _user.email||''; }
