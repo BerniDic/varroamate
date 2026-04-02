@@ -19,7 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --amber:#D4820A; --amber-light:#F5A623; --amber-pale:#FFF3DC; --amber-dark:#8B5200;
@@ -2402,11 +2402,23 @@ async function startCheckout(tier) {
   showToast('Opening checkout… 🐝');
 
   try {
-    // Use supabase-js functions.invoke — avoids CORS preflight issues with raw fetch
-    const { data, error } = await _sb.functions.invoke('create-checkout', {
-      body: { price_id: priceId },
+    // Direct fetch with apikey header — avoids CORS preflight
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+        'apikey': SUPABASE_ANON,
+      },
+      body: JSON.stringify({ price_id: priceId }),
     });
-    if (error) throw error;
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error('Checkout HTTP error:', res.status, txt);
+      showToast('Checkout error (' + res.status + ')');
+      return;
+    }
+    const data = await res.json();
     if (data?.url) {
       window.location.href = data.url;
     } else {
