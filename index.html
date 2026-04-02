@@ -954,17 +954,6 @@ html, body {
   #about-btn { bottom: 14px; right: 14px; font-size: 11px; padding: 6px 12px 6px 9px; }
 }
 
-/* ── Launch banner ── */
-.launch-banner {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  background: linear-gradient(90deg, #8B4500 0%, #C46000 50%, #8B4500 100%);
-  color: white; text-align: center;
-  padding: 10px 48px 10px 16px;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.35);
-}
-.launch-banner strong { color: #FFE082; }
-.launch-banner .sep { opacity: 0.4; margin: 0 10px; }
 .launch-banner .banner-close {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
   background: none; border: none; color: rgba(255,255,255,0.6);
@@ -996,14 +985,6 @@ html, body {
 </head>
 <body>
 
-<div class="launch-banner" id="launchBanner">
-  ⚠️ <strong>Scheduled maintenance — Monday 31 March, 6:00 pm to 10:00 pm AEDT.</strong>
-  <span class="sep">|</span>
-  All VarroaMate apps will be offline during this window.
-  <span class="sep">|</span>
-  🚀 <strong>All plans go live immediately after.</strong>
-  <button class="banner-close" onclick="dismissBanner()" aria-label="Close">×</button>
-</div>
 <div id="scene">
   <!-- Sky -->
   <div id="sky" aria-hidden="true"></div>
