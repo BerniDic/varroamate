@@ -2472,6 +2472,7 @@ function renderPathogenCards(){
 // AUTH
 // ══════════════════════════════════════════════
 async function generateToolkitAdvice(){
+  if(!requireAIPlan()) return;
   const btn = document.getElementById('toolkitAiBtn');
   const panel = document.getElementById('toolkitAiPanel');
   const textEl = document.getElementById('toolkitAiText');
