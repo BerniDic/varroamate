@@ -1383,6 +1383,13 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px;">
 
+      <!-- MANAGE SUBSCRIPTION -->
+      <div id="manage-sub-row" style="display:none;margin-bottom:16px;">
+        <button onclick="openCustomerPortal()" class="btn btn-outline btn-full" style="border-color:var(--amber);color:var(--amber-dark);font-size:14px;">
+          ⚙️ Manage / Cancel Subscription
+        </button>
+      </div>
+
       <!-- FREE -->
       <div class="card" style="border:2px solid var(--border);position:relative;">
         <div style="font-size:26px;margin-bottom:4px;">🐝</div>
@@ -2316,6 +2323,10 @@ function applyPlanUI(){
   // Past due warning
   const pdWarn = document.getElementById('past-due-warning');
   if(pdWarn) pdWarn.style.display = _planStatus === 'past_due' ? 'block' : 'none';
+
+  // Show manage button only for paid plans
+  const manageRow = document.getElementById('manage-sub-row');
+  if(manageRow) manageRow.style.display = (_plan !== 'free') ? 'block' : 'none';
 }
 
 function canAddHive(){
@@ -2484,6 +2495,44 @@ async function startCheckout(tier) {
     window.history.replaceState({}, '', window.location.pathname);
   }
 })();
+
+
+// ── Customer Portal ───────────────────────────────────────────────────────────
+async function openCustomerPortal() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) {
+    showToast('Please sign in first 🐝');
+    return;
+  }
+
+  showToast('Opening subscription portal… 🐝');
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-portal-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+        'apikey': SUPABASE_ANON,
+      },
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error('Portal error:', res.status, txt);
+      showToast('Portal error — please try again');
+      return;
+    }
+    const data = await res.json();
+    if (data?.url) {
+      window.location.href = data.url;
+    } else {
+      showToast('Portal error: ' + (data?.error || 'unknown'));
+    }
+  } catch (err) {
+    console.error('Portal error:', err);
+    showToast('Portal error: ' + (err.message || err));
+  }
+}
 
 async function logout(){
   if(!confirm('Sign out of VarroaMate?'))return;
