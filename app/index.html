@@ -2386,7 +2386,6 @@ const STRIPE_PRICES = {
 };
 
 async function startCheckout(tier) {
-  // Get current user session
   const { data: { session } } = await _sb.auth.getSession();
   if (!session) {
     showToast('Please sign in to subscribe 🐝');
@@ -2403,23 +2402,19 @@ async function startCheckout(tier) {
   showToast('Opening checkout… 🐝');
 
   try {
-    const res = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/create-checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + session.access_token,
-      },
-      body: JSON.stringify({ price_id: priceId }),
+    // Use supabase-js functions.invoke — avoids CORS preflight issues with raw fetch
+    const { data, error } = await _sb.functions.invoke('create-checkout', {
+      body: { price_id: priceId },
     });
-    const data = await res.json();
-    if (data.url) {
+    if (error) throw error;
+    if (data?.url) {
       window.location.href = data.url;
     } else {
-      showToast('Checkout error: ' + (data.error || 'unknown'));
+      showToast('Checkout error: ' + (data?.error || 'unknown'));
     }
   } catch (err) {
-    console.error(err);
-    showToast('Checkout failed — please try again');
+    console.error('Checkout error:', err);
+    showToast('Checkout error: ' + (err.message || err));
   }
 }
 
