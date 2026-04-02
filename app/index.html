@@ -2991,7 +2991,7 @@ const FREE_HIVE_LIMIT = 3;
 const HOBBYIST_HIVE_LIMIT = 15;
 const BEEKEEPER_HIVE_LIMIT = 100;
 
-function getUserPlan(){ return 'free'; } // TODO: replace with real plan lookup from Supabase
+function getUserPlan(){ return _plan || 'free'; }
 
 function showHiveLimitModal(){
   const plan = getUserPlan();
