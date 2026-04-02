@@ -1732,12 +1732,14 @@ html, body {
 
 <!-- Frame bar — outside scene so it doesn't block hive clicks -->
 <div id="frame-bar">
-  <button class="frame-btn" onclick="openFrame('about')">⭐ About Us</button>
-  <button class="frame-btn" onclick="openFrame('pricing')">🍯 Pricing</button>
-  <button class="frame-btn" onclick="openFrame('faq')">❓ FAQ</button>
-  <button class="frame-btn" onclick="openFrame('contact')">✉️ Contact</button>
-  <button class="frame-btn" onclick="openFrame('privacy')">🔒 Privacy</button>
-  <button class="frame-btn" onclick="openFrame('terms')">📋 Terms</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('about')">About Us</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('pricing')">Pricing</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('faq')">FAQ</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('contact')">Contact</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('privacy')">Privacy</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('terms')">Terms</button>
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('cookies')">Cookies</button>
+  <button class="frame-btn" id="frame-menu-btn" onclick="openFrame('menu')">Info ▾</button>
 </div>
 
 <script>
