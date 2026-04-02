@@ -1143,19 +1143,15 @@ body::before{
   font-family:'Bitter',serif;
 }
 
-/* ── Legal content ───────────────────────────────── */
+/* ── Legal ── */
 .legal-doc{font-size:13px;color:var(--text2);line-height:1.75;}
 .legal-doc h3.legal-h3{font-size:12px;font-weight:700;color:var(--text1);margin:16px 0 5px;text-transform:uppercase;letter-spacing:0.4px;}
 .legal-doc h4.legal-h4{font-size:11px;font-weight:700;color:var(--text2);margin:12px 0 3px;text-transform:uppercase;letter-spacing:0.3px;}
-.legal-doc p{margin:0 0 8px;}
-.legal-doc a{color:var(--forest);}
+.legal-doc p{margin:0 0 8px;}.legal-doc a{color:var(--forest);}
 .legal-updated{font-size:11px;color:var(--text3);margin-top:12px;border-top:1px solid var(--border);padding-top:8px;}
-.legal-ol{padding-left:20px;margin:0 0 8px;}
-.legal-ol>li{margin-bottom:6px;}
-.legal-ol-alpha{padding-left:20px;margin:5px 0 8px;list-style-type:lower-alpha;}
-.legal-ol-alpha>li{margin-bottom:5px;}
-.legal-ol-roman{padding-left:20px;margin:4px 0 5px;list-style-type:lower-roman;}
-.legal-ol-roman>li{margin-bottom:3px;}
+.legal-ol{padding-left:20px;margin:0 0 8px;}.legal-ol>li{margin-bottom:6px;}
+.legal-ol-alpha{padding-left:20px;margin:5px 0 8px;list-style-type:lower-alpha;}.legal-ol-alpha>li{margin-bottom:5px;}
+.legal-ol-roman{padding-left:20px;margin:4px 0 5px;list-style-type:lower-roman;}.legal-ol-roman>li{margin-bottom:3px;}
 .legal-table{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:12px;}
 .legal-table td{padding:7px 9px;border:1px solid var(--border);vertical-align:top;line-height:1.55;}
 .legal-table td:first-child{white-space:nowrap;font-weight:600;width:130px;background:var(--paper);}
@@ -1273,11 +1269,9 @@ body::before{
     </div>
 
     <div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:14px;line-height:1.7;">
-      Full legal documents available in the <strong>Terms</strong> tab, or at
-      <a href="https://varroamate.com" target="_blank" style="color:var(--forest);text-decoration:underline;">varroamate.com</a><br>
+      Full legal documents in the <strong>Terms</strong> tab · <a href="https://varroamate.com" target="_blank" style="color:var(--forest);">varroamate.com</a><br>
       VarroaMate Pty Ltd ACN 696 739 732 · Last updated 1 April 2026
     </div>
-
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:18px;padding:12px 14px;background:var(--terra-pale);border-radius:var(--radius-sm);border:1.5px solid var(--border);">
       <input type="checkbox" id="discAckCheck" style="margin-top:3px;accent-color:var(--terra);width:16px;height:16px;flex-shrink:0;cursor:pointer;"
         onchange="document.getElementById('discProceedBtn').disabled=!this.checked">
@@ -1583,7 +1577,7 @@ body::before{
   
     <!-- ══ SCREEN: DISCLAIMER ══ -->
     <div class="screen" id="screen-disclaimer">
-      <div class="content-area">
+      <div style="padding:20px 16px 100px;">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--forest);margin-bottom:6px;">📋 Terms &amp; Disclaimer</div>
         <div style="font-size:13px;color:var(--text3);margin-bottom:18px;">VarroaMate Productivity</div>
 
@@ -1624,11 +1618,12 @@ body::before{
           I understand — open Productivity
         </button>
 
-        <!-- Full legal documents -->
+        <!-- Legal documents -->
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
-          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:16px;">⚖️ Legal Documents</div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:14px;">⚖️ Legal Documents</div>
 
           <div class="legal-doc" style="background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
+            <h3 class="legal-h3" style="margin-top:0;">Terms &amp; Conditions</h3>
 <h2 class="legal-h2">Terms and Conditions</h2>
 <p class="legal-entity">VarroaMate Pty Ltd ACN 696 739 732</p>
 
@@ -1909,8 +1904,7 @@ body::before{
           </div>
 
           <div class="legal-doc" style="background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
-<h2 class="legal-h2">Privacy Policy</h2>
-<p class="legal-entity">VarroaMate ACN 696 739 732</p>
+            <h3 class="legal-h3" style="margin-top:0;">Privacy Policy</h3>
 
 <h3 class="legal-h3">Introduction</h3>
 <ol class="legal-ol">
@@ -2019,8 +2013,7 @@ body::before{
           </div>
 
           <div class="legal-doc" style="background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
-<h2 class="legal-h2">Cookies Policy</h2>
-<p class="legal-entity">VarroaMate Pty Ltd ACN 696 739 732</p>
+            <h3 class="legal-h3" style="margin-top:0;">Cookies Policy</h3>
 
 <h3 class="legal-h3">Introduction</h3>
 <ol class="legal-ol-alpha">
@@ -2563,7 +2556,6 @@ function vmpAckDisclaimer(){
   var btn = document.getElementById('vmp-disc-btn');
   if(row) row.style.display='none';
   if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='Open Productivity →'; btn.onclick=function(){ switchTab('harvest'); }; }
-  // Do not auto-navigate — let user scroll to read legal docs, then tap the button
 }
 function ackDisclaimer(){
   localStorage.setItem('vmp_disc_acked','1');
