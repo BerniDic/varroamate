@@ -1007,7 +1007,7 @@ html, body {
     box-shadow:0 24px 80px rgba(0,0,0,0.4);
     padding:40px 36px;max-width:420px;width:90%;
     text-align:center;font-family:'DM Sans',sans-serif;">
-    <div style="font-size:48px;margin-bottom:16px;">🔧</div>
+    <div style="font-size:48px;margin-bottom:16px;cursor:pointer;" id="maint-icon" onclick="maintClick()">🔧</div>
     <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;
       color:#3A2000;margin-bottom:12px;">Down for Maintenance</div>
     <p style="font-size:15px;color:#6A4A20;line-height:1.7;margin-bottom:20px;">
@@ -2772,5 +2772,27 @@ window.addEventListener('resize', ()=>{
 <p>For further information about our Cookies Policy or practices, please contact us using the details set out below:</p>
 <p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:bernhard@varroamate.com">bernhard@varroamate.com</a></p>
 <p class="legal-updated">Our Cookies Policy was last updated on 1 April 2026.</p></script>
+
+<script>
+// Maintenance overlay — secret dismiss
+var _maintClicks = 0;
+function maintClick(){
+  _maintClicks++;
+  if(_maintClicks >= 3){
+    document.getElementById('maintenance-overlay').style.display='none';
+    _maintClicks = 0;
+  }
+}
+// Keyboard: type "bee" to dismiss
+var _maintKeys = '';
+document.addEventListener('keydown', function(e){
+  _maintKeys += e.key.toLowerCase();
+  if(_maintKeys.includes('bee')){
+    document.getElementById('maintenance-overlay').style.display='none';
+    _maintKeys = '';
+  }
+  if(_maintKeys.length > 10) _maintKeys = _maintKeys.slice(-10);
+});
+</script>
 </body>
 </html>
