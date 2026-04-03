@@ -2415,7 +2415,7 @@ let countsPage = 0, treatmentsPage = 0, notesPage = 0;
 const PAGE_SIZE = 5;
 
 // ══ NAVIGATION ══
-const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription','s-disclaimer','s-library'];
+const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-feedback','s-prefs','s-subscription','s-library'];
 const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-feedback':'tabnav-feedback','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription','s-disclaimer':'tabnav-disclaimer','s-library':'tabnav-library'};
 
 
@@ -2573,6 +2573,10 @@ function toggleBilling(){
 }
 
 function goto(id,param){
+  // Enforce disclaimer acceptance before any app screen
+  if(APP_SCREENS.includes(id) && id!=='s-disclaimer' && !hasAcceptedDisclaimer()){
+    id='s-disclaimer';
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   const show=APP_SCREENS.includes(id);
@@ -4956,8 +4960,11 @@ function restoreSelectedDiseases(containerId,diseases){
 
 
 // ══ BEEMAX EXPORT ══
-function exportBeeMAX(){
+async function exportBeeMAX(){
   if(!_dataLoaded){showToast('Data still loading — please try again in a moment');return;}
+  // Refresh data from Supabase before generating report to ensure no stale hives
+  showToast('Refreshing data… 🐝');
+  await loadDataFromSupabase();
   // Build set of current hive IDs to strictly filter out any orphaned data
   const currentHiveIds=new Set(Object.values(hives).flat().map(h=>h.id));
   // Collect mite count entries — strictly from current apiaries and hives only
