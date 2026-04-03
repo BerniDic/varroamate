@@ -4962,8 +4962,11 @@ function restoreSelectedDiseases(containerId,diseases){
 // ══ BEEMAX EXPORT ══
 async function exportBeeMAX(){
   if(!_dataLoaded){showToast('Data still loading — please try again in a moment');return;}
-  // Refresh data from Supabase before generating report to ensure no stale hives
-  showToast('Refreshing data… 🐝');
+  // Open window BEFORE await to preserve user gesture (prevents popup blocker)
+  const win=window.open('','_blank','width=860,height=700');
+  if(!win){showToast('Please allow popups for this site to use BeeMAX export');return;}
+  win.document.write('<html><body style="font-family:sans-serif;padding:40px;color:#555;">⏳ Refreshing data…</body></html>');
+  // Refresh data from Supabase
   await loadDataFromSupabase();
   // Build set of current hive IDs to strictly filter out any orphaned data
   const currentHiveIds=new Set(Object.values(hives).flat().map(h=>h.id));
@@ -4984,7 +4987,6 @@ async function exportBeeMAX(){
   // Sort by date desc
   entries.sort((a,b)=>b.count.date.localeCompare(a.count.date));
 
-  const win=window.open('','_blank','width=860,height=700');
   const generated=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
 
   win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — BeeMAX Export</title>
