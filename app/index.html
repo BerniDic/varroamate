@@ -2650,6 +2650,7 @@ async function doSignIn(e){
     // Code not found — fall through to normal load
   }
   await loadDataFromSupabase();
+  await loadPlan();
   currentApiaryId=apiaries[0]?.id??0;
   if(hasAcceptedDisclaimer()){goto('s-apiaries');}else{goto('s-disclaimer');}
 }
