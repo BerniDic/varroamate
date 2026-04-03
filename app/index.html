@@ -4974,9 +4974,10 @@ async function exportBeeMAX(){
     const hiveCount=hvList.length;
     for(const h of hvList){
       const counts=(miteCountsByHive[h.id]||[]).filter(c=>c&&c.date);
-      for(const c of counts){
-        entries.push({apiary:a,hive:h,count:c,hiveCount});
-      }
+      if(!counts.length) continue;
+      // Only the most recent count per hive
+      const latest=counts.sort((a,b)=>b.date.localeCompare(a.date))[0];
+      entries.push({apiary:a,hive:h,count:latest,hiveCount});
     }
   }
   if(!entries.length){showToast('No mite count entries to export');return;}
