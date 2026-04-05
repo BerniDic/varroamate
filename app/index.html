@@ -1230,6 +1230,23 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <h1 class="page-title">Guidance</h1>
     <p class="page-subtitle">AI-powered varroa management advice</p>
     <div class="info-row" id="guidance-chips"></div>
+
+    <div id="guidance-ai-explainer" style="background:linear-gradient(135deg,#FFF8EE,#FFF3DC);border:1.5px solid var(--amber);border-radius:12px;padding:16px 18px;margin-bottom:18px;display:none;">
+      <div style="font-size:15px;font-weight:700;color:var(--amber-dark);margin-bottom:10px;">🤖 Why AI guidance beats fixed rules</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;color:var(--text2);line-height:1.6;">
+        <div style="display:flex;gap:8px;"><span style="font-size:18px;flex-shrink:0;">📊</span><div><strong>Reads your actual data</strong><br>Not generic advice — the AI analyses your real mite counts, treatment history and trend before responding.</div></div>
+        <div style="display:flex;gap:8px;"><span style="font-size:18px;flex-shrink:0;">🗺️</span><div><strong>State-aware</strong><br>Knows your state's current Varroa status, approved products, resistance warnings and reporting requirements.</div></div>
+        <div style="display:flex;gap:8px;"><span style="font-size:18px;flex-shrink:0;">🌿</span><div><strong>Respects your preferences</strong><br>Organic-only beekeeper? The AI never suggests synthetics. It tailors every recommendation to your management philosophy.</div></div>
+        <div style="display:flex;gap:8px;"><span style="font-size:18px;flex-shrink:0;">💬</span><div><strong>Ask anything</strong><br>"Can I treat during a honey flow?" — the AI chat answers free-form questions that fixed rules simply can't handle.</div></div>
+        <div style="display:flex;gap:8px;"><span style="font-size:18px;flex-shrink:0;">🌡️</span><div><strong>Season & temperature aware</strong><br>Combines your 14-day forecast with treatment temperature windows to flag whether conditions are right to treat now.</div></div>
+        <div style="display:flex;gap:8px;"><span style="font-size:18px;flex-shrink:0;">🔄</span><div><strong>Rotation intelligence</strong><br>Tracks your treatment history across modes of action and warns when you're at risk of resistance from repeating the same product.</div></div>
+      </div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(200,130,30,0.2);font-size:12px;color:var(--text3);">
+        Powered by Claude (Anthropic) — the same AI model used by researchers and professionals worldwide.
+        <button onclick="goto('s-subscription')" style="margin-left:8px;background:var(--amber-dark);color:#fff;border:none;border-radius:12px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">Upgrade to unlock →</button>
+      </div>
+    </div>
+
     <div class="two-col">
       <div>
         <div class="guidance-section"><div class="guidance-section-header" style="display:flex;align-items:center;justify-content:space-between;"><svg width="20" height="14" viewBox="0 0 128 90" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="22" y1="44" x2="12" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="52" x2="8" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="60" x2="8" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="22" y1="68" x2="12" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="44" x2="100" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="52" x2="104" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="60" x2="104" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="68" x2="100" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="58" rx="38" ry="26" fill="#C8820A"/><ellipse cx="56" cy="54" rx="28" ry="17" fill="#A86808"/><ellipse cx="56" cy="37" rx="9" ry="6" fill="#B07008"/></svg> Varroa Status<button class="speak-btn" onclick="speakSection('guidance-summary-body')" title="Read aloud">🔊</button></div><div class="guidance-section-body" id="guidance-summary-body"><div style="color:var(--text3);font-style:italic;">Select a hive to load guidance.</div></div></div>
@@ -2333,6 +2350,9 @@ function applyPlanUI(){
     const allowed = PLAN_LIMITS[_plan]?.[req] ?? false;
     el.style.display = allowed ? '' : 'none';
   });
+  // Show/hide AI explainer on guidance screen
+  const aiExplainer = document.getElementById('guidance-ai-explainer');
+  if(aiExplainer) aiExplainer.style.display = _planLimits.ai ? 'none' : '';
   // Show/hide AI upgrade nudges
   document.querySelectorAll('.ai-upgrade-nudge').forEach(el=>{
     el.style.display = _planLimits.ai ? 'none' : '';
