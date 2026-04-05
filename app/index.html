@@ -2381,8 +2381,6 @@ function canAddHive(){
 
 function requireAI(action){
   if(_planLimits.ai) return true;
-  showToast('AI features require a paid plan — see Plans & Pricing 🐝');
-  goto('s-subscription');
   return false;
 }
 
@@ -2864,11 +2862,13 @@ function renderApiaries(){
         <div class="apiary-addr" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.address}</div>
         <div class="apiary-hives" style="margin-top:4px;">${hc} hive${hc!==1?'s':''} · <span style="color:${st.color};font-weight:600;">${st.label}</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
-        <button class="icon-btn" title="Move up" onclick="event.stopPropagation();moveApiary(${a.id},'up')" style="font-size:14px;">↑</button>
-        <button class="icon-btn" title="Move down" onclick="event.stopPropagation();moveApiary(${a.id},'down')" style="font-size:14px;">↓</button>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:6px;">
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <button class="icon-btn" title="Move up" onclick="event.stopPropagation();moveApiary(${a.id},'up')" style="font-size:11px;padding:2px 4px;line-height:1;height:auto;">↑</button>
+          <button class="icon-btn" title="Move down" onclick="event.stopPropagation();moveApiary(${a.id},'down')" style="font-size:11px;padding:2px 4px;line-height:1;height:auto;">↓</button>
+        </div>
         <button class="icon-btn" title="Edit apiary" onclick="event.stopPropagation();editApiary(${a.id})">✏️</button>
-        <button class="icon-btn danger" title="Delete apiary" onclick="event.stopPropagation();deleteApiary(${a.id},'${a.name.replace(/'/g,"\'")}')">🗑</button>
+        <button class="icon-btn danger" title="Delete apiary" onclick="event.stopPropagation();deleteApiary(${a.id},'${a.name.replace(/'/g,"\\'")}')">🗑</button>
         <span style="color:var(--text3);font-size:22px;line-height:1;cursor:pointer;" onclick="currentApiaryId=${a.id};goto('s-hives')">›</span>
       </div>`;
     list.appendChild(div);
@@ -3835,6 +3835,14 @@ async function loadGuidance(){
     {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
     {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic PRO (Formic Acid) also allows supers on. Supers must be removed for: Apivar, Apitraz, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
   ];
+  if(!_planLimits.ai){
+    // Free user — show upgrade prompt in each section
+    sections.forEach(s=>{
+      const el=document.getElementById(s.id);
+      if(el) el.innerHTML='<div style="text-align:center;padding:20px 10px;color:var(--text3);font-size:14px;">🔒 Upgrade to unlock AI guidance for this hive</div>';
+    });
+    return;
+  }
   for(const s of sections)loadSection(s.id,s.prompt,pref);
 }
 
@@ -3962,7 +3970,10 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
 async function loadSection(elId,prompt,prefProfile){
   const el=document.getElementById(elId);if(!el)return;
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);font-style:italic;"><div class="dot-pulse"><span></span><span></span><span></span></div> Loading…</div>';
-  if(!requireAI('guidance')) return;
+  if(!requireAI('guidance')){
+    el.innerHTML='';
+    return;
+  }
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
 CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.
@@ -3991,7 +4002,11 @@ async function sendChat(){
   input.value='';
   addChatMsg(msg,'user');chatHistory.push({role:'user',content:msg});
   const loading=addChatMsg('…','bot');
-  if(!requireAI('chat')) return;
+  if(!requireAI('chat')){
+    loading.textContent='';
+    showToast('AI chat requires a paid plan — upgrade in Plans & Pricing 🐝');
+    return;
+  }
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
@@ -4634,7 +4649,10 @@ function _parseSpokenNumber(transcript){
 }
 
 function fieldToggleVoice(){
-  if(!requireAI('voice')) return;
+  if(!requireAI('voice')){
+    showToast('Voice entry requires a paid plan — upgrade in Plans & Pricing 🐝');
+    return;
+  }
   if(listeningActive){_voiceCleanup();_voiceSetStatus('Stopped.');return;}
 
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition||
