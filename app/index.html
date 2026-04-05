@@ -444,7 +444,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <!-- DISCLAIMER -->
 <div id="s-disclaimer" class="screen">
-  <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a><div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div><div style="flex-shrink:0;margin-left:auto;display:flex;align-items:center;gap:6px;"><button class="nav-btn" onclick="history.length>1?history.back():goto('s-apiaries')">← Back</button><button class="nav-btn" onclick="toggleAppsDropdown(event)" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button></div></div></div>
+  <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a><div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div><div style="flex-shrink:0;margin-left:auto;display:flex;align-items:center;gap:6px;"><button class="nav-btn" onclick="goto('s-apiaries')">← Back</button><button class="nav-btn" onclick="toggleAppsDropdown(event)" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button></div></div></div>
   <div class="page-body">
     <div class="legal-doc">
 <h2 class="legal-h2">Terms and Conditions</h2>
@@ -3098,7 +3098,7 @@ function renderHives(){
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();speakHiveSummary(${h.id},this)">🔊 Summary</button>
           <button class="icon-btn" title="Edit hive" onclick="event.stopPropagation();editHive(${h.id})">✏️</button>
-          <button class="icon-btn danger" title="Delete hive" onclick="event.stopPropagation();deleteHive(${h.id},this.dataset.name)" data-name="${h.name.replace(/'/g,'&apos;')}">🗑️</button>
+          <button class="icon-btn danger" title="Delete hive" onclick="event.stopPropagation();deleteHive(${h.id},this.dataset.name)" data-name="${h.name.replace(/'/g,'&apos;')}">✕</button>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
@@ -3236,6 +3236,7 @@ async function saveEditHive(){
   const id=parseInt(document.getElementById('hive-edit-id').value);
   const name=document.getElementById('new-hive-name').value.trim();
   console.log('saveEditHive called, id='+id+', name='+name);
+  if(!id || isNaN(id)){showToast('Error: no hive ID found — please try again');return;}
   const notes=document.getElementById('new-hive-notes').value.trim();
   const field=document.getElementById('hive-apiary-field');
   const newApiaryId=field.style.display!=='none'
@@ -3243,8 +3244,10 @@ async function saveEditHive(){
     : currentApiaryId;
   if(!name){showToast('Please enter a hive name');return;}
   showSaveSpinner(true);
+  const updateData = {name, apiary_id: newApiaryId};
+  if(notes !== undefined) updateData.notes = notes;
   const {error}=await _sb.from('hives')
-    .update({name, notes, apiary_id: newApiaryId})
+    .update(updateData)
     .eq('id',id).eq('user_id',_sbUser.id);
   showSaveSpinner(false);
   if(error){showToast('Save failed: '+error.message);return;}
