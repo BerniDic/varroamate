@@ -1054,12 +1054,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
     <div style="position:relative;display:inline-flex;flex-shrink:0;" id="apps-dropdown-wrap">
         <button class="nav-btn" onclick="toggleAppsDropdown()" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button>
-        <div id="apps-dropdown" style="display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid var(--border);min-width:200px;overflow:hidden;z-index:1300;">
-          <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">📋 Productivity</a>
-          <a href="#" onclick="event.preventDefault();if(requireAI('planner'))window.location.href='/planner/'" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧠 Smart Planner</a>
-          <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;border-bottom:1px solid var(--border);" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🎓 Academy <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
-          <a href="/hygiene/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧹 Hygiene</a>
-        </div>
+
       </div>
     <!-- Mobile overflow menu button (shown on ≤900px, hidden on desktop via nav-desktop-btns logic) -->
     <button class="nav-overflow-btn" id="nav-overflow-btn" onclick="toggleNavOverflow()" title="Menu">⋮</button>
@@ -4378,7 +4373,7 @@ function toggleAppsDropdown(){
   if(!open){
     setTimeout(()=>{
       document.addEventListener('click',function closeApps(e){
-        if(!document.getElementById('apps-dropdown-wrap')?.contains(e.target)){
+        if(!document.getElementById('apps-dropdown')?.contains(e.target)||e.target.closest('button[onclick*="toggleAppsDropdown"]')){
           d.style.display='none';
           document.removeEventListener('click',closeApps);
         }
@@ -5652,4 +5647,35 @@ async function submitFeedback(){
 <!-- HIVE LIMIT UPGRADE MODAL -->
 <div class="modal-overlay" id="modal-hive-limit" onclick="closeModalOutside(event,'modal-hive-limit')">
   <div class="modal-box">
-    <div 
+    <div class="modal-title">🐝 Hive Limit Reached <button class="modal-close" onclick="closeModal('modal-hive-limit')">✕</button></div>
+    <div id="hive-limit-body"></div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn btn-outline btn-full" onclick="closeModal('modal-hive-limit')">Maybe later</button>
+      <button class="btn btn-primary btn-full" onclick="closeModal('modal-hive-limit');goto('s-subscription')">View Plans →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tabbar" id="tabbar">
+  <div class="tabbar-inner">
+    <div class="tab-item active" id="tabnav-apiaries" onclick="goto('s-apiaries')"><div class="tab-icon">🏡</div><div>Apiaries</div></div>
+    <div class="tab-item" id="tabnav-subscription" onclick="goto('s-subscription')"><div class="tab-icon">💳</div><div>Plans</div></div>
+    <div class="tab-item" id="tabnav-library" onclick="goto('s-library')"><div class="tab-icon">📚</div><div>Library</div></div>
+    <div class="tab-item" id="tabnav-disclaimer" onclick="goto('s-disclaimer')"><div class="tab-icon">📋</div><div>Terms</div></div>
+  </div>
+</div>
+
+<!-- CHAT FAB -->
+<button class="chat-fab" id="chat-fab" onclick="goto('s-guidance')" title="AI Guidance" style="display:none;">🤖</button>
+
+<!-- Global apps dropdown -->
+<div id="apps-dropdown" style="display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid var(--border);min-width:200px;overflow:hidden;z-index:1300;">
+  <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">📋 Productivity</a>
+  <a href="#" onclick="event.preventDefault();if(requireAI('planner'))window.location.href='/planner/'" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧠 Smart Planner</a>
+  <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;border-bottom:1px solid var(--border);" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🎓 Academy <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
+  <a href="/hygiene/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧹 Hygiene</a>
+</div>
+
+</body>
+</html>
