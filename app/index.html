@@ -2397,7 +2397,7 @@ async function loadDataFromSupabase(){
   const uid=_sbUser.id;
   try{
     const [apRes,hvRes,cntRes,trtRes,noteRes]=await Promise.all([
-      _sb.from('apiaries').select('*').eq('user_id',uid).order('created_at'),
+      _sb.from('apiaries').select('*').eq('user_id',uid).order('sort_order',{ascending:true,nullsFirst:false}).order('created_at'),
       _sb.from('hives').select('*').eq('user_id',uid).order('created_at'),
       _sb.from('mite_counts').select('*').eq('user_id',uid).order('date',{ascending:false}),
       _sb.from('treatments').select('*').eq('user_id',uid).order('date',{ascending:false}),
@@ -2408,7 +2408,7 @@ async function loadDataFromSupabase(){
     if(cntRes.error)throw cntRes.error;
     if(trtRes.error)throw trtRes.error;
     if(noteRes.error)throw noteRes.error;
-    apiaries=apRes.data.map(a=>({id:a.id,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0}));
+    apiaries=apRes.data.map((a,i)=>({id:a.id,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0,sort_order:a.sort_order??i}));
     hives={};
     hvRes.data.forEach(h=>{if(!hives[h.apiary_id])hives[h.apiary_id]=[];hives[h.apiary_id].push({id:h.id,name:h.name});});
     miteCountsByHive={};
@@ -2857,6 +2857,8 @@ function renderApiaries(){
         <div class="apiary-hives" style="margin-top:4px;">${hc} hive${hc!==1?'s':''} · <span style="color:${st.color};font-weight:600;">${st.label}</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
+        <button class="icon-btn" title="Move up" onclick="event.stopPropagation();moveApiary(${a.id},'up')" style="font-size:14px;">↑</button>
+        <button class="icon-btn" title="Move down" onclick="event.stopPropagation();moveApiary(${a.id},'down')" style="font-size:14px;">↓</button>
         <button class="icon-btn" title="Edit apiary" onclick="event.stopPropagation();editApiary(${a.id})">✏️</button>
         <button class="icon-btn danger" title="Delete apiary" onclick="event.stopPropagation();deleteApiary(${a.id},'${a.name.replace(/'/g,"\'")}')">🗑</button>
         <span style="color:var(--text3);font-size:22px;line-height:1;cursor:pointer;" onclick="currentApiaryId=${a.id};goto('s-hives')">›</span>
@@ -3063,6 +3065,24 @@ function editApiary(id){
   openModal('modal-add-apiary');
   setTimeout(initMiniMap,100);
 }
+async function moveApiary(id, direction){
+  const idx = apiaries.findIndex(a => a.id === id);
+  if(idx < 0) return;
+  const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+  if(swapIdx < 0 || swapIdx >= apiaries.length) return;
+  // Swap in local array
+  [apiaries[idx], apiaries[swapIdx]] = [apiaries[swapIdx], apiaries[idx]];
+  // Assign sequential sort_order values
+  apiaries.forEach((a, i) => a.sort_order = i);
+  // Persist to Supabase
+  try {
+    await Promise.all(apiaries.map((a, i) =>
+      _sb.from('apiaries').update({sort_order: i}).eq('id', a.id).eq('user_id', _sbUser.id)
+    ));
+  } catch(e) { console.warn('sort_order save:', e); }
+  renderApiaries();
+}
+
 function deleteApiary(id,name){
   deleteType='apiary';deleteId=id;
   document.getElementById('delete-confirm-msg').textContent=`Delete apiary "${name}" and all its hive data?\nThis cannot be undone.`;
