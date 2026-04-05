@@ -2101,7 +2101,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <select id="hive-apiary-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;background:var(--white);">
       </select>
     </div>
-    <button class="btn btn-primary btn-full" id="hive-save-btn">Add Hive</button>
+    <button class="btn btn-primary btn-full" id="hive-save-btn" onclick="document.getElementById('hive-edit-id').value ? saveEditHive() : saveNewHive()">Add Hive</button>
   </div>
 </div>
 
@@ -3235,6 +3235,7 @@ async function saveNewHive(){
 async function saveEditHive(){
   const id=parseInt(document.getElementById('hive-edit-id').value);
   const name=document.getElementById('new-hive-name').value.trim();
+  console.log('saveEditHive called, id='+id+', name='+name);
   const notes=document.getElementById('new-hive-notes').value.trim();
   const field=document.getElementById('hive-apiary-field');
   const newApiaryId=field.style.display!=='none'
