@@ -2101,6 +2101,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <input type="hidden" id="hive-edit-id" value="">
     <div class="field"><label>Hive Name</label><input type="text" id="new-hive-name" placeholder="e.g. Hive Delta"></div>
     <div class="field"><label>Notes (optional)</label><input type="text" id="new-hive-notes" placeholder="e.g. Langstroth, 2 boxes"></div>
+    <div class="field" id="hive-apiary-field" style="display:none;">
+      <label>Move to Apiary</label>
+      <select id="hive-apiary-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;background:var(--white);">
+      </select>
+    </div>
     <button class="btn btn-primary btn-full" id="hive-save-btn" onclick="saveNewHive()">Add Hive</button>
   </div>
 </div>
@@ -3172,6 +3177,15 @@ async function editHive(id){
   document.getElementById('new-hive-notes').value=h.notes||'';
   document.getElementById('hive-save-btn').textContent='Save Changes';
   document.getElementById('hive-save-btn').onclick=saveEditHive;
+  // Show apiary selector if more than one apiary
+  const sel=document.getElementById('hive-apiary-select');
+  const field=document.getElementById('hive-apiary-field');
+  if(apiaries.length>1){
+    sel.innerHTML=apiaries.map(a=>`<option value="${a.id}"${a.id===currentApiaryId?' selected':''}>${a.name}</option>`).join('');
+    field.style.display='';
+  } else {
+    field.style.display='none';
+  }
   openModal('modal-add-hive');
 }
 
@@ -3218,19 +3232,33 @@ async function saveEditHive(){
   const id=parseInt(document.getElementById('hive-edit-id').value);
   const name=document.getElementById('new-hive-name').value.trim();
   const notes=document.getElementById('new-hive-notes').value.trim();
+  const field=document.getElementById('hive-apiary-field');
+  const newApiaryId=field.style.display!=='none'
+    ? parseInt(document.getElementById('hive-apiary-select').value)
+    : currentApiaryId;
   if(!name){showToast('Please enter a hive name');return;}
   showSaveSpinner(true);
-  const {error}=await _sb.from('hives').update({name,notes}).eq('id',id).eq('user_id',_sbUser.id);
+  const {error}=await _sb.from('hives')
+    .update({name, notes, apiary_id: newApiaryId})
+    .eq('id',id).eq('user_id',_sbUser.id);
   showSaveSpinner(false);
   if(error){showToast('Save failed: '+error.message);return;}
-  // Update local state
+  // Update local state — move hive between apiary buckets if needed
   for(const aid of Object.keys(hives)){
     const idx=hives[aid].findIndex(h=>h.id===id);
-    if(idx>=0){hives[aid][idx].name=name;hives[aid][idx].notes=notes;break;}
+    if(idx>=0){
+      const hive=hives[aid].splice(idx,1)[0];
+      hive.name=name; hive.notes=notes;
+      if(!hives[newApiaryId]) hives[newApiaryId]=[];
+      hives[newApiaryId].push(hive);
+      break;
+    }
   }
   closeModal('modal-add-hive');
   resetHiveModal();
-  showToast('Hive updated 🐝');
+  const moved = newApiaryId !== currentApiaryId;
+  const destApiary = apiaries.find(a=>a.id===newApiaryId);
+  showToast(moved ? `Hive moved to ${destApiary?.name||'new apiary'} 🐝` : 'Hive updated 🐝');
   renderHives();
 }
 
