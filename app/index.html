@@ -832,7 +832,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <h3 class="legal-h3">Contact Us</h3>
 <ol class="legal-ol" start="14">
 <li>For further information about our privacy policy or practices, or to access or correct your personal information, or make a complaint, please contact us using the details set out below:
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:Bernhard@varroamate.com">Bernhard@varroamate.com</a></p>
+<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:Bernhard@varroamate.com">Bernhard&#64;varroamate.com</a></p>
 </li>
 </ol>
 <p class="legal-updated">Our privacy policy was last updated on 1 April 2026.</p>
@@ -880,7 +880,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <h3 class="legal-h3">Contact Us</h3>
 <p>For further information about our Cookies Policy or practices, please contact us using the details set out below:</p>
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:Bernhard@varroamate.com">Bernhard@varroamate.com</a></p>
+<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:Bernhard@varroamate.com">Bernhard&#64;varroamate.com</a></p>
 <p class="legal-updated">Our Cookies Policy was last updated on 1 April 2026.</p>
       </div>
     </div>
@@ -2097,10 +2097,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <!-- MODAL: Add Hive -->
 <div class="modal-overlay" id="modal-add-hive" onclick="closeModalOutside(event,'modal-add-hive')">
   <div class="modal-box">
-    <div class="modal-title">🐝 Add Hive <button class="modal-close" onclick="closeModal('modal-add-hive')">✕</button></div>
+    <div class="modal-title">🐝 <span id="modal-hive-title">Add Hive</span> <button class="modal-close" onclick="closeModal('modal-add-hive')">✕</button></div>
+    <input type="hidden" id="hive-edit-id" value="">
     <div class="field"><label>Hive Name</label><input type="text" id="new-hive-name" placeholder="e.g. Hive Delta"></div>
     <div class="field"><label>Notes (optional)</label><input type="text" id="new-hive-notes" placeholder="e.g. Langstroth, 2 boxes"></div>
-    <button class="btn btn-primary btn-full" onclick="saveNewHive()">Add Hive</button>
+    <button class="btn btn-primary btn-full" id="hive-save-btn" onclick="saveNewHive()">Add Hive</button>
   </div>
 </div>
 
@@ -2313,7 +2314,7 @@ function applyPlanUI(){
       btn.style.cursor = 'default';
     } else if(p === 'free'){
       btn.textContent = 'Downgrade';
-      btn.onclick = () => showToast('To cancel your subscription, contact hello@varroamate.com');
+      btn.onclick = () => showToast('To cancel your subscription, contact hello&#64;varroamate.com');
       btn.classList.remove('btn-primary');
       btn.classList.add('btn-outline');
     } else {
@@ -3096,6 +3097,8 @@ function renderHives(){
           <span class="badge ${b.cls}">${b.label}</span>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();speakHiveSummary(${h.id},this)">🔊 Summary</button>
+          <button class="icon-btn" title="Edit hive" onclick="event.stopPropagation();editHive(${h.id})">✏️</button>
+          <button class="icon-btn danger" title="Delete hive" onclick="event.stopPropagation();deleteHive(${h.id},this.dataset.name)" data-name="${h.name.replace(/'/g,'&apos;')}">🗑</button>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
@@ -3141,6 +3144,7 @@ function showHiveLimitModal(){
 }
 
 function tryAddHive(){
+  resetHiveModal();
   if(!canAddHive()){
     const planNames={free:'Free',free_ai:'Free + AI',hobbyist:'Hobbyist',beekeeper:'Beekeeper'};
     showToast(`Hive limit reached for ${planNames[_plan]} plan (${_planLimits.hives} hives) — upgrade to add more 🐝`);
@@ -3158,6 +3162,33 @@ function _tryAddHive(){
     if(totalHives >= HOBBYIST_HIVE_LIMIT){ showHiveLimitModal(); return; }
   }
   openModal('modal-add-hive');
+}
+
+async function editHive(id){
+  const h=Object.values(hives).flat().find(x=>x.id===id);if(!h)return;
+  document.getElementById('modal-hive-title').textContent='Edit Hive';
+  document.getElementById('hive-edit-id').value=id;
+  document.getElementById('new-hive-name').value=h.name;
+  document.getElementById('new-hive-notes').value=h.notes||'';
+  document.getElementById('hive-save-btn').textContent='Save Changes';
+  document.getElementById('hive-save-btn').onclick=saveEditHive;
+  openModal('modal-add-hive');
+}
+
+function deleteHive(id,nameOrEl){
+  const name = typeof nameOrEl === 'string' ? nameOrEl : nameOrEl;
+  deleteType='hive';deleteId=id;
+  document.getElementById('delete-confirm-msg').textContent='Delete hive "'+name+'"?\nAll mite counts, treatments and notes for this hive will also be deleted. This cannot be undone.';
+  openModal('modal-confirm-delete');
+}
+
+function resetHiveModal(){
+  document.getElementById('modal-hive-title').textContent='Add Hive';
+  document.getElementById('hive-edit-id').value='';
+  document.getElementById('new-hive-name').value='';
+  document.getElementById('new-hive-notes').value='';
+  document.getElementById('hive-save-btn').textContent='Add Hive';
+  document.getElementById('hive-save-btn').onclick=saveNewHive;
 }
 
 async function saveNewHive(){
@@ -3182,6 +3213,27 @@ async function saveNewHive(){
   showSaveSpinner(false);
   closeModal('modal-add-hive');showToast('"'+name+'" added! 🐝');renderHives();
 }
+
+async function saveEditHive(){
+  const id=parseInt(document.getElementById('hive-edit-id').value);
+  const name=document.getElementById('new-hive-name').value.trim();
+  const notes=document.getElementById('new-hive-notes').value.trim();
+  if(!name){showToast('Please enter a hive name');return;}
+  showSaveSpinner(true);
+  const {error}=await _sb.from('hives').update({name,notes}).eq('id',id).eq('user_id',_sbUser.id);
+  showSaveSpinner(false);
+  if(error){showToast('Save failed: '+error.message);return;}
+  // Update local state
+  for(const aid of Object.keys(hives)){
+    const idx=hives[aid].findIndex(h=>h.id===id);
+    if(idx>=0){hives[aid][idx].name=name;hives[aid][idx].notes=notes;break;}
+  }
+  closeModal('modal-add-hive');
+  resetHiveModal();
+  showToast('Hive updated 🐝');
+  renderHives();
+}
+
 
 // ══ HIVE DETAIL ══
 function renderHiveDetail(){
@@ -3420,6 +3472,21 @@ async function confirmDelete(){
     if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
     notesByHive[currentHiveId]=(notesByHive[currentHiveId]||[]).filter(x=>String(x.id)!==strId);
     renderNotesList();
+  } else if(deleteType==='hive'){
+    const {error}=await _sb.from('hives').delete().eq('id',numId).eq('user_id',_sbUser.id);
+    if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
+    // Remove from local state
+    for(const aid of Object.keys(hives)){
+      const idx=hives[aid].findIndex(h=>h.id===numId);
+      if(idx>=0){
+        hives[aid].splice(idx,1);
+        delete miteCountsByHive[numId];
+        delete treatmentsByHive[numId];
+        delete notesByHive[numId];
+        break;
+      }
+    }
+    showSaveSpinner(false);closeModal('modal-confirm-delete');showToast('Hive deleted.');renderHives();return;
   } else if(deleteType==='apiary'){
     const {error}=await _sb.from('apiaries').delete().eq('id',numId).eq('user_id',_sbUser.id);
     if(error){showToast('Delete failed: '+error.message);showSaveSpinner(false);return;}
