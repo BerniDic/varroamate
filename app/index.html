@@ -444,7 +444,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 
 <!-- DISCLAIMER -->
 <div id="s-disclaimer" class="screen">
-  <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a><div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div><div style="flex-shrink:0;margin-left:auto;"><button class="nav-btn" onclick="toggleAppsDropdown(event)" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button></div></div></div>
+  <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a><div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div><div style="flex-shrink:0;margin-left:auto;display:flex;align-items:center;gap:6px;"><button class="nav-btn" onclick="history.length>1?history.back():goto('s-apiaries')">← Back</button><button class="nav-btn" onclick="toggleAppsDropdown(event)" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button></div></div></div>
   <div class="page-body">
     <div class="legal-doc">
 <h2 class="legal-h2">Terms and Conditions</h2>
@@ -2101,7 +2101,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <select id="hive-apiary-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;background:var(--white);">
       </select>
     </div>
-    <button class="btn btn-primary btn-full" id="hive-save-btn" onclick="saveNewHive()">Add Hive</button>
+    <button class="btn btn-primary btn-full" id="hive-save-btn">Add Hive</button>
   </div>
 </div>
 
@@ -3164,7 +3164,13 @@ function _tryAddHive(){
   openModal('modal-add-hive');
 }
 
-async function editHive(id){
+async // Initialise hive save button onclick on load
+(function(){ 
+  const btn=document.getElementById('hive-save-btn');
+  if(btn) btn.onclick=saveNewHive;
+})();
+
+function editHive(id){
   const h=Object.values(hives).flat().find(x=>x.id===id);if(!h)return;
   document.getElementById('modal-hive-title').textContent='Edit Hive';
   document.getElementById('hive-edit-id').value=id;
@@ -3196,8 +3202,11 @@ function resetHiveModal(){
   document.getElementById('hive-edit-id').value='';
   document.getElementById('new-hive-name').value='';
   document.getElementById('new-hive-notes').value='';
-  document.getElementById('hive-save-btn').textContent='Add Hive';
-  document.getElementById('hive-save-btn').onclick=saveNewHive;
+  const btn=document.getElementById('hive-save-btn');
+  btn.textContent='Add Hive';
+  btn.onclick=saveNewHive;
+  const field=document.getElementById('hive-apiary-field');
+  if(field) field.style.display='none';
 }
 
 async function saveNewHive(){
