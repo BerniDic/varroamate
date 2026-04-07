@@ -2360,14 +2360,16 @@ async function loadPlan(){
       .eq('user_id', _sbUser.id)
       .maybeSingle();
     if(error){
-      console.warn('loadPlan error:', error.message);
+      console.error('loadPlan error:', error.code, error.message, error.details);
       return; // Don't overwrite plan on transient DB errors
     }
     if(!data){
       // No subscription row yet — new user, default to free
+      console.log('loadPlan: no subscription row found for user', _sbUser.id);
       _plan = 'free';
       _planStatus = 'active';
     } else {
+      console.log('loadPlan: loaded plan', data.plan, 'status', data.status);
       _plan = data.plan || 'free';
       _planStatus = data.status || 'active';
       // Treat past_due as still active (grace period) — downgrade if cancelled
@@ -2375,7 +2377,7 @@ async function loadPlan(){
     }
     _planLimits = PLAN_LIMITS[_plan] || PLAN_LIMITS.free;
     applyPlanUI();
-  } catch(e){ console.warn('loadPlan:', e); }
+  } catch(e){ console.error('loadPlan exception:', e); }
 }
 
 function applyPlanUI(){
@@ -5652,8 +5654,26 @@ document.addEventListener('DOMContentLoaded', async function(){
   }
   const ls=document.getElementById('s-loading');
   if(ls)ls.classList.add('active');
+  // Handle invalid/expired refresh tokens gracefully
+  _sb.auth.onAuthStateChange((event, session) => {
+    if(event === 'TOKEN_REFRESHED') {
+      console.log('Token refreshed successfully');
+    }
+    if(event === 'SIGNED_OUT') {
+      _sbUser = null;
+    }
+  });
+
   try{
-    const {data:{session}}=await _sb.auth.getSession();
+    const {data:{session},error:sessionError}=await _sb.auth.getSession();
+    // If refresh token is invalid, clear session and send to sign-in
+    if(sessionError && sessionError.message?.includes('Refresh Token')){
+      console.warn('Invalid refresh token — clearing session');
+      await _sb.auth.signOut();
+      if(ls)ls.classList.remove('active');
+      goto('s-welcome');
+      return;
+    }
     if(session){
       _sbUser=session.user;
       const urlParams=new URLSearchParams(window.location.search);
