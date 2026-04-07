@@ -2358,13 +2358,13 @@ async function loadPlan(){
       .from('subscriptions')
       .select('plan, status, current_period_end, cancel_at_period_end')
       .eq('user_id', _sbUser.id)
-      .single();
-    if(error || !data){
-      // No row yet — insert a free row and use defaults
-      await _sb.from('subscriptions').upsert(
-        { user_id: _sbUser.id, plan: 'free', status: 'active' },
-        { onConflict: 'user_id' }
-      );
+      .maybeSingle();
+    if(error){
+      console.warn('loadPlan error:', error.message);
+      return; // Don't overwrite plan on transient DB errors
+    }
+    if(!data){
+      // No subscription row yet — new user, default to free
       _plan = 'free';
       _planStatus = 'active';
     } else {
