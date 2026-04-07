@@ -2186,12 +2186,13 @@ async function loadPlan(){
       .from('subscriptions')
       .select('plan, status')
       .eq('user_id', _user.id)
-      .single();
-    if(error || !data){
-      await _sb.from('subscriptions').upsert(
-        { user_id: _user.id, plan: 'free', status: 'active' },
-        { onConflict: 'user_id' }
-      );
+      .maybeSingle();
+    if(error){
+      console.warn('loadPlan query error:', error.message);
+      return; // Don't overwrite plan on transient errors
+    }
+    if(!data){
+      // No subscription row yet — new user, set free without upsert
       _plan = 'free'; _planStatus = 'active';
     } else {
       _plan = data.plan || 'free';
