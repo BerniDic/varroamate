@@ -915,8 +915,22 @@ html, body {
 </head>
 <body>
 
-<!-- ══ NEW FEATURE BANNER ══ -->
-<div style="
+<!-- ══ BANNERS ══ -->
+<!-- Safari warning — shown only in Safari -->
+<div id="safari-warning" style="display:none;
+  position:fixed;top:0;left:0;right:0;z-index:10001;
+  background:linear-gradient(90deg,#B85C00,#D4720A);
+  color:white;text-align:center;
+  padding:11px 40px 11px 16px;
+  font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.5;
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);">
+  ⚠️ <strong>Safari users:</strong> We are aware of a login issue affecting Safari. We recommend using <strong>Chrome</strong> or <strong>Firefox</strong> until this is resolved. We apologise for the inconvenience.
+  <button onclick="document.getElementById('safari-warning').style.display='none'"
+    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.2);border:none;color:white;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;">✕</button>
+</div>
+
+<!-- Feature banner — shown to non-Safari users -->
+<div id="feature-banner" style="
   position:fixed;top:0;left:0;right:0;z-index:10000;
   background:linear-gradient(90deg,#2C6E49,#3A9463);
   color:white;text-align:center;
@@ -925,6 +939,16 @@ html, body {
   box-shadow:0 2px 12px rgba(0,0,0,0.25);">
   🆕 <strong>New in VarroaMate:</strong> Hives can now be moved between apiaries — QR codes and hive IDs stay put. Perfect for pollination runs and chasing honey flows. 🍯
 </div>
+
+<script>
+(function(){
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if(isSafari){
+    document.getElementById('safari-warning').style.display = 'block';
+    document.getElementById('feature-banner').style.display = 'none';
+  }
+})();
+</script>
 
 
 <div id="scene">
