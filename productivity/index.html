@@ -14,26 +14,7 @@
   var p = params.get('h') || params.get('vmp');
   if(p){
     window._qrHiveCode = p.toUpperCase();
-    try{ sessionStorage.setItem('vmp_pending_qr', p.toUpperCase()); }catch(e){}
-    // Handle Safari bfcache restore
-window.addEventListener('pageshow', async function(event){
-  if(event.persisted){
-    console.log('pageshow: bfcache restore — reloading data');
-    if(typeof _dataLoaded !== 'undefined') _dataLoaded = false;
-    const {data:{session}} = await _sb.auth.getSession();
-    if(session?.user && typeof loadAllData === 'function'){
-      await loadAllData();
-    } else if(session?.user && typeof loadDataFromSupabase === 'function'){
-      await loadDataFromSupabase();
-      if(typeof loadPlan === 'function') await loadPlan();
-      if(typeof goto === 'function' && typeof hasAcceptedDisclaimer === 'function'){
-        if(hasAcceptedDisclaimer()){ goto('s-apiaries'); } else { goto('s-disclaimer'); }
-      }
-    }
-  }
-});
-
-document.addEventListener('DOMContentLoaded', function(){
+    document.addEventListener('DOMContentLoaded', function(){
       var banner = document.createElement('div');
       banner.id = 'qrScanBanner';
       banner.style.cssText = 'position:fixed;top:56px;left:0;right:0;z-index:500;background:#4A7A58;color:white;padding:10px 16px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
@@ -148,7 +129,7 @@ body::before{
   height:calc(58px + env(safe-area-inset-top,0px));
   display:flex;align-items:center;justify-content:space-between;
   gap:6px;
-  overflow:visible;     /* allow dropdowns to extend below bar */
+  overflow:hidden;      /* prevent children spilling out of bar */
   box-shadow:0 2px 12px rgba(30,10,30,0.35);
   border-bottom:2px solid rgba(242,217,138,0.25);
 }
@@ -1578,7 +1559,7 @@ body::before{
   <!-- Bottom nav -->
   
     <!-- ══ SCREEN: DISCLAIMER ══ -->
-    <div class="screen" id="screen-disclaimer" style="overflow-y:auto;">
+    <div class="screen" id="screen-disclaimer">
       <div style="padding:20px 16px 100px;">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--forest);margin-bottom:6px;">📋 Terms &amp; Disclaimer</div>
         <div style="font-size:13px;color:var(--text3);margin-bottom:18px;">VarroaMate Productivity</div>
@@ -2179,7 +2160,6 @@ const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const CLAUDE_MODEL  = 'claude-opus-4-6';       // update here when Anthropic releases new models
 const CLAUDE_MODEL_VOICE = 'claude-haiku-4-5-20251001'; // lighter model for voice extraction
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
-
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ══════════════════════════════════════════════
@@ -2205,13 +2185,12 @@ async function loadPlan(){
       .from('subscriptions')
       .select('plan, status')
       .eq('user_id', _user.id)
-      .maybeSingle();
-    if(error){
-      console.warn('loadPlan query error:', error.message);
-      return; // Don't overwrite plan on transient errors
-    }
-    if(!data){
-      // No subscription row yet — new user, set free without upsert
+      .single();
+    if(error || !data){
+      await _sb.from('subscriptions').upsert(
+        { user_id: _user.id, plan: 'free', status: 'active' },
+        { onConflict: 'user_id' }
+      );
       _plan = 'free'; _planStatus = 'active';
     } else {
       _plan = data.plan || 'free';
@@ -2446,7 +2425,7 @@ async function signOut(){
   if(!_user){ showToast('Not signed in.'); return; }
   if(!confirm('Sign out of VarroaMate?')) return;
   await _sb.auth.signOut();
-  window.location.href = '/';
+  showToast('Signed out');
 }
 
 // ══════════════════════════════════════════════
@@ -2506,10 +2485,6 @@ async function loadAllData(){
   renderAll();
 
   // QR deep-link: auto-open inspection modal for scanned hive
-  // Restore from sessionStorage in case it was consumed on a previous render
-  if(!window._qrHiveCode){
-    try{ const s=sessionStorage.getItem('vmp_pending_qr'); if(s) window._qrHiveCode=s; }catch(e){}
-  }
   if(window._qrHiveCode){
     const code = window._qrHiveCode;
     const hive = getHiveByCode(code);
@@ -2517,8 +2492,7 @@ async function loadAllData(){
     const banner = document.getElementById('qrScanBanner');
     if(banner) banner.remove();
     if(hive){
-      window._qrHiveCode = null;
-      try{ sessionStorage.removeItem('vmp_pending_qr'); }catch(e){}
+      window._qrHiveCode = null; // consume
       switchTab('inspections');
       setTimeout(()=>{
         openInspModal(null, String(hive.id));
@@ -2527,8 +2501,7 @@ async function loadAllData(){
     } else {
       // Hive code not found — show clear error
       window._qrHiveCode = null;
-      try{ sessionStorage.removeItem('vmp_pending_qr'); }catch(e){}
-      showToast(`QR code "${code}" — hive not found. Make sure you're signed in to the correct account.`, 4000);
+      showToast(`QR code "${code}" — hive not found. Is this the right account?`, 4000);
     }
   }
 }
@@ -3376,10 +3349,8 @@ function renderQueens(){
   const knownAp2 = new Set(_apiaries.map(a=>a.id));
   fHives.filter(h=>!knownAp2.has(h.apiary_id)).forEach(hive=> allQueenHives.push({hive, ap:null}));
 
-  const totalPages = Math.ceil(allQueenHives.length / PAGE_SIZE);
-  const qPage = (window._queenPage||0);
-  if(qPage >= totalPages) window._queenPage = Math.max(0, totalPages-1);
-  const pageHives = allQueenHives.slice((window._queenPage||0)*PAGE_SIZE, ((window._queenPage||0)+1)*PAGE_SIZE);
+  const totalPages = 1; // no pagination — show all hives
+  const pageHives = allQueenHives;
 
   let html2 = '';
   let lastApName = null;
@@ -3396,12 +3367,7 @@ function renderQueens(){
     html2 += q ? queenCard(q, hive, ap) : emptyCard(hive);
   });
 
-  const pagination = totalPages > 1 ? `
-    <div class="pagination" style="grid-column:1/-1;">
-      <button class="page-btn" onclick="window._queenPage=Math.max(0,(window._queenPage||0)-1);renderQueens()" ${(window._queenPage||0)===0?'disabled':''}>← Prev</button>
-      <span class="page-info">Page ${(window._queenPage||0)+1} of ${totalPages}</span>
-      <button class="page-btn" onclick="window._queenPage=((window._queenPage||0)+1);renderQueens()" ${(window._queenPage||0)>=totalPages-1?'disabled':''}>Next →</button>
-    </div>` : '';
+  const pagination = '';
 
   grid.innerHTML = (html2 + pagination) || `<div class="empty-state" style="grid-column:1/-1">
     <div class="empty-state-icon">👑</div>No hives found for the selected filter.</div>`;
@@ -3614,7 +3580,6 @@ async function saveLoss(){
 function renderInsights(){
   const el = document.getElementById('insightsContent');
 
-  // Gate insights to paid plans
   const paid = ['free_ai','hobbyist','beekeeper'];
   if(!paid.includes(_plan)){
     el.innerHTML=`
@@ -3859,12 +3824,19 @@ function renderInsights(){
       border:1.5px solid var(--border);background:transparent;color:var(--text2);
       font-family:'Bitter',serif;outline:none;">
       <option value="all">All apiaries</option>
-      ${_apiaries.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}
-      ${_hives.some(h=>!_apiaries.some(a=>a.id===h.apiary_id))?'<option value="orphan">Other hives</option>':''}
     </select>
   </div>
   ${(()=>{
+    // Populate the health filter dropdown
     const healthSel = document.getElementById('healthFilterSelect');
+    if(healthSel){
+      const current = healthSel.value;
+      healthSel.innerHTML = '<option value="all">All apiaries</option>' +
+        _apiaries.map(a=>`<option value="${a.id}">${a.name}</option>`).join('') +
+        (_hives.some(h=>!_apiaries.some(a=>a.id===h.apiary_id))?'<option value="orphan">Other hives</option>':'');
+      // Restore selection if still valid
+      if([...healthSel.options].some(o=>o.value===current)) healthSel.value = current;
+    }
     const healthFilter = healthSel?.value || 'all';
 
     const lossSet = new Set(_losses.map(l=>String(l.hive_id)));
@@ -3951,13 +3923,10 @@ function renderInsights(){
         const s = levelStyle[level];
         const kg = hiveYieldMap[hive.id];
         const tip = hiveTip(hive);
-        return `<div title="${tip}" onclick="switchTab('inspections');setTimeout(()=>openInspModal(null,'${hive.id}'),150);" style="
+        return `<div title="${tip}" style="
           background:${s.bg};border:2px solid ${s.border};border-radius:var(--radius-sm);
-          padding:10px 8px;cursor:pointer;text-align:center;min-width:0;
-          transition:transform 0.1s,box-shadow 0.1s;
-          ${level==='lost'?'opacity:0.55;':''}"
-          onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.12)'"
-          onmouseleave="this.style.transform='';this.style.boxShadow=''">
+          padding:10px 8px;cursor:default;text-align:center;min-width:0;
+          ${level==='lost'?'opacity:0.55;':''}">
           <div style="width:10px;height:10px;border-radius:50%;background:${s.dot};margin:0 auto 5px;"></div>
           <div style="font-size:12px;font-weight:700;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${hive.name}">${hive.name}</div>
           <div style="font-size:10px;color:var(--text3);margin-top:2px;">${kg?kg.toFixed(1)+' kg':'no harvest'}</div>
