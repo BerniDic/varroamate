@@ -3605,7 +3605,13 @@ function renderInsights(){
     return;
   }
 
-  const YEAR = CURRENT_YEAR;
+  // Use most recent year in actual data — handles future-dated entries (e.g. 2027)
+  const _allYears = [...new Set([
+    ..._harvests.map(h=>(h.date||'').slice(0,4)),
+    ..._mite_counts.map(m=>(m.date||'').slice(0,4)),
+    ..._inspections.map(i=>(i.date||'').slice(0,4)),
+  ])].filter(y=>y>='2020').sort();
+  const YEAR = parseInt(_allYears.length > 0 ? _allYears[_allYears.length-1] : CURRENT_YEAR);
   const lastYear = YEAR-1;
 
   // ─ Season totals
