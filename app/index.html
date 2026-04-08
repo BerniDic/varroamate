@@ -5687,39 +5687,39 @@ document.addEventListener('DOMContentLoaded', async function(){
   // Handle invalid/expired refresh tokens gracefully
   _sb.auth.onAuthStateChange(async (event, session) => {
     console.log('onAuthStateChange:', event, !!session);
-    if(event === 'SIGNED_IN' && session?.user) {
-      // Different user signing in — clear stale data and reload
-      if(!_sbUser || _sbUser.id !== session.user.id) {
-        apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
-        _dataLoaded=false;_plan='free';_planLimits=PLAN_LIMITS.free;
-        _sbUser = session.user;
-        if(_dataLoaded === false && document.getElementById('s-apiaries')?.classList.contains('active')){
-          // Already on apiaries screen with wrong data — reload
-          await loadDataFromSupabase();
-          await loadPlan();
-          currentApiaryId=apiaries[0]?.id??0;
-          goto('s-apiaries');
-        } else {
-          await loadPlan();
-        }
-      }
-    }
-    if(event === 'TOKEN_REFRESHED' && session?.user) {
-      _sbUser = session.user;
-      if(!_dataLoaded) {
-        // Token refreshed before data loaded — run full boot
-        console.log('TOKEN_REFRESHED: data not loaded yet — running full boot');
-        await loadDataFromSupabase();
-        await loadPlan();
-        currentApiaryId = apiaries[0]?.id ?? 0;
-        if(hasAcceptedDisclaimer()){ goto('s-apiaries'); } else { goto('s-disclaimer'); }
-      } else {
-        // Data already loaded — just quietly refresh the plan
-        await loadPlan();
-      }
-    }
-    if(event === 'SIGNED_OUT') {
+
+    if(event === 'SIGNED_OUT'){
       _sbUser = null;
+      apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
+      _dataLoaded=false;
+      goto('s-welcome');
+      return;
+    }
+
+    if(!session?.user) return;
+
+    const incomingId = session.user.id;
+    const switchingUser = _sbUser && _sbUser.id !== incomingId;
+
+    // Clear stale data if switching accounts
+    if(switchingUser){
+      apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
+      _dataLoaded=false;_plan='free';_planLimits=PLAN_LIMITS.free;
+    }
+
+    _sbUser = session.user;
+
+    // Load data whenever we have a user but no data loaded yet
+    // Covers: SIGNED_IN, TOKEN_REFRESHED, INITIAL_SESSION — all cases
+    if(!_dataLoaded){
+      console.log('onAuthStateChange: loading data for', event);
+      await loadDataFromSupabase();
+      await loadPlan();
+      currentApiaryId = apiaries[0]?.id ?? 0;
+      if(hasAcceptedDisclaimer()){ goto('s-apiaries'); } else { goto('s-disclaimer'); }
+    } else if(event === 'TOKEN_REFRESHED'){
+      // Data already loaded, just refresh the plan quietly
+      await loadPlan();
     }
   });
 
@@ -5759,18 +5759,12 @@ document.addEventListener('DOMContentLoaded', async function(){
         if(ls)ls.classList.remove('active');
         if(!found){
           showToast('Hive not found — check your QR label');
-          await loadDataFromSupabase();
-          currentApiaryId=apiaries[0]?.id??0;
+          // Fall through — onAuthStateChange will load data
           goto('s-apiaries');
         }
-        // If found, loadHiveForQR already called gotoField() and started background load
       } else {
-        // Normal boot — load everything then navigate
-        await loadDataFromSupabase();
-        await loadPlan();
-        currentApiaryId=apiaries[0]?.id??0;
+        // onAuthStateChange INITIAL_SESSION will fire and load data
         if(ls)ls.classList.remove('active');
-        goto('s-apiaries');
       }
     } else {
       // Not logged in — save QR code for after login
