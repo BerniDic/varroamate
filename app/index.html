@@ -2317,33 +2317,23 @@ const SEED = {
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 
-// Cookie-based session storage — works in Safari ITP and cross-path on same domain
-const _vmCookieStorage = {
-  getItem: (key) => {
-    try {
-      const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
-      return match ? decodeURIComponent(match[1]) : null;
-    } catch(e) { return null; }
-  },
-  setItem: (key, value) => {
-    try {
-      // 7 day expiry, SameSite=Lax, path=/ so all apps on same domain share it
-      const expires = new Date(Date.now() + 7*24*60*60*1000).toUTCString();
-      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) +
-        '; expires=' + expires + '; path=/; SameSite=Lax';
-    } catch(e) {}
-  },
-  removeItem: (key) => {
-    try {
-      document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
-    } catch(e) {}
-  }
-};
+// Session storage — localStorage with in-memory fallback for Safari private mode
+const _vmStorage = (() => {
+  const mem = {};
+  let useLocal = true;
+  try { localStorage.setItem('_vm_test','1'); localStorage.removeItem('_vm_test'); } 
+  catch(e) { useLocal = false; }
+  return {
+    getItem:    k => useLocal ? localStorage.getItem(k)    : (mem[k] ?? null),
+    setItem:    (k,v) => useLocal ? localStorage.setItem(k,v)    : (mem[k]=v),
+    removeItem: k => useLocal ? localStorage.removeItem(k) : (delete mem[k]),
+  };
+})();
 
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
-    storage: _vmCookieStorage,       // cookie storage — works in Safari + cross-path
-    storageKey: 'varroamate-auth',   // shared key across all VM apps on same domain
+    storage: _vmStorage,
+    storageKey: 'varroamate-auth',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
@@ -2755,6 +2745,11 @@ async function doSignIn(e){
   const {data,error}=await _sb.auth.signInWithPassword({email,password:pw});
   if(btn){btn.disabled=false;btn.textContent='Sign In';}
   if(error){err.style.display='';err.textContent=error.message;return;}
+  // Clear any stale data from a previous account before loading new account
+  if(_sbUser && _sbUser.id !== data.user.id){
+    apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
+    _dataLoaded=false;_plan='free';_planLimits=PLAN_LIMITS.free;
+  }
   _sbUser=data.user;
   // Notify the browser Credential Manager so password managers can save / offer biometric autofill
   if(window.PasswordCredential){
@@ -5693,10 +5688,20 @@ document.addEventListener('DOMContentLoaded', async function(){
   _sb.auth.onAuthStateChange(async (event, session) => {
     console.log('onAuthStateChange:', event, !!session);
     if(event === 'SIGNED_IN' && session?.user) {
-      // Only act if this is a different user signing in (not a token refresh disguised as SIGNED_IN)
+      // Different user signing in — clear stale data and reload
       if(!_sbUser || _sbUser.id !== session.user.id) {
+        apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
+        _dataLoaded=false;_plan='free';_planLimits=PLAN_LIMITS.free;
         _sbUser = session.user;
-        await loadPlan();
+        if(_dataLoaded === false && document.getElementById('s-apiaries')?.classList.contains('active')){
+          // Already on apiaries screen with wrong data — reload
+          await loadDataFromSupabase();
+          await loadPlan();
+          currentApiaryId=apiaries[0]?.id??0;
+          goto('s-apiaries');
+        } else {
+          await loadPlan();
+        }
       }
     }
     if(event === 'TOKEN_REFRESHED' && session?.user) {
