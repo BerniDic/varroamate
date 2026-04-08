@@ -5482,9 +5482,12 @@ function exportCalendar(){
     for(const h of hvList){
 
       // Alcohol wash reminders: every 4 weeks for 16 weeks (4 counts)
-      // Collect dates first — deduplicated to one reminder per day across all hives
+      // Skip winter months (May=4, Jun=5, Jul=6) — no 4-weekly washes in winter
       for(let w=1;w<=4;w++){
         const d=new Date(today);d.setDate(d.getDate()+w*28);
+        const month=d.getMonth(); // 0=Jan
+        const isWinter = month>=4 && month<=7; // May, Jun, Jul, Aug
+        if(isWinter) continue;
         const dateKey=icsDate(d);
         if(!washDates.has(dateKey)){
           washDates.set(dateKey,d);
@@ -5518,7 +5521,7 @@ function exportCalendar(){
       uid:makeUID(),
       date:d,
       summary:`🔬 Alcohol Wash — All Hives`,
-      description:`4-weekly Varroa mite count reminder.\\nAlcohol wash ~300 bees (½ cup) per hive. Record each result in VarroaMate.\\nGeneral guidance: count every 4 weeks when mite numbers are low and controlled; increase to fortnightly if counts are rising or after treatment.`,
+      description:`4-weekly Varroa mite count reminder.\\nAlcohol wash ~300 bees (½ cup) per hive. Record each result in VarroaMate.\\nGeneral guidance: count every 4 weeks during the active season (Aug–Apr); reduce to every 6–8 weeks in winter (May–Jul). Increase to fortnightly if counts are rising or after treatment.`,
       alarm:true
     });
   }
