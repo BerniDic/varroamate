@@ -2180,28 +2180,7 @@ const CLAUDE_MODEL  = 'claude-opus-4-6';       // update here when Anthropic rel
 const CLAUDE_MODEL_VOICE = 'claude-haiku-4-5-20251001'; // lighter model for voice extraction
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 
-// Session storage — localStorage with in-memory fallback for Safari private mode
-const _vmStorage = (() => {
-  const mem = {};
-  let useLocal = true;
-  try { localStorage.setItem('_vm_test','1'); localStorage.removeItem('_vm_test'); } 
-  catch(e) { useLocal = false; }
-  return {
-    getItem:    k => useLocal ? localStorage.getItem(k)    : (mem[k] ?? null),
-    setItem:    (k,v) => useLocal ? localStorage.setItem(k,v)    : (mem[k]=v),
-    removeItem: k => useLocal ? localStorage.removeItem(k) : (delete mem[k]),
-  };
-})();
-
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: {
-    storage: _vmStorage,
-    storageKey: 'varroamate-auth',
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  }
-});
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ══════════════════════════════════════════════
 // STATE
