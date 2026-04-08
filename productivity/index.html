@@ -15,7 +15,25 @@
   if(p){
     window._qrHiveCode = p.toUpperCase();
     try{ sessionStorage.setItem('vmp_pending_qr', p.toUpperCase()); }catch(e){}
-    document.addEventListener('DOMContentLoaded', function(){
+    // Handle Safari bfcache restore
+window.addEventListener('pageshow', async function(event){
+  if(event.persisted){
+    console.log('pageshow: bfcache restore — reloading data');
+    if(typeof _dataLoaded !== 'undefined') _dataLoaded = false;
+    const {data:{session}} = await _sb.auth.getSession();
+    if(session?.user && typeof loadAllData === 'function'){
+      await loadAllData();
+    } else if(session?.user && typeof loadDataFromSupabase === 'function'){
+      await loadDataFromSupabase();
+      if(typeof loadPlan === 'function') await loadPlan();
+      if(typeof goto === 'function' && typeof hasAcceptedDisclaimer === 'function'){
+        if(hasAcceptedDisclaimer()){ goto('s-apiaries'); } else { goto('s-disclaimer'); }
+      }
+    }
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function(){
       var banner = document.createElement('div');
       banner.id = 'qrScanBanner';
       banner.style.cssText = 'position:fixed;top:56px;left:0;right:0;z-index:500;background:#4A7A58;color:white;padding:10px 16px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
@@ -2162,33 +2180,23 @@ const CLAUDE_MODEL  = 'claude-opus-4-6';       // update here when Anthropic rel
 const CLAUDE_MODEL_VOICE = 'claude-haiku-4-5-20251001'; // lighter model for voice extraction
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 
-// Cookie-based session storage — works in Safari ITP and cross-path on same domain
-const _vmCookieStorage = {
-  getItem: (key) => {
-    try {
-      const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
-      return match ? decodeURIComponent(match[1]) : null;
-    } catch(e) { return null; }
-  },
-  setItem: (key, value) => {
-    try {
-      // 7 day expiry, SameSite=Lax, path=/ so all apps on same domain share it
-      const expires = new Date(Date.now() + 7*24*60*60*1000).toUTCString();
-      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) +
-        '; expires=' + expires + '; path=/; SameSite=Lax';
-    } catch(e) {}
-  },
-  removeItem: (key) => {
-    try {
-      document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
-    } catch(e) {}
-  }
-};
+// Session storage — localStorage with in-memory fallback for Safari private mode
+const _vmStorage = (() => {
+  const mem = {};
+  let useLocal = true;
+  try { localStorage.setItem('_vm_test','1'); localStorage.removeItem('_vm_test'); } 
+  catch(e) { useLocal = false; }
+  return {
+    getItem:    k => useLocal ? localStorage.getItem(k)    : (mem[k] ?? null),
+    setItem:    (k,v) => useLocal ? localStorage.setItem(k,v)    : (mem[k]=v),
+    removeItem: k => useLocal ? localStorage.removeItem(k) : (delete mem[k]),
+  };
+})();
 
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
-    storage: _vmCookieStorage,       // cookie storage — works in Safari + cross-path
-    storageKey: 'varroamate-auth',   // shared key across all VM apps on same domain
+    storage: _vmStorage,
+    storageKey: 'varroamate-auth',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
