@@ -1615,9 +1615,34 @@ function acceptDisclaimer(){
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 const CLAUDE_MODEL  = 'claude-opus-4-6'; // update here when Anthropic releases new models
+
+// Cookie-based session storage — works in Safari ITP and cross-path on same domain
+const _vmCookieStorage = {
+  getItem: (key) => {
+    try {
+      const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    } catch(e) { return null; }
+  },
+  setItem: (key, value) => {
+    try {
+      // 7 day expiry, SameSite=Lax, path=/ so all apps on same domain share it
+      const expires = new Date(Date.now() + 7*24*60*60*1000).toUTCString();
+      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) +
+        '; expires=' + expires + '; path=/; SameSite=Lax';
+    } catch(e) {}
+  },
+  removeItem: (key) => {
+    try {
+      document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
+    } catch(e) {}
+  }
+};
+
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
-    storageKey: 'varroamate-auth',
+    storage: _vmCookieStorage,       // cookie storage — works in Safari + cross-path
+    storageKey: 'varroamate-auth',   // shared key across all VM apps on same domain
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
