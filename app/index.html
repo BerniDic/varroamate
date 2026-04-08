@@ -5674,6 +5674,26 @@ async function loadHiveForQR(uid, hCode){
   return true;
 }
 
+// Handle Safari bfcache restore — fires when user navigates back/forward
+// event.persisted=true means page was restored from cache, not freshly loaded
+window.addEventListener('pageshow', async function(event){
+  if(event.persisted){
+    console.log('pageshow: restored from bfcache — reloading data');
+    // Page was restored from bfcache — force a fresh data load
+    _dataLoaded = false;
+    const {data:{session}} = await _sb.auth.getSession();
+    if(session?.user){
+      _sbUser = session.user;
+      await loadDataFromSupabase();
+      await loadPlan();
+      currentApiaryId = apiaries[0]?.id ?? 0;
+      if(hasAcceptedDisclaimer()){ goto('s-apiaries'); } else { goto('s-disclaimer'); }
+    } else {
+      goto('s-welcome');
+    }
+  }
+});
+
 document.addEventListener('DOMContentLoaded', async function(){
   // Only hide voice button on browsers that definitively lack speech recognition
   // (Do NOT hide on iOS Safari - webkitSpeechRecognition exists but requires a user gesture to confirm)
