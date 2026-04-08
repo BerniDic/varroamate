@@ -2672,23 +2672,25 @@ function renderHarvest(){
     return;
   }
 
-  // Hero — current year total
-  const thisYearData = data.filter(h=>h.date?.startsWith(CURRENT_YEAR+''));
-  const totalKg = thisYearData.reduce((s,h)=>s+(parseFloat(h.kg)||0),0);
-
-  // Best year for fill % calc
+  // Build year totals across all data
   const byYear = {};
   data.forEach(h=>{
     const yr = (h.date||'').slice(0,4);
     if(yr) byYear[yr] = (byYear[yr]||0) + (parseFloat(h.kg)||0);
   });
   const years = Object.keys(byYear).sort();
+  // Use most recent year with harvest data (may be ahead of calendar year)
+  const activeYear = years.length > 0 ? years[years.length-1] : String(CURRENT_YEAR);
   const maxYield = Math.max(...Object.values(byYear), 1);
+
+  // Hero — most recent year total
+  const thisYearData = data.filter(h=>h.date?.startsWith(activeYear));
+  const totalKg = thisYearData.reduce((s,h)=>s+(parseFloat(h.kg)||0),0);
   const fillPct = totalKg / maxYield;
 
   document.getElementById('hiveSvgWrap').innerHTML = buildHiveSVG(fillPct);
   document.getElementById('heroYield').textContent = totalKg>0 ? totalKg.toFixed(1) : '—';
-  document.getElementById('heroHiveName').textContent = `${hiveName} · ${CURRENT_YEAR}`;
+  document.getElementById('heroHiveName').textContent = `${hiveName} · ${activeYear}`;
 
   // Year comparison
   const yearRow = document.getElementById('yearBarRow');
