@@ -2393,7 +2393,7 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
 _sb.auth.onAuthStateChange((event, session)=>{
   applySession(session);
   // Reload data on sign-in, clear on sign-out
-  if(event==='SIGNED_IN') loadAllData();
+  if(event==='SIGNED_IN') loadAllData(); // Note: populateHiveSelectors now preserves modal selections
   if(event==='SIGNED_OUT'){
     _harvests=[];_inspections=[];_queens=[];_losses=[];
     _apiaries=[];_hives=[];_mite_counts=[];_treatments=[];
@@ -2485,6 +2485,11 @@ async function loadAllData(){
   ]);
 
   populateHiveSelectors();
+  // Debug: log queen hive_ids vs actual hive ids to diagnose mismatches
+  if(_queens.length > 0){
+    console.log('Hive IDs:', _hives.map(h=>({id:h.id, name:h.name, type:typeof h.id})));
+    console.log('Queen hive_ids:', _queens.map(q=>({hive_id:q.hive_id, type:typeof q.hive_id})));
+  }
   renderAll();
 
   // QR deep-link: auto-open inspection modal for scanned hive
@@ -2554,7 +2559,10 @@ function populateHiveSelectors(){
   // Modal selects (no "All hives" option)
   ['hHive','iHive','qHive','lHive'].forEach(id=>{
     const el = document.getElementById(id);
-    if(el) el.innerHTML = groupedOptions(false);
+    if(!el) return;
+    const prev = el.value; // preserve current selection (e.g. QR-preselected hive)
+    el.innerHTML = groupedOptions(false);
+    if(prev && el.querySelector('option[value="'+prev+'"]')) el.value = prev;
   });
 }
 
