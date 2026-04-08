@@ -924,7 +924,7 @@ html, body {
   padding:11px 40px 11px 16px;
   font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.5;
   box-shadow:0 2px 12px rgba(0,0,0,0.3);">
-  ⚠️ <strong>Safari users:</strong> We are aware of a login issue affecting Safari. We recommend using <strong>Chrome</strong> or <strong>Firefox</strong> until this is resolved. We apologise for the inconvenience.
+  ⚠️ <strong>Known issue:</strong> We are currently experiencing login issues on Safari and Chrome. Please use <strong>Firefox</strong> for the best experience until this is resolved. We apologise for the inconvenience.
   <button onclick="document.getElementById('safari-warning').style.display='none'"
     style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.2);border:none;color:white;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;">✕</button>
 </div>
@@ -942,11 +942,9 @@ html, body {
 
 <script>
 (function(){
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  if(isSafari){
-    document.getElementById('safari-warning').style.display = 'block';
-    document.getElementById('feature-banner').style.display = 'none';
-  }
+  // Show warning to all users until Safari/Chrome issue is resolved
+  document.getElementById('safari-warning').style.display = 'block';
+  document.getElementById('feature-banner').style.display = 'none';
 })();
 </script>
 
