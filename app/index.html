@@ -2316,7 +2316,14 @@ const SEED = {
 // ══════════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    storageKey: 'varroamate-auth',   // shared key across all VM apps on same domain
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  }
+});
 
 // ── AI CONFIG — update CLAUDE_MODEL here when Anthropic releases a new version ──
 const CLAUDE_MODEL = 'claude-opus-4-6';
@@ -5661,7 +5668,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   _sb.auth.onAuthStateChange(async (event, session) => {
     console.log('onAuthStateChange:', event, !!session);
     if(event === 'SIGNED_IN' && session?.user) {
-      // Ensure plan is loaded whenever a sign-in occurs (covers biometric/autofill paths)
+      // Only act if this is a different user signing in (not a token refresh disguised as SIGNED_IN)
       if(!_sbUser || _sbUser.id !== session.user.id) {
         _sbUser = session.user;
         await loadPlan();
@@ -5669,7 +5676,17 @@ document.addEventListener('DOMContentLoaded', async function(){
     }
     if(event === 'TOKEN_REFRESHED' && session?.user) {
       _sbUser = session.user;
-      await loadPlan();
+      if(!_dataLoaded) {
+        // Token refreshed before data loaded — run full boot
+        console.log('TOKEN_REFRESHED: data not loaded yet — running full boot');
+        await loadDataFromSupabase();
+        await loadPlan();
+        currentApiaryId = apiaries[0]?.id ?? 0;
+        if(hasAcceptedDisclaimer()){ goto('s-apiaries'); } else { goto('s-disclaimer'); }
+      } else {
+        // Data already loaded — just quietly refresh the plan
+        await loadPlan();
+      }
     }
     if(event === 'SIGNED_OUT') {
       _sbUser = null;
@@ -5677,8 +5694,22 @@ document.addEventListener('DOMContentLoaded', async function(){
   });
 
   try{
-    const {data:{session},error:sessionError}=await _sb.auth.getSession();
+    let {data:{session},error:sessionError}=await _sb.auth.getSession();
     console.log('Boot: session=',!!session,'error=',sessionError?.message||null);
+    // If no session, retry up to 3 times with increasing delays
+    // (handles mid-refresh token state when navigating between VarroaMate apps)
+    if(!session && !sessionError){
+      const delays = [800, 1500, 2500];
+      for(const delay of delays){
+        console.log(`Boot: no session — retrying in ${delay}ms`);
+        await new Promise(r=>setTimeout(r,delay));
+        const retry = await _sb.auth.getSession();
+        session = retry.data.session;
+        sessionError = retry.error;
+        console.log('Boot retry: session=',!!session,'error=',sessionError?.message||null);
+        if(session || sessionError) break;
+      }
+    }
     // If refresh token is invalid, clear local session and send to sign-in
     if(sessionError && sessionError.message?.includes('Refresh Token')){
       console.warn('Invalid refresh token — clearing local session');
