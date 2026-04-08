@@ -669,7 +669,9 @@ body{
         <div style="font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:12px;">
           Hive Hygiene is actively developed as part of the VarroaMate ecosystem. If something isn't clear, if you spot an error, or if there's a topic you'd like to see covered — we'd love to hear from you. Your feedback directly shapes what gets built next.
         </div>
-        <a href="mailto:hello@varroamate.com">hello@varroamate.com</a>
+        <a href="/cdn-cgi/l/email-protection#442c2128282b04322536362b25292530216a272b297b3731262e2127307912090c0c617674022121202625272f" class="btn btn-forest btn-full" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
+          ✉️ Send Feedback
+        </a>
       </div>
 
     </div><!-- end screen-intro -->
@@ -1613,14 +1615,45 @@ function acceptDisclaimer(){
 const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
 const CLAUDE_MODEL  = 'claude-opus-4-6'; // update here when Anthropic releases new models
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Cookie-based session storage — works in Safari ITP and cross-path on same domain
+const _vmCookieStorage = {
+  getItem: (key) => {
+    try {
+      const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    } catch(e) { return null; }
+  },
+  setItem: (key, value) => {
+    try {
+      // 7 day expiry, SameSite=Lax, path=/ so all apps on same domain share it
+      const expires = new Date(Date.now() + 7*24*60*60*1000).toUTCString();
+      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) +
+        '; expires=' + expires + '; path=/; SameSite=Lax';
+    } catch(e) {}
+  },
+  removeItem: (key) => {
+    try {
+      document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
+    } catch(e) {}
+  }
+};
+
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    storage: _vmCookieStorage,       // cookie storage — works in Safari + cross-path
+    storageKey: 'varroamate-auth',   // shared key across all VM apps on same domain
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  }
+});
 
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
 let _user = null;
 let _profile = {}; // beekeeper hygiene profile
-let _userPlan = 'free'; // subscription plan
 let _hiveData = { hives:[], miteHistory:[], diseaseHistory:[], colonyLosses:[], inspections:[] };
 let _toolkit = {}; // which tools the beekeeper owns
 let _wizardStep = 1;
@@ -1864,8 +1897,9 @@ function buildChecklist(){
 
   // Torch-based items
   if(_profile.torch==='yes'){
-    items.push({text:'Flame sterilise hive tool between apiaries — 10–20 seconds until propolis burns', priority:'Tool hygiene', checked:false});
-    items.push({text:'Scorch empty hive boxes with propane torch before returning to service', priority:'Equipment hygiene', checked:false});
+    items.push({text:'Carry 2–3 hive tools — rotate to a clean tool after any suspicious hive. Sterilise all used tools at home after each apiary visit.', priority:'Tool hygiene', checked:false});
+    items.push({text:'Flame sterilise hive tools between apiaries — 10–20 seconds until propolis burns', priority:'Tool hygiene', checked:false});
+    items.push({text:'Scorch empty hive boxes with propane torch before returning to service — timber boxes only. Do NOT use flame on polystyrene (EPS) or plastic boxes — use hot washing soda solution or bleach instead.', priority:'Equipment hygiene', checked:false});
   } else {
     items.push({text:'No torch available — use bleach solution (1:10 household bleach:water) for 10 min, or wipe with ≥70% methylated spirits (30 sec contact time) as a quick field option', priority:'Tool hygiene', checked:false});
     items.push({text:'Consider purchasing a propane torch ($40–50) — the single most effective sterilisation tool', priority:'Equipment upgrade', checked:false});
@@ -2185,7 +2219,6 @@ async function generatePlan(){
 // AI PLAN NARRATIVE
 // ══════════════════════════════════════════════
 async function generateAiPlan(){
-  if(!requireAIPlan()) return;
   const btn = document.getElementById('generateAiBtn');
   const panel = document.getElementById('aiNarrative');
   const text = document.getElementById('aiNarrativeText');
@@ -2329,7 +2362,7 @@ function renderEquipMatrix(){
 
   const EQUIP = [
     {name:'🔧 Hive tool', risk:'HIGH', method: hasTorch ? '🔥 Flame sterilise 10–20s' : hasBleach ? '🧴 Bleach soak 10 min (1:10)' : hasMeths ? '🧪 Wipe with ≥70% methylated spirits — 30s contact time. Quick field option.' : '🧼 Wash thoroughly + sunlight'},
-    {name:'🪵 Wooden hive boxes', risk:'MEDIUM', method: hasTorch ? '🔥 Scorch surface with propane torch' : hasSoda ? '🫧 Hot washing soda bath, then sun dry' : '☀️ Scrape + sunlight exposure'},
+    {name:'🪵 Wooden hive boxes', risk:'MEDIUM', method: hasTorch ? '🔥 Scorch surface with propane torch — timber only. EPS/plastic: hot washing soda solution or bleach.' : hasSoda ? '🫧 Hot washing soda bath, then sun dry' : '☀️ Scrape + sunlight exposure'},
     {name:'🖼️ Frames & comb', risk:'VERY HIGH',
       method: (hasOzone ? '🌀 Ozone treatment overnight for stored comb. ' : hasFreezer ? '🧊 Freeze −18°C for 48h for stored comb (kills wax moth and SHB). Consider Bacillus thuringiensis (Bt) spray for wax moth on stored comb. ' : '⚠️ If AFB suspected: report to state authority first — await instructions before destroying any comb or equipment. ')
             + 'Rotation: move frames from brood nest outward to honey super position over time — this naturally cycles old dark comb out of the brood nest. Mark each frame with a permanent marker showing month and year of introduction (e.g. "Oct 24") on the top bar. Replace any frame older than 3 years, or sooner if comb is very dark, damaged, or disease-suspect.'},
@@ -2470,7 +2503,6 @@ function renderPathogenCards(){
 // AUTH
 // ══════════════════════════════════════════════
 async function generateToolkitAdvice(){
-  if(!requireAIPlan()) return;
   const btn = document.getElementById('toolkitAiBtn');
   const panel = document.getElementById('toolkitAiPanel');
   const textEl = document.getElementById('toolkitAiText');
@@ -2589,7 +2621,7 @@ const TOOL_INFO = {
     steps:[
       {n:1, t:'<strong>Fill and test</strong> — use a standard propane or butane canister. Test the flame before leaving home. Keep a spare canister in your kit.'},
       {n:2, t:'<strong>Hive tools</strong> — hold the metal part in the flame for 10–20 seconds until propolis visibly burns and the metal glows slightly. Allow to cool before use. Repeat between every apiary.'},
-      {n:3, t:'<strong>Hive boxes (empty)</strong> — pass the flame slowly over all internal surfaces — corners, joints, and frame rests. You are scorching, not burning. A light brown char is correct; do not ignite the wood.'},
+      {n:3, t:'<strong>Hive boxes (empty, timber only)</strong> — pass the flame slowly over all internal surfaces — corners, joints, and frame rests. You are scorching, not burning. A light brown char is correct; do not ignite the wood.'},
       {n:4, t:'<strong>Frame rests and rebates</strong> — these areas accumulate propolis and wax and are often overlooked. Give them extra attention.'},
       {n:5, t:'<strong>Never use on comb</strong> — flame destroys wax. Use ozone or freezer for comb and frames.'},
     ],
@@ -2780,7 +2812,7 @@ const PATHWAY_INFO = {
     colour:'#B8780A',
     sections:[
       {h:'Unsterilised hive tools',
-       b:'A hive tool moved between colonies without sterilisation is the single fastest disease vector under beekeeper control. AFB spores can be transferred in seconds. <strong>Flame sterilise between every apiary — not just every hive.</strong> Bleach solution is an acceptable field backup but less effective on propolis-coated tools.'},
+       b:'A hive tool moved between colonies without sterilisation is the single fastest disease vector under beekeeper control. AFB spores can be transferred in seconds. <strong>Carry multiple hive tools</strong> — swap to a clean tool after handling any suspicious hive, and sterilise used tools at home. Between apiaries, flame sterilise all tools before moving on. If you only have one tool, wipe with ≥70% methylated spirits between hives as a field backup — thorough flame or bleach sterilisation can follow at home.'},
       {h:'Wax scraps and debris',
        b:'<strong>One of the most overlooked transmission routes.</strong> During inspection, beekeepers routinely scrape wax and propolis from frames and boxes, dropping it on the ground in front of hives. Bees immediately forage on these scraps, ingesting anything present — AFB spores, Nosema, EFB. Never leave wax scrapings, brace comb, or burr comb on the ground near hives. Collect it in a sealed container and dispose of it away from the apiary.'},
       {h:'Frame and comb exchange',
@@ -2788,7 +2820,7 @@ const PATHWAY_INFO = {
       {h:'Hive movement for pollination or nectar flow',
        b:'Moving hives into commercial pollination or mass flowering events concentrates colonies from different beekeepers in close proximity. Drift and robbing increase dramatically at high densities. <strong>Any disease present in one beekeeper&#39;s hives can spread across an entire pollination block within days.</strong> Inspect hives before movement, treat for Varroa to the lowest possible level beforehand, and be aware that you may bring diseases home from other beekeepers&#39; hives placed alongside yours.'},
       {h:'Second-hand equipment',
-       b:'Old hive boxes, frames, and comb are a common source of AFB introduction. AFB spores survive for 50+ years in wax. Never use second-hand equipment without thorough sterilisation — scorch wooden boxes with a torch, destroy suspect comb, and bleach all metal components.'},
+       b:'Old hive boxes, frames, and comb are a common source of AFB introduction. AFB spores survive for 50+ years in wax. Never use second-hand equipment without thorough sterilisation — scorch wooden boxes with a torch (timber only — use washing soda or bleach for EPS/plastic boxes), destroy suspect comb, and bleach all metal components.'},
       {h:'Protective clothing',
        b:'Bee suits, gloves, and veils pick up propolis, wax, and bee products from every hive. Machine wash at 60°C with washing soda between apiaries. Leather gauntlets cannot be fully sterilised — consider switching to nitrile for disease-risk inspections.'},
     ]
@@ -2800,7 +2832,7 @@ const PATHWAY_INFO = {
       {h:'Stored comb',
        b:'Drawn comb is valuable and beekeepers are reluctant to discard it — but it is the primary reservoir for AFB spores, Nosema, and wax moth. <strong>AFB spores survive in wax for 50+ years.</strong> Comb stored in a warm, humid shed becomes a wax moth nursery and a pathogen time-bomb. Store comb frozen (−18°C, 48h), ozone-treated, or with Bt spray for wax moth. Mark every frame with month and year and rotate out frames older than three years.'},
       {h:'Hive boxes',
-       b:'Internal surfaces of wooden boxes accumulate propolis, wax, and organic residue that harbours pathogens. Scorch empty boxes with a propane torch before returning to service. Hot washing soda solution dissolves wax and propolis effectively. Never return boxes from a disease-suspect colony to service without thorough sterilisation.'},
+       b:'Internal surfaces of wooden boxes accumulate propolis, wax, and organic residue that harbours pathogens. Scorch empty timber boxes with a propane torch before returning to service — timber only, never EPS/polystyrene or plastic boxes (use hot washing soda or bleach for those). Hot washing soda solution dissolves wax and propolis effectively. Never return boxes from a disease-suspect colony to service without thorough sterilisation.'},
       {h:'Shared and borrowed equipment',
        b:'Borrowing a friend&#39;s extractor, sharing a nucleus box, or buying a second-hand hive are common pathogen entry points. Treat all borrowed or purchased equipment as potentially contaminated. This is a particularly important entry route for AFB into otherwise clean operations.'},
       {h:'Feeders and extractors',
@@ -2870,30 +2902,6 @@ async function vmSignIn(){
   });
 }
 
-async function loadSubscription(){
-  if(!_user) return;
-  try {
-    const { data } = await _sb
-      .from('subscriptions')
-      .select('plan, status')
-      .eq('user_id', _user.id)
-      .maybeSingle();
-    if(data && data.status !== 'canceled') {
-      _userPlan = data.plan || 'free';
-    } else {
-      _userPlan = 'free';
-    }
-    console.log('VMHH plan:', _userPlan);
-  } catch(e){ console.warn('loadSubscription:', e); }
-}
-
-function requireAIPlan(){
-  const paid = ['free_ai','hobbyist','beekeeper'];
-  if(paid.includes(_userPlan)) return true;
-  alert('AI features require a paid VarroaMate plan.\n\nPlease subscribe at varroamate.com/app/ to access AI hygiene analysis.');
-  return false;
-}
-
 function signOut(){
   if(!confirm('Sign out?')) return;
   _sb.auth.signOut().then(()=>{ window.location.href='/'; });
@@ -2918,7 +2926,6 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
   try {
     if(session){
       _user = session.user;
-      await loadSubscription();
       const initials = (_user.email||'?')[0].toUpperCase();
       const topUser = document.getElementById('topUser');
       if(topUser){ topUser.textContent = 'Sign out'; topUser.title = _user.email||''; }
