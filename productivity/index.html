@@ -1440,6 +1440,9 @@ body::before{
           <div class="hero-hive-name" id="heroHiveName">All hives · 2026</div>
           <div class="hero-yield"><span id="heroYield">—</span><span class="hero-yield-unit">kg</span></div>
           <div class="hero-year" id="heroYearNote"></div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:6px;max-width:160px;">
+            Hive fill shows this season's yield as a % of your best season. Year cards below compare all seasons.
+          </div>
         </div>
       </div>
 
@@ -3812,10 +3815,12 @@ function renderInsights(){
     <div class="card-body">
       ${_queens.filter(q=>q.year_introduced&&(YEAR-parseInt(q.year_introduced))>=2).map(q=>{
         const hive=_hives.find(h=>String(h.id)===String(q.hive_id));
+        const ap=hive?_apiaries.find(a=>a.id===hive.apiary_id):null;
         const age=YEAR-parseInt(q.year_introduced);
+        const displayName=hive?.name||(q.hive_id?'Hive #'+q.hive_id:'Unknown hive');
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
           <div>
-            <div style="font-size:13px;font-weight:600;">${hive?.name||'?'}</div>
+            <div style="font-size:13px;font-weight:600;">${displayName}${ap?' <span style=\"font-size:11px;color:var(--text3);font-weight:400;\">· '+ap.name+'</span>':''}</div>
             <div style="font-size:11px;color:var(--text3);">Queen introduced ${q.year_introduced}</div>
           </div>
           <span class="tag tag-red">${age} yr${age!==1?'s':''} old</span>
