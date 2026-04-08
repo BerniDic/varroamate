@@ -3859,19 +3859,12 @@ function renderInsights(){
       border:1.5px solid var(--border);background:transparent;color:var(--text2);
       font-family:'Bitter',serif;outline:none;">
       <option value="all">All apiaries</option>
+      ${_apiaries.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}
+      ${_hives.some(h=>!_apiaries.some(a=>a.id===h.apiary_id))?'<option value="orphan">Other hives</option>':''}
     </select>
   </div>
   ${(()=>{
-    // Populate the health filter dropdown
     const healthSel = document.getElementById('healthFilterSelect');
-    if(healthSel){
-      const current = healthSel.value;
-      healthSel.innerHTML = '<option value="all">All apiaries</option>' +
-        _apiaries.map(a=>`<option value="${a.id}">${a.name}</option>`).join('') +
-        (_hives.some(h=>!_apiaries.some(a=>a.id===h.apiary_id))?'<option value="orphan">Other hives</option>':'');
-      // Restore selection if still valid
-      if([...healthSel.options].some(o=>o.value===current)) healthSel.value = current;
-    }
     const healthFilter = healthSel?.value || 'all';
 
     const lossSet = new Set(_losses.map(l=>String(l.hive_id)));
@@ -3958,10 +3951,13 @@ function renderInsights(){
         const s = levelStyle[level];
         const kg = hiveYieldMap[hive.id];
         const tip = hiveTip(hive);
-        return `<div title="${tip}" style="
+        return `<div title="${tip}" onclick="switchTab('inspections');setTimeout(()=>openInspModal(null,'${hive.id}'),150);" style="
           background:${s.bg};border:2px solid ${s.border};border-radius:var(--radius-sm);
-          padding:10px 8px;cursor:default;text-align:center;min-width:0;
-          ${level==='lost'?'opacity:0.55;':''}">
+          padding:10px 8px;cursor:pointer;text-align:center;min-width:0;
+          transition:transform 0.1s,box-shadow 0.1s;
+          ${level==='lost'?'opacity:0.55;':''}"
+          onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.12)'"
+          onmouseleave="this.style.transform='';this.style.boxShadow=''">
           <div style="width:10px;height:10px;border-radius:50%;background:${s.dot};margin:0 auto 5px;"></div>
           <div style="font-size:12px;font-weight:700;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${hive.name}">${hive.name}</div>
           <div style="font-size:10px;color:var(--text3);margin-top:2px;">${kg?kg.toFixed(1)+' kg':'no harvest'}</div>
