@@ -4519,7 +4519,13 @@ function toggleAppsDropdown(e){
   const btn=(e&&e.currentTarget)||document.querySelector('button[onclick*="toggleAppsDropdown"]');
   if(btn){
     const r=btn.getBoundingClientRect();
-    d.style.top=(r.bottom+4)+'px';
+    const dropH = d.scrollHeight || 300;
+    const spaceBelow = window.innerHeight - r.bottom - 4;
+    if(spaceBelow < dropH && r.top > dropH){
+      d.style.top=(r.top-dropH-4)+'px'; // open upward if not enough space below
+    } else {
+      d.style.top=(r.bottom+4)+'px';
+    }
     d.style.left=Math.max(4,Math.min(r.left,window.innerWidth-220))+'px';
     d.style.right='auto';
   }
@@ -5931,7 +5937,7 @@ async function submitFeedback(){
 <button class="chat-fab" id="chat-fab" onclick="goto('s-guidance')" title="AI Guidance" style="display:none;">🤖</button>
 
 <!-- Global apps dropdown -->
-<div id="apps-dropdown" style="display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid var(--border);min-width:200px;overflow:hidden;z-index:1300;">
+<div id="apps-dropdown" style="display:none;position:fixed;top:54px;right:10px;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid var(--border);min-width:200px;overflow:visible;z-index:1300;max-height:calc(100vh - 70px);overflow-y:auto;">
   <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">📋 Productivity</a>
   <a href="#" onclick="event.preventDefault();if(requireAI('planner'))window.location.href='/planner/'" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🧠 Smart Planner</a>
   <a href="#" onclick="event.preventDefault();document.getElementById('apps-dropdown').style.display='none';showToast('🎓 Beekeeper Academy — coming soon! 🐝')" style="display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.1s;opacity:0.6;border-bottom:1px solid var(--border);" onmouseenter="this.style.background='#FFF8EE'" onmouseleave="this.style.background=''">🎓 Academy <span style="font-size:11px;color:var(--text3);font-weight:400;">coming soon</span></a>
