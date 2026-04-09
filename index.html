@@ -1815,18 +1815,28 @@ const FRAME_CONTENT = {
   }
 };
 
+const LEGAL_PDFS = {
+  'privacy': {title:'🔒 Privacy Policy',         url:'https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/sign/Legal%20documents/Privacy%20Policy.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xOGQ2YWVhMy04YjA3LTQwODMtOTI1YS0xMDQ1MWE0NWZmMjkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJMZWdhbCBkb2N1bWVudHMvUHJpdmFjeSBQb2xpY3kucGRmIiwiaWF0IjoxNzc1NzE3NjgyLCJleHAiOjE3ODAwMzc2ODJ9.amZGAHE1fLNxdKZB7j3EibILP0IaZZrGt4gSmCojqlQ'},
+  'terms':   {title:'📋 Terms & Conditions',      url:'https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/sign/Legal%20documents/WEBSITE_TERMS_AND_CONDITIONS.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xOGQ2YWVhMy04YjA3LTQwODMtOTI1YS0xMDQ1MWE0NWZmMjkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJMZWdhbCBkb2N1bWVudHMvV0VCU0lURV9URVJNU19BTkRfQ09ORElUSU9OUy5wZGYiLCJpYXQiOjE3NzU3MTc3NzAsImV4cCI6MzM1MjUxNzc3MH0.oZBzTojmy0v-ywa1xO3Odq6q_NC9phxDoSsUfgFsmME'},
+  'cookies': {title:'🍪 Cookies Policy',          url:'https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/sign/Legal%20documents/Cookies%20Policy.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xOGQ2YWVhMy04YjA3LTQwODMtOTI1YS0xMDQ1MWE0NWZmMjkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJMZWdhbCBkb2N1bWVudHMvQ29va2llcyBQb2xpY3kucGRmIiwiaWF0IjoxNzc1NzE3NjA4LCJleHAiOjMzNTI1MTc2MDh9.FtgbuhOplh8t5asLKW5PsIxGbDHhDVFUxk4t7Omg1DY'}
+};
+
 function openFrame(key){
-  const LEGAL_KEYS = {
-    'about':   {id:'about-content', title:'⭐ About Us'},
-    'privacy': {id:'legal-privacy', title:'Privacy Policy'},
-    'terms':   {id:'legal-terms',   title:'Terms & Conditions'},
-    'cookies': {id:'legal-cookies', title:'Cookies Policy'}
-  };
-  if(LEGAL_KEYS[key]){
-    const lk = LEGAL_KEYS[key];
-    const el = document.getElementById(lk.id);
+  if(LEGAL_PDFS[key]){
+    const lk = LEGAL_PDFS[key];
     document.getElementById('frame-modal-title').textContent = lk.title;
-    document.getElementById('frame-modal-body').innerHTML = '<div class="legal-doc">' + (el ? el.textContent : '') + '</div>';
+    document.getElementById('frame-modal-body').innerHTML =
+      '<iframe src="' + lk.url + '#toolbar=1&view=FitH" style="width:100%;height:calc(85vh - 80px);border:none;border-radius:8px;" title="' + lk.title + '"></iframe>' +
+      '<p style="text-align:center;margin-top:10px;font-size:12px;color:var(--text3);"><a href="' + lk.url + '" target="_blank" style="color:var(--amber-dark);">Open in new tab ↗</a></p>';
+    const overlay = document.getElementById('frame-overlay');
+    overlay.classList.add('open');
+    document.getElementById('frame-modal').scrollTop = 0;
+    return;
+  }
+  if(key === 'about'){
+    const el = document.getElementById('about-content');
+    document.getElementById('frame-modal-title').textContent = '⭐ About Us';
+    document.getElementById('frame-modal-body').innerHTML = el ? el.textContent : '';
     const overlay = document.getElementById('frame-overlay');
     overlay.classList.add('open');
     document.getElementById('frame-modal').scrollTop = 0;
@@ -2426,270 +2436,6 @@ window.addEventListener('resize', ()=>{
       <p>This is why we created VarroaMate. Our goal is simple. We want to support beekeepers with practical tools, clear guidance, and confidence as they navigate beekeeping in the age of Varroa. VarroaMate is built by beekeepers, for beekeepers, with the hope that it helps the community continue to thrive while keeping strong and healthy colonies. 🐝</p>
 </script>
 
-<script type="text/legal" id="legal-privacy">
-<h3 class="legal-h3">Introduction</h3>
-<ol class="legal-ol">
-<li>This document sets out the privacy policy of VarroaMate ACN 696 739 732 (referred to in this privacy policy as '<strong>we</strong>', '<strong>us</strong>', or '<strong>our</strong>').
-<p>We take our privacy obligations seriously and we've created this privacy policy to explain how we store, maintain, use and disclose personal information.</p>
-<p>We are committed to preventing serious invasions of privacy and ensuring the protection of your personal information, so you can contact us using the details below if you have any questions or concerns.</p>
-<p>By providing personal information to us, you consent to our storage, maintenance, use and disclosing of personal information in accordance with this privacy policy.</p>
-<p>We may change this privacy policy from time to time by posting an updated copy on our website and we encourage you to check our website regularly to ensure that you are aware of our most current privacy policy.</p>
-</li>
-</ol>
-
-<h3 class="legal-h3">Types of Personal Information We Collect</h3>
-<ol class="legal-ol" start="4">
-<li>The personal information we collect may include the following:
-<ol class="legal-ol-alpha">
-<li>name;</li>
-<li>billing address;</li>
-<li>email address;</li>
-<li>Hive location;</li>
-<li>telephone number and other contact details;</li>
-<li>credit card or other payment information;</li>
-<li>information about your business or personal circumstances;</li>
-<li>information in connection with client surveys, questionnaires and promotions;</li>
-<li>your device identity and type, I.P. address, geo-location information, page view statistics, advertising data and standard web log information;</li>
-<li>information about third parties; and</li>
-<li>any other information provided by you to us via our website or our online presence, or otherwise required by us or provided by you.</li>
-</ol>
-</li>
-</ol>
-
-<h3 class="legal-h3">How We Collect Personal Information</h3>
-<ol class="legal-ol" start="5">
-<li>We may collect personal information either directly from you, or from third parties, including where you:
-<ol class="legal-ol-alpha">
-<li>contact us through our website;</li>
-<li>register an account via our Web App;</li>
-<li>receive goods or services from us;</li>
-<li>submit any of our online sign up forms;</li>
-<li>communicate with us via email, telephone, SMS, social applications (such as LinkedIn or Facebook) or otherwise;</li>
-<li>interact with our website, social applications, services, content and advertising; and</li>
-<li>invest in our business or enquire as to a potential purchase in our business.</li>
-</ol>
-<p>We may also collect personal information from you when you use or access our website or our social media pages. This may be done through use of web analytics tools, 'cookies' or other similar tracking technologies that allow us to track and analyse your website usage. Cookies are small files that store information on your computer, mobile phone or other device and enable and allow the creator of the cookie to identify when you visit different websites. If you do not wish information to be stored as a cookie, you can disable cookies in your web browser.</p>
-</li>
-</ol>
-
-<h3 class="legal-h3">Use of Your Personal Information</h3>
-<ol class="legal-ol" start="7">
-<li>We collect and use personal information for the following purposes:
-<ol class="legal-ol-alpha">
-<li>to provide you with our Web Apps;</li>
-<li>to provide goods, services or information to you;</li>
-<li>for record keeping and administrative purposes;</li>
-<li>to provide information about you to our contractors, employees, consultants, agents or other third parties for the purpose of providing goods or services to you;</li>
-<li>to improve and optimise our service offering and customer experience;</li>
-<li>to comply with our legal obligations, resolve disputes or enforce our agreements with third parties;</li>
-<li>to send you administrative messages, reminders, notices, updates, security alerts, and other information requested by you; and</li>
-<li>to consider an application of employment from you.</li>
-</ol>
-<p>We may disclose your personal information to cloud-providers, contractors and other third parties located inside or outside of Australia. If we do so, we will take reasonable steps to ensure that any overseas recipient has similar legal safeguards and deals with such personal information in a manner consistent with how we deal with it.</p>
-</li>
-</ol>
-
-<h3 class="legal-h3">Automated Decision-Making</h3>
-<p>We may use automated systems to make decisions that significantly affect you. These processes may involve the use of personal information to evaluate you. You may request human review of any automated decision by contacting us using the details below.</p>
-
-<h3 class="legal-h3">Marketing</h3>
-<p>We may at times send you marketing communications which will be done in accordance with the <em>Spam Act 2003</em> (Cth) (<strong>Spam Act</strong>).</p>
-<p>If we do, we may use email, SMS, social media, phone or mail to send you direct marketing communications.</p>
-<p>Where consent is needed, we will ask you for your consent before sending you marketing communications, except where you:</p>
-<ol class="legal-ol-alpha">
-<li>have explicitly opted-in to receiving email marketing from us in the past; or</li>
-<li>were given the option to opt-out of email marketing when you initially signed up for one of our platforms and you did not do so.</li>
-</ol>
-<p>You can, at any time, opt out of receiving marketing materials from us by using the opt-out facility provided (e.g., an unsubscribe link on emails we send you) or by contacting us via the details provided at the end of this privacy policy. We will implement such a request as soon as possible, however, cannot guarantee that such a response will be immediate.</p>
-
-<h3 class="legal-h3">Security</h3>
-<ol class="legal-ol" start="9">
-<li>We take reasonable steps to ensure your personal information is secure and protected from misuse or unauthorised access. Our information technology systems are password protected, and we use a range of administrative and technical measures to protect these systems. However, we cannot guarantee the security of your personal information.</li>
-</ol>
-
-<h3 class="legal-h3">Links</h3>
-<ol class="legal-ol" start="10">
-<li>Our website may contain links to other websites. Those links are provided for convenience and may not remain current or be maintained. We are not responsible for the privacy practices of those linked websites and we suggest you review the privacy policies of those websites before using them.</li>
-</ol>
-
-<h3 class="legal-h3">Requesting Access or Correcting Your Personal Information</h3>
-<ol class="legal-ol" start="11">
-<li>If you wish to request access to the personal information we hold about you, please contact us using the contact details set out below including your name and contact details. We may need to verify your identity before providing you with your personal information. In some cases, we may be unable to provide you with access to all your personal information and where this occurs, we will explain why. We will deal with all requests for access to personal information within a reasonable timeframe.
-<p>If you think that any personal information we hold about you is inaccurate, please contact us using the contact details set out below and we will take reasonable steps to ensure that it is corrected.</p>
-</li>
-</ol>
-
-<h3 class="legal-h3">Complaints</h3>
-<ol class="legal-ol" start="13">
-<li>If you wish to complain about how we handle your personal information or believe your privacy has been seriously invaded, please contact us using the details provided below with your name and contact details. We will investigate your complaint promptly and respond within a reasonable timeframe.</li>
-</ol>
-
-<h3 class="legal-h3">Contact Us</h3>
-<ol class="legal-ol" start="14">
-<li>For further information about our privacy policy or practices, or to access or correct your personal information, or make a complaint, please contact us using the details set out below:
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:bernhard@varroamate.com">bernhard&#64;varroamate.com</a></p>
-</li>
-</ol>
-<p class="legal-updated">Our privacy policy was last updated on 1 April 2026.</p></script>
-<script type="text/legal" id="legal-terms">
-<h3 class="legal-h3">Introduction</h3>
-<ol class="legal-ol-alpha">
-<li>These terms and conditions (<strong>Terms</strong>) apply when you use this website, <a href="https://varroamate.com/" target="_blank">https://varroamate.com/</a> (<strong>Website</strong>).</li>
-<li>You agree to be bound by these Terms which form a binding contractual agreement between you and us, VarroaMate Pty Ltd (ACN 696 739 732) (<strong>VarroaMate, our, we or us</strong>).</li>
-<li>If you don't agree to these Terms, you must refrain from using the Website.</li>
-<li>We may change these Terms at any time by updating this page of the Website, and your continued use of the Website following such an update will represent an agreement by you to be bound by the Terms as amended.</li>
-</ol>
-
-<h3 class="legal-h3">Access and Use of the Website</h3>
-<ol class="legal-ol">
-<li>You must only use the Website in accordance with these Terms and any applicable laws, and must ensure that your employees, sub-contractors and any other agents who use or access the Website comply with the Terms and any applicable laws.</li>
-</ol>
-
-<h3 class="legal-h3">Your Obligations</h3>
-<ol class="legal-ol" start="2">
-<li>You must not:
-<ol class="legal-ol-alpha">
-<li>copy, mirror, reproduce, translate, adapt, vary, modify, sell, decipher or decompile any part or aspect of the Website without our express consent;</li>
-<li>use the Website for any purpose other than the purposes of browsing, selecting or purchasing goods;</li>
-<li>use, or attempt to use, the Website in a manner that is illegal or fraudulent or facilitates illegal or fraudulent activity;</li>
-<li>use, or attempt to use, the Website in a manner that may interfere with, disrupt or create undue burden on the Website or the servers or networks that host the Website;</li>
-<li>use the Website with the assistance of any automated scripting tool or software;</li>
-<li>act in a way that may diminish or adversely impact our reputation, including by linking to the Website on any other website; and</li>
-<li>attempt to breach the security of the Website, or otherwise interfere with the normal functions of the Website, including by:
-<ol class="legal-ol-roman">
-<li>gaining unauthorised access to Website accounts or data;</li>
-<li>scanning, probing or testing the Website for security vulnerabilities;</li>
-<li>overloading, flooding, mailbombing, crashing or submitting a virus to the Website; or</li>
-<li>instigate or participate in a denial-of-service attack against the Website.</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-
-<h3 class="legal-h3">Information on the Website</h3>
-<p>While we will use our best endeavours to ensure the Website is as up-to-date and accurate as possible, you acknowledge and agree that from time to time, you may encounter the following issues:</p>
-<ol class="legal-ol-alpha" start="8">
-<li>the Website may have errors or defects;</li>
-<li>the Website may not be accessible at times;</li>
-<li>messages sent through the Website may not be delivered promptly, or delivered at all;</li>
-<li>information you receive or supply through the Website may not be secure or confidential; or</li>
-<li>any information provided through the Website may not be accurate or true.</li>
-</ol>
-<ol class="legal-ol" start="3">
-<li>We reserve the right to change any information or functionality on the Website by updating the Website at any time without notice, including product descriptions, prices and other Website Content.</li>
-</ol>
-
-<h3 class="legal-h3">Intellectual Property</h3>
-<ol class="legal-ol-alpha">
-<li>We retain ownership of the Website and all materials on the Website (including text, graphics, logos, design, icons, images, sound and video recordings, pricing, downloads and software) (<strong>Website Content</strong>) and reserves all rights in any intellectual property rights owned or licensed by it not expressly granted to you.</li>
-<li>You may make a temporary electronic copy of all or part of the Website for the sole purpose of viewing it. You must not otherwise reproduce, transmit, adapt, distribute, sell, modify or publish the Website or any Website Content without prior written consent from us or as permitted by law.</li>
-</ol>
-
-<h3 class="legal-h3">Links to Other Websites</h3>
-<ol class="legal-ol-alpha" start="3">
-<li>The Website may contain links to other websites that are not our responsibility. We have no control over the content of the linked websites and we are not responsible for it.</li>
-<li>Inclusion of any linked website on the Website does not imply our approval or endorsement of the linked website.</li>
-</ol>
-
-<h3 class="legal-h3">Security</h3>
-<ol class="legal-ol" start="4">
-<li>We do not accept responsibility for loss or damage to computer systems, mobile phones or other electronic devices arising in connection with use of the Website. You should take your own precautions to ensure that the process that you employ for accessing the Website does not expose you to risk of viruses, malicious computer code or other forms of interference.</li>
-</ol>
-
-<h3 class="legal-h3">Reporting Misuse</h3>
-<ol class="legal-ol" start="5">
-<li>If you become aware of misuse of the Website by any person, any errors in the material on the Website or any difficulty in accessing or using the Website, please contact us immediately using the contact details or form provided on our Website.</li>
-</ol>
-
-<h3 class="legal-h3">Privacy</h3>
-<ol class="legal-ol" start="6">
-<li>You agree to be bound by our Privacy Policy, which can be found at <a href="https://varroamate.com" target="_blank">varroamate.com</a>.</li>
-</ol>
-
-<h3 class="legal-h3">Liability</h3>
-<ol class="legal-ol">
-<li>We make no warranties or representations about this Website or any of its content and will not be responsible to you or any third party for any direct or consequential loss suffered in connection with the use of this Website. To the maximum extent permitted by law, we each exclude each other from any liability that may arise due to your use of our Website and/or the information or materials contained on it.</li>
-</ol>
-
-<h3 class="legal-h3">General</h3>
-<h4 class="legal-h4">Governing Law and Jurisdiction</h4>
-<ol class="legal-ol" start="8">
-<li>This agreement is governed by the law applying in Victoria, Australia. Each party irrevocably submits to the exclusive jurisdiction of the courts of Victoria, Australia and courts of appeal from them in respect of any proceedings arising out of or in connection with this agreement. Each party irrevocably waives any objection to the venue of any legal process on the basis that the process has been brought in an inconvenient forum.</li>
-</ol>
-<h4 class="legal-h4">Waiver</h4>
-<ol class="legal-ol" start="9">
-<li>No party to this agreement may rely on the words or conduct of any other party as a waiver of any right unless the waiver is in writing and signed by the party granting the waiver.</li>
-</ol>
-<h4 class="legal-h4">Severance</h4>
-<ol class="legal-ol" start="10">
-<li>Any term of this agreement which is wholly or partially void or unenforceable is severed to the extent that it is void or unenforceable. The validity and enforceability of the remainder of this agreement is not limited or otherwise affected.</li>
-</ol>
-<h4 class="legal-h4">Joint and Several Liability</h4>
-<ol class="legal-ol" start="11">
-<li>An obligation or a liability assumed by, or a right conferred on, two or more persons binds or benefits them jointly and severally.</li>
-</ol>
-<h4 class="legal-h4">Assignment</h4>
-<ol class="legal-ol" start="12">
-<li>A party cannot assign, novate or otherwise transfer any of its rights or obligations under this agreement without the prior written consent of the other party.</li>
-</ol>
-<h4 class="legal-h4">Entire Agreement</h4>
-<ol class="legal-ol" start="13">
-<li>This agreement embodies the entire agreement between the parties and supersedes any prior negotiation, conduct, arrangement, understanding or agreement, express or implied, in relation to the subject matter of this agreement.</li>
-</ol>
-<h4 class="legal-h4">Interpretation</h4>
-<ol class="legal-ol-alpha">
-<li>(<strong>singular and plural</strong>) words in the singular includes the plural (and vice versa);</li>
-<li>(<strong>gender</strong>) words indicating a gender includes the corresponding words of any other gender;</li>
-<li>(<strong>defined terms</strong>) if a word or phrase is given a defined meaning, any other part of speech or grammatical form of that word or phrase has a corresponding meaning;</li>
-<li>(<strong>person</strong>) a reference to "person" or "you" includes an individual, the estate of an individual, a corporation, an authority, an association, consortium or joint venture (whether incorporated or unincorporated), a partnership, a trust and any other entity;</li>
-<li>(<strong>party</strong>) a reference to a party includes that party's executors, administrators, successors and permitted assigns, including persons taking by way of novation and, in the case of a trustee, includes any substituted or additional trustee;</li>
-<li>(<strong>this agreement</strong>) a reference to a party, clause, paragraph, schedule, exhibit, attachment or annexure is a reference to a party, clause, paragraph, schedule, exhibit, attachment or annexure to or of this agreement, and a reference to this agreement includes all schedules, exhibits, attachments and annexures to it;</li>
-<li>(<strong>document</strong>) a reference to a document (including this agreement) is to that document as varied, novated, ratified or replaced from time to time;</li>
-<li>(<strong>headings</strong>) headings and words in bold type are for convenience only and do not affect interpretation;</li>
-<li>(<strong>includes</strong>) the word "includes" and similar words in any form is not a word of limitation;</li>
-<li>(<strong>adverse interpretation</strong>) no provision of this agreement will be interpreted adversely to a party because that party was responsible for the preparation of this agreement or that provision; and</li>
-<li>(<strong>currency</strong>) a reference to $, or "dollar", is to Australian currency, unless otherwise agreed in writing.</li>
-</ol></script>
-<script type="text/legal" id="legal-cookies">
-<h3 class="legal-h3">Introduction</h3>
-<ol class="legal-ol-alpha">
-<li>This document sets out the Cookies Policy of VarroaMate Pty Ltd ACN 696 739 732 (<strong>VarroaMate</strong>) (referred to in this cookies policy as '<strong>we</strong>', '<strong>us</strong>', or '<strong>our</strong>').</li>
-<li>This Cookies Policy applies when you use our website accessible at <a href="https://varroamate.com/" target="_blank">https://varroamate.com/</a> ("<strong>Website</strong>") and describes the types of cookies we use on our Website, how we use them, and how you can control them.</li>
-<li>We may update this Cookies Policy from time to time by posting an updated copy on our website and we encourage you to check our website regularly to ensure that you are aware of our most current Cookies Policy.</li>
-</ol>
-
-<h3 class="legal-h3">Types of Cookies We Use</h3>
-<p>A cookie is a small file that's stored on your computer or device when you visit a website that uses cookies. We may use several different cookies on our Website, for the purposes of website functionality, performance, advertising, and social media or content cookies. Cookies enhance your experience on our Website, as it allows us to recognise you, remember your details and preferences (for example, your log-in details), and provide us with information on when you've visited and how you've interacted with our Website.</p>
-<p>The below table sets out the type of cookies we may collect on our Website.</p>
-
-<table class="legal-table">
-<tr><td><strong>Strictly Necessary Cookies</strong></td><td>Certain cookies we use are essential for the proper functioning of our Website, without which our Website won't work or certain features won't be accessible to you. For example, we may need to remember data you've inputted from one page to the next in a single session.</td></tr>
-<tr><td><strong>Performance Cookies</strong></td><td>Performance cookies collect information about your use of the Website to help enhance the services we provide to you. We collect information about how you interact with the Website, including the pages you visit and the frequency of your visits. This information helps us identify patterns of usage on the site, collect analytics data, identify issues you may have had on the Website, make changes to enhance your browsing experience, and analyse if our marketing is effective and relevant to you.</td></tr>
-<tr><td><strong>Functional Cookies</strong></td><td>We use functional cookies to improve your experience on our Website and make things more convenient for you. These cookies personalise your experience on our Website based on your preferences, by remembering your details such as your login details or region.<br><br>Security cookies are a type of functional cookie, which assist with website and user account security. Load balancing session cookies are used for the duration of the session to distribute user requests across multiple servers to optimize website speed and capacity. We may also use user interface customization persistent cookies to store a user's preferred version of our Website, such as font and language preferences.</td></tr>
-<tr><td><strong>Advertising cookies</strong></td><td>Advertising cookies are used on our Website to provide you with targeted marketing materials in accordance with your interests and preferences. These cookies remember that you visited our Website, and we may provide this information to third-parties. These cookies usually cannot personally identify you, so your anonymity is typically secured. These cookies ensure that advertisements displayed to you are things that may be of interest to you.</td></tr>
-<tr><td><strong>Content cookies</strong></td><td>Content cookies are placed by many social media plugins (like plugins that allow you to share content on Facebook), and other tools to enhance the content displayed on a website (for example, services that allow the playing of video files). We integrate these plugins into our Website to improve usability and customer experience. Some of these third party services may place cookies that are also used for the purposes of behavioural advertising or market analysis.</td></tr>
-</table>
-
-<h3 class="legal-h3">How Long Will Cookies Remain on My Device?</h3>
-<p>The amount of time that a cookie remains on your computer or device depends on the type of cookie — cookies are either "persistent" or "session" cookies. Persistent cookies last until they expire or are deleted, so they may remain on your device for as little as 10 minutes to several years. Session cookies last until you stop browsing, so just for the relevant session.</p>
-
-<h3 class="legal-h3">How Do Third Parties Use Cookies on the Website?</h3>
-<p>We may use third party analytics cookies to collect information about your interaction with our Website.</p>
-<p>We may use Google Analytics and other third-party analytics providers to help process data. To find out more, see <a href="https://policies.google.com/technologies/partner-sites" target="_blank">How Google uses data when you use our partners' sites or apps</a>.</p>
-
-<h3 class="legal-h3">How Do I Control Cookies?</h3>
-<ol class="legal-ol-alpha" start="4">
-<li>Usually, you can control and manage cookies through your browser. You can control whether or not your browser accepts cookies, how to filter and manage cookies, and how to delete cookies at the end of a session.</li>
-<li>If you remove or block cookies, this may negatively impact your experience of our Website and you may not be able to access all parts of our Website.</li>
-<li>Many third party advertising services allow you to opt out of their tracking systems, by giving you the opportunity to opt out by way of a pop-up before downloading cookies to your device.</li>
-<li>For more information about cookies and how to manage them, visit <a href="http://www.allaboutcookies.org/" target="_blank">www.allaboutcookies.org</a>.</li>
-</ol>
-
-<h3 class="legal-h3">Contact Us</h3>
-<p>For further information about our Cookies Policy or practices, please contact us using the details set out below:</p>
-<p><strong>Name:</strong> Bernhard Dichtl<br><strong>Email:</strong> <a href="mailto:bernhard@varroamate.com">bernhard&#64;varroamate.com</a></p>
-<p class="legal-updated">Our Cookies Policy was last updated on 1 April 2026.</p></script>
 
 </body>
 </html>
