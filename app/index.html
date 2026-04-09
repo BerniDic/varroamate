@@ -452,7 +452,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <button onclick="document.getElementById('disc-accept-row').scrollIntoView({behavior:'smooth',block:'start'})" style="display:inline-block;margin-top:6px;background:var(--amber-dark);color:#fff;border:none;border-radius:12px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;">Skip to accept ↓</button>
     </div>
     <!-- Scrollable legal content in a fixed-height box -->
-    <!-- Legal documents as PDFs -->
+    <!-- Legal documents via PDF.js -->
     <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">
 
       <div>
@@ -460,9 +460,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           📋 Terms &amp; Conditions
           <a href="https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/TERMS_AND_CONDITIONS.pdf" target="_blank" style="font-size:11px;font-weight:400;color:var(--amber-dark);margin-left:auto;">Open ↗</a>
         </div>
-        <iframe src="https://docs.google.com/viewer?url=https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/TERMS_AND_CONDITIONS.pdf&embedded=true"
-          style="width:100%;height:45vh;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);"
-          title="Terms and Conditions"></iframe>
+        <div id="pdf-v88-terms" style="width:100%;height:45vh;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);-webkit-overflow-scrolling:touch;"></div>
       </div>
 
       <div>
@@ -470,9 +468,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           🔒 Privacy Policy
           <a href="https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Privacy%20Policy.pdf" target="_blank" style="font-size:11px;font-weight:400;color:var(--amber-dark);margin-left:auto;">Open ↗</a>
         </div>
-        <iframe src="https://docs.google.com/viewer?url=https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Privacy%20Policy.pdf&embedded=true"
-          style="width:100%;height:45vh;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);"
-          title="Privacy Policy"></iframe>
+        <div id="pdf-v88-privacy" style="width:100%;height:45vh;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);-webkit-overflow-scrolling:touch;"></div>
       </div>
 
       <div>
@@ -480,12 +476,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
           🍪 Cookies Policy
           <a href="https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Cookies%20Policy.pdf" target="_blank" style="font-size:11px;font-weight:400;color:var(--amber-dark);margin-left:auto;">Open ↗</a>
         </div>
-        <iframe src="https://docs.google.com/viewer?url=https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Cookies%20Policy.pdf&embedded=true"
-          style="width:100%;height:45vh;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);"
-          title="Cookies Policy"></iframe>
+        <div id="pdf-v88-cookies" style="width:100%;height:45vh;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);-webkit-overflow-scrolling:touch;"></div>
       </div>
 
     </div><!-- end legal PDFs -->
+
 
     <!-- Accept row -->
     <div id="disc-accept-row" style="margin:0 0 24px;">
@@ -4535,8 +4530,7 @@ function printQR(){
       ${src?`<img src="${src}" width="180" height="180" alt="QR code">`:'<p style="color:#c00;font-size:12px;padding:10px;">QR image unavailable — close and reopen the QR modal then try again</p>'}
       <div class="hint">Scan to open field entry in VarroaMate<br>or tap <strong>VMP</strong> tab for inspection log</div>
     </div>
-    <br><button onclick="window.print()">🖨 Print</button>
-  </body></html>`;
+    <br><button onclick="window.print()">🖨 Print</button></body></html>`;
   // Use blob URL to avoid popup blockers
   const blob=new Blob([html],{type:'text/html'});
   const url=URL.createObjectURL(blob);
@@ -5538,3 +5532,35 @@ async function submitFeedback(){
 
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" onload="initPDFJS_V88()"></script>
+<script>
+function initPDFJS_V88() {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  function renderPDF(url, containerId) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:60px;color:var(--text3);font-size:13px;">Loading...</div>';
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      container.innerHTML = '';
+      for (var p = 1; p <= pdf.numPages; p++) {
+        (function(num) {
+          pdf.getPage(num).then(function(page) {
+            var vp = page.getViewport({scale: window.devicePixelRatio >= 2 ? 1.8 : 1.5});
+            var c = document.createElement('canvas');
+            c.width = vp.width; c.height = vp.height;
+            c.style.width = '100%'; c.style.display = 'block'; c.style.marginBottom = '2px';
+            container.appendChild(c);
+            page.render({canvasContext: c.getContext('2d'), viewport: vp});
+          });
+        })(p);
+      }
+    }).catch(function() {
+      container.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Unable to load. <a href="' + url + '" target="_blank" style="color:var(--amber-dark);">Open PDF</a></div>';
+    });
+  }
+  renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/TERMS_AND_CONDITIONS.pdf', 'pdf-v88-terms');
+  renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Privacy%20Policy.pdf', 'pdf-v88-privacy');
+  renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Cookies%20Policy.pdf', 'pdf-v88-cookies');
+}
+</script>
