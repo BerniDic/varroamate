@@ -5533,10 +5533,11 @@ async function submitFeedback(){
 </body>
 </html>
 
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" onload="initPDFJS_V88()"></script>
 <script>
-function initPDFJS_V88() {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+(function() {
+  var _pdfjsReady = false;
+  var _rendered = false;
+
   function renderPDF(url, containerId) {
     var container = document.getElementById(containerId);
     if (!container) return;
@@ -5559,8 +5560,43 @@ function initPDFJS_V88() {
       container.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Unable to load. <a href="' + url + '" target="_blank" style="color:var(--amber-dark);">Open PDF</a></div>';
     });
   }
-  renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/TERMS_AND_CONDITIONS.pdf', 'pdf-v88-terms');
-  renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Privacy%20Policy.pdf', 'pdf-v88-privacy');
-  renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Cookies%20Policy.pdf', 'pdf-v88-cookies');
-}
+
+  function renderDisclaimerPDFs() {
+    if (!_pdfjsReady || _rendered) return;
+    _rendered = true;
+    renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/TERMS_AND_CONDITIONS.pdf', 'pdf-v88-terms');
+    renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Privacy%20Policy.pdf', 'pdf-v88-privacy');
+    renderPDF('https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Cookies%20Policy.pdf', 'pdf-v88-cookies');
+  }
+
+  // Patch goto() to trigger render when disclaimer screen becomes visible
+  window.addEventListener('load', function() {
+    var _origGoto = window.goto;
+    if (typeof _origGoto === 'function') {
+      window.goto = function(id, param) {
+        _origGoto(id, param);
+        if (id === 's-disclaimer') renderDisclaimerPDFs();
+      };
+    }
+    // Also render immediately if disclaimer is the active screen on load
+    var disc = document.getElementById('s-disclaimer');
+    if (disc && (disc.classList.contains('active') || getComputedStyle(disc).display !== 'none')) {
+      renderDisclaimerPDFs();
+    }
+  });
+
+  // Load PDF.js dynamically
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+  s.onload = function() {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    _pdfjsReady = true;
+    // If disclaimer is already visible by the time library loads, render now
+    var disc = document.getElementById('s-disclaimer');
+    if (disc && (disc.classList.contains('active') || getComputedStyle(disc).display !== 'none')) {
+      renderDisclaimerPDFs();
+    }
+  };
+  document.head.appendChild(s);
+})();
 </script>
