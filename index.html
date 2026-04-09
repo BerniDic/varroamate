@@ -1826,7 +1826,7 @@ function openFrame(key){
     const lk = LEGAL_PDFS[key];
     document.getElementById('frame-modal-title').textContent = lk.title;
     document.getElementById('frame-modal-body').innerHTML =
-      '<iframe src="' + lk.url + '#toolbar=1&view=FitH" style="width:100%;height:calc(85vh - 80px);border:none;border-radius:8px;" title="' + lk.title + '"></iframe>' +
+      '<iframe src="' + lk.url + '#toolbar=0" style="width:100%;height:calc(85vh - 80px);border:none;border-radius:8px;" title="' + lk.title + '"></iframe>' +
       '<p style="text-align:center;margin-top:10px;font-size:12px;color:var(--text3);"><a href="' + lk.url + '" target="_blank" style="color:var(--amber-dark);">Open in new tab ↗</a></p>';
     const overlay = document.getElementById('frame-overlay');
     overlay.classList.add('open');
