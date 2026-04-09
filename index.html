@@ -1826,8 +1826,9 @@ function openFrame(key){
     const lk = LEGAL_PDFS[key];
     document.getElementById('frame-modal-title').textContent = lk.title;
     document.getElementById('frame-modal-body').innerHTML =
-      '<iframe src="https://docs.google.com/viewer?url=' + lk.url + '&embedded=true" style="width:100%;height:calc(85vh - 80px);border:none;border-radius:8px;" title="' + lk.title + '"></iframe>' +
-      '<p style="text-align:center;margin-top:10px;font-size:12px;color:var(--text3);"><a href="' + lk.url + '" target="_blank" style="color:var(--amber-dark);">Open in new tab ↗</a></p>';
+      '<div id="pdf-home-viewer" style="width:100%;height:calc(85vh - 110px);overflow-y:auto;border-radius:8px;background:#f5f5f5;"></div>' +
+      '<p style="text-align:center;margin-top:8px;font-size:12px;color:var(--text3);"><a href="' + lk.url + '" target="_blank" style="color:var(--amber-dark);">Open in new tab ↗</a></p>';
+    renderPDF(lk.url, 'pdf-home-viewer');
     const overlay = document.getElementById('frame-overlay');
     overlay.classList.add('open');
     document.getElementById('frame-modal').scrollTop = 0;
@@ -2437,5 +2438,31 @@ window.addEventListener('resize', ()=>{
 </script>
 
 
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  function renderPDF(url, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:13px;">Loading…</div>';
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      container.innerHTML = '';
+      for (var p = 1; p <= pdf.numPages; p++) {
+        (function(num) {
+          pdf.getPage(num).then(function(page) {
+            var vp = page.getViewport({scale: window.devicePixelRatio >= 2 ? 1.8 : 1.5});
+            var c = document.createElement('canvas');
+            c.width = vp.width; c.height = vp.height;
+            c.style.width = '100%'; c.style.display = 'block'; c.style.marginBottom = '2px';
+            container.appendChild(c);
+            page.render({canvasContext: c.getContext('2d'), viewport: vp});
+          });
+        })(p);
+      }
+    }).catch(function() {
+      container.innerHTML = '<div style="padding:16px;font-size:13px;color:#888;">Unable to load. <a href="' + url + '" target="_blank" style="color:var(--amber-dark);">Open PDF ↗</a></div>';
+    });
+  }
+</script>
 </body>
 </html>
