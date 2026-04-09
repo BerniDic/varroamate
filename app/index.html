@@ -4530,11 +4530,17 @@ function printQR(){
     if(qrImg)src=qrImg.src;
   }
   const html=`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:sans-serif;text-align:center;padding:40px;background:#fff;}
     .label{border:2.5px solid #2C1A00;border-radius:14px;padding:22px 24px;display:inline-block;min-width:220px;}
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');.vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}.vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}.vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}.vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}.vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
+    .vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}
+    .vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}
+    .vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}
+    .vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}
+    .vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
     .hive{font-size:24px;font-weight:700;color:#2C1A00;margin-bottom:4px;}
     .code{font-family:monospace;font-size:15px;color:#9C7A4A;margin-bottom:10px;}
     img{display:block;margin:10px auto;}
@@ -4668,10 +4674,17 @@ function printAllQR(){
   const baseVMP=window.location.origin+'/productivity/';
 
   win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — QR Labels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:sans-serif;background:#fff;padding:20px;color:#2C1A00;}
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');.vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}.vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}.vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}.vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}.vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}  h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
+  .vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}
+  .vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}
+  .vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}
+  .vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}
+  .vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
+  h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
   .subtitle{font-size:13px;color:#9C7A4A;margin-bottom:16px;}
   .instructions{background:#FFF3DC;border:1px solid #E8D5B0;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:#6B4C1E;line-height:1.65;}
   .instructions h3{font-size:14px;font-weight:700;color:#8B5200;margin-bottom:8px;}
