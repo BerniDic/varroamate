@@ -4477,48 +4477,26 @@ function qrRenderCanvas(url){
   const canvas=document.getElementById('qr-canvas');
   canvas.innerHTML='';
   if(typeof QRCode!=='undefined'){
-    new QRCode(canvas,{text:url,width:200,height:200,colorDark:'#2C1A00',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-    // Poll until QRCode.js finishes rendering (canvas or img), then overlay bee
-    var _tries=0;
-    var _poll=setInterval(function(){
-      _tries++;
-      var qrCanvas=canvas.querySelector('canvas');
-      var qrImg=canvas.querySelector('img');
-      if(qrCanvas){
-        clearInterval(_poll);
-        var ctx=qrCanvas.getContext('2d');
-        var size=qrCanvas.width;
-        var logoSize=Math.round(size*0.22);
-        ctx.fillStyle='#ffffff';
-        ctx.beginPath();
-        ctx.arc(size/2,size/2,logoSize*0.52,0,Math.PI*2);
-        ctx.fill();
-        ctx.font=logoSize+'px serif';
-        ctx.textAlign='center';
-        ctx.textBaseline='middle';
-        ctx.fillText('🐝',size/2,size/2+2);
-      } else if(qrImg && qrImg.complete && qrImg.naturalWidth){
-        // img fallback: draw onto a new canvas on top
-        clearInterval(_poll);
-        var overlay=document.createElement('canvas');
-        overlay.width=200; overlay.height=200;
-        overlay.style.cssText='position:absolute;top:0;left:0;pointer-events:none;';
-        canvas.style.position='relative';
-        canvas.appendChild(overlay);
-        var ctx=overlay.getContext('2d');
-        var size=200;
-        var logoSize=Math.round(size*0.22);
-        ctx.fillStyle='#ffffff';
-        ctx.beginPath();
-        ctx.arc(size/2,size/2,logoSize*0.52,0,Math.PI*2);
-        ctx.fill();
-        ctx.font=logoSize+'px serif';
-        ctx.textAlign='center';
-        ctx.textBaseline='middle';
-        ctx.fillText('🐝',size/2,size/2+2);
-      } else if(_tries>40){
-        clearInterval(_poll); // give up after 2s
-      }
+    // Wrapper so we can absolutely position the bee overlay
+    const wrap=document.createElement('div');
+    wrap.style.cssText='position:relative;display:inline-block;';
+    canvas.appendChild(wrap);
+    new QRCode(wrap,{text:url,width:200,height:200,colorDark:'#2C1A00',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+    // Overlay bee after QRCode.js renders (50ms poll, up to 2s)
+    var tries=0;
+    var poll=setInterval(function(){
+      tries++;
+      if(wrap.querySelector('canvas')||wrap.querySelector('img')){
+        clearInterval(poll);
+        var bee=document.createElement('div');
+        bee.textContent='🐝';
+        bee.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);font-size:42px;line-height:1;pointer-events:none;filter:drop-shadow(0 0 3px #fff);';
+        // White circle behind bee
+        var bg=document.createElement('div');
+        bg.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:#fff;pointer-events:none;';
+        wrap.appendChild(bg);
+        wrap.appendChild(bee);
+      } else if(tries>40){ clearInterval(poll); }
     },50);
   } else {
     canvas.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:20px;">QR library loading… try again in a moment.</div>`;
@@ -4556,7 +4534,7 @@ function printQR(){
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:sans-serif;text-align:center;padding:40px;background:#fff;}
     .label{border:2.5px solid #2C1A00;border-radius:14px;padding:22px 24px;display:inline-block;min-width:220px;}
-    .brand{font-size:16px;font-weight:700;color:#8B5200;letter-spacing:0.05em;margin-bottom:10px;}
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');.vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}.vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}.vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}.vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}.vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
     .hive{font-size:24px;font-weight:700;color:#2C1A00;margin-bottom:4px;}
     .code{font-family:monospace;font-size:15px;color:#9C7A4A;margin-bottom:10px;}
     img{display:block;margin:10px auto;}
@@ -4566,7 +4544,7 @@ function printQR(){
   </style></head>
   <body>
     <div class="label">
-      <div class="brand">🐝 VarroaMate™</div>
+      <div class="vm-logo"><span class="vm-bee">🐝</span><span class="vm-varroa">Varroa</span><span class="vm-mate">Mate</span><sup class="vm-tm">™</sup></div>
       <div class="hive">${hiveName}</div>
       <div class="code">${code}</div>
       ${src?`<img src="${src}" width="180" height="180" alt="QR code">`:'<p style="color:#c00;font-size:12px;padding:10px;">QR image unavailable — close and reopen the QR modal then try again</p>'}
@@ -4693,7 +4671,7 @@ function printAllQR(){
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:sans-serif;background:#fff;padding:20px;color:#2C1A00;}
-  h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');.vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}.vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}.vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}.vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}.vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}  h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
   .subtitle{font-size:13px;color:#9C7A4A;margin-bottom:16px;}
   .instructions{background:#FFF3DC;border:1px solid #E8D5B0;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:#6B4C1E;line-height:1.65;}
   .instructions h3{font-size:14px;font-weight:700;color:#8B5200;margin-bottom:8px;}
@@ -4743,7 +4721,7 @@ function printAllQR(){
   }
 </style>
 </head><body>
-<h1>🐝 VarroaMate™ — Hive QR Labels</h1>
+<div class="vm-logo"><span class="vm-bee">🐝</span><span class="vm-varroa">Varroa</span><span class="vm-mate">Mate</span><sup class="vm-tm">™</sup></div><h1 style="margin-top:0;">Hive QR Labels</h1>
 <div class="subtitle">${allHives.length} hive${allHives.length!==1?'s':''} · ${allHives.length*2} labels (VM + VMP per hive) · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}</div>
 
 <div class="instructions no-print">
