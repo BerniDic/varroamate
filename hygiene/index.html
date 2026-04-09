@@ -1618,6 +1618,28 @@ const CLAUDE_MODEL  = 'claude-opus-4-6'; // update here when Anthropic releases 
 
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+// ── Plan / subscription state ──────────────────────────────────────────────
+let _plan = 'free'; // 'free' | 'free_ai' | 'hobbyist' | 'beekeeper'
+const AI_PLANS = new Set(['free_ai','hobbyist','beekeeper']);
+
+async function loadPlan(userId){
+  try{
+    const {data,error} = await _sb.from('subscriptions')
+      .select('plan,status').eq('user_id',userId).single();
+    if(!error && data){
+      _plan = (data.status==='cancelled') ? 'free' : (data.plan||'free');
+    }
+  }catch(e){ console.warn('VMHH loadPlan:',e); }
+}
+
+function hasAI(){ return AI_PLANS.has(_plan); }
+
+function requireAIOrUpgrade(){
+  if(hasAI()) return true;
+  showToast('AI features require a paid plan — see Plans & Pricing 🐝');
+  return false;
+}
+
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
@@ -2188,6 +2210,7 @@ async function generatePlan(){
 // AI PLAN NARRATIVE
 // ══════════════════════════════════════════════
 async function generateAiPlan(){
+  if(!requireAIOrUpgrade()) return;
   const btn = document.getElementById('generateAiBtn');
   const panel = document.getElementById('aiNarrative');
   const text = document.getElementById('aiNarrativeText');
@@ -2472,6 +2495,7 @@ function renderPathogenCards(){
 // AUTH
 // ══════════════════════════════════════════════
 async function generateToolkitAdvice(){
+  if(!requireAIOrUpgrade()) return;
   const btn = document.getElementById('toolkitAiBtn');
   const panel = document.getElementById('toolkitAiPanel');
   const textEl = document.getElementById('toolkitAiText');
@@ -2908,6 +2932,7 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
   try {
     if(session){
       _user = session.user;
+      await loadPlan(_user.id);
       const initials = (_user.email||'?')[0].toUpperCase();
       const topUser = document.getElementById('topUser');
       if(topUser){ topUser.textContent = 'Sign out'; topUser.title = _user.email||''; }
