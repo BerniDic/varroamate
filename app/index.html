@@ -4478,21 +4478,48 @@ function qrRenderCanvas(url){
   canvas.innerHTML='';
   if(typeof QRCode!=='undefined'){
     new QRCode(canvas,{text:url,width:200,height:200,colorDark:'#2C1A00',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-    setTimeout(function(){
-      const qrCanvas=canvas.querySelector('canvas');
-      if(!qrCanvas)return;
-      const ctx=qrCanvas.getContext('2d');
-      const size=qrCanvas.width;
-      const logoSize=Math.round(size*0.22);
-      ctx.fillStyle='#ffffff';
-      ctx.beginPath();
-      ctx.arc(size/2,size/2,logoSize*0.52,0,Math.PI*2);
-      ctx.fill();
-      ctx.font=logoSize+'px serif';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      ctx.fillText('🐝',size/2,size/2+2);
-    },100);
+    // Poll until QRCode.js finishes rendering (canvas or img), then overlay bee
+    var _tries=0;
+    var _poll=setInterval(function(){
+      _tries++;
+      var qrCanvas=canvas.querySelector('canvas');
+      var qrImg=canvas.querySelector('img');
+      if(qrCanvas){
+        clearInterval(_poll);
+        var ctx=qrCanvas.getContext('2d');
+        var size=qrCanvas.width;
+        var logoSize=Math.round(size*0.22);
+        ctx.fillStyle='#ffffff';
+        ctx.beginPath();
+        ctx.arc(size/2,size/2,logoSize*0.52,0,Math.PI*2);
+        ctx.fill();
+        ctx.font=logoSize+'px serif';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText('🐝',size/2,size/2+2);
+      } else if(qrImg && qrImg.complete && qrImg.naturalWidth){
+        // img fallback: draw onto a new canvas on top
+        clearInterval(_poll);
+        var overlay=document.createElement('canvas');
+        overlay.width=200; overlay.height=200;
+        overlay.style.cssText='position:absolute;top:0;left:0;pointer-events:none;';
+        canvas.style.position='relative';
+        canvas.appendChild(overlay);
+        var ctx=overlay.getContext('2d');
+        var size=200;
+        var logoSize=Math.round(size*0.22);
+        ctx.fillStyle='#ffffff';
+        ctx.beginPath();
+        ctx.arc(size/2,size/2,logoSize*0.52,0,Math.PI*2);
+        ctx.fill();
+        ctx.font=logoSize+'px serif';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText('🐝',size/2,size/2+2);
+      } else if(_tries>40){
+        clearInterval(_poll); // give up after 2s
+      }
+    },50);
   } else {
     canvas.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:20px;">QR library loading… try again in a moment.</div>`;
   }
