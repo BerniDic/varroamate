@@ -4529,7 +4529,7 @@ function printQR(){
     const qrImg=document.querySelector('#qr-canvas img');
     if(qrImg)src=qrImg.src;
   }
-  const html=`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>QR — ${hiveName}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <style>
@@ -4558,7 +4558,7 @@ function printQR(){
     </div>
     <br><button onclick="window.print()">🖨 Print</button></body></html>`;
   // Use blob URL to avoid popup blockers
-  const blob=new Blob([html],{type:'text/html'});
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const win=window.open(url,'_blank');
   if(!win){
@@ -4673,7 +4673,7 @@ function printAllQR(){
   const base=window.location.origin+'/app/';
   const baseVMP=window.location.origin+'/productivity/';
 
-  win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — QR Labels</title>
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VarroaMate — QR Labels</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
