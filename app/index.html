@@ -4478,8 +4478,26 @@ function qrRenderCanvas(url){
   canvas.innerHTML='';
   if(typeof QRCode!=='undefined'){
     new QRCode(canvas,{text:url,width:200,height:200,colorDark:'#2C1A00',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+    // Overlay bee branding in centre after QRCode renders
+    setTimeout(function(){
+      const qrCanvas=canvas.querySelector('canvas');
+      if(!qrCanvas)return;
+      const ctx=qrCanvas.getContext('2d');
+      const size=qrCanvas.width;
+      const logoSize=Math.round(size*0.22);
+      // White circle background so bee sits cleanly on QR modules
+      ctx.fillStyle='#ffffff';
+      ctx.beginPath();
+      ctx.arc(size/2,size/2,logoSize*0.52,0,Math.PI*2);
+      ctx.fill();
+      // Draw bee emoji centred
+      ctx.font=logoSize+'px serif';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText('\uD83D\uDC1D',size/2,size/2+2);
+    },100);
   } else {
-    canvas.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:20px;">QR library loading… try again in a moment.</div>`;
+    canvas.innerHTML='<div style="font-size:13px;color:var(--text3);padding:20px;">QR library loading\u2026 try again in a moment.</div>';
   }
 }
 
