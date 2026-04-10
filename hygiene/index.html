@@ -1634,6 +1634,18 @@ async function loadPlan(userId){
 
 function hasAI(){ return AI_PLANS.has(_plan); }
 
+function renderAIMarkdown(text){
+  if(!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s,'<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
+    .replace(/\n\n/g,'</p><p style="margin-top:6px;">')
+    .replace(/\n/g,'<br>');
+}
+
 function requireAIOrUpgrade(){
   if(hasAI()) return true;
   showToast('AI features require a paid plan — see Plans & Pricing 🐝');
@@ -2293,10 +2305,7 @@ CRITICAL FIELD HYGIENE RULES — you must follow these exactly:
       if(data.error?.type==='overloaded_error'){ lastErr=new Error('busy'); continue; }
       if(data.error) throw new Error(data.error?.message||'API error');
       const raw = data.content?.find(b=>b.type==='text')?.text||'';
-      text.innerHTML = raw
-        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-        .replace(/\n\n/g,'<br><br>')
-        .replace(/\n/g,'<br>');
+      text.innerHTML = renderAIMarkdown(raw);
       btn.style.display = 'none';
       setTimeout(()=>{ panel.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
       return;
@@ -2542,7 +2551,7 @@ In 3–4 sentences, identify the single most important tool they should add next
       if(data.error?.type==='overloaded_error'){ lastErr=new Error('busy'); continue; }
       if(data.error) throw new Error(data.error?.message||'API error');
       const text = data.content?.find(b=>b.type==='text')?.text || 'Unable to generate advice — please try again.';
-      textEl.textContent = text;
+      textEl.innerHTML = renderAIMarkdown(text);
       btn.textContent = '↻ Refresh advice';
       btn.disabled = false;
       return;
