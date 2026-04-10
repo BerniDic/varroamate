@@ -818,7 +818,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           <div class="leg-item"><div class="leg-dot" style="background:#5A9E60"></div>Organic [OA/EO]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#1C3829"></div>Synthetic [AMZ/PYR]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#7B6FA0"></div>Mechanical [MCH]</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#A0522D"></div>Physical [PHY]</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#A0522D"></div>Heat [HT]</div>
           <div class="leg-item" style="gap:5px;"><span style="background:#B85C38;color:white;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;">!</span> Wrong season</div>
           <div class="leg-item"><div class="leg-dot" style="background:#D4820A"></div>⚠ MoA Rotation!</div>
         </div>
@@ -1807,8 +1807,8 @@ const TREATMENTS = {
   'apistan':     {name:'Apistan',               abbrev:'API',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'⚠ High resistance risk in Australia. Confirm susceptibility first.',            duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'drone-comb':  {name:'Drone Comb Removal',    abbrev:'DCR',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Remove and freeze capped drone comb. Ongoing throughout drone-rearing season.', duration:0,  season:['spring','summer'],        badSeasons:['autumn','winter'], badSeasonNote:'⚠ Not effective in autumn — drone rearing has ceased by then'},
   'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap. Best in late summer (Jan–Feb) when mite:brood ratio is highest and winter bee rearing has not yet begun. Avoid March–April — caging the queen disrupts critical winter bee production and weakens the colony heading into winter.',    duration:25, season:['spring','summer'],  badSeasons:['winter','autumn'], badSeasonNote:'⚠ Avoid in autumn (Mar–Apr) — disrupts winter bee rearing, weakening the colony heading into winter. Cannot perform in winter — brood already absent. Best timing: Jan–Feb (late summer)'},
-  'heat':        {name:'Heat Treatment (Varroa Controller)', abbrev:'HT', color:'#C17B2A', moa:'Physical', moaShort:'PHY', synthetic:false, tempRange:'>18°C ambient', supersOff:false, notes:'Varroa Controller early-spring treatment — removes capped brood frames one by one, heat-treats at 40–42°C. Spring-only because brood nest is smallest (2–3 frames) maximising mite concentration per frame and minimising session time. For summer heat treatment, use the Duplex-Framebox plan (duplex) instead — it is specifically designed for the expanded summer brood nest.', duration:1, season:['spring'], badSeasons:['winter','summer','autumn'], badSeasonNote:'⚠ SPRING ONLY (Sep–Nov, southern hemisphere) — brood nest must be small (2–3 frames). NEVER suggest in summer (Nov–Jan) or December: use Duplex-Framebox (duplex) for summer heat treatment instead. Winter: no capped brood to treat.'},
-  'duplex':      {name:'Duplex-Framebox Plan',  abbrev:'DFB',  color:'#A0522D', moa:'Physical',      moaShort:'PHY', synthetic:false, tempRange:'>18°C', supersOff:false,
+  'heat':        {name:'Heat Treatment (Varroa Controller)', abbrev:'HT', color:'#C17B2A', moa:'Heat', moaShort:'HT', synthetic:false, tempRange:'>18°C ambient', supersOff:false, notes:'Varroa Controller early-spring treatment — removes capped brood frames one by one, heat-treats at 40–42°C. Spring-only because brood nest is smallest (2–3 frames) maximising mite concentration per frame and minimising session time. For summer heat treatment, use the Duplex-Framebox plan (duplex) instead — it is specifically designed for the expanded summer brood nest.', duration:1, season:['spring'], badSeasons:['winter','summer','autumn'], badSeasonNote:'⚠ SPRING ONLY (Sep–Nov, southern hemisphere) — brood nest must be small (2–3 frames). NEVER suggest in summer (Nov–Jan) or December: use Duplex-Framebox (duplex) for summer heat treatment instead. Winter: no capped brood to treat.'},
+  'duplex':      {name:'Duplex-Framebox Plan',  abbrev:'DFB',  color:'#A0522D', moa:'Heat',      moaShort:'HT', synthetic:false, tempRange:'>18°C', supersOff:false,
     notes:'Varroa Controller Duplex-Framebox — 24-day queen-caging mite concentration plan. Day 0: cage queen with 1 brood frame + 1 foundation in aluminium Duplex-Framebox; place in centre of brood super. All external brood continues to emerge. Day 12: first capped frame from box → heat treat in Varroa Controller; replace with empty frame; reclip box. Day 24 (honey harvest day): all brood outside box has now emerged — mites have no option but to enter the 2 box frames to reproduce. Remove both box frames → heat treat. Colony is now effectively broodless. Treat adult bees (lactic acid or OA dribble). Release queen immediately; feed with sugar syrup. Result: near-complete mite removal at honey harvest, ~20% more honey (bees not rearing brood for 24 days), fresh wax foundations, heat-treated frames available for nuc reinforcement. Requires marked queen for efficiency. Best timing: around summer solstice (Dec–Jan southern hemisphere).',
     duration:24, season:['summer'], badSeasons:['winter','spring','autumn'],
     badSeasonNote:'⚠ Designed for peak-summer use (Dec–Jan, southern hemisphere) — colony must be at full strength and honey supers in place. Spring colonies too small; autumn brood declining.'},
@@ -1827,7 +1827,7 @@ const REG_INFO = {
   'apistan':        'Active: Tau-fluvalinate. APVMA registered. Remove supers. WHP: nil per label. 2 strips × 8 weeks. ⚠ Widespread pyrethroid resistance in Australia — alcohol wash recommended at day 14 to confirm efficacy.',
   'drone-comb':     'No APVMA registration required — mechanical method. No withholding period. Permitted under all state Varroa regulations. Use in conjunction with a registered chemical treatment.',
   'brood-int':      'No APVMA registration required — mechanical brood interruption. No WHP. Combine with registered OA vaporisation during broodless period for maximum efficacy.',
-  'heat':           'No APVMA registration required — physical heat treatment (Varroa Controller). No WHP. Supers may remain on hive. No chemical residues.',
+  'heat':           'No APVMA registration required — heat treatment (Varroa Controller). No WHP. Supers may remain on hive. No chemical residues.',
   'duplex':         'No APVMA registration required for queen caging. OA dribble applied on Day 24 must comply with APVMA label conditions. No honey WHP.',
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1842,7 +1842,7 @@ const TREAT_GROUPS = [
     { label:'Pyrethroids',             ids:['bayvarol','apistan'] },
   ]},
   { label:'Mechanical',             ids:['drone-comb','brood-int'] },
-  { label:'Physical',               ids:['heat','duplex'] },
+  { label:'Heat',               ids:['heat','duplex'] },
 ];
 
 let currentPref = PREFS[0];
@@ -2859,7 +2859,7 @@ function scorePlan(){
 
   const MOA_REPEAT_PENALTY   = {'Organic Acid':5, 'Essential Oil':12, 'Amitraz':25, 'Pyrethroid':25};
   const MOA_CONFLICT_PENALTY = {'Organic Acid':6, 'Essential Oil':10, 'Amitraz':18, 'Pyrethroid':18};
-  const chemSorted = scoringSorted.filter(e => TREATMENTS[e.treatId]?.moa !== 'Physical');
+  const chemSorted = scoringSorted.filter(e => TREATMENTS[e.treatId]?.moa !== 'Heat');
   let rotPenalty = 0;
   for(let i=1;i<chemSorted.length;i++){
     const prevMoA = TREATMENTS[chemSorted[i-1].treatId]?.moa;
@@ -2910,7 +2910,7 @@ function scorePlan(){
     'Essential Oil / Thymol': 72,
     'Synthetic — Amitraz (Formamidine)': 92,
     'Synthetic — Pyrethroid': 60,
-    'Physical': 80,
+    'Heat': 80,
     'Mechanical': 40,
   };
   const getCeiling = id => {
@@ -2927,26 +2927,26 @@ function scorePlan(){
     if(moa.includes('Essential'))  return 'essential';
     if(moa.includes('Amitraz'))    return 'amitraz';
     if(moa.includes('Pyrethroid')) return 'pyrethroid';
-    if(moa === 'Physical')         return 'physical';
+    if(moa === 'Heat')         return 'heat_phys';
     if(moa === 'Mechanical')       return 'mechanical';
     return 'other';
   }));
 
   const hasChem      = moaClassesUsed.has('organic') || moaClassesUsed.has('essential') || moaClassesUsed.has('amitraz') || moaClassesUsed.has('pyrethroid');
   const hasMech      = moaClassesUsed.has('mechanical');
-  const hasPhys      = moaClassesUsed.has('physical');
+  const hasPhys      = moaClassesUsed.has('heat_phys');
   const allMoAs = new Set(planEvents.map(e => {
     const moa = TREATMENTS[e.treatId]?.moa || '';
     if(moa.includes('Organic'))    return 'organic';
     if(moa.includes('Essential'))  return 'essential';
     if(moa.includes('Amitraz'))    return 'amitraz';
     if(moa.includes('Pyrethroid')) return 'pyrethroid';
-    if(moa === 'Physical')         return 'physical';
+    if(moa === 'Heat')         return 'heat_phys';
     if(moa === 'Mechanical')       return 'mechanical';
     return 'other';
   }));
   const planHasChem = allMoAs.has('organic') || allMoAs.has('essential') || allMoAs.has('amitraz') || allMoAs.has('pyrethroid');
-  const planHasPhys = allMoAs.has('physical');
+  const planHasPhys = allMoAs.has('heat_phys');
   const mechOnly     = scoringEvents.length > 0 && !planHasChem && !planHasPhys && hasMech;
   const fullSpectrum = hasChem && (hasMech || hasPhys) && moaClassesUsed.size >= 3;
 
@@ -3339,7 +3339,7 @@ Treatment classification (never mislabel):
 - Organic acids (NOT synthetic): OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP
 - Essential oils (NOT synthetic): Apiguard, ApiLife VAR
 - Synthetic acaricides ONLY: Apivar/Apitraz (amitraz), Bayvarol/Apistan (pyrethroids)
-- Physical: Varroa Controller heat, Duplex-Framebox. Mechanical: Drone Comb Removal, Brood Interruption
+- Heat: Varroa Controller heat, Duplex-Framebox. Mechanical: Drone Comb Removal, Brood Interruption
 Always use MoA from the plan summary — never infer from context.`;
 
   try {
@@ -3641,13 +3641,13 @@ Key rules:
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
 - SPRING PRIORITY: If the plan includes any post-winter months (August onwards), the first treatment after winter MUST be in September (month index 8). September is the highest-priority treatment window — brood nest is at its smallest, mite concentration per frame is highest, and early intervention prevents exponential mite growth. Never place the first post-winter treatment in October or later.
 - 12-MONTH HARD LIMIT: NEVER suggest any treatment more than 12 months from today (${todayLabel}). Any treatment beyond this window is meaningless for current planning, will not be visible in the timeline, and will not count toward the plan score. If the plan spans a winter gap, the full 12 months from today is your planning horizon — stay within it.
-- Target approximately 2 chemical treatments + approximately 2 mechanical/physical treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
+- Target approximately 2 chemical treatments + approximately 2 mechanical/heat treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
 - LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol, OA/formic) to a maximum of 2 per plan, and only include them when warranted by mite pressure
-- Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
+- Heat treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
 - If there is a RECENT treatment in the history (within 8 weeks), factor it into the plan as if it were the first treatment — do not suggest a duplicate or overlapping treatment, and count it toward the ~2 chemical or ~2 mechanical slots accordingly
 - NEVER suggest a treatment without a preceding mite count check — always include alcohol wash checks in the rationale and space them no more than 4 weeks apart. If the beekeeper has no recent mite count, the rationale must recommend an alcohol wash BEFORE starting any treatment
 - Alcohol wash monitoring checks MUST be scheduled at least every 4 weeks throughout the active season (Sep–Apr). In winter (May–Aug) reduce to every 6–8 weeks — colonies are broodless or have minimal brood and 4-weekly washes are not appropriate. Never suggest 4-weekly washes in winter
-- Physical treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred where available
+- Heat treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred where available
 - OA treatments and heat are supers-compatible
 PLAN QUALITY — your suggested plan will be scored on these dimensions. Aim for a plan that would score 'Good' (70%+) or better on each:
 - Philosophy alignment: use only the treatments allowed for the beekeeper's philosophy
@@ -3676,7 +3676,7 @@ month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${
   const userMsg = `Today is ${todayLabel}. ${suggestMiteContext}
 The beekeeper's treatment history: ${historyContext}.
 Please suggest a plan for the next 12 months (from ${todayLabel}) using only their allowed treatments.
-Target approximately 2 chemical + 2 mechanical/physical treatments for a full year.
+Target approximately 2 chemical + 2 mechanical/heat treatments for a full year.
 If a recent treatment appears in the history (within last 8 weeks), count it toward the plan slots — do not re-suggest it.
 NEVER suggest starting a treatment without a mite count first. Space alcohol wash monitoring checks no more than 4 weeks apart.
 NEVER recommend an alcohol wash more than 4 weeks in the future during the active season (Sep–Apr). In winter (May–Aug) recommend 6–8 weekly intervals only.
@@ -4018,7 +4018,7 @@ function getConflicts(){
     start: monthFrac(e.year,e.month),
     end:   monthFrac(e.year,e.month) + durationInMonths(e.treatId),
     moa:   TREATMENTS[e.treatId]?.moa
-  })).filter(e => e.moa && e.moa !== 'Physical'); // Physical = no resistance, no conflict flagging
+  })).filter(e => e.moa && e.moa !== 'Heat'); // Physical = no resistance, no conflict flagging
   for(let i=0;i<all.length;i++){
     for(let j=i+1;j<all.length;j++){
       const a=all[i], b=all[j];
@@ -4336,7 +4336,7 @@ function drawTimeline(){
   const BAR_PAD = LANE_H * 0.14;     // inset within a lane
   const BAR_H = LANE_H - BAR_PAD*2;
 
-  const BAND_LABELS = ['Chemical','Mechanical','Physical Plan'];
+  const BAND_LABELS = ['Chemical','Mechanical','Heat Plan'];
   const BAND_COLORS = ['#7A9E8A','#8A7FAA','#B87840'];
   ctx.font='500 10px DM Sans,sans-serif';
   ctx.textAlign='right';
