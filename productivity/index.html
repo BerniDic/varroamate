@@ -3435,8 +3435,8 @@ function renderLosses(){
   data.forEach(l=>{
     const hive = _hives.find(h=>String(h.id)===String(l.hive_id));
     const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
-    const key  = String(ap?.id||'other');
-    if(!byApiary[key]) byApiary[key]={ap, items:[]};
+    const key  = String(ap?.id || l.apiary_name || 'other');
+    if(!byApiary[key]) byApiary[key]={ap, apiaryLabel: ap?.name || l.apiary_name || null, items:[]};
     byApiary[key].items.push({l, hive, ap});
   });
 
@@ -3444,11 +3444,11 @@ function renderLosses(){
   let html = summaryHtml;
 
   Object.values(byApiary).sort((a,b)=>{
-    if(!a.ap) return 1; if(!b.ap) return -1;
-    return a.ap.name.localeCompare(b.ap.name);
-  }).forEach(({ap, items})=>{
+    if(!a.ap && !a.apiaryLabel) return 1; if(!b.ap && !b.apiaryLabel) return -1;
+    return (a.ap?.name||a.apiaryLabel||'').localeCompare(b.ap?.name||b.apiaryLabel||'');
+  }).forEach(({ap, apiaryLabel, items})=>{
     if(multiAp){
-      html += `<div class="health-apiary-header">📍 ${ap?.name||'Other'}</div>`;
+      html += `<div class="health-apiary-header">📍 ${ap?.name || apiaryLabel || 'Other'}</div>`;
     }
     items.forEach(({l, hive, ap})=>{
       const dt = l.date ? new Date(l.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
@@ -3458,8 +3458,8 @@ function renderLosses(){
       const causeClass = isAbscond ? 'abscond' : (!l.cause ? 'unknown' : '');
       const confirmLabel = {suspected:'🤔 Suspected',confirmed:'✅ Confirmed',investigated:'🔬 Investigated'}[l.confirmation]||'';
       const isNotifiable = LOSS_NOTIFIABLE.includes(l.cause);
-      const hiveName = hive?.name||'Unknown hive';
-      const apLabel  = ap?.name ? `📍 ${ap.name}` : '';
+      const hiveName = hive?.name || l.hive_name || `Hive lost ${dt}`;
+      const apLabel  = (ap?.name || l.apiary_name) ? `📍 ${ap?.name || l.apiary_name}` : '';
 
       html += `<div class="loss-item" onclick="openLossModal('${l.id}')">
         <div class="loss-icon ${isAbscond?'abscond':''}">${isAbscond?'🏃':'🪦'}</div>
@@ -3542,6 +3542,10 @@ async function saveLoss(){
   if(!hive_id||!date||!loss_type){showToast('Please fill in hive, date and loss type.');return;}
   const btn = document.getElementById('lossSaveBtn');
   btn.textContent='Saving…';btn.disabled=true;
+  const hive = _hives.find(h=>String(h.id)===String(hive_id));
+  const ap   = hive ? _apiaries.find(a=>a.id===hive.apiary_id) : null;
+  const hiveName  = hive?.name || 'Unknown hive';
+  const apiaryName = ap?.name  || '';
   const payload = {
     user_id:      _user.id,
     hive_id,
@@ -3551,6 +3555,8 @@ async function saveLoss(){
     confirmation: getRating('lConfirmGroup')||null,
     last_strength:getRating('lStrengthGroup')||null,
     notes:        document.getElementById('lNotes').value||null,
+    hive_name:    hiveName,
+    apiary_name:  apiaryName,
   };
   let err;
   if(_editingLossId){
