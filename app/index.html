@@ -4595,12 +4595,18 @@ function printQR(){
     const qrImg=document.querySelector('#qr-canvas img');
     if(qrImg)src=qrImg.src;
   }
-  const html=`<!DOCTYPE html><html><head><title>QR — ${hiveName}</title>
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>QR — ${hiveName}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:sans-serif;text-align:center;padding:40px;background:#fff;}
     .label{border:2.5px solid #2C1A00;border-radius:14px;padding:22px 24px;display:inline-block;min-width:220px;}
-    .brand{font-size:16px;font-weight:700;color:#8B5200;letter-spacing:0.05em;margin-bottom:10px;}
+    .vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}
+    .vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}
+    .vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}
+    .vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}
+    .vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
     .hive{font-size:24px;font-weight:700;color:#2C1A00;margin-bottom:4px;}
     .code{font-family:monospace;font-size:15px;color:#9C7A4A;margin-bottom:10px;}
     img{display:block;margin:10px auto;}
@@ -4610,7 +4616,7 @@ function printQR(){
   </style></head>
   <body>
     <div class="label">
-      <div class="brand">🐝 VarroaMate™</div>
+      <div class="vm-logo"><span class="vm-bee">🐝</span><span class="vm-varroa">Varroa</span><span class="vm-mate">Mate</span><sup class="vm-tm">™</sup></div>
       <div class="hive">${hiveName}</div>
       <div class="code">${code}</div>
       ${src?`<img src="${src}" width="180" height="180" alt="QR code">`:'<p style="color:#c00;font-size:12px;padding:10px;">QR image unavailable — close and reopen the QR modal then try again</p>'}
@@ -4618,7 +4624,7 @@ function printQR(){
     </div>
     <br><button onclick="window.print()">🖨 Print</button></body></html>`;
   // Use blob URL to avoid popup blockers
-  const blob=new Blob([html],{type:'text/html'});
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const win=window.open(url,'_blank');
   if(!win){
@@ -4729,14 +4735,20 @@ function printAllQR(){
   }
   if(!allHives.length){showToast('No hives found — add some hives first');return;}
 
-  const win=window.open('','_blank','width=1000,height=700');
   const base=window.location.origin+'/app/';
   const baseVMP=window.location.origin+'/productivity/';
 
-  win.document.write(`<!DOCTYPE html><html><head><title>VarroaMate — QR Labels</title>
+  const _allQRhtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VarroaMate — QR Labels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:sans-serif;background:#fff;padding:20px;color:#2C1A00;}
+  .vm-logo{display:inline-flex;align-items:baseline;gap:0;line-height:1;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #F5D99A;}
+  .vm-bee{font-size:22px;margin-right:5px;line-height:1;align-self:center;}
+  .vm-varroa{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#8B5200;}
+  .vm-mate{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;font-style:italic;color:#F5A623;}
+  .vm-tm{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
   h1{font-size:20px;font-weight:700;color:#8B5200;margin-bottom:4px;}
   .subtitle{font-size:13px;color:#9C7A4A;margin-bottom:16px;}
   .instructions{background:#FFF3DC;border:1px solid #E8D5B0;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:#6B4C1E;line-height:1.65;}
@@ -4758,6 +4770,10 @@ function printAllQR(){
   .label-code{font-family:monospace;font-size:13px;font-weight:700;color:#8B5200;letter-spacing:0.1em;margin-top:5px;}
   .label-purpose{font-size:10px;color:#9C7A4A;margin-top:3px;line-height:1.4;}
   .cut-hint{font-size:9px;color:#C8820A;margin-top:8px;letter-spacing:0.05em;}
+  .card-logo{display:flex;align-items:baseline;justify-content:center;gap:0;margin-bottom:6px;}
+  .card-logo-varroa{font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;color:#8B5200;}
+  .card-logo-mate{font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;font-style:italic;color:#F5A623;}
+  .card-logo-tm{font-family:Arial,sans-serif;font-size:7px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
   .no-print{margin-top:24px;text-align:center;}
   button{padding:10px 24px;background:#8B5200;color:#fff;border:none;border-radius:20px;font-size:16px;font-weight:700;cursor:pointer;margin:0 6px;}
   button.sec{background:#F5EDD8;color:#8B5200;border:1px solid #E8D5B0;}
@@ -4787,18 +4803,20 @@ function printAllQR(){
   }
 </style>
 </head><body>
-<h1>🐝 VarroaMate™ — Hive QR Labels</h1>
+<div class="vm-logo"><span class="vm-bee">🐝</span><span class="vm-varroa">Varroa</span><span class="vm-mate">Mate</span><sup class="vm-tm">™</sup></div><h1 style="margin-top:0;">Hive QR Labels</h1>
 <div class="subtitle">${allHives.length} hive${allHives.length!==1?'s':''} · ${allHives.length*2} labels (VM + VMP per hive) · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}</div>
 
 <div class="instructions no-print">
   <h3>📋 Two labels per hive — VM (mite counts) and VMP (inspections)</h3>
   <ol>
+    <li><em>Log into VarroaMate and VarroaMate Productivity first</em> — open both apps in your browser and sign in before scanning any QR code. If you are not already logged in, scanning will take you to the login page instead of directly to the hive. Do this once on each device you plan to use in the field.</li>
     <li><em>Each hive gets a pair of labels</em> — the <strong style="color:#C8820A;">amber VM label</strong> opens mite count field entry in VarroaMate; the <strong style="color:#2C6E49;">green VMP label</strong> opens the inspection log in Productivity. The dashed line between them is the cut line.</li>
     <li><em>Print this page</em> — set margins to "Minimum" or "None". Two pairs per row when printed.</li>
     <li><em>Cut along the dashed line</em> — keeping both labels together or separating them as needed. You can attach both to the same hive box, or put the VM label on the hive and the VMP label in your inspection kit.</li>
     <li><em>Make it weatherproof</em> — laminate or cover with clear packing tape before attaching to the hive.</li>
   </ol>
   <div class="tip">💡 In the field: point your phone camera at the QR code — tap the notification to jump straight to that hive in the correct app. The 4-letter code below each QR is a manual fallback if the code is dirty or damaged.</div>
+  <div class="tip" style="margin-top:8px;background:#FFF3DC;border-color:#E8D5B0;">🖨️ <strong>Best printed in Chrome or Firefox.</strong> Safari and some other browsers may print across card boundaries, splitting labels between pages. If your printout looks misaligned, try reopening this page in Chrome or Firefox before printing.</div>
 </div>
 
 <div class="pairs-grid" id="qr-grid"></div>
@@ -4823,25 +4841,27 @@ hiveData.forEach(({hive,apiary,code})=>{
   const vmDiv = document.createElement('div');
   vmDiv.className = 'label-vm';
   vmDiv.innerHTML = \`
-    <div class="app-badge-vm">VarroaMate — VM</div>
+    <div class="card-logo"><span class="card-logo-varroa">Varroa</span><span class="card-logo-mate">Mate</span><sup class="card-logo-tm">&#x2122;</sup></div>
+    <div class="app-badge-vm">VM &mdash; Field Entry</div>
     <div class="label-apiary">\${apiary.name}</div>
     <div class="label-hive">\${hive.name}</div>
     <div class="label-qr" id="qr-vm-\${code}"></div>
     <div class="label-code">\${code}</div>
     <div class="label-purpose">Mite count field entry</div>
-    <div class="cut-hint">✂ - - - - - - - ✂</div>\`;
+    <div class="cut-hint">&#x2702; - - - - - - - &#x2702;</div>\`;
 
   // VMP label
   const vmpDiv = document.createElement('div');
   vmpDiv.className = 'label-vmp';
   vmpDiv.innerHTML = \`
-    <div class="app-badge-vmp">Productivity — VMP</div>
+    <div class="card-logo"><span class="card-logo-varroa">Varroa</span><span class="card-logo-mate">Mate</span><sup class="card-logo-tm">&#x2122;</sup></div>
+    <div class="app-badge-vmp">VMP &mdash; Inspection Log</div>
     <div class="label-apiary">\${apiary.name}</div>
     <div class="label-hive">\${hive.name}</div>
     <div class="label-qr" id="qr-vmp-\${code}"></div>
     <div class="label-code">\${code}</div>
     <div class="label-purpose">Inspection log</div>
-    <div class="cut-hint">✂ - - - - - - - ✂</div>\`;
+    <div class="cut-hint">&#x2702; - - - - - - - &#x2702;</div>\`;
 
   pair.appendChild(vmDiv);
   pair.appendChild(vmpDiv);
@@ -4860,9 +4880,14 @@ hiveData.forEach(({hive,apiary,code})=>{
   });
 });
 <\/script>
-</body></html>`);
-  win.document.close();
+</body></html>`;
+  const _allQRblob=new Blob([_allQRhtml],{type:'text/html;charset=utf-8'});
+  const _allQRurl=URL.createObjectURL(_allQRblob);
+  const win=window.open(_allQRurl,'_blank');
+  if(!win) window.location.href=_allQRurl;
+  setTimeout(()=>URL.revokeObjectURL(_allQRurl),15000);
 }
+
 
 
 // ══ HIVE STRENGTH (modal) ══
