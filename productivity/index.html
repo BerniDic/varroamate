@@ -1949,6 +1949,10 @@ body::before{
         placeholder="What did you observe? Any signs of disease, unusual behaviour, recent treatments…" rows="3"></textarea>
     </div>
 
+    <div id="lossNewWarning" style="margin-top:14px;padding:10px 12px;background:#FEF3CD;border:1.5px solid #F0C040;border-radius:var(--radius-sm);font-size:12px;color:#7A4A00;line-height:1.6;">
+      ⚠️ <strong>Before you save:</strong> This loss record cannot be undone. Once saved, you should also remove or archive this hive in <strong>VarroaMate</strong> to keep your records consistent — the hive will otherwise continue to appear in your mite count history, treatment records, and apiary lists.
+    </div>
+
     <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap;">
       <button class="btn btn-outline" id="lossDeleteBtn" onclick="deleteLoss()"
         style="display:none;color:#B03030;border-color:#E0B0B0;">🗑 Delete</button>
@@ -3484,6 +3488,7 @@ function openLossModal(editId=null){
   document.getElementById('lHiveLabel').textContent = '';
   document.getElementById('lossDeleteBtn').style.display = editId ? 'inline-flex' : 'none';
   document.getElementById('lossNotifiableWarning').style.display = 'none';
+  document.getElementById('lossNewWarning').style.display = editId ? 'none' : 'block';
   ['lTypeGroup','lConfirmGroup','lStrengthGroup'].forEach(clearRatings);
 
   if(editId){
