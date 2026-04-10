@@ -6338,8 +6338,6 @@ window.addEventListener('DOMContentLoaded', () => {
       btn.onclick = () => gotoScreen('screen-planner');
     }
   }
-  const pbw = document.getElementById('paletteBodyWrap');
-  if(pbw) pbw.style.maxHeight = pbw.scrollHeight + 'px';
   gotoScreen(_discAcked ? 'screen-planner' : 'screen-mission');
 });
 
