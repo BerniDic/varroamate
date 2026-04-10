@@ -1884,7 +1884,6 @@ body::before{
       <div class="rating-group" id="lTypeGroup">
         <div class="rating-opt" data-val="deadout"   onclick="selectRating(this,'lTypeGroup')">🪦 Dead-out</div>
         <div class="rating-opt" data-val="abscond"   onclick="selectRating(this,'lTypeGroup')">🏃 Absconded</div>
-        <div class="rating-opt" data-val="absconded-swarm" onclick="selectRating(this,'lTypeGroup')">🐝 Swarm loss</div>
       </div>
     </div>
 
@@ -3419,7 +3418,7 @@ function renderLosses(){
 
   // Loss summary strip
   const deadouts  = data.filter(l=>l.loss_type==='deadout').length;
-  const absconds  = data.filter(l=>l.loss_type==='abscond'||l.loss_type==='absconded-swarm').length;
+  const absconds  = data.filter(l=>l.loss_type==='abscond').length;
   const varroa    = data.filter(l=>l.cause?.startsWith('varroa')).length;
   const notifiable= data.filter(l=>LOSS_NOTIFIABLE.includes(l.cause)).length;
 
@@ -3452,8 +3451,8 @@ function renderLosses(){
     }
     items.forEach(({l, hive, ap})=>{
       const dt = l.date ? new Date(l.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
-      const isAbscond = l.loss_type==='abscond'||l.loss_type==='absconded-swarm';
-      const typeLabel = {deadout:'🪦 Dead-out', abscond:'🏃 Absconded', 'absconded-swarm':'🐝 Swarm loss'}[l.loss_type]||l.loss_type;
+      const isAbscond = l.loss_type==='abscond';
+      const typeLabel = {deadout:'🪦 Dead-out', abscond:'🏃 Absconded', 'absconded-swarm':'🏃 Absconded'}[l.loss_type]||l.loss_type;
       const causeLabel = l.cause ? (LOSS_CAUSE_LABELS[l.cause]||l.cause) : 'Unknown cause';
       const causeClass = isAbscond ? 'abscond' : (!l.cause ? 'unknown' : '');
       const confirmLabel = {suspected:'🤔 Suspected',confirmed:'✅ Confirmed',investigated:'🔬 Investigated'}[l.confirmation]||'';
