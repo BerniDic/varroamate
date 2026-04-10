@@ -4669,11 +4669,10 @@ function printAllQR(){
   }
   if(!allHives.length){showToast('No hives found — add some hives first');return;}
 
-  const win=window.open('','_blank','width=1000,height=700');
   const base=window.location.origin+'/app/';
   const baseVMP=window.location.origin+'/productivity/';
 
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VarroaMate — QR Labels</title>
+  const _allQRhtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VarroaMate — QR Labels</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
@@ -4807,8 +4806,12 @@ hiveData.forEach(({hive,apiary,code})=>{
   });
 });
 <\/script>
-</body></html>`);
-  win.document.close();
+</body></html>`;
+  const _allQRblob=new Blob([_allQRhtml],{type:'text/html;charset=utf-8'});
+  const _allQRurl=URL.createObjectURL(_allQRblob);
+  const win=window.open(_allQRurl,'_blank');
+  if(!win) window.location.href=_allQRurl;
+  setTimeout(()=>URL.revokeObjectURL(_allQRurl),15000);
 }
 
 
