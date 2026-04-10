@@ -2008,6 +2008,27 @@ body::before{
   </div>
 </div>
 
+<!-- COLONY LOSS CONDOLENCE PANEL -->
+<div class="modal-overlay" id="lossCondolenceModal">
+  <div class="modal" style="max-width:400px;text-align:center;">
+    <div style="font-size:36px;margin-bottom:10px;">🪦</div>
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700;color:var(--terra-deep);margin-bottom:8px;">We're sorry for your loss.</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">Losing a colony is one of the harder parts of beekeeping. The loss has been recorded — building that picture over time helps you spot patterns and make better decisions for your remaining hives.</p>
+    <div style="background:var(--terra-pale);border:1.5px solid var(--terra-mid);border-radius:var(--radius-sm);padding:14px 16px;text-align:left;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--terra-deep);margin-bottom:6px;">🐝 Give your hives the best possible chance</div>
+      <p style="font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:8px;">While no tool can guarantee colony survival, the VarroaMate suite is designed to give you every advantage:</p>
+      <ul style="font-size:12px;color:var(--text2);line-height:1.8;padding-left:16px;margin-bottom:0;">
+        <li><strong>VarroaMate</strong> — track mite loads and act before populations reach dangerous levels</li>
+        <li><strong>Smart Planner</strong> — build a structured annual treatment plan with resistance rotation and seasonal timing</li>
+        <li><strong>Day Plans</strong> — step-by-step implementation guides for mechanical treatments like heat treatment and brood breaks</li>
+        <li><strong>VarroaMate Productivity</strong> — monitor colony health trends, queen histories, and connect treatment outcomes to hive performance over time</li>
+      </ul>
+    </div>
+    <p style="font-size:11px;color:var(--text3);line-height:1.6;margin-bottom:16px;">AI-powered guidance is available across all apps with a paid subscription — personalised to your hives, your location, and your treatment approach.</p>
+    <button class="btn btn-honey" style="width:100%;" onclick="closeModal('lossCondolenceModal')">Close</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="queenModal">
   <div class="modal">
     <div class="modal-head">
@@ -3583,7 +3604,11 @@ async function saveLoss(){
   btn.textContent='Save';btn.disabled=false;
   if(err){showToast('Error: '+err.message);return;}
   closeModal('lossModal');
-  showToast(_editingLossId?'Loss record updated ✓':'Colony loss recorded 🪦');
+  if(_editingLossId){
+    showToast('Loss record updated ✓');
+  } else {
+    openModal('lossCondolenceModal');
+  }
   await loadAllData();
 }
 
