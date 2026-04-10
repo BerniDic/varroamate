@@ -2078,6 +2078,13 @@ function canAddHive(){
 
 function requireAI(action){
   if(_planLimits.ai) return true;
+  const msgs = {
+    planner: '🧠 The Smart Planner requires a subscription — upgrade in Settings to access it.',
+    guidance: '🔒 AI guidance requires a subscription — upgrade to unlock personalised advice.',
+    chat:     '🔒 The AI assistant requires a subscription — upgrade to unlock it.',
+    voice:    '🔒 Voice entry requires a subscription — upgrade to unlock it.',
+  };
+  showToast(msgs[action] || '🔒 This feature requires a subscription — upgrade to unlock it.');
   return false;
 }
 
