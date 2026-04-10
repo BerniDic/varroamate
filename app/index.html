@@ -4704,6 +4704,10 @@ function printAllQR(){
   .label-code{font-family:monospace;font-size:13px;font-weight:700;color:#8B5200;letter-spacing:0.1em;margin-top:5px;}
   .label-purpose{font-size:10px;color:#9C7A4A;margin-top:3px;line-height:1.4;}
   .cut-hint{font-size:9px;color:#C8820A;margin-top:8px;letter-spacing:0.05em;}
+  .card-logo{display:flex;align-items:baseline;justify-content:center;gap:0;margin-bottom:6px;}
+  .card-logo-varroa{font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;color:#8B5200;}
+  .card-logo-mate{font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;font-style:italic;color:#F5A623;}
+  .card-logo-tm{font-family:Arial,sans-serif;font-size:7px;font-weight:700;color:#F5A623;vertical-align:super;margin-left:1px;}
   .no-print{margin-top:24px;text-align:center;}
   button{padding:10px 24px;background:#8B5200;color:#fff;border:none;border-radius:20px;font-size:16px;font-weight:700;cursor:pointer;margin:0 6px;}
   button.sec{background:#F5EDD8;color:#8B5200;border:1px solid #E8D5B0;}
@@ -4769,25 +4773,27 @@ hiveData.forEach(({hive,apiary,code})=>{
   const vmDiv = document.createElement('div');
   vmDiv.className = 'label-vm';
   vmDiv.innerHTML = \`
-    <div class="app-badge-vm">VarroaMate — VM</div>
+    <div class="card-logo"><span class="card-logo-varroa">Varroa</span><span class="card-logo-mate">Mate</span><sup class="card-logo-tm">&#x2122;</sup></div>
+    <div class="app-badge-vm">VM &mdash; Field Entry</div>
     <div class="label-apiary">\${apiary.name}</div>
     <div class="label-hive">\${hive.name}</div>
     <div class="label-qr" id="qr-vm-\${code}"></div>
     <div class="label-code">\${code}</div>
     <div class="label-purpose">Mite count field entry</div>
-    <div class="cut-hint">✂ - - - - - - - ✂</div>\`;
+    <div class="cut-hint">&#x2702; - - - - - - - &#x2702;</div>\`;
 
   // VMP label
   const vmpDiv = document.createElement('div');
   vmpDiv.className = 'label-vmp';
   vmpDiv.innerHTML = \`
-    <div class="app-badge-vmp">Productivity — VMP</div>
+    <div class="card-logo"><span class="card-logo-varroa">Varroa</span><span class="card-logo-mate">Mate</span><sup class="card-logo-tm">&#x2122;</sup></div>
+    <div class="app-badge-vmp">VMP &mdash; Inspection Log</div>
     <div class="label-apiary">\${apiary.name}</div>
     <div class="label-hive">\${hive.name}</div>
     <div class="label-qr" id="qr-vmp-\${code}"></div>
     <div class="label-code">\${code}</div>
     <div class="label-purpose">Inspection log</div>
-    <div class="cut-hint">✂ - - - - - - - ✂</div>\`;
+    <div class="cut-hint">&#x2702; - - - - - - - &#x2702;</div>\`;
 
   pair.appendChild(vmDiv);
   pair.appendChild(vmpDiv);
