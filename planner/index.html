@@ -1780,9 +1780,12 @@ const PREFS = [
   {id:'organic-first',icon:'🌿',  name:'Organic-First with Emergency Synthetic',
    desc:'Organic acids as primary; synthetics only if infestation becomes critical.',
    allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
+  {id:'organic-heat', icon:'🌿🌡️', name:'Organic + Heat Treatment',
+   desc:'Organic acids and thymol combined with Varroa Controller heat treatment. No synthetic chemicals.',
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','heat','duplex']},
   {id:'organic',      icon:'🍃',  name:'Organic-Only Strategy',
-   desc:'Organic acids exclusively. No synthetic chemicals.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
+   desc:'Organic acids and thymol exclusively. No synthetics, no heat device, no mechanical methods.',
+   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard']},
   {id:'mech-organic', icon:'🔩',  name:'Mechanical + Organic Strategy',
    desc:'Mechanical/heat combined with organic acids. No synthetics.',
    allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
@@ -2554,6 +2557,7 @@ const VM_PREF_MAP = {
   'Integrated Chemical & Non-Chemical':       'integrated',
   'Integrated Chemical &amp; Non-Chemical':   'integrated', // HTML-encoded variant
   'Organic-First with Emergency Synthetic':   'organic-first',
+  'Organic + Heat Treatment':                 'organic-heat',
   'Organic-Only Strategy':                    'organic',
   'Mechanical + Organic Strategy':            'mech-organic',
   'Mechanical Strategy Only':                 'mechanical',
@@ -3674,7 +3678,8 @@ NEVER recommend an alcohol wash more than 4 weeks in the future during the activ
 Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
 Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul). Do not suggest anything more than 12 months from today — the planning horizon ends at ${MONTHS[(todayMonth+12)%12]} ${todayMonth >= 0 ? todayYear + Math.floor((todayMonth+12)/12) : todayYear+1}. Any treatment beyond this will be rejected and will not appear in the timeline.
 Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale honestly — do not suggest an ineffective plan and score it as good.
-ORGANIC-ONLY PHILOSOPHY: If the philosophy is organic-only, the strongest available treatments are OA vaporisation (spring/winter), Formic PRO (spring/autumn), Aluen CAP (spring/summer/autumn), and Apiguard/ApiLife (spring/summer). Pair these with mechanical options (drone comb removal, brood interruption in Jan–Feb). OA vap in September is the critical spring treatment — always include it. If mite pressure is critical and organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers emergency synthetic treatment.
+ORGANIC-ONLY PHILOSOPHY: If the philosophy is Organic-Only Strategy, permitted treatments are OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, and Apiguard. No synthetics, no heat device, no mechanical methods. If mite pressure is so high that organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers upgrading to Organic + Heat Treatment or consulting their state authority.
+ORGANIC + HEAT PHILOSOPHY: If the philosophy is Organic + Heat Treatment, permitted treatments are OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Heat Treatment (Varroa Controller), and Duplex-Framebox Plan. No synthetics, no drone comb removal, no brood interruption. Pair organic acids with heat treatment for comprehensive coverage — OA vap targets phoretic mites, heat treatment kills mites in capped brood. If mite pressure is so high that this strategy cannot realistically achieve colony survival, say so clearly but do not suggest synthetics.
 MECHANICAL-ONLY PHILOSOPHY: If the philosophy is Mechanical Strategy Only, the ONLY permitted treatments are Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), and Duplex-Framebox Plan. NEVER suggest any chemical treatment — not Apitraz, Apistan, Apivar, Bayvarol, OA vaporisation, Formic PRO, or any other chemical or organic acid — regardless of mite pressure. If mite pressure is so high that mechanical-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper reconsiders their strategy, but do not suggest chemicals.
 SPRING RULE: If the plan spans across a winter period (May–Jul), always include a treatment in September (month 8) — the first full spring month — not later. September is the critical early-spring window when the brood nest is smallest and mite concentration is highest. Never skip September in favour of October or later if the plan covers post-winter months.`;
 
