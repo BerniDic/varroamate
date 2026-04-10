@@ -1950,7 +1950,7 @@ body::before{
     </div>
 
     <div id="lossNewWarning" style="margin-top:14px;padding:10px 12px;background:#FEF3CD;border:1.5px solid #F0C040;border-radius:var(--radius-sm);font-size:12px;color:#7A4A00;line-height:1.6;">
-      ⚠️ <strong>Before you save:</strong> This loss record cannot be undone. Once saved, you should also remove or archive this hive in <strong>VarroaMate</strong> to keep your records consistent — the hive will otherwise continue to appear in your mite count history, treatment records, and apiary lists.
+      ⚠️ <strong>This cannot be undone.</strong> Saving this loss will permanently delete the hive and all its associated records — mite counts, treatments, inspections, harvests, and queen history — from VarroaMate. The loss record itself will be retained for your statistics.
     </div>
 
     <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap;">
@@ -3564,6 +3564,18 @@ async function saveLoss(){
   if(_editingLossId){
     showToast('Loss record updated ✓');
   } else {
+    // Delete the hive and all associated records from Supabase
+    const uid = _user.id;
+    const hid = hive_id;
+    await Promise.all([
+      _sb.from('mite_counts').delete().eq('hive_id', hid).eq('user_id', uid),
+      _sb.from('treatments').delete().eq('hive_id', hid).eq('user_id', uid),
+      _sb.from('notes').delete().eq('hive_id', hid).eq('user_id', uid),
+      _sb.from('inspections').delete().eq('hive_id', hid).eq('user_id', uid),
+      _sb.from('harvests').delete().eq('hive_id', hid).eq('user_id', uid),
+      _sb.from('queens').delete().eq('hive_id', hid).eq('user_id', uid),
+    ]);
+    await _sb.from('hives').delete().eq('id', hid).eq('user_id', uid);
     openModal('lossCondolenceModal');
   }
   await loadAllData();
