@@ -1788,7 +1788,7 @@ const PREFS = [
    allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
   {id:'mechanical',   icon:'🔧',  name:'Mechanical Strategy Only',
    desc:'Mechanical/heat only. Zero chemicals of any kind.',
-   allowed:['drone-comb','brood-int','heat','duplex','apitraz','apistan']},
+   allowed:['drone-comb','brood-int','heat','duplex']},
 ];
 
 const TREATMENTS = {
@@ -3675,6 +3675,7 @@ Do not recommend prophylactic chemical treatments — mite pressure must exceed 
 Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (May–Jul). Do not suggest anything more than 12 months from today — the planning horizon ends at ${MONTHS[(todayMonth+12)%12]} ${todayMonth >= 0 ? todayYear + Math.floor((todayMonth+12)/12) : todayYear+1}. Any treatment beyond this will be rejected and will not appear in the timeline.
 Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale honestly — do not suggest an ineffective plan and score it as good.
 ORGANIC-ONLY PHILOSOPHY: If the philosophy is organic-only, the strongest available treatments are OA vaporisation (spring/winter), Formic PRO (spring/autumn), Aluen CAP (spring/summer/autumn), and Apiguard/ApiLife (spring/summer). Pair these with mechanical options (drone comb removal, brood interruption in Jan–Feb). OA vap in September is the critical spring treatment — always include it. If mite pressure is critical and organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers emergency synthetic treatment.
+MECHANICAL-ONLY PHILOSOPHY: If the philosophy is Mechanical Strategy Only, the ONLY permitted treatments are Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), and Duplex-Framebox Plan. NEVER suggest any chemical treatment — not Apitraz, Apistan, Apivar, Bayvarol, OA vaporisation, Formic PRO, or any other chemical or organic acid — regardless of mite pressure. If mite pressure is so high that mechanical-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper reconsiders their strategy, but do not suggest chemicals.
 SPRING RULE: If the plan spans across a winter period (May–Jul), always include a treatment in September (month 8) — the first full spring month — not later. September is the critical early-spring window when the brood nest is smallest and mite concentration is highest. Never skip September in favour of October or later if the plan covers post-winter months.`;
 
   _suggestHistory = [{role:'user', content: userMsg}];
