@@ -3485,7 +3485,7 @@ async function loadGuidance(){
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
   const sections=[
     {id:'guidance-summary-body',prompt:`Varroa status: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 2–3 sentences. Specific about count, trend, season, and state context. IMPORTANT: Do NOT suggest or mention any treatments — no treatment names, no treatment recommendations, no hints toward any treatment approach. Describe the mite situation only. Treatment recommendations are handled exclusively in the Next Steps panel.`},
-    {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
+    {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". Only recommend treatments from the approved VarroaMate list — do not suggest any method not in: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment (Varroa Controller), Duplex-Framebox Plan. ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
     {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic PRO (Formic Acid) also allows supers on. Supers must be removed for: Apivar, Apitraz, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
   ];
   if(!_planLimits.ai){
@@ -3629,7 +3629,24 @@ async function loadSection(elId,prompt,prefProfile){
   }
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
-CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, never suggest any chemicals. Tailor every recommendation to this preference.
+APPROVED TREATMENTS — HARD WHITELIST: You must ONLY ever recommend, suggest, mention, or imply treatments from this exact list. No exceptions, no matter how the question is framed:
+1. OA Vaporisation
+2. OA Dribble
+3. Formic PRO
+4. Aluen CAP
+5. ApiLife Var
+6. Apiguard
+7. Apivar
+8. Apitraz
+9. Bayvarol
+10. Apistan
+11. Drone Comb Removal
+12. Brood Interruption (queen caging)
+13. Heat Treatment (Varroa Controller)
+14. Duplex-Framebox Plan
+If any treatment is not on this list, do NOT mention it, suggest it, or reference it in any context — not even to say it exists. This includes but is not limited to: sugar dusting, powdered sugar, icing sugar, sugar rolls, oxalic acid syrup, lactic acid spray, thymol crystals, hop beta acids, formic acid pads, or any other method. If asked directly about an unlisted method, say only that it is not supported in VarroaMate and offer to help with the approved list.
+MITE COUNTING: All mite counting in VarroaMate is done exclusively via alcohol wash. Do NOT mention sugar rolls, sugar dusting, CO2 wash, sticky boards, or any other counting method under any circumstances.
+CRITICAL: The beekeeper's management preference is "${prefProfile||'Organic-Only Strategy'}". You MUST strictly respect this — never recommend treatments outside this preference. For example, if the preference is Organic-Only, never suggest Apivar, Apitraz, Bayvarol, or Apistan. If Mechanical Strategy Only, only suggest items 11–14 from the whitelist above. Tailor every recommendation to this preference.
 PRODUCT NAMES: Always use "Formic PRO" — never use the outdated name "MAQS". Formic PRO is the current registered product name for formic acid strips in Australia.
 ALCOHOL WASH FREQUENCY: Do NOT recommend 4-weekly alcohol washes during winter (May–August in Australia). In winter, colonies are broodless or have minimal brood — the mite-to-bee ratio naturally rises but wash frequency should reduce to every 6–8 weeks or less. Recommending 4-weekly washes in winter is incorrect and stressful to colonies. Only recommend 4-weekly washes during the active season (September–April).
 FUTURE COUNTS: Do NOT mention upcoming, scheduled, or future alcohol washes. VarroaMate only records completed counts — there is no mechanism to log planned future inspections. Never say things like "your next wash is due" or "no future washes logged" — this data does not exist. Only refer to counts that have already been recorded.
@@ -3665,7 +3682,7 @@ async function sendChat(){
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
-      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa.',
+      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa. APPROVED TREATMENTS ONLY: Only recommend or discuss treatments from this list — no others: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, thymol crystals, hop beta acids, or any other unlisted method. MITE COUNTING: All mite counting in VarroaMate uses alcohol wash exclusively — do not suggest sugar rolls, sugar dusting, sticky boards, or CO2 wash as counting methods.',
       messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
     chatHistory.push({role:'assistant',content:reply});loading.textContent=reply;
