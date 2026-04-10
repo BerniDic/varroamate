@@ -915,16 +915,60 @@ html, body {
 </head>
 <body>
 
-<!-- ══ NEW FEATURE BANNER ══ -->
-<div style="
+<!-- ══ DID YOU KNOW BANNER ══ -->
+<div id="dyk-banner" style="
   position:fixed;top:0;left:0;right:0;z-index:10000;
   background:linear-gradient(90deg,#2C6E49,#3A9463);
-  color:white;text-align:center;
-  padding:11px 16px;
+  color:white;
+  padding:11px 48px 11px 16px;
   font-family:'DM Sans',sans-serif;font-size:14px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.25);">
-  🆕 <strong>New in VarroaMate:</strong> Hives can now be moved between apiaries — QR codes and hive IDs stay put. Perfect for pollination runs and chasing honey flows. 🍯
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+  min-height:42px;display:flex;align-items:center;justify-content:center;">
+  <span id="dyk-text" style="text-align:center;line-height:1.4;transition:opacity 0.4s;"></span>
+  <button onclick="dykDismiss()" aria-label="Dismiss" style="
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    background:rgba(255,255,255,0.18);border:none;color:white;
+    width:26px;height:26px;border-radius:50%;font-size:16px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
 </div>
+<script>
+(function(){
+  const tips = [
+    '🆕 <strong>New in VarroaMate:</strong> Hives can now be moved between apiaries — QR codes and hive IDs stay put. Perfect for pollination runs and chasing honey flows. 🍯',
+    '💡 <strong>Did you know?</strong> You can use <strong>voice entry</strong> and <strong>QR codes</strong> to enter mite counts in VarroaMate — and log entire hive inspections in the Productivity App — without typing a thing.',
+    '🧼 <strong>Did you know?</strong> Our <strong>Hygiene App</strong> provides sanitation advice tailored specifically to your toolset — so you clean what matters, the right way, every time.',
+    '📅 <strong>Did you know?</strong> The <strong>Smart Planner</strong> lets you generate a seasonal Varroa treatment plan in seconds, or build your own from scratch — with resistance rotation, timing windows, and a live plan score.',
+  ];
+  let idx = 0;
+  const el = document.getElementById('dyk-text');
+  const banner = document.getElementById('dyk-banner');
+
+  function show(i){
+    el.style.opacity = 0;
+    setTimeout(()=>{
+      el.innerHTML = tips[i];
+      el.style.opacity = 1;
+    }, 400);
+  }
+
+  function advance(){
+    idx = (idx + 1) % tips.length;
+    show(idx);
+  }
+
+  window.dykDismiss = function(){
+    banner.style.transition = 'opacity 0.3s';
+    banner.style.opacity = 0;
+    setTimeout(()=>{ banner.style.display = 'none'; }, 300);
+    clearInterval(window._dykTimer);
+  };
+
+  // Start on a random tip so repeat visitors see variety
+  idx = Math.floor(Math.random() * tips.length);
+  show(idx);
+  window._dykTimer = setInterval(advance, 7000);
+})();
+</script>
 
 
 <div id="scene">
