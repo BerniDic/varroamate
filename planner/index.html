@@ -3357,11 +3357,7 @@ Always use MoA from the plan summary — never infer from context.`;
       throw new Error('API error: '+(data.error?.message||data.error?.type||JSON.stringify(data).slice(0,100)));
     }
     const text = data.content?.map(b=>b.text||'').join('') || 'Unable to load advice.';
-    body.innerHTML = text
-      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-      .replace(/^#{1,4}\s*(.+)$/gm,'<h4>$1</h4>')
-      .replace(/\n\n/g,'<br><br>')
-      .replace(/\n/g,'<br>');
+    body.innerHTML = renderAIMarkdown(text);
   } catch(e) {
     console.error('[VMSP AI]', e);
     body.innerHTML = `<p style="color:var(--text2)">AI advice unavailable: ${e.message||'connection error'}. Here's a quick analysis based on your scores:</p>` + localAdvice(result);
@@ -6380,6 +6376,18 @@ function renderHeatPlanner(){
 }
 
 let vmspChatHistory = [];
+function renderAIMarkdown(text){
+  if(!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
+    .replace(/\n\n/g,'</p><p style="margin-top:6px;">')
+    .replace(/\n/g,'<br>');
+}
+
 function vmspToggleChat(){
   const p = document.getElementById('vmsp-chat-panel');
   p.classList.toggle('open');
@@ -6417,7 +6425,7 @@ DAY PLANS: When discussing mechanical treatments — Drone Comb Removal, Brood I
     const data = await r.json();
     const reply = data.content?.map(b=>b.text||'').join('') || 'Sorry, could not respond.';
     vmspChatHistory.push({role:'assistant', content:reply});
-    loading.textContent = reply;
+    loading.innerHTML = renderAIMarkdown(reply);
   } catch(e){
     loading.textContent = 'Connection failed. Please try again.';
   }
