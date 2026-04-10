@@ -833,7 +833,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           </div>
           <span id="paletteChevron" style="font-size:22px;color:var(--sage);transition:transform 0.25s;margin-left:auto;line-height:1;">▴</span>
         </div>
-        <div id="paletteBodyWrap" style="overflow:hidden;transition:max-height 0.3s ease;">
+        <div id="paletteBodyWrap" style="overflow:hidden;transition:max-height 0.3s ease;max-height:2000px;">
           <div class="palette-body" id="paletteBody"></div>
         </div>
       </div>
@@ -3485,7 +3485,7 @@ function togglePalette(){
   _paletteOpen = !_paletteOpen;
   const wrap = document.getElementById('paletteBodyWrap');
   const chev = document.getElementById('paletteChevron');
-  if(wrap) wrap.style.maxHeight = _paletteOpen ? wrap.scrollHeight + 'px' : '0';
+  if(wrap) wrap.style.maxHeight = _paletteOpen ? '2000px' : '0';
   if(chev) chev.style.transform = _paletteOpen ? '' : 'rotate(180deg)';
 }
 function _setPaletteVisible(v){
