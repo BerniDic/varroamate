@@ -3507,7 +3507,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   // Navigation is handled by the async BOOT handler below — do not navigate here
 });
-async function loadGuidance(){
+async 
+function renderAIMarkdown(text){
+  if(!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
+    .replace(/\n\n/g,'</p><p style="margin-top:6px;">')
+    .replace(/\n/g,'<br>');
+}
+
+function loadGuidance(){
   const hive=Object.values(hives).flat().find(h=>h.id===currentHiveId);
   const ap=apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===currentHiveId));
   const counts=miteCountsByHive[currentHiveId]||[];
@@ -3708,7 +3721,7 @@ AUSTRALIAN DISEASES ONLY: Only reference diseases established in Australia — A
       system:systemPrompt,
       messages:[{role:'user',content:prompt}]});
     if(data.error){el.innerHTML=`<span style="color:var(--red);">Error: ${data.error.message}</span>`;return;}
-    el.innerHTML=(data.content?.map(b=>b.text||'').join('')||'Unable to load guidance.').replace(/\n/g,'<br>');
+    el.innerHTML=renderAIMarkdown(data.content?.map(b=>b.text||'').join('')||'Unable to load guidance.');
   }catch(e){el.innerHTML='<span style="color:var(--text3)">Unable to connect. Please check your internet connection.</span>';}
 }
 
@@ -3735,7 +3748,7 @@ async function sendChat(){
       system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa. APPROVED TREATMENTS ONLY: Only recommend or discuss treatments from this list — no others: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, thymol crystals, hop beta acids, or any other unlisted method. MITE COUNTING: All mite counting in VarroaMate uses alcohol wash exclusively — do not suggest sugar rolls, sugar dusting, sticky boards, or CO2 wash as counting methods.',
       messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
-    chatHistory.push({role:'assistant',content:reply});loading.textContent=reply;
+    chatHistory.push({role:'assistant',content:reply});loading.innerHTML=renderAIMarkdown(reply);
   }catch(e){loading.textContent='Connection failed. Please try again.';}
   const msgs=document.getElementById('chat-messages');msgs.scrollTop=msgs.scrollHeight;
 }
