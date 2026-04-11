@@ -1353,7 +1353,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         </div>
         <div class="lib-section">
           <div class="lib-section-title">Resistance risk</div>
-          <p>Amitraz resistance in Varroa has been documented in multiple countries. In 2024–25, NSW DPIRD confirmed the first cases of suspected amitraz resistance in Australian Varroa populations. Resistance develops when colonies are treated repeatedly with the same mode of action — mites with slightly altered octopamine receptors survive, reproduce, and pass on resistance. Rotation with other modes of action (organic acids, essential oils, physical methods) is strongly recommended to slow resistance development.</p>
+          <p>Amitraz resistance in Varroa has been documented in multiple countries. Amitraz resistance has now been confirmed in NSW (April 2026) — in the same populations previously confirmed for pyrethroid resistance in northern NSW. Amitraz resistance was also previously confirmed in south-east Queensland. Resistance develops when colonies are treated repeatedly with the same mode of action — mites with slightly altered octopamine receptors survive, reproduce, and pass on resistance. Where resistance is confirmed, Apivar and Apitraz are less likely to be effective and complete treatment failure has been reported in some cases. For the majority of beekeepers in NSW and QLD where resistance is not yet confirmed, treatments should remain effective. Rotation with other modes of action is strongly recommended to slow further spread.</p>
         </div>
         <div class="lib-section">
           <div class="lib-section-title">How it affects bees</div>
@@ -1392,7 +1392,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         </div>
         <div class="lib-section">
           <div class="lib-section-title">Resistance — a serious concern</div>
-          <p>Pyrethroid resistance in Varroa is widespread globally and well-documented in Australia. Resistance arises through mutations in the sodium channel target site (knockdown resistance, kdr) that reduce binding affinity, as well as through upregulation of metabolic detoxification enzymes. In resistant populations, treatment efficacy drops dramatically — field studies have recorded efficacies below 20% in some resistant Australian populations. <strong>Varroa populations should be tested for pyrethroid susceptibility before use.</strong> NSW DPIRD has confirmed resistance in multiple NSW apiaries. Pyrethroids should not be used as a first-line treatment in areas with known resistance.</p>
+          <p>Pyrethroid resistance in Varroa is widespread globally and confirmed in Australia. In northern NSW, pyrethroid resistance (L925I mutation) was confirmed in January 2026, and the same populations have now also been confirmed for amitraz resistance (April 2026). Pyrethroid and amitraz resistance has also been confirmed in south-east Queensland. Resistance arises through mutations in the sodium channel target site (knockdown resistance, kdr) that reduce binding affinity. In resistant populations, treatment efficacy drops dramatically. <strong>NSW and QLD beekeepers should monitor treatment efficacy closely with a post-treatment alcohol wash.</strong> For beekeepers outside confirmed resistance zones, pyrethroids remain an option but MoA rotation is essential. NSW DPIRD advises that the geographical spread of resistance currently appears limited.</p>
         </div>
         <div class="lib-section">
           <div class="lib-section-title">How it affects bees</div>
@@ -3549,7 +3549,7 @@ async function loadGuidance(){
   const month=new Date().getMonth(); // 0=Jan
   const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
   const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||'Australia (state unknown)',varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
-  const pyrethreidWarning=state==='NSW'||state==='ACT'?'IMPORTANT: Pyrethroid-resistant varroa (L925I mutation) confirmed in northern NSW January 2026. If recommending Bayvarol or Apistan, include a strong caution to monitor post-treatment efficacy and contact NSW DPIRD if poor knock-down is observed.':'';
+  const pyrethreidWarning=state==='NSW'||state==='ACT'?'IMPORTANT (April 2026 update): Pyrethroid resistance (L925I) AND amitraz resistance are now both confirmed in northern NSW populations. The same populations previously confirmed for pyrethroid resistance are also confirmed for amitraz resistance. Pyrethroid and amitraz resistance is also confirmed in south-east QLD. If recommending Bayvarol, Apistan, Apivar, or Apitraz in NSW or QLD, include a strong caution: these treatments may be ineffective in affected areas. Recommend a post-treatment alcohol wash at day 14–21 to confirm efficacy, and advise the beekeeper to contact NSW DPIRD if poor knock-down is observed. For beekeepers NOT in confirmed resistance zones, treatments should remain effective — but MoA rotation is essential. NSW DPIRD advises the geographical spread appears currently limited.':'';
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
   const sections=[
     {id:'guidance-summary-body',prompt:`Varroa status: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 2–3 sentences. Specific about count, trend, season, and state context. IMPORTANT: Do NOT suggest or mention any treatments — no treatment names, no treatment recommendations, no hints toward any treatment approach. Describe the mite situation only. Treatment recommendations are handled exclusively in the Next Steps panel.`},
@@ -3821,7 +3821,7 @@ const STATE_DATA = {
     label: 'NSW — Varroa established',
     statusColor: '#E74C3C',
     statusBg: '#FDEDEC',
-    summary: 'Varroa established across NSW. Treatment is expected when thresholds are met. ⚠️ Pyrethroid-resistant varroa (L925I mutation) confirmed in northern NSW, January 2026 — monitor Bayvarol and Apistan efficacy closely.',
+    summary: 'Varroa established across NSW. Treatment is expected when thresholds are met. ⚠️ APRIL 2026: Pyrethroid resistance (L925I) AND amitraz resistance now both confirmed in northern NSW populations. Monitor Bayvarol, Apistan, Apivar and Apitraz efficacy closely with post-treatment alcohol wash. NSW DPIRD advises geographical spread currently appears limited.',
     authority: 'NSW DPIRD',
     authorityUrl: 'https://www.dpi.nsw.gov.au/animals-and-livestock/bees/pests-diseases/varroa/varroa-mites',
     reportingSystem: 'NSW DPIRD Biosecurity',
@@ -3990,8 +3990,8 @@ const TREATMENT_STATE_NOTES = {
     NT:  {ok:false, note:'Varroa not detected in NT — not currently required or permitted.'},
   },
   'bayvarol': {
-    NSW: {ok:true,  note:'⚠️ Pyrethroid-resistant varroa (L925I) confirmed in northern NSW (January 2026). Monitor treatment efficacy closely. If poor knock-down is observed, contact NSW DPIRD immediately and switch to a different mode of action. Available under permit PER95037.'},
-    ACT: {ok:true,  note:'Available under permit PER95037. Monitor efficacy — pyrethroid resistance confirmed nearby in NSW.'},
+    NSW: {ok:true,  note:'⚠️ Pyrethroid resistance (L925I) confirmed in northern NSW (Jan 2026) AND amitraz resistance now also confirmed in the same populations (April 2026). Monitor efficacy with post-treatment alcohol wash. If poor knock-down observed, contact NSW DPIRD and switch MoA. Available under permit PER95037.'},
+    ACT: {ok:true,  note:'Available under permit PER95037. Monitor efficacy — pyrethroid AND amitraz resistance confirmed in northern NSW (April 2026).'},
     VIC: {ok:true,  note:'Available under permit PER95037. No confirmed resistance in VIC as of January 2026, but rotate MoA as a precaution. Report via BeeMAX.'},
     QLD: {ok:true,  note:'Available under general use permit PER95037. Rotate with other MoA classes to manage resistance risk.'},
     SA:  {ok:true,  note:'Available. PIRSA confirms all AHBIC-listed products available. Rotate MoA to manage resistance.'},
@@ -4000,8 +4000,8 @@ const TREATMENT_STATE_NOTES = {
     NT:  {ok:false, note:'Varroa not detected in NT — not currently required or permitted.'},
   },
   'apistan': {
-    NSW: {ok:true,  note:'⚠️ Pyrethroid resistance (L925I) confirmed in northern NSW (January 2026). Apistan shares the pyrethroid mode of action with Bayvarol — treat with caution and confirm efficacy post-treatment. Available under permit PER95038.'},
-    ACT: {ok:true,  note:'Available under permit PER95038. Monitor efficacy given nearby pyrethroid resistance in NSW.'},
+    NSW: {ok:true,  note:'⚠️ Pyrethroid resistance (L925I) confirmed in northern NSW (Jan 2026) AND amitraz resistance now also confirmed in same populations (April 2026). Apistan shares the pyrethroid MoA with Bayvarol — confirm efficacy with post-treatment alcohol wash. Available under permit PER95038.'},
+    ACT: {ok:true,  note:'Available under permit PER95038. Monitor efficacy — pyrethroid AND amitraz resistance confirmed in northern NSW (April 2026).'},
     VIC: {ok:true,  note:'Available under permit PER95038. Rotate MoA as a precaution. Report via BeeMAX.'},
     QLD: {ok:true,  note:'Available under general use permit PER95038. Rotate with non-pyrethroid treatments.'},
     SA:  {ok:true,  note:'Available. PIRSA confirms all AHBIC-listed products available. Pyrethroid resistance risk — rotate MoA.'},
