@@ -915,7 +915,32 @@ html, body {
 </head>
 <body>
 
-<!-- ══ DID YOU KNOW BANNER ══ -->
+<!-- ══ AHBIC RESISTANCE ALERT BANNER ══ -->
+<div id="alert-banner" style="
+  position:fixed;top:0;left:0;right:0;z-index:10000;
+  background:linear-gradient(90deg,#8B1A1A,#B02020);
+  color:white;
+  padding:11px 48px 11px 16px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.35);
+  min-height:42px;display:flex;align-items:center;justify-content:center;">
+  <span style="text-align:center;line-height:1.55;">
+    🚨 <strong>AHBIC Biosecurity Update — 10 April 2026:</strong>
+    Amitraz resistance now confirmed in NSW (in addition to SE QLD).
+    <a href="https://honeybee.org.au/ahbic-biosecurity-update-resistant-varroa-mite-10-april-2026/" target="_blank" rel="noopener"
+       style="color:#FFD0D0;text-decoration:underline;font-weight:600;">Read the full update →</a>
+    &nbsp;·&nbsp; VarroaMate guidance and documentation has been updated accordingly.
+    Use the <strong>Smart Planner</strong> for MoA rotation, and always measure mite counts <strong>before and after</strong> each treatment.
+  </span>
+  <button onclick="document.getElementById('alert-banner').style.display='none'" aria-label="Dismiss" style="
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    background:rgba(255,255,255,0.18);border:none;color:white;
+    width:26px;height:26px;border-radius:50%;font-size:16px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+</div>
+
+<!-- ══ DID YOU KNOW BANNER (temporarily replaced by alert above) ══ -->
+<!--
 <div id="dyk-banner" style="
   position:fixed;top:0;left:0;right:0;z-index:10000;
   background:linear-gradient(90deg,#2C6E49,#3A9463);
@@ -973,8 +998,7 @@ html, body {
   idx = Math.floor(Math.random() * tips.length);
   show(idx);
   window._dykTimer = setInterval(advance, 20000);
-})();
-</script>
+
 
 
 <div id="scene">
