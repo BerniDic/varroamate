@@ -1803,16 +1803,18 @@ function resetProfile(){
 async function loadHiveData(){
   if(!_user) return;
   try{
-    const [hvRes, cntRes, lossRes, inspRes] = await Promise.all([
+    const [hvRes, cntRes, lossRes, inspRes, treatRes] = await Promise.all([
       _sb.from('hives').select('*').eq('user_id',_user.id),
       _sb.from('mite_counts').select('id,hive_id,date,value,diseases').eq('user_id',_user.id).order('date',{ascending:false}).limit(50),
       _sb.from('colony_losses').select('hive_id,date,loss_type,cause,confirmation,last_strength,notes').eq('user_id',_user.id).order('date',{ascending:false}).limit(20),
       _sb.from('inspections').select('hive_id,date,queen,brood,stores,mood,strength').eq('user_id',_user.id).order('date',{ascending:false}).limit(30),
+      _sb.from('treatments').select('id,hive_id,date,product,treatment_type,completed,notes').eq('user_id',_user.id).order('date',{ascending:false}).limit(50),
     ]);
     _hiveData.hives = hvRes.data || [];
     _hiveData.miteHistory = cntRes.data || [];
     _hiveData.colonyLosses = lossRes.data || [];
     _hiveData.inspections = inspRes.data || [];
+    _hiveData.treatments = treatRes.data || [];
     // diseases are stored on mite_counts, not a separate inspections table
     _hiveData.diseaseHistory = (cntRes.data || []).filter(c => c.diseases && c.diseases.length > 0);
   } catch(e){
@@ -1915,8 +1917,18 @@ function buildChecklist(){
         latestPerHive[c.hive_id] = c;
     });
     const counts = Object.values(latestPerHive);
-    const critical  = counts.filter(c => c.value >= 9);
-    const unmanaged = counts.filter(c => c.value >= 3 && c.value < 9);
+
+    // Build a map of hives currently under active treatment
+    const activeTreatments = {}; // hive_id -> latest treatment record
+    (_hiveData.treatments||[]).forEach(t => {
+      if(!activeTreatments[t.hive_id] || t.date > activeTreatments[t.hive_id].date)
+        activeTreatments[t.hive_id] = t;
+    });
+
+    const critical  = counts.filter(c => c.value >= 9 && !activeTreatments[c.hive_id]);
+    const unmanaged = counts.filter(c => c.value >= 3 && c.value < 9 && !activeTreatments[c.hive_id]);
+    const underTreatment = counts.filter(c => c.value >= 3 && activeTreatments[c.hive_id]);
+
     const recent    = _hiveData.miteHistory[0];
     const daysSince = Math.floor((Date.now()-new Date(recent.date))/(1000*60*60*24));
     if(daysSince > 28){
@@ -1927,6 +1939,14 @@ function buildChecklist(){
     }
     if(unmanaged.length > 0){
       items.push({text:`${unmanaged.length} hive${unmanaged.length!==1?'s':''} above action threshold (≥3/300) — treatment decision required this visit.`, priority:'🚨 Action required', checked:false});
+    }
+    if(underTreatment.length > 0){
+      const names = underTreatment.map(c=>{
+        const hive = (_hiveData.hives.find(h=>h.id===c.hive_id)||{}).name||'Hive';
+        const t = activeTreatments[c.hive_id];
+        return `${hive} (${t.product||t.treatment_type||'treatment'} applied ${t.date})`;
+      }).join(', ');
+      items.push({text:`Treatment in progress: ${names}. Monitor closely — recount mites 4 weeks after treatment ends to confirm efficacy.`, priority:'🧪 Treatment monitoring', checked:false});
     }
   }
 
@@ -2220,6 +2240,21 @@ async function generateAiPlan(){
         const days = Math.floor((Date.now()-new Date(c.date))/(1000*60*60*24));
         return hive+': '+c.value+'/300 ('+status+', '+days+'d ago)';
       }).join(' | ');
+
+  // Build treatment summary — latest treatment per hive
+  const latestTreatPerHive = {};
+  (_hiveData.treatments||[]).forEach(t=>{
+    if(!latestTreatPerHive[t.hive_id]||t.date>latestTreatPerHive[t.hive_id].date) latestTreatPerHive[t.hive_id]=t;
+  });
+  const treatEntries = Object.values(latestTreatPerHive);
+  const treatmentSummary = treatEntries.length === 0 ? 'No treatments recorded'
+    : treatEntries.map(t=>{
+        const hive = (_hiveData.hives.find(h=>h.id===t.hive_id)||{}).name||'Hive';
+        const days = Math.floor((Date.now()-new Date(t.date))/(1000*60*60*24));
+        const status = t.completed ? 'completed' : 'in progress';
+        return `${hive}: ${t.product||t.treatment_type||'treatment'} (${status}, ${days}d ago)`;
+      }).join(' | ');
+
   const diseases = (_hiveData.diseaseHistory||[]).flatMap(i=>i.diseases||[]).filter(d=>d&&d!=='No Disease Present');
   const uniqueDiseases = [...new Set(diseases)];
 
@@ -2234,6 +2269,7 @@ Beekeeper profile:
 - Primary concern: ${_profile.concern || 'general'}
 - Current season window: ${win.label} (${win.msg})
 - Mite counts (latest per hive): ${miteSummary}${criticalHives.length>0 ? ' ⚠️ '+criticalHives.length+' hive(s) CRITICAL — treat now' : ''}
+- Varroa treatments recorded: ${treatmentSummary}
 ${uniqueDiseases.length > 0 ? `- Recent disease observations: ${uniqueDiseases.join(', ')}` : '- No recent disease observations'}
 ${_hiveData.colonyLosses.length > 0 ? `- Colony losses recorded: ${_hiveData.colonyLosses.length} total. Most recent: ${_hiveData.colonyLosses[0].date} (cause: ${_hiveData.colonyLosses[0].cause||'unspecified'}, last colony strength: ${_hiveData.colonyLosses[0].last_strength||'unknown'})` : '- No colony losses recorded'}
 ${(()=>{
@@ -2254,6 +2290,11 @@ Structure your response with these three sections only:
 3. **For Your Toolkit** — one practical improvement specific to their equipment situation
 
 Keep it direct, practical and Australian. Never mention MAQS — use Formic PRO. Do not repeat the checklist items.
+
+TREATMENT CONTEXT RULES — you must follow these exactly:
+- If a treatment is recorded as 'in progress' for a hive that is above mite threshold, DO NOT tell the beekeeper to treat — they already are. Instead acknowledge the treatment is underway and advise on monitoring after completion.
+- If a treatment is recorded as 'completed' recently (within 6 weeks), note that a follow-up mite count is needed 4 weeks after treatment ended to confirm efficacy.
+- Never contradict a recorded treatment by saying the beekeeper hasn't acted — always work with what is recorded.
 
 CRITICAL FIELD HYGIENE RULES — you must follow these exactly:
 - NEVER recommend ozone or UV-C treatment between hives during an apiary inspection. Ozone generators and UV-C cabinets are home/shed equipment only — they require setup time and are completely impractical in the field.
