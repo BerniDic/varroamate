@@ -785,10 +785,15 @@ html, body {
   gap: 8px;
   align-items: center;
   z-index: 50;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   padding: 0 12px;
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+#frame-bar::-webkit-scrollbar { display: none; }
 .frame-btn {
   background: rgba(255,248,220,0.88);
   border: 1.5px solid rgba(160,110,30,0.35);
@@ -840,8 +845,8 @@ html, body {
 .rss-filter:hover{border-color:rgba(160,110,30,0.6);background:rgba(255,245,200,0.9);}
 .rss-filter.active{background:#C8820A;border-color:#C8820A;color:white;font-weight:600;}
 #frame-menu-btn    { display: none; }
-/* Tablet & mobile: hide individual buttons, show Info ▾ only */
-@media (max-width: 1024px) {
+/* Mobile only: hide individual buttons, show Info ▾ only */
+@media (max-width: 640px) {
   .frame-btn-desktop { display: none; }
   #frame-menu-btn    { display: inline-block; }
 }
