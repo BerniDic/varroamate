@@ -846,6 +846,14 @@ html, body {
 .rss-filter{padding:5px 12px;border-radius:20px;border:1.5px solid rgba(160,110,30,0.3);background:rgba(255,248,220,0.6);color:#7A5800;font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.15s;}
 .rss-filter:hover{border-color:rgba(160,110,30,0.6);background:rgba(255,245,200,0.9);}
 .rss-filter.active{background:#C8820A;border-color:#C8820A;color:white;font-weight:600;}
+/* RSS tabs */
+.rss-tab-bar{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid rgba(160,110,30,0.2);}
+.rss-tab{padding:8px 16px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:#9A7030;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;white-space:nowrap;}
+.rss-tab:hover{color:#C8820A;}
+.rss-tab.active{color:#C8820A;border-bottom-color:#C8820A;font-weight:700;}
+/* Journal/blog item card */
+.rss-source-badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 7px;border-radius:10px;margin-right:6px;}
+.rss-section-divider{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#B09060;margin:16px 0 10px;padding-bottom:4px;border-bottom:1px solid rgba(160,110,30,0.15);}
 #frame-menu-btn    { display: none; }
 /* Mobile only: hide individual buttons, show Info ▾ only */
 @media (max-width: 640px) {
@@ -1787,13 +1795,41 @@ const FRAME_CONTENT = {
   news: {
     title: '🐝 Beekeeping News & Research',
     body: `<div id="rss-widget">
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="rss-filter-bar">
-    <button class="rss-filter active" data-cat="all" onclick="rssFilter(this,'all')">All</button>
-    <button class="rss-filter" data-cat="australia" onclick="rssFilter(this,'australia')">🇦🇺 Australia</button>
-    <button class="rss-filter" data-cat="science" onclick="rssFilter(this,'science')">🔬 Science</button>
-    <button class="rss-filter" data-cat="international" onclick="rssFilter(this,'international')">🌐 International</button>
+  <!-- Tab bar -->
+  <div class="rss-tab-bar">
+    <button class="rss-tab active" onclick="rssSetTab(this,'news')">📰 News</button>
+    <button class="rss-tab" onclick="rssSetTab(this,'journals')">📚 Journals & Blogs</button>
+    <button class="rss-tab" onclick="rssSetTab(this,'reports')">📊 Reports</button>
   </div>
-  <div id="rss-items"><div style="text-align:center;padding:32px;color:#9A7030;font-style:italic;">Loading news…</div></div>
+
+  <!-- News tab -->
+  <div id="rss-panel-news">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="rss-filter-bar">
+      <button class="rss-filter active" data-cat="all" onclick="rssFilter(this,'all')">All</button>
+      <button class="rss-filter" data-cat="australia" onclick="rssFilter(this,'australia')">🇦🇺 Australia</button>
+      <button class="rss-filter" data-cat="science" onclick="rssFilter(this,'science')">🔬 Science</button>
+      <button class="rss-filter" data-cat="international" onclick="rssFilter(this,'international')">🌐 International</button>
+    </div>
+    <div id="rss-items"><div style="text-align:center;padding:32px;color:#9A7030;font-style:italic;">Loading news…</div></div>
+  </div>
+
+  <!-- Journals & Blogs tab -->
+  <div id="rss-panel-journals" style="display:none;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="rss-journal-filter-bar">
+      <button class="rss-filter active" data-src="all"      onclick="rssJournalFilter(this,'all')">All</button>
+      <button class="rss-filter" data-src="science"         onclick="rssJournalFilter(this,'science')">🔬 Science</button>
+      <button class="rss-filter" data-src="australia"       onclick="rssJournalFilter(this,'australia')">🇦🇺 Australia</button>
+      <button class="rss-filter" data-src="international"   onclick="rssJournalFilter(this,'international')">🌐 International</button>
+      <button class="rss-filter" data-src="blogs"           onclick="rssJournalFilter(this,'blogs')">✍️ Blogs</button>
+    </div>
+    <div id="rss-journal-items"><div style="text-align:center;padding:32px;color:#9A7030;font-style:italic;">Loading journals & blogs…</div></div>
+  </div>
+
+  <!-- Reports tab -->
+  <div id="rss-panel-reports" style="display:none;">
+    <div id="rss-report-items"><div style="text-align:center;padding:32px;color:#9A7030;font-style:italic;">Loading reports…</div></div>
+  </div>
+
   <div id="rss-footer" style="font-size:11px;color:#B09060;margin-top:14px;text-align:right;"></div>
 </div>`,
   },
@@ -1983,27 +2019,72 @@ function openFrame(key){
 }
 
 // ── RSS NEWS FEED ─────────────────────────────────
-const RSS_ENDPOINT = 'https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/rss-feed';
+const RSS_ENDPOINT         = 'https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/rss-feed';
+const RSS_JOURNALS_ENDPOINT= 'https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/rss-journals';
+const RSS_REPORTS_ENDPOINT = 'https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/rss-reports';
 const RSS_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
-let _rssItems = [];
-let _rssCat = 'all';
-let _rssLoaded = false;
 
+let _rssItems         = [];
+let _rssCat           = 'all';
+let _rssLoaded        = false;
+
+let _rssJournalItems  = [];
+let _rssJournalSrc    = 'all';
+let _rssJournalLoaded = false;
+
+let _rssReportItems   = [];
+let _rssReportLoaded  = false;
+
+let _rssActiveTab     = 'news';
+
+// ── Tab switching ──────────────────────────────────
+function rssSetTab(btn, tab){
+  _rssActiveTab = tab;
+  document.querySelectorAll('.rss-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['news','journals','reports'].forEach(t => {
+    const p = document.getElementById('rss-panel-' + t);
+    if(p) p.style.display = t === tab ? '' : 'none';
+  });
+  if(tab === 'news'     && !_rssLoaded)        rssLoad();
+  if(tab === 'journals' && !_rssJournalLoaded) rssJournalsLoad();
+  if(tab === 'reports'  && !_rssReportLoaded)  rssReportsLoad();
+}
+
+// ── Shared fetch helper ────────────────────────────
+async function rssFetch(url){
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${RSS_ANON}`, 'Content-Type': 'application/json' }
+  });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+function rssItemHTML(item, catColour, catLabel){
+  const d   = item.date ? new Date(item.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+  const cat = item.category || item.source || '';
+  const col = catColour[cat] || '#7A5800';
+  const lab = catLabel[cat] || item.feedLabel || item.feedId || cat;
+  return `<div style="padding:12px 0;border-bottom:1px solid rgba(160,110,30,0.15);">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;background:${col};color:white;padding:2px 7px;border-radius:10px;">${lab}</span>
+      ${d ? `<span style="font-size:11px;color:#B09060;margin-left:auto;">${d}</span>` : ''}
+    </div>
+    <div style="font-size:14px;font-weight:600;color:#3A2000;margin-bottom:3px;line-height:1.4;">
+      ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" style="color:#3A2000;text-decoration:none;" onmouseover="this.style.color='#C8820A'" onmouseout="this.style.color='#3A2000'">${item.title} ↗</a>` : item.title}
+    </div>
+    ${item.summary ? `<div style="font-size:12px;color:#7A5800;line-height:1.6;">${item.summary}</div>` : ''}
+  </div>`;
+}
+
+// ── NEWS tab ───────────────────────────────────────
 async function rssLoad(){
   if(_rssLoaded) return;
   try{
-    const res = await fetch(RSS_ENDPOINT, {
-      headers: { 'Authorization': `Bearer ${RSS_ANON}`, 'Content-Type': 'application/json' }
-    });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    _rssItems = data.items || [];
+    const data = await rssFetch(RSS_ENDPOINT);
+    _rssItems  = data.items || [];
     _rssLoaded = true;
-    const footer = document.getElementById('rss-footer');
-    if(footer && data.fetchedAt){
-      const d = new Date(data.fetchedAt);
-      footer.textContent = 'Last updated: ' + d.toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    }
+    rssUpdateFooter(data.fetchedAt);
     rssRender();
   } catch(e){
     const el = document.getElementById('rss-items');
@@ -2013,7 +2094,7 @@ async function rssLoad(){
 
 function rssFilter(btn, cat){
   _rssCat = cat;
-  document.querySelectorAll('.rss-filter').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#rss-filter-bar .rss-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   rssRender();
 }
@@ -2028,22 +2109,120 @@ function rssRender(){
   }
   const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90' };
   const catLabel  = { australia:'🇦🇺 Australia', science:'🔬 Science', international:'🌐 International' };
-  el.innerHTML = items.map(item => {
-    const d = item.date ? new Date(item.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
-    const col = catColour[item.category] || '#7A5800';
-    const lab = catLabel[item.category] || item.category;
-    return `<div style="padding:12px 0;border-bottom:1px solid rgba(160,110,30,0.15);">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
-        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;background:${col};color:white;padding:2px 7px;border-radius:10px;">${lab}</span>
-        <span style="font-size:11px;color:#9A7030;">${item.feedLabel}</span>
-        ${d ? `<span style="font-size:11px;color:#B09060;margin-left:auto;">${d}</span>` : ''}
-      </div>
-      <div style="font-size:14px;font-weight:600;color:#3A2000;margin-bottom:3px;line-height:1.4;">
-        ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" style="color:#3A2000;text-decoration:none;" onmouseover="this.style.color='#C8820A'" onmouseout="this.style.color='#3A2000'">${item.title} ↗</a>` : item.title}
-      </div>
-      ${item.summary ? `<div style="font-size:12px;color:#7A5800;line-height:1.6;">${item.summary}</div>` : ''}
-    </div>`;
+  el.innerHTML = items.map(i => rssItemHTML(i, catColour, catLabel)).join('');
+}
+
+// ── JOURNALS & BLOGS tab ───────────────────────────
+const JOURNAL_COLOUR = {
+  australia    : '#2C6E49',
+  science      : '#2A5A9A',
+  international: '#7A4A90',
+  blogs        : '#B06010',
+};
+
+async function rssJournalsLoad(){
+  if(_rssJournalLoaded) return;
+  try{
+    const data         = await rssFetch(RSS_JOURNALS_ENDPOINT);
+    _rssJournalItems   = data.items || [];
+    _rssJournalLoaded  = true;
+    rssUpdateFooter(data.fetchedAt);
+    rssJournalRender();
+  } catch(e){
+    const el = document.getElementById('rss-journal-items');
+    if(el) el.innerHTML = '<div style="text-align:center;padding:24px;color:#B05020;font-size:13px;">⚠️ Could not load journals — check your internet connection.</div>';
+  }
+}
+
+function rssJournalFilter(btn, cat){
+  _rssJournalSrc = cat;
+  document.querySelectorAll('#rss-journal-filter-bar .rss-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  rssJournalRender();
+}
+
+function rssJournalRender(){
+  const el = document.getElementById('rss-journal-items');
+  if(!el) return;
+  const items = _rssJournalSrc === 'all'
+    ? _rssJournalItems
+    : _rssJournalItems.filter(i => i.category === _rssJournalSrc);
+  if(!items.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:#9A7030;font-style:italic;font-size:13px;">No items for this category yet.</div>';
+    return;
+  }
+  // Group by feedLabel for readability
+  const groups = {};
+  items.forEach(i => {
+    const k = i.feedLabel || i.feedId || 'Other';
+    if(!groups[k]) groups[k] = { cat: i.category, items: [] };
+    groups[k].items.push(i);
+  });
+  const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90', blogs:'#B06010' };
+  el.innerHTML = Object.entries(groups).map(([label, grp]) => {
+    const col = catColour[grp.cat] || '#7A5800';
+    const header = `<div class="rss-section-divider" style="color:${col};">${label}</div>`;
+    return header + grp.items.map(i => rssItemHTML(i, catColour, {})).join('');
   }).join('');
+}
+
+
+// ── REPORTS tab ────────────────────────────────────
+const REPORT_COLOUR = {
+  'usda-honey'    : '#8A4A10',
+  'usda-colonies' : '#2A6A3A',
+  'usda-pollination':'#6A3A8A',
+  'usda-other'    : '#5A5A5A',
+};
+const REPORT_LABEL = {
+  'usda-honey'       : '🍯 USDA Honey Reports',
+  'usda-colonies'    : '🐝 USDA Colony Loss',
+  'usda-pollination' : '🌸 USDA Pollination',
+  'usda-other'       : '📊 USDA Other',
+};
+
+async function rssReportsLoad(){
+  if(_rssReportLoaded) return;
+  try{
+    const data       = await rssFetch(RSS_REPORTS_ENDPOINT);
+    _rssReportItems  = data.items || [];
+    _rssReportLoaded = true;
+    rssUpdateFooter(data.fetchedAt);
+    rssReportRender();
+  } catch(e){
+    const el = document.getElementById('rss-report-items');
+    if(el) el.innerHTML = '<div style="text-align:center;padding:24px;color:#B05020;font-size:13px;">⚠️ Could not load reports — check your internet connection.</div>';
+  }
+}
+
+function rssReportRender(){
+  const el = document.getElementById('rss-report-items');
+  if(!el) return;
+  if(!_rssReportItems.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:#9A7030;font-style:italic;font-size:13px;">No reports available yet.</div>';
+    return;
+  }
+  // Group by source
+  const groups = {};
+  _rssReportItems.forEach(i => {
+    const k = i.source || 'usda-other';
+    if(!groups[k]) groups[k] = [];
+    groups[k].push(i);
+  });
+  el.innerHTML = Object.entries(groups).map(([src, grpItems]) => {
+    const label = REPORT_LABEL[src] || src;
+    const header = `<div class="rss-section-divider">${label}</div>`;
+    return header + grpItems.map(i => rssItemHTML(i, REPORT_COLOUR, REPORT_LABEL)).join('');
+  }).join('');
+}
+
+// ── Shared footer updater ──────────────────────────
+function rssUpdateFooter(fetchedAt){
+  const footer = document.getElementById('rss-footer');
+  if(footer && fetchedAt){
+    const d = new Date(fetchedAt);
+    footer.textContent = 'Last updated: ' + d.toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
 }
 
 function closeFrame(){
