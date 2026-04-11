@@ -807,8 +807,38 @@ html, body {
   -webkit-backdrop-filter: blur(4px);
 }
 .frame-btn:hover { background: rgba(255,245,200,0.97); border-color: rgba(160,110,30,0.6); }
+#frame-btn-news {
+  background: rgba(255,248,220,0.88);
+  border-color: rgba(160,110,30,0.35);
+  color: #6A4010;
+  position: relative;
+  padding-left: 22px;
+}
+#frame-btn-news::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #E03020;
+  animation: news-pulse 1.4s ease-in-out infinite;
+}
+#frame-btn-news:hover {
+  background: rgba(255,245,200,0.97);
+  border-color: rgba(160,110,30,0.6);
+}
+@keyframes news-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,40,20,0.7); transform: translateY(-50%) scale(1); }
+  50%       { box-shadow: 0 0 0 5px rgba(220,40,20,0); transform: translateY(-50%) scale(0.85); }
+}
 /* Desktop: show individual buttons, hide Info ▾ */
 .frame-btn-desktop { display: inline-block; }
+.rss-filter{padding:5px 12px;border-radius:20px;border:1.5px solid rgba(160,110,30,0.3);background:rgba(255,248,220,0.6);color:#7A5800;font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.15s;}
+.rss-filter:hover{border-color:rgba(160,110,30,0.6);background:rgba(255,245,200,0.9);}
+.rss-filter.active{background:#C8820A;border-color:#C8820A;color:white;font-weight:600;}
 #frame-menu-btn    { display: none; }
 /* Mobile: hide individual buttons, show Info ▾ only */
 @media (max-width: 640px) {
@@ -1730,6 +1760,7 @@ html, body {
 
 <!-- Frame bar — outside scene so it doesn't block hive clicks -->
 <div id="frame-bar">
+  <button class="frame-btn frame-btn-desktop" onclick="openFrame('news')" id="frame-btn-news">Live Bee News</button>
   <button class="frame-btn frame-btn-desktop" onclick="openFrame('about')">About Us</button>
   <button class="frame-btn frame-btn-desktop" onclick="openFrame('pricing')">Pricing</button>
   <button class="frame-btn frame-btn-desktop" onclick="openFrame('faq')">FAQ</button>
@@ -1745,6 +1776,19 @@ html, body {
 
 // ── FRAME BAR ─────────────────────────────────────
 const FRAME_CONTENT = {
+  news: {
+    title: '🐝 Beekeeping News & Research',
+    body: `<div id="rss-widget">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="rss-filter-bar">
+    <button class="rss-filter active" data-cat="all" onclick="rssFilter(this,'all')">All</button>
+    <button class="rss-filter" data-cat="australia" onclick="rssFilter(this,'australia')">🇦🇺 Australia</button>
+    <button class="rss-filter" data-cat="science" onclick="rssFilter(this,'science')">🔬 Science</button>
+    <button class="rss-filter" data-cat="international" onclick="rssFilter(this,'international')">🌐 International</button>
+  </div>
+  <div id="rss-items"><div style="text-align:center;padding:32px;color:#9A7030;font-style:italic;">Loading news…</div></div>
+  <div id="rss-footer" style="font-size:11px;color:#B09060;margin-top:14px;text-align:right;"></div>
+</div>`,
+  },
   about: {
     title: '⭐ About VarroaMate',
     body: `<p>VarroaMate is an Australian beekeeping management platform built to help beekeepers monitor, manage and respond to Varroa destructor — and the broader disease ecology it brings.</p>
@@ -1925,6 +1969,71 @@ function openFrame(key){
   const overlay = document.getElementById('frame-overlay');
   overlay.classList.add('open');
   document.getElementById('frame-modal').scrollTop = 0;
+  if(key === 'news') rssLoad();
+}
+
+// ── RSS NEWS FEED ─────────────────────────────────
+const RSS_ENDPOINT = 'https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/rss-feed';
+const RSS_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
+let _rssItems = [];
+let _rssCat = 'all';
+let _rssLoaded = false;
+
+async function rssLoad(){
+  if(_rssLoaded) return;
+  try{
+    const res = await fetch(RSS_ENDPOINT, {
+      headers: { 'Authorization': `Bearer ${RSS_ANON}`, 'Content-Type': 'application/json' }
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    _rssItems = data.items || [];
+    _rssLoaded = true;
+    const footer = document.getElementById('rss-footer');
+    if(footer && data.fetchedAt){
+      const d = new Date(data.fetchedAt);
+      footer.textContent = 'Last updated: ' + d.toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    }
+    rssRender();
+  } catch(e){
+    const el = document.getElementById('rss-items');
+    if(el) el.innerHTML = '<div style="text-align:center;padding:24px;color:#B05020;font-size:13px;">⚠️ Could not load news feed — check your internet connection.</div>';
+  }
+}
+
+function rssFilter(btn, cat){
+  _rssCat = cat;
+  document.querySelectorAll('.rss-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  rssRender();
+}
+
+function rssRender(){
+  const el = document.getElementById('rss-items');
+  if(!el) return;
+  const items = _rssCat === 'all' ? _rssItems : _rssItems.filter(i => i.category === _rssCat);
+  if(!items.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:#9A7030;font-style:italic;font-size:13px;">No items in this category yet.</div>';
+    return;
+  }
+  const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90' };
+  const catLabel  = { australia:'🇦🇺 Australia', science:'🔬 Science', international:'🌐 International' };
+  el.innerHTML = items.map(item => {
+    const d = item.date ? new Date(item.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '';
+    const col = catColour[item.category] || '#7A5800';
+    const lab = catLabel[item.category] || item.category;
+    return `<div style="padding:12px 0;border-bottom:1px solid rgba(160,110,30,0.15);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;background:${col};color:white;padding:2px 7px;border-radius:10px;">${lab}</span>
+        <span style="font-size:11px;color:#9A7030;">${item.feedLabel}</span>
+        ${d ? `<span style="font-size:11px;color:#B09060;margin-left:auto;">${d}</span>` : ''}
+      </div>
+      <div style="font-size:14px;font-weight:600;color:#3A2000;margin-bottom:3px;line-height:1.4;">
+        ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" style="color:#3A2000;text-decoration:none;" onmouseover="this.style.color='#C8820A'" onmouseout="this.style.color='#3A2000'">${item.title} ↗</a>` : item.title}
+      </div>
+      ${item.summary ? `<div style="font-size:12px;color:#7A5800;line-height:1.6;">${item.summary}</div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function closeFrame(){
