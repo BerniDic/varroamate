@@ -1828,8 +1828,13 @@ async function loadHiveData(){
 // PLAN GENERATOR (Rules engine)
 // ══════════════════════════════════════════════
 function getSeasonalWindow(){
-  const m = new Date().getMonth(); // 0=Jan
-  // Australian seasons: Spring Aug–Oct (7–9), Summer Nov–Feb (10–0), Autumn Mar–May (2–4), Winter Jun–Jul (5–6)
+  if(typeof VM_CONFIG !== 'undefined' && VM_CONFIG?.getSeasonalWindow){
+    const w = VM_CONFIG.getSeasonalWindow(new Date().getMonth());
+    // map VM_CONFIG season fields to hygiene app's expected field names
+    return { ...w, colour: w.color||w.colour, border: w.color||w.border };
+  }
+  // ── fallback (AU hardcoded) ──────────────────────────────────────────────
+  const m = new Date().getMonth();
   if(m>=7 && m<=9) return {label:'Spring', risk:'high', icon:'🌱', colour:'#1C5A28', bg:'#EEF6F0', border:'#5A8A6A',
     msg:'Spring brood disease window. Swarm season — inspect every 1–2 weeks. Avoid unnecessary frame exchange.',
     actions:['Inspect brood carefully — record any abnormal cells', 'Check for queen cells every visit', 'Avoid frame exchange between hives', 'Flame sterilise tools between apiaries', 'Quarantine any new colonies']};
@@ -2049,8 +2054,8 @@ async function generatePlan(){
     const total = _hiveData.hives.length;
 
     // Thresholds (per 300 bees)
-    const T_ACTION  = 3;   // ≥3 = action required
-    const T_CRITICAL = 9;  // ≥9 = colony at serious risk
+    const T_ACTION  = VM_CONFIG?.thresholds?.action  ?? 3;
+    const T_CRITICAL = VM_CONFIG?.thresholds?.critical ?? 9;
 
     // Get most recent count per hive
     const latestPerHive = {};
@@ -2232,7 +2237,8 @@ async function generateAiPlan(){
   const win = getSeasonalWindow();
   const hiveCount = _hiveData.hives.length;
   // Latest count per hive with status
-  const T_CRIT = 9, T_ACT = 3;
+  const T_CRIT = VM_CONFIG?.thresholds?.critical ?? 9;
+  const T_ACT  = VM_CONFIG?.thresholds?.action   ?? 3;
   const latestMitePerHive = {};
   (_hiveData.miteHistory||[]).forEach(c=>{
     if(!latestMitePerHive[c.hive_id]||c.date>latestMitePerHive[c.hive_id].date) latestMitePerHive[c.hive_id]=c;
@@ -2296,7 +2302,7 @@ Structure your response with these three sections only:
 2. **Top Priority Action** — one clear thing they should do this week
 3. **For Your Toolkit** — one practical improvement specific to their equipment situation
 
-Keep it direct, practical and Australian. Never mention MAQS — use Formic PRO. Do not repeat the checklist items.
+Keep it direct, practical and Australian. ${VM_CONFIG?.ai?.productNameRules||'Never mention MAQS — use Formic PRO.'} Do not repeat the checklist items.
 
 TREATMENT AWARENESS — follow these exactly:
 - If a treatment was applied within the last 56 days, the beekeeper has already acted. Do NOT tell them to treat. Acknowledge the treatment by product name and advise a follow-up mite count 4 weeks after the treatment is removed to confirm efficacy.
