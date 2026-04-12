@@ -346,6 +346,19 @@ Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, th
     countMethod:        'Alcohol wash',
     countMethodNote:    'The only method accepted for biosecurity reporting in most states.',
     countMethodUrl:     'https://agriculture.vic.gov.au/biosecurity/animal-diseases/honey-bee-pests-and-diseases/alcohol-wash-test-to-detect-honey-bee-parasites',
+
+    // About/welcome narrative
+    aboutText: 'VarroaMate is designed to complement and strengthen national and state Varroa management strategies — supporting the Australian beekeeping community in doing their part to protect colonies, reduce mite loads, and maintain healthy apiaries across the country.',
+
+    // Alcohol wash explainer
+    countMethodExplainer: 'Alcohol wash is what the national varroa program, AHBIC, and state authorities use as the reference method.',
+
+    // Feature flags — set to false in uk.js, de.js etc. to hide AU-only features
+    features: {
+      beemaxExport:   true,   // BeeMAX export — AU only
+      stateSelector:  true,   // Australian state selector — AU only
+      resistanceMap:  true,   // NSW/QLD resistance warnings — AU only
+    },
   },
 
 
