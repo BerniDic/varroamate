@@ -432,7 +432,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div style="color:rgba(255,255,255,0.85);font-size:18px;margin-bottom:40px;">Smart Varroa management for Australian beekeepers</div>
   <div class="welcome-card">
     <h3>About VarroaMate<sup style="font-size:10px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></h3>
-    <p>Varroa<em>Mate</em> is designed to complement and strengthen national and state Varroa management strategies — supporting the Australian beekeeping community in doing their part to protect colonies, reduce mite loads, and maintain healthy apiaries across the country.</p>
+    <p>Varroa<em>Mate</em> is designed to complement and strengthen Varroa management across the United Kingdom and the Republic of Ireland — supporting beekeepers in doing their part to protect colonies, reduce mite loads, and maintain healthy apiaries. Aligned with NBU (UK) and DAFM (Ireland) integrated pest management guidance.</p>
     <p style="margin-top:8px;">Australian beekeepers now face one of their greatest challenges — Varroa is established and spreading, and the decisions made in the next few years will shape the future of beekeeping across the country. VarroaMate's mission is to give every beekeeper the best possible tools, information, and guidance to protect their colonies, manage mite loads effectively, and help save Australia's bees.</p>
     <p style="margin-top:8px;">VarroaMate is under ongoing development and welcomes your feedback.</p>
   </div>
@@ -790,7 +790,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
               </div>
 
               <div style="margin-top:10px;padding:10px 12px;background:var(--amber-pale);border-radius:var(--radius-sm);border-left:3px solid var(--amber);font-size:13px;color:var(--text2);line-height:1.6;">
-                💡 <strong>Why alcohol wash only?</strong> Consistent, standardised counts across time and between beekeepers. Sugar shake can undercount by 40–60%. Alcohol wash is what the national varroa program, AHBIC, and state authorities use as the reference method.
+                💡 <strong>Why alcohol wash?</strong> Consistent, standardised counts across time and between beekeepers. Sugar shake can undercount by 40–60%. Alcohol wash is what the NBU (National Bee Unit) recommends as the most accurate method for determining Varroa infestation levels.
               </div>
             </div>
           </div>
@@ -2624,8 +2624,8 @@ function initMiniMap(){
   const el=document.getElementById('apiary-mini-map');
   if(!el)return;
   // Centre on Australia, or on existing pending location
-  const centre=pendingApiary&&pendingApiary.lat?[pendingApiary.lat,pendingApiary.lon]:[-27.5,133.5];
-  const zoom=pendingApiary&&pendingApiary.lat?13:4;
+  const centre=pendingApiary&&pendingApiary.lat?[pendingApiary.lat,pendingApiary.lon]:(VM_CONFIG?.region==='UK-IE'?[54.0,-2.5]:[-27.5,133.5]);
+  const zoom=pendingApiary&&pendingApiary.lat?13:(VM_CONFIG?.region==='UK-IE'?6:4);
   miniMap=L.map('apiary-mini-map',{zoomControl:true}).setView(centre,zoom);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(miniMap);
   if(pendingApiary&&pendingApiary.lat){
@@ -2698,7 +2698,8 @@ async function searchAddr(){
   if(q.length<4){box.style.display='none';return;}
   try{
     // Photon geocoder — much better Australian address resolution than Nominatim
-    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&bbox=112,-44,154,-10&limit=6&lang=en`);
+    const bbox=VM_CONFIG?.region==='UK-IE'?'-10.5,51.3,2.0,60.9':'112,-44,154,-10';
+    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&bbox=${bbox}&limit=6&lang=en`);
     const data=await r.json();
     const features=data.features||[];
     if(!features.length){box.style.display='none';return;}
@@ -3547,7 +3548,7 @@ async function loadGuidance(){
 
   const month=new Date().getMonth(); // 0=Jan
   const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
-  const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||'Australia (state unknown)',varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
+  const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||`${VM_CONFIG?.region==='UK-IE'?'United Kingdom / Ireland':'Australia'} (region unknown)`,varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
   const pyrethreidWarning=state==='NSW'||state==='ACT'?'IMPORTANT (April 2026 update): Pyrethroid resistance (L925I) AND amitraz resistance are now both confirmed in northern NSW populations. The same populations previously confirmed for pyrethroid resistance are also confirmed for amitraz resistance. Pyrethroid and amitraz resistance is also confirmed in south-east QLD. If recommending Bayvarol, Apistan, Apivar, or Apitraz in NSW or QLD, include a strong caution: these treatments may be ineffective in affected areas. Recommend a post-treatment alcohol wash at day 14–21 to confirm efficacy, and advise the beekeeper to contact NSW DPIRD if poor knock-down is observed. For beekeepers NOT in confirmed resistance zones, treatments should remain effective — but MoA rotation is essential. NSW DPIRD advises the geographical spread appears currently limited.':'';
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
   const sections=[
@@ -3695,7 +3696,7 @@ async function loadSection(elId,prompt,prefProfile){
     return;
   }
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
-  const systemPrompt=`You are VarroaMate, an expert assistant for Australian beekeepers. Give clear, practical advice in plain English.
+  const systemPrompt=`You are VarroaMate, an expert assistant for beekeepers in the ${VM_CONFIG?.region==='UK-IE'?'United Kingdom and Republic of Ireland':'Australia'}. Give clear, practical advice in plain English.
 APPROVED TREATMENTS — HARD WHITELIST: You must ONLY ever recommend, suggest, mention, or imply treatments from this exact list. No exceptions, no matter how the question is framed:
 1. OA Vaporisation
 2. OA Dribble
