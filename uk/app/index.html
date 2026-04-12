@@ -4150,7 +4150,7 @@ function showTreatmentInfo(key){
       <div style="font-size:14px;color:var(--text2);line-height:1.6;">${stateNote.note}</div>
       ${sd?`<a href="${sd.authorityUrl}" target="_blank" style="font-size:13px;color:${col};font-weight:600;display:inline-block;margin-top:6px;">Visit ${sd.authority} →</a>`:''}
     </div>`;
-  } else if(!state){
+  } else if(!state&&VM_CONFIG?.region!=='UK-IE'){
     statePanel=`<div style="background:var(--amber-pale);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--text2);">
       💡 Set your state in <strong>Preferences</strong> to see state-specific registration and regulatory notes.
     </div>`;
@@ -4169,14 +4169,14 @@ function showTreatmentInfo(key){
       <div style="font-size:14px;color:#5A3A00;line-height:1.6;">${t.removal}</div>
     </div>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
-      ${tr('Active ingredient',t.active)}${tr('Temperature',`<strong style="color:${t.tempSensitive?'var(--red)':'var(--green)'}">${t.tempRange}</strong>`)}
+      ${tr('Active ingredient',t.active||t.moa||'—')}${tr('Temperature',`<strong style="color:${t.tempSensitive!==false?'var(--red)':'var(--green)'}">${t.tempRange||'—'}</strong>`)}
       ${tr('Honey supers',t.honeySupers)}${tr('With brood',t.withBrood)}${tr('Dosage',t.dosage)}
-      ${tr('Duration',t.duration)}${tr('Resistance risk',t.resistance)}${tr('APVMA / National',t.regulatory)}
+      ${tr('Duration',t.duration??(t.durationDays?t.durationDays+' days':'—'))}${tr('Resistance risk',t.resistance)}${tr(VM_CONFIG?.region==='UK-IE'?'VMD Registration':'APVMA / National',t.regulatory||'—')}
     </table>
     <div style="margin-top:12px;padding:10px 12px;background:var(--amber-pale);border-radius:var(--radius-sm);font-size:14px;border-left:3px solid var(--amber);">
       <strong>Notes:</strong> ${t.notes}
     </div>
-    <div style="margin-top:10px;font-size:12px;color:var(--text3);">State regulatory data current as of January 2026. Varroa situation is evolving — always verify with your state authority. The National Varroa Mite Management Program (varroa.org.au) wound up February 2026; state ag departments are now the authoritative source.</div>`;
+    <div style="margin-top:10px;font-size:12px;color:var(--text3);">${VM_CONFIG?.region==='UK-IE'?'VMD registration data current as of 2026. Always verify with the VMD product database (vmd.defra.gov.uk) or the NBU bee medicines fact sheet. Republic of Ireland beekeepers should verify with the HPRA.':`State regulatory data current as of January 2026. Always verify with your state authority.`}</div>`;
   openModal('modal-treatment-info');
 }
 function tr(label,val){return`<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 6px 8px 0;font-weight:600;color:var(--text2);width:38%;vertical-align:top;">${label}</td><td style="padding:8px 0;color:var(--text);vertical-align:top;">${val}</td></tr>`;}
