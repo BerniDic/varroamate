@@ -3464,8 +3464,8 @@ function initChart(canvasEl,maintainAR){
       c2.save();c2.fillStyle='rgba(180,100,0,0.60)';c2.font=`bold ${fs}px sans-serif`;c2.textAlign='left';
       c2.fillText('Action zone',left+4,y.getPixelForValue(firstAz.hi)-3);c2.restore();
 
-      // Seasonal colony loss threshold — stepped line
-      const seasonThreshold={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5};
+      // Seasonal colony loss threshold — use VM_CONFIG if available
+      const seasonThreshold=VM_CONFIG?.chartSeasonThreshold||{2:10,3:10,4:10,5:15,6:15,7:15,8:10,9:10,10:8,11:6,0:6,1:6};
       c2.save();c2.setLineDash([6,4]);c2.strokeStyle='#C0392B';c2.lineWidth=2;c2.beginPath();
       let firstPt=true;
       buckets.forEach((b,i)=>{
@@ -3663,8 +3663,17 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
           ctx.fillText('Extended forecast ▸',left+reliableDay*cw+4,top+fs+2);
           ctx.restore();
         }
-        // Treatment threshold lines — full names, no abbreviations
-        const thresholds=[
+        // Treatment threshold lines — UK VMD registered products
+        const _ukThresholds=[
+          {val:30,color:'rgba(192,57,43,0.8)',label:'30°C — Thymol upper limit (Thymovar/ApiLife/Apiguard) & MAQS/Formicpro upper limit (25°C)'},
+          {val:25,color:'rgba(243,156,18,0.8)',label:'25°C — MAQS & Formicpro upper limit (queen loss risk above this)'},
+          {val:25,color:'rgba(243,156,18,0.5)',label:'25°C — OA Vaporisation upper limit'},
+          {val:15,color:'rgba(39,174,96,0.6)',label:'15°C — Thymol minimum (Thymovar/ApiLife/Apiguard)'},
+          {val:10,color:'rgba(41,128,185,0.6)',label:'10°C — MAQS & Formicpro minimum · Apivar/Apitraz/Apistan preferred minimum'},
+          {val:8, color:'rgba(100,140,200,0.5)',label:'8°C — VarroMed & Oxuvar spray minimum'},
+          {val:3, color:'rgba(100,140,200,0.4)',label:'3°C — OA Vaporisation (Api-Bioxal/Varroxal) minimum'},
+        ];
+        const _auThresholds=[
           {val:40,color:'rgba(192,57,43,0.7)',label:'40°C — Aluen CAP upper limit'},
           {val:30,color:'rgba(192,57,43,0.8)',label:'30°C — Thymol (ApiLife/Apiguard) upper limit & Formic PRO upper limit (29°C)'},
           {val:25,color:'rgba(243,156,18,0.8)',label:'25°C — OA Vaporisation upper limit'},
@@ -3673,6 +3682,7 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
           {val:5, color:'rgba(100,140,200,0.5)',label:'5°C — Aluen CAP & OA Dribble minimum'},
           {val:3, color:'rgba(100,140,200,0.4)',label:'3°C — OA Vaporisation minimum'},
         ];
+        const thresholds=VM_CONFIG?.region==='UK-IE'?_ukThresholds:_auThresholds;
         thresholds.forEach(t=>{
           if(t.val<chart.scales.y.min||t.val>chart.scales.y.max)return;
           const py=y.getPixelForValue(t.val);
@@ -3699,7 +3709,16 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
       tempBody.innerHTML=summary;
       if(legend){
         legend.style.display='';
-        legend.innerHTML=`
+        legend.innerHTML=VM_CONFIG?.region==='UK-IE'?`
+          <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;">
+            <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 OA Vap (Api-Bioxal/Varroxal): 3–25°C</span>
+            <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 OA Dribble/Spray (Oxuvar/Oxybee): 5–25°C</span>
+            <span style="background:rgba(41,128,185,0.15);padding:2px 8px;border-radius:4px;">🔵 MAQS (supers on): 10–25°C ⚠️ queen loss risk above 25°C</span>
+            <span style="background:rgba(41,128,185,0.15);padding:2px 8px;border-radius:4px;">🔵 Formicpro (supers off): 10–25°C</span>
+            <span style="background:rgba(41,128,185,0.15);padding:2px 8px;border-radius:4px;">🔵 VarroMed: 8°C+</span>
+            <span style="background:rgba(39,174,96,0.15);padding:2px 8px;border-radius:4px;">🟢 Thymovar / ApiLife / Apiguard: 15–30°C</span>
+            <span style="background:rgba(180,180,180,0.15);padding:2px 8px;border-radius:4px;">⚪ Apivar / Apitraz / Apistan: &gt;10°C preferred, no upper limit</span>
+          </div>`:`
           <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;">
             <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 OA Vap / Dribble: 3–25°C</span>
             <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 Aluen CAP: 5–40°C</span>
