@@ -5,12 +5,17 @@
 <script src="/config/uk.js"></script>
 <script>
 if(typeof VM_CONFIG!=='undefined'&&VM_CONFIG?.ui?.features?.stateSelector===false){
-  document.addEventListener('DOMContentLoaded',function(){
+  function _hideStateSelector(){
     const c=document.getElementById('state-selector-card');
     const h=document.getElementById('state-selector-heading');
     if(c) c.style.display='none';
     if(h) h.style.display='none';
-  });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',_hideStateSelector);
+  } else {
+    _hideStateSelector();
+  }
 }
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-X6VCPVFJXH"></script>
