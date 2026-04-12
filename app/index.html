@@ -7,15 +7,9 @@
 if(typeof VM_CONFIG!=='undefined'&&VM_CONFIG?.ui?.features?.stateSelector===false){
   document.addEventListener('DOMContentLoaded',function(){
     const c=document.getElementById('state-selector-card');
-    if(c){
-      // hide card and its preceding heading card
-      c.style.display='none';
-      let prev=c.previousElementSibling;
-      while(prev){
-        if(prev.classList&&prev.classList.contains('card')){prev.style.display='none';break;}
-        prev=prev.previousElementSibling;
-      }
-    }
+    const h=document.getElementById('state-selector-heading');
+    if(c) c.style.display='none';
+    if(h) h.style.display='none';
   });
 }
 </script>
