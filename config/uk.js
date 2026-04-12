@@ -25,7 +25,7 @@
 window.VM_CONFIG = {
 
   // ── Identity ──────────────────────────────────────────────────────────────
-  region:     'UK',
+  region:     'UK-IE',
   locale:     'en-GB',
   hemisphere: 'northern',
   currency:   'GBP',
@@ -220,7 +220,7 @@ window.VM_CONFIG = {
     industryUrl:    'https://www.bbka.org.uk',
     trackingSystem: 'BeeBase',
     trackingLabel:  'BeeBase',
-    reportingLabel: 'your local bee inspector or the National Bee Unit',
+    reportingLabel: 'your local NBU bee inspector (UK) / DAFM inspector (Republic of Ireland)',
     reportingNote:  'Report notifiable diseases and Asian hornet sightings to your local NBU bee inspector.',
     nbuUrl:         'https://www.nationalbeeunit.com',
     beebaseUrl:     'https://www.nationalbeeunit.com/register',
@@ -234,7 +234,7 @@ window.VM_CONFIG = {
 
   // ── AI System Prompt Fragments ────────────────────────────────────────────
   ai: {
-    identity: 'You are VarroaMate, a friendly expert assistant for UK and Irish beekeepers managing Varroa mite.',
+    identity: 'You are VarroaMate, a friendly expert assistant for beekeepers in the United Kingdom and the Republic of Ireland managing Varroa mite.',
 
     treatmentRules: `APPROVED TREATMENTS ONLY: Only recommend or discuss treatments registered by the VMD for use in the UK — no others: OA Vaporisation (Api-Bioxal), OA Dribble (Api-Bioxal/Oxuvar), OA Spray (Oxuvar), MAQS, Formicpro, VarroMed, Thymovar, Apiguard, ApiLife Var, Apivar, Apitraz, Apistan, Drone Comb Removal, Brood Interruption.
 Do NOT suggest Aluen CAP, Bayvarol, sugar dusting, lactic acid spray, thymol crystals, or any unregistered method.
@@ -274,7 +274,7 @@ Beekeepers are legally required to keep a veterinary medicine administration rec
     countMethodNote:    'Recommended by the NBU as the most accurate monitoring method.',
     countMethodUrl:     'https://www.nationalbeeunit.com/diseases-and-pests/varroa/how-do-i-manage-varroa',
 
-    aboutText: 'VarroaMate helps UK and Irish beekeepers monitor Varroa mite levels, plan treatments, and maintain healthy colonies — aligned with NBU integrated pest management guidance.',
+    aboutText: 'VarroaMate helps beekeepers in the United Kingdom and the Republic of Ireland monitor Varroa mite levels, plan treatments, and maintain healthy colonies — aligned with NBU (UK) and DAFM (Ireland) guidance.',
 
     countMethodExplainer: 'Alcohol wash is recommended by the National Bee Unit (NBU) as the most accurate method for determining Varroa infestation levels.',
 
