@@ -3067,7 +3067,7 @@ function renderCountsList(){
   for(const c of page){
     const v=c.value;
     const color=v>=6?'var(--red)':v>=3?'var(--yellow)':'var(--green)';
-    const label=v>=15?'Critical ⚠️':v>=6?'High ⚠️':v>=3?'Treatment zone':'Good';
+    const label=v>=(VM_CONFIG?.chartSeasonThreshold?.[new Date().getMonth()]??15)?'Critical ⚠️':v>=(VM_CONFIG?.thresholds?.critical??9)?'High ⚠️':v>=(VM_CONFIG?.thresholds?.action??3)?'Treatment zone':'Good';
     const row=document.createElement('div');row.className='entry-row';
     row.innerHTML=`<div class="entry-date">${fmtDate(c.date)}</div>
       <div class="entry-content"><strong style="color:${color};">${v} mites</strong> — ${label}</div>
@@ -3374,15 +3374,15 @@ function initChart(canvasEl,maintainAR){
         label:c=>{
           const y=c.raw?.y;if(y==null)return'No data';
           const m=new Date(c.raw?.x).getMonth();
-          const thresh={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5}[m]??15;
+          const thresh=(VM_CONFIG?.chartSeasonThreshold?.[m])??15;
           const risk=y>=thresh?' ⚠ colony loss risk':'';
           return`${y} mites/300 bees${risk}`;
         },
         afterLabel:c=>{
           const m=new Date(c.raw?.x).getMonth();
-          const thresh={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5}[m]??15;
-          const az={8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}}[m]||{lo:3,hi:6};
-          const sName={8:'Spring',9:'Spring',10:'Spring',11:'Summer',0:'Summer',1:'Summer',2:'Autumn',3:'Autumn',4:'Autumn',5:'Winter',6:'Winter',7:'Winter'}[m]||'';
+          const thresh=(VM_CONFIG?.chartSeasonThreshold?.[m])??15;
+          const az=(VM_CONFIG?.chartActionZone?.[m])||{lo:3,hi:6};
+          const sName=(VM_CONFIG?.getSeasonConfig?.(m)?.label)||'';
           return[`${sName} action zone: ${az.lo}–${az.hi}`,`${sName} colony loss risk: ${thresh}+`];
         }
       }}},
@@ -3400,18 +3400,14 @@ function initChart(canvasEl,maintainAR){
 
       const fs=Math.max(11,Math.round(chart.width*0.013));
 
-      const seasonColors={
-        11:'rgba(255,200,50,0.10)',0:'rgba(255,200,50,0.10)',1:'rgba(255,200,50,0.10)',
-        2:'rgba(200,130,60,0.10)',3:'rgba(200,130,60,0.10)',4:'rgba(200,130,60,0.10)',
-        5:'rgba(100,140,200,0.10)',6:'rgba(100,140,200,0.10)',7:'rgba(100,140,200,0.10)',
-        8:'rgba(80,200,80,0.10)',9:'rgba(80,200,80,0.10)',10:'rgba(80,200,80,0.10)'
-      };
-      const seasonNames={
-        11:'☀ Summer',0:'☀ Summer',1:'☀ Summer',
-        2:'🍂 Autumn',3:'🍂 Autumn',4:'🍂 Autumn',
-        5:'❄ Winter',6:'❄ Winter',7:'❄ Winter',
-        8:'🌸 Spring',9:'🌸 Spring',10:'🌸 Spring'
-      };
+      const _scBase={spring:'rgba(80,200,80,0.10)',summer:'rgba(255,200,50,0.10)',autumn:'rgba(200,130,60,0.10)',winter:'rgba(100,140,200,0.10)'};
+      const seasonColors=VM_CONFIG?.monthSeason
+        ? Object.fromEntries(Array.from({length:12},(_,i)=>[i,_scBase[VM_CONFIG.monthSeason[i]]||'transparent']))
+        : {11:'rgba(255,200,50,0.10)',0:'rgba(255,200,50,0.10)',1:'rgba(255,200,50,0.10)',2:'rgba(200,130,60,0.10)',3:'rgba(200,130,60,0.10)',4:'rgba(200,130,60,0.10)',5:'rgba(100,140,200,0.10)',6:'rgba(100,140,200,0.10)',7:'rgba(100,140,200,0.10)',8:'rgba(80,200,80,0.10)',9:'rgba(80,200,80,0.10)',10:'rgba(80,200,80,0.10)'};
+      const _snBase={spring:'🌸 Spring',summer:'☀ Summer',autumn:'🍂 Autumn',winter:'❄ Winter'};
+      const seasonNames=VM_CONFIG?.monthSeason
+        ? Object.fromEntries(Array.from({length:12},(_,i)=>[i,_snBase[VM_CONFIG.monthSeason[i]]||'']))
+        : {11:'☀ Summer',0:'☀ Summer',1:'☀ Summer',2:'🍂 Autumn',3:'🍂 Autumn',4:'🍂 Autumn',5:'❄ Winter',6:'❄ Winter',7:'❄ Winter',8:'🌸 Spring',9:'🌸 Spring',10:'🌸 Spring'};
 
       // Season bands using bucket pixel positions
       let runStart=null,runSeason=null;
@@ -3429,7 +3425,7 @@ function initChart(canvasEl,maintainAR){
       });
 
       // Seasonal action zone band
-      const actionZone={8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}};
+      const actionZone=VM_CONFIG?.chartActionZone||{8:{lo:3,hi:5},9:{lo:3,hi:5},10:{lo:3,hi:5},11:{lo:5,hi:7},0:{lo:5,hi:7},1:{lo:5,hi:7},2:{lo:3,hi:4},3:{lo:3,hi:4},4:{lo:3,hi:4},5:{lo:2,hi:3},6:{lo:2,hi:3},7:{lo:2,hi:3}};
       buckets.forEach(b=>{
         const sx=Math.max(left,x.getPixelForValue(b.startMs));
         const ex=Math.min(right,x.getPixelForValue(b.endMs));
@@ -3443,7 +3439,7 @@ function initChart(canvasEl,maintainAR){
       c2.fillText('Action zone',left+4,y.getPixelForValue(firstAz.hi)-3);c2.restore();
 
       // Seasonal colony loss threshold — stepped line
-      const seasonThreshold={8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5};
+      const seasonThreshold=VM_CONFIG?.chartSeasonThreshold||{8:10,9:10,10:10,11:15,0:15,1:15,2:8,3:8,4:8,5:5,6:5,7:5};
       c2.save();c2.setLineDash([6,4]);c2.strokeStyle='#C0392B';c2.lineWidth=2;c2.beginPath();
       let firstPt=true;
       buckets.forEach((b,i)=>{
@@ -4291,8 +4287,8 @@ function fieldUpdateThreshold(){
   const bar=document.getElementById('field-threshold-bar');
   const month=new Date().getMonth();
   const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
-  const az={Summer:{lo:5,hi:7},Autumn:{lo:3,hi:4},Winter:{lo:2,hi:3},Spring:{lo:3,hi:5}}[season];
-  const thresh={Summer:15,Autumn:8,Winter:5,Spring:10}[season];
+  const az=(VM_CONFIG?.chartActionZone?.[month])||{Summer:{lo:5,hi:7},Autumn:{lo:3,hi:4},Winter:{lo:2,hi:3},Spring:{lo:3,hi:5}}[season];
+  const thresh=(VM_CONFIG?.chartSeasonThreshold?.[month])||{Summer:15,Autumn:8,Winter:5,Spring:10}[season];
   let msg='',bg='',color='';
   if(v===0){msg=`${season} action zone: ${az.lo}–${az.hi} · Colony loss risk: ${thresh}+`;bg='var(--bg2)';color='var(--text3)';}
   else if(v>=thresh){msg=`⚠ Colony loss risk! ${season} threshold: ${thresh}+`;bg='#FDECEA';color='var(--red)';}
