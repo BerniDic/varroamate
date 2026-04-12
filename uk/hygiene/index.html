@@ -1,0 +1,2997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="/config/uk.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>VarroaMate · Hive Hygiene</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Bitter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root{
+  /* ── Primary — deep teal slate ── */
+  --forest:     #1A3A4A;
+  --forest-mid: #2A5568;
+  --sage:       #4A8A9A;
+
+  /* ── Page surfaces ── */
+  --cream:      #F2EDE4;
+  --paper:      #FAFAF7;
+
+  /* ── Accent — warm beeswax gold ── */
+  --amber:      #B8780A;
+  --amber-pale: #FEF6E4;
+
+  /* ── Alert colours ── */
+  --terra:      #7A3040;
+  --rust:       #C0402A;
+
+  /* ── Borders & text ── */
+  --border:     #D8D0C4;
+  --border-mid: #BEB4A4;
+  --text1:      #1A1410;
+  --text2:      #4A3C30;
+  --text3:      #8A7A6A;
+
+  /* ── Radius, shadow, nav ── */
+  --radius:     14px;
+  --radius-sm:  9px;
+  --shadow:     0 2px 14px rgba(20,30,40,0.12);
+  --shadow-lg:  0 8px 36px rgba(20,30,40,0.20);
+  --nav-h:      64px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;height:-webkit-fill-available;}
+body{
+  font-family:'Bitter',serif;
+  background:var(--cream);
+  background-image: radial-gradient(ellipse at 20% 0%, rgba(42,85,104,0.06) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 100%, rgba(184,120,10,0.05) 0%, transparent 50%);
+  color:var(--text1);
+  -webkit-font-smoothing:antialiased;
+  height:100%;
+  height:-webkit-fill-available;
+}
+#app{
+  display:none;
+  flex-direction:column;
+  height:100%;
+  height:-webkit-fill-available;
+  overflow:hidden;
+  position:fixed;
+  inset:0;
+}
+#app.ready{display:flex;}
+
+/* ══════════════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════════════ */
+.top-bar{
+  flex-shrink:0;
+  background:linear-gradient(135deg,#122838 0%,#1A3A4A 40%,#2A5568 100%);
+  padding:0 14px 0 16px;
+  padding-top:env(safe-area-inset-top,0px);
+  height:calc(58px + env(safe-area-inset-top,0px));
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;
+  box-shadow:0 2px 12px rgba(10,30,10,0.35);
+  border-bottom:2px solid rgba(184,120,10,0.40);
+}
+.top-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:21px;font-weight:700;
+  color:white;letter-spacing:-0.2px;
+  text-decoration:none;
+  display:flex;align-items:center;gap:5px;
+  flex-shrink:0;white-space:nowrap;
+}
+.top-logo-brand{white-space:nowrap;}
+.top-logo em{color:#E8B84A;font-style:normal;}
+.top-logo-sub{
+  font-family:'Bitter',serif;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.65);letter-spacing:1.2px;text-transform:uppercase;margin-left:2px;
+}
+@media(max-width:430px){.top-logo-sub{display:none;}.top-logo{font-size:19px;}}
+.top-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.top-user{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--sage);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:white;
+  cursor:pointer;flex-shrink:0;min-width:34px;
+}
+.top-icon-btn{
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.85);
+  height:32px;border-radius:16px;
+  padding:0 10px;gap:4px;
+  cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;
+}
+
+/* ══════════════════════════════════════════════
+   CONTENT AREA
+══════════════════════════════════════════════ */
+.content-area{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  padding:16px 16px 80px;
+  background:var(--cream);
+}
+@media(min-width:600px){.content-area{padding:20px 24px 90px;}}
+@media(min-width:900px){.content-area{padding:24px 32px 90px;max-width:860px;margin:0 auto;width:100%;}}
+
+/* ══════════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════════ */
+.bottom-nav{
+  flex-shrink:0;background:#F5F2EC;
+  border-top:2px solid var(--border);
+  display:flex;flex-direction:row;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-tab{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;padding:8px 1px;min-height:44px;
+  transition:all 0.15s;border:none;background:transparent;
+  color:var(--text3);-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.nav-tab.active{color:#1A3A4A;}
+.nav-tab-icon{font-size:18px;line-height:1;}
+.nav-tab-label{font-size:10px;font-weight:600;letter-spacing:0.1px;white-space:nowrap;}
+.nav-tab.active .nav-tab-label{color:#1A3A4A;}
+.more-menu-item{
+  display:flex;align-items:center;gap:14px;width:100%;
+  padding:13px 24px;border:none;background:transparent;
+  font-family:inherit;font-size:16px;font-weight:600;color:var(--text1);
+  cursor:pointer;text-align:left;
+}
+.more-menu-item:active{background:var(--cream);}
+.more-menu-item.active-more{color:#1A3A4A;}
+
+
+/* ══════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════ */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ══════════════════════════════════════════════
+   CARDS & COMPONENTS
+══════════════════════════════════════════════ */
+.card{
+  background:var(--paper);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 2px 10px rgba(20,30,40,0.08), 0 1px 3px rgba(20,30,40,0.05);
+}
+.card-title{
+  font-size:17px;font-weight:700;color:#1A1410;
+  margin-bottom:10px;display:flex;align-items:center;gap:8px;
+  padding-bottom:8px;
+  border-bottom:2px solid rgba(184,120,10,0.18);
+}
+.card-sub{font-size:15px;color:var(--text3);margin-bottom:8px;}
+
+.section-header{
+  font-family:'Cormorant Garamond',serif;
+  font-size:23px;font-weight:700;color:#1A3A4A;
+  margin-bottom:6px;
+}
+.section-sub{font-size:16px;color:var(--text3);margin-bottom:16px;line-height:1.5;}
+
+/* Risk pills */
+.risk-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:20px;
+  font-size:13px;font-weight:700;letter-spacing:0.3px;
+}
+.risk-high{background:#FDEAEA;color:#9A1010;border:1.5px solid #F5BCBC;}
+.risk-med{background:#FFF4E0;color:#8A5010;border:1.5px solid #F5D890;}
+.risk-low{background:#EAF5EE;color:#1A5A28;border:1.5px solid #90CCA8;}
+
+/* Season badges */
+.season-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:13px;font-weight:600;
+}
+.season-spring{background:#E8F5EC;color:#1C5A28;}
+.season-summer{background:#FFF4D8;color:#8A5000;}
+.season-autumn{background:#FFF0E8;color:#8A3010;}
+.season-winter{background:#E8EEF8;color:#1A3A7A;}
+
+/* Reservoir cards */
+.reservoir-card{
+  border-radius:var(--radius);padding:14px 16px;
+  margin-bottom:10px;cursor:pointer;
+  transition:transform 0.15s, box-shadow 0.15s;
+  border:2px solid transparent;
+}
+.reservoir-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.reservoir-card.comb{background:linear-gradient(135deg,#FFFBF0,#FEF0CC);border-color:#C89828;}
+.reservoir-card.bee{background:linear-gradient(135deg,#EBF5F8,#D0EBF2);border-color:#2A7A90;}
+.reservoir-card.collapse{background:linear-gradient(135deg,#FFF0F2,#FDDDE0);border-color:#B03050;}
+.reservoir-card.arrivals{background:linear-gradient(135deg,#F0F4FF,#E4EAFF);border-color:#4A5EA0;}
+.reservoir-title{font-size:17px;font-weight:700;margin-bottom:4px;}
+.reservoir-card.comb .reservoir-title{color:#7A5A08;}
+.reservoir-card.bee .reservoir-title{color:#1A4A5A;}
+.reservoir-card.collapse .reservoir-title{color:#8A1838;}
+.reservoir-card.arrivals .reservoir-title{color:#2A3E7A;}
+.reservoir-card.arrivals .reservoir-title{color:#2A3E7A;}
+.reservoir-expand{display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.08);}
+.reservoir-card.open .reservoir-expand{display:block;}
+
+/* Pathogen chips */
+.pathogen-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:12px;
+  font-size:13px;font-weight:600;margin:2px;
+  background:rgba(0,0,0,0.06);color:var(--text2);
+}
+
+/* Checklist items */
+.check-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.check-item:last-child{border-bottom:none;}
+.check-box{
+  width:22px;height:22px;border-radius:6px;flex-shrink:0;
+  border:2px solid var(--border-mid);background:white;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.check-box.checked{background:#1A3A4A;border-color:#1A3A4A;}
+.check-box.checked::after{content:'✓';color:white;font-size:15px;font-weight:700;}
+.check-label{font-size:16px;color:var(--text2);line-height:1.5;flex:1;}
+.check-priority{font-size:13px;font-weight:700;color:var(--text3);margin-top:2px;}
+
+/* Equipment matrix row */
+.equip-row{
+  display:grid;grid-template-columns:1fr auto auto;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  gap:8px;align-items:center;
+}
+.hazard-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:700;letter-spacing:0.2px;
+  padding:2px 7px 2px 4px;border-radius:4px;margin-left:5px;
+  vertical-align:middle;white-space:nowrap;flex-shrink:0;line-height:1.4;
+}
+.hazard-fire{background:#FFF0E0;color:#C03010;border:1px solid #E8A060;}
+.hazard-chem{background:#FFF4F0;color:#902020;border:1px solid #D09080;}
+.hazard-gas {background:#F0F4FF;color:#303090;border:1px solid #8090D0;}
+.hazard-cold{background:#E8F4FF;color:#1060A0;border:1px solid #70A8D8;}
+.hazard-uv  {background:#F0F4FF;color:#303090;border:1px solid #8090D0;}
+.tool-info-btn{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid var(--border);background:var(--paper);
+  color:var(--text3);font-size:14px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.15s;
+}
+.tool-info-btn:hover{border-color:var(--sage);color:var(--sage);}
+/* Info drawer */
+#toolInfoDrawer{
+  position:fixed;inset:0;z-index:8000;display:none;
+}
+#toolInfoBackdrop{
+  position:absolute;inset:0;background:rgba(10,20,30,0.55);
+}
+#toolInfoPanel{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--paper);border-radius:18px 18px 0 0;
+  padding:0 0 env(safe-area-inset-bottom,16px);
+  max-height:82vh;overflow-y:auto;
+  box-shadow:0 -4px 32px rgba(10,20,30,0.25);
+}
+#toolInfoHandle{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--border);margin:12px auto 0;
+}
+#toolInfoContent{padding:16px 20px 24px;}
+#toolInfoTitle{font-size:18px;font-weight:700;color:var(--text1);margin-bottom:4px;}
+#toolInfoSub{font-size:14px;color:var(--text3);margin-bottom:16px;}
+.info-step{
+  display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;
+}
+.info-step-num{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--forest);color:white;
+  font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  margin-top:1px;
+}
+.info-step-text{font-size:16px;color:var(--text2);line-height:1.6;}
+.info-step-text strong{color:var(--text1);}
+.info-tip{
+  background:var(--amber-pale);border:1px solid #E8C070;
+  border-radius:8px;padding:10px 12px;
+  font-size:14px;color:var(--text2);line-height:1.5;margin-top:4px;
+}
+.equip-name{font-size:15px;font-weight:600;color:var(--text1);}
+.equip-method{font-size:15px;color:var(--text3);margin-top:2px;}
+.equip-toggle{
+  width:36px;height:20px;border-radius:10px;background:var(--border);
+  position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;
+}
+.equip-toggle.on{background:var(--forest);}
+.equip-toggle::after{
+  content:'';position:absolute;
+  width:16px;height:16px;border-radius:50%;
+  background:white;top:2px;left:2px;
+  transition:left 0.2s;
+}
+.equip-toggle.on::after{left:18px;}
+
+/* AI narrative panel */
+.ai-panel{
+  background:linear-gradient(135deg,#122838 0%,#1A3A4A 50%,#2A5568 100%);
+  border-radius:var(--radius);padding:16px;
+  margin-bottom:14px;color:white;
+}
+.ai-panel-title{font-size:16px;font-weight:700;margin-bottom:8px;opacity:0.9;}
+.ai-panel-body{font-size:16px;line-height:1.65;opacity:0.85;}
+
+/* Season wheel */
+.season-row{
+  display:grid;grid-template-columns:80px 1fr;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);align-items:start;
+}
+.season-row:last-child{border-bottom:none;}
+.season-row.active-season{
+  background:linear-gradient(135deg,#FFFBE6,#FFF6D0);
+  border-radius:10px;
+  margin:0 -4px;
+  padding:12px 4px;
+  border-bottom:none !important;
+  box-shadow:0 0 0 2px #E8C040;
+}
+.season-row.active-season .season-month{color:#8A5000;}
+.season-month{font-size:14px;font-weight:700;color:var(--text3);}
+.season-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.season-actions{font-size:15px;color:var(--text2);line-height:1.6;}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 18px;border-radius:var(--radius-sm);
+  font-family:'Bitter',serif;font-size:16px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.15s;text-decoration:none;
+}
+.btn-forest{background:#1A3A4A;color:white;}
+.btn-forest:hover{background:#2A5568;}
+.btn-outline{background:transparent;color:#1A3A4A;border:1.5px solid #1A3A4A;}
+.btn-amber{background:var(--amber);color:white;}
+.btn-sm{padding:7px 12px;font-size:15px;}
+.btn-full{width:100%;display:flex;}
+
+/* Profile wizard */
+.wizard-step{display:none;}
+.wizard-step.active{display:block;}
+.wizard-q{font-size:17px;font-weight:700;color:var(--text1);margin-bottom:14px;line-height:1.4;}
+.wizard-option{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:var(--radius-sm);
+  border:2px solid var(--border);background:white;
+  margin-bottom:8px;cursor:pointer;transition:all 0.15s;
+}
+.wizard-option:hover{border-color:#1A3A4A;background:#FEF6E4;}
+.wizard-option.selected{border-color:#1A3A4A;background:#EBF5F8;}
+.wizard-option-icon{font-size:23px;flex-shrink:0;}
+.wizard-option-label{font-size:16px;font-weight:600;color:var(--text1);}
+.wizard-option-sub{font-size:15px;color:var(--text3);margin-top:2px;}
+.wizard-progress{
+  display:flex;gap:6px;justify-content:center;margin-bottom:20px;
+}
+.wizard-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--border);transition:background 0.2s;
+}
+.wizard-dot.done{background:#1A3A4A;}
+.wizard-dot.current{background:var(--amber);}
+
+/* Reference list */
+.ref-item{
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.ref-item:last-child{border-bottom:none;}
+.ref-source{font-size:14px;font-weight:700;color:#1A3A4A;margin-bottom:2px;}
+.ref-title{font-size:15px;color:var(--text2);line-height:1.4;}
+.ref-link{font-size:13px;color:#B8780A;text-decoration:none;}
+
+/* Loading spinner */
+.spinner{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--border);border-top-color:var(--forest);
+  animation:spin 0.7s linear infinite;display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px);
+  left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--text1);color:#fff;
+  padding:10px 18px;border-radius:20px;font-size:15px;font-weight:600;
+  opacity:0;transition:all 0.25s;z-index:9999;white-space:nowrap;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Apps dropdown */
+#vmhh-apps-dropdown{
+  display:none;position:fixed;
+  background:var(--paper);border-radius:10px;
+  box-shadow:var(--shadow-lg);border:1.5px solid var(--border);
+  min-width:200px;overflow:hidden;z-index:1300;
+}
+
+/* ══════════════════════════════════════════════
+   DISCLAIMER OVERLAY
+══════════════════════════════════════════════ */
+#disclaimerOverlay{
+  position:fixed;inset:0;z-index:9000;
+  background:linear-gradient(160deg,#0E2030 0%,#1A3A4A 45%,#2A5568 100%);
+  display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);
+  overflow-y:auto;
+}
+.disc-inner{
+  max-width:560px;margin:0 auto;
+  padding:32px 24px 40px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.disc-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:29px;font-weight:700;color:white;
+  text-align:center;margin-bottom:4px;
+}
+.disc-logo em{color:#E8B84A;font-style:normal;}
+.disc-title{
+  font-size:21px;font-weight:700;color:white;
+  text-align:center;margin-bottom:8px;
+}
+.disc-card{
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:var(--radius);padding:16px;
+  color:rgba(255,255,255,0.88);font-size:15px;line-height:1.65;
+}
+.disc-card h4{
+  font-size:16px;font-weight:700;color:white;
+  margin-bottom:8px;margin-top:12px;
+}
+.disc-card h4:first-child{margin-top:0;}
+.disc-card a{color:#8FD4A8;}
+.disc-checkbox-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px;
+  background:rgba(255,255,255,0.08);
+  border:1.5px solid rgba(255,255,255,0.2);
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+}
+.disc-checkbox{
+  width:22px;height:22px;border-radius:5px;flex-shrink:0;
+  border:2px solid rgba(255,255,255,0.5);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;margin-top:1px;
+}
+.disc-checkbox.checked{background:#E8B84A;border-color:#E8B84A;}
+.disc-checkbox.checked::after{content:'✓';color:#1A1410;font-size:15px;font-weight:700;}
+.disc-checkbox-label{font-size:15px;color:rgba(255,255,255,0.88);line-height:1.5;}
+.disc-btn{
+  width:100%;padding:14px;border-radius:var(--radius-sm);
+  background:#E8B84A;color:#1A1410;border:none;
+  font-family:'Bitter',serif;font-size:17px;font-weight:700;
+  cursor:pointer;transition:all 0.15s;opacity:0.4;pointer-events:none;
+}
+.disc-btn.enabled{opacity:1;pointer-events:auto;}
+.disc-btn.enabled:hover{background:#F0CC6A;}
+
+
+/* ── Legal content ───────────────────────────────── */
+.legal-doc{font-size:13px;color:var(--text2);line-height:1.75;}
+.legal-doc h3.legal-h3{font-size:12px;font-weight:700;color:var(--text1);margin:16px 0 5px;text-transform:uppercase;letter-spacing:0.4px;}
+.legal-doc h4.legal-h4{font-size:11px;font-weight:700;color:var(--text2);margin:12px 0 3px;text-transform:uppercase;letter-spacing:0.3px;}
+.legal-doc p{margin:0 0 8px;}
+.legal-doc a{color:var(--sage,#4A7C6B);}
+.legal-updated{font-size:11px;color:var(--text3);margin-top:12px;border-top:1px solid var(--border);padding-top:8px;}
+.legal-ol{padding-left:20px;margin:0 0 8px;}
+.legal-ol>li{margin-bottom:6px;}
+.legal-ol-alpha{padding-left:20px;margin:5px 0 8px;list-style-type:lower-alpha;}
+.legal-ol-alpha>li{margin-bottom:5px;}
+.legal-ol-roman{padding-left:20px;margin:4px 0 5px;list-style-type:lower-roman;}
+.legal-ol-roman>li{margin-bottom:3px;}
+.legal-table{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:12px;}
+.legal-table td{padding:7px 9px;border:1px solid var(--border);vertical-align:top;line-height:1.55;}
+.legal-table td:first-child{white-space:nowrap;font-weight:600;width:130px;background:var(--paper);}
+</style>
+</head>
+<body>
+
+<!-- ══ DISCLAIMER OVERLAY (one-time) ══ -->
+<div id="disclaimerOverlay">
+  <div class="disc-inner">
+    <div class="disc-logo">🐝 Varroa<em>Mate</em>™</div>
+    <div class="disc-title">Hive Hygiene — Terms & Disclaimer</div>
+
+    <div class="disc-card">
+      <h4>About This Module</h4>
+      VarroaMate Hive Hygiene provides practical, evidence-based guidance on apiary sanitation and disease prevention for Australian beekeepers. Content is based on peer-reviewed research and guidance from Plant Health Australia, Agriculture Victoria, and the National Varroa Management Program.
+
+      <h4>Disclaimer</h4>
+      The information in this module is provided in good faith for educational purposes. It does not constitute professional veterinary, biosecurity, or agronomic advice. Beekeepers are solely responsible for all management decisions and for complying with applicable state and territory biosecurity laws.
+
+      <h4>Notifiable Diseases</h4>
+      American Foulbrood, European Foulbrood, and Varroa destructor are notifiable pests in all Australian states and territories. If you suspect a notifiable disease or pest, you are legally required to report it to your state or territory agriculture authority promptly. VarroaMate does not replace this obligation.
+
+      <h4>Treatment Information</h4>
+      Treatment recommendations are based on current general guidance. Approved chemicals, withholding periods, and permit conditions vary by state and change over time. Always verify current requirements with your state authority and the APVMA before treating.
+
+      <h4>AI-Generated Content</h4>
+      Some sections of this app use AI to generate personalised hygiene plans and recommendations. AI-generated content can contain errors, omissions, or outdated information. It should be treated as a starting point for your own research — not as definitive advice. Always cross-check AI recommendations against current authoritative sources before acting on them.
+
+      <h4>Data</h4>
+      This module connects to your VarroaMate account to personalise recommendations using your hive and mite count data. Your data is handled in accordance with the <a href="https://yadptqjsjqxqjxouqkll.supabase.co/storage/v1/object/public/Legal%20documents/Privacy%20Policy.pdf" target="_blank">VarroaMate Privacy Policy</a>.
+    </div>
+
+    <div class="disc-checkbox-row" onclick="toggleDisclaimer()" id="discCheckRow">
+      <div class="disc-checkbox" id="discCheck"></div>
+      <div class="disc-checkbox-label">I have read and understand the disclaimer. I accept that this module provides guidance only and does not replace professional advice or legal biosecurity obligations.</div>
+    </div>
+
+    <button class="disc-btn" id="discBtn" onclick="acceptDisclaimer()">Enter Hive Hygiene →</button>
+  </div>
+</div>
+
+
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a class="top-logo" href="/">🐝 <span class="top-logo-brand">Varroa<em>Mate</em>™</span> <span class="top-logo-sub">Hive Hygiene</span></a>
+    <div class="top-right">
+      <button class="top-user" id="topUser" onclick="signOut()" title="Sign out" style="font-size:11px;font-weight:700;letter-spacing:0.3px;cursor:pointer;">Sign out</button>
+      <div style="position:relative;" id="vmhh-apps-wrap">
+        <button class="top-icon-btn" onclick="toggleApps()" title="Switch app">🐝 Apps ▾</button>
+        <div id="vmhh-apps-dropdown">
+          <a href="/app/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);"><svg width="20" height="14" viewBox="0 0 128 90" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="22" y1="44" x2="12" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="52" x2="8" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="60" x2="8" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="22" y1="68" x2="12" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="44" x2="100" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="52" x2="104" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="60" x2="104" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="68" x2="100" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="58" rx="38" ry="26" fill="#C8820A"/><ellipse cx="56" cy="54" rx="28" ry="17" fill="#A86808"/><ellipse cx="56" cy="37" rx="9" ry="6" fill="#B07008"/></svg> VarroaMate</a>
+          <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">📋 Productivity</a>
+          <a href="/planner/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">🧠 Smart Planner</a>
+          <a href="#" onclick="event.preventDefault();showToast('🎓 Academy — coming soon!')" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;opacity:0.5;">🎓 Academy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area" id="contentArea">
+
+    <!-- ══ SCREEN: INTRO ══ -->
+    <div class="screen active" id="screen-intro">
+
+      <div class="section-header">Why Hygiene Matters More Than Ever</div>
+      <div class="section-sub">A new era for Australian beekeeping — and why this module exists</div>
+
+      <div class="card" style="background:linear-gradient(135deg,#FFF8EE,#FFF0D8);border-color:#D4A040;">
+        <div class="card-title" style="color:#8A5000;">🔴 The Varroa Turning Point</div>
+        <div style="font-size:15px;color:var(--text2);line-height:1.65;">
+          Varroa destructor arrived in Australia in 2022 and is now established. This single event has fundamentally changed the disease ecology of Australian honey bee colonies — and with it, the hygiene requirements every beekeeper must meet.
+          <br><br>
+          Before Varroa, most bee diseases spread relatively slowly — primarily through contaminated equipment and beekeeper movement. The main threats (AFB, Chalkbrood) were serious but containable with good equipment hygiene.
+          <br><br>
+          Varroa changes this completely. It acts as a <strong>biological amplifier</strong> — vectorising viruses directly into bee haemolymph, enabling viral titres to increase <strong>millions-fold</strong> in collapsing colonies. A single dying colony can distribute hundreds of mites to neighbours through robbing, triggering cascading losses across an entire apiary.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌿 Beyond Varroa — Compounding Stressors</div>
+        <div style="font-size:15px;color:var(--text2);line-height:1.65;">
+          Varroa does not operate in isolation. Australian beekeepers now face a convergence of stressors that collectively reduce colony resilience and amplify disease risk:
+        </div>
+        <div style="margin-top:10px;display:grid;gap:8px;">
+          <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid var(--amber);">
+            <div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:3px;">🧪 Pesticide accumulation</div>
+            <div style="font-size:14px;color:var(--text2);line-height:1.5;">Sublethal pesticide exposure — particularly neonicotinoids and fungicides — impairs bee immune function, learning, and navigation. Wax accumulates lipophilic pesticide residues over multiple seasons, creating a chronic background stressor in the hive environment.</div>
+          </div>
+          <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid var(--sage);">
+            <div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:3px;">🌾 Nutritional stress</div>
+            <div style="font-size:14px;color:var(--text2);line-height:1.5;">Landscape simplification and seasonal monocultures reduce floral diversity. Nutritionally stressed colonies have weakened immune responses, making them more vulnerable to pathogens at any mite load.</div>
+          </div>
+          <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid #8090C0;">
+            <div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:3px;">🌡️ Climate variability</div>
+            <div style="font-size:14px;color:var(--text2);line-height:1.5;">Extended droughts, irregular flowering, and heat events disrupt the seasonal rhythms that bees and beekeepers rely on. Unpredictable nectar dearths increase robbing pressure and colony stress.</div>
+          </div>
+          <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid var(--rust);">
+            <div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:3px;">🔬 Emerging pathogens</div>
+            <div style="font-size:14px;color:var(--text2);line-height:1.5;">With Varroa established, previously uncommon viruses — Deformed Wing Virus, Acute Bee Paralysis Virus, Israeli Acute Paralysis Virus — are now circulating at much higher levels. The pathogen landscape has permanently shifted.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background:linear-gradient(135deg,#EEF6F0,#E0F0E8);border-color:#5A8A6A;">
+        <div class="card-title" style="color:#1C5A28;">💡 Why This Module Exists</div>
+        <div style="font-size:15px;color:var(--text2);line-height:1.65;">
+          Comprehensive hygiene guidance for beekeepers already exists in regulatory documents — but it is scattered, focused on listing rules rather than explaining why they matter, and largely written before Varroa arrived in Australia.
+          <br><br>
+          What is missing is a <strong>practical, pathogen-centred guide</strong> that explains:
+        </div>
+        <div style="margin-top:10px;font-size:15px;color:var(--text2);line-height:1.8;">
+          • Why different pathogens require completely different hygiene strategies<br>
+          • When in the season each intervention matters most<br>
+          • What cheap, field-ready methods actually work — and which don't<br>
+          • How the beekeeper themselves can be a disease vector without knowing it
+        </div>
+        <div style="margin-top:12px;font-size:15px;color:var(--text2);line-height:1.65;">
+          This module fills that gap. It is built on peer-reviewed science, government biosecurity guidance, and practical knowledge from experienced apiarists and bee inspectors — presented in a format that works in the field, not just on a desk.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📖 How to Use This Module</div>
+        <div style="display:grid;gap:8px;font-size:15px;color:var(--text2);">
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:19px;flex-shrink:0;">📋</div>
+            <div><strong>My Plan</strong> — answer 4 quick questions about your operation and get a personalised hygiene checklist, updated with your live hive data and the current season.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:19px;flex-shrink:0;">🗺️</div>
+            <div><strong>Disease Map</strong> — understand where pathogens live and how they move. The conceptual framework behind all hygiene decisions.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:19px;flex-shrink:0;">🧰</div>
+            <div><strong>Toolkit</strong> — mark what you own. Get equipment-specific sanitation methods filtered to your actual kit.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:19px;flex-shrink:0;">📅</div>
+            <div><strong>Season</strong> — the three critical transmission windows. When to focus effort and what actions matter most.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:19px;flex-shrink:0;">🦠</div>
+            <div><strong>Pathogens</strong> — the eight bee health threats every Australian beekeeper should understand, with detection and control for each.</div>
+          </div>
+        </div>
+        <button class="btn btn-forest btn-full" onclick="switchTab('plan')" style="margin-top:14px;">
+          → Build My Hygiene Plan
+        </button>
+      </div>
+
+      <div class="card" style="background:linear-gradient(135deg,#F0F4FF,#E8EEFF);border-color:#6A7EC0;">
+        <div class="card-title" style="color:#2A3E7A;">💬 Share Your Feedback</div>
+        <div style="font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:12px;">
+          Hive Hygiene is actively developed as part of the VarroaMate ecosystem. If something isn't clear, if you spot an error, or if there's a topic you'd like to see covered — we'd love to hear from you. Your feedback directly shapes what gets built next.
+        </div>
+        <a href="/cdn-cgi/l/email-protection#442c2128282b04322536362b25292530216a272b297b3731262e2127307912090c0c617674022121202625272f" class="btn btn-forest btn-full" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
+          ✉️ Send Feedback
+        </a>
+      </div>
+
+    </div><!-- end screen-intro -->
+
+    <!-- ══ SCREEN: PLAN ══ -->
+    <div class="screen" id="screen-plan">
+
+      <!-- Profile wizard (shown until profile complete) -->
+      <div id="profileWizard">
+        <div class="section-header" id="wizardTitle">👋 Welcome to Hive Hygiene</div>
+        <div class="section-sub" id="wizardSub">Let's build your personalised hygiene plan. Answer a few quick questions about your operation.</div>
+
+        <!-- Skip banner — shown when an existing profile is saved -->
+        <div id="wizardSkipBanner" style="display:none;background:#EEF6F0;border:1.5px solid #5A8A6A;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:700;color:#2A5A3A;margin-bottom:4px;">Your profile is already saved</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Your previous answers are stored. You can jump straight back to your plan, or update any answers below.</div>
+          <button onclick="generatePlan().catch(e=>console.error(e))" style="width:100%;padding:11px;background:#2A6A3A;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">
+            ↩ Skip — use my existing profile
+          </button>
+        </div>
+
+        <div class="wizard-progress" id="wizardProgress"></div>
+        <!-- Back button -->
+        <button id="wizardBackBtn" onclick="wizardBack()" style="display:none;background:none;border:none;color:var(--text3);font-size:12px;font-weight:600;padding:0 0 10px 0;cursor:pointer;font-family:inherit;">‹ Back</button>
+
+        <!-- Step 1: Gloves -->
+        <div class="wizard-step active" id="step-1">
+          <div class="wizard-q">🧤 What gloves do you use?</div>
+          <div class="wizard-option" onclick="wizardSelect(1,'gloves','nitrile')" data-val="nitrile">
+            <div class="wizard-option-icon">🟢</div>
+            <div><div class="wizard-option-label">Disposable nitrile</div><div class="wizard-option-sub">Best hygiene — change between apiaries</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(1,'gloves','synthetic')" data-val="synthetic">
+            <div class="wizard-option-icon">🔵</div>
+            <div><div class="wizard-option-label">Washable synthetic / rubber</div><div class="wizard-option-sub">Good — can be bleach-wiped and washed</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(1,'gloves','leather')" data-val="leather">
+            <div class="wizard-option-icon">🟡</div>
+            <div><div class="wizard-option-label">Leather gauntlets</div><div class="wizard-option-sub">Cannot be reliably sterilised — we'll explain why</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(1,'gloves','activity')" data-val="activity">
+            <div class="wizard-option-icon">🔄</div>
+            <div><div class="wizard-option-label">Depends on the activity</div><div class="wizard-option-sub">Nitrile for inspections, bare hands for lighter tasks</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(1,'gloves','none')" data-val="none">
+            <div class="wizard-option-icon">🔴</div>
+            <div><div class="wizard-option-label">No gloves</div><div class="wizard-option-sub">Higher transmission risk — we'll explain the implications</div></div>
+          </div>
+        </div>
+
+        <!-- Step 2: Torch -->
+        <div class="wizard-step" id="step-2">
+          <div class="wizard-q">🔥 Do you have a propane / butane torch?</div>
+          <div class="wizard-option" onclick="wizardSelect(2,'torch','yes')" data-val="yes">
+            <div class="wizard-option-icon">✅</div>
+            <div><div class="wizard-option-label">Yes</div><div class="wizard-option-sub">The single most effective sterilisation tool</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(2,'torch','no')" data-val="no">
+            <div class="wizard-option-icon">❌</div>
+            <div><div class="wizard-option-label">Not yet</div><div class="wizard-option-sub">We'll suggest practical alternatives</div></div>
+          </div>
+        </div>
+
+        <!-- Step 3: Ozone -->
+        <div class="wizard-step" id="step-3">
+          <div class="wizard-q">🌀 Do you have access to an ozone generator or UV-C steriliser?<br><span style="font-size:14px;color:var(--text3);font-weight:400;">e.g. Ozone generator (light bulb type) · UV-C steriliser (light bulb type)</span></div>
+          <div class="wizard-option" onclick="wizardSelect(3,'ozone','ozone')" data-val="ozone">
+            <div class="wizard-option-icon">🌀</div>
+            <div><div class="wizard-option-label">Ozone generator</div><div class="wizard-option-sub">Excellent for stored comb and equipment</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(3,'ozone','uv')" data-val="uv">
+            <div class="wizard-option-icon">💡</div>
+            <div><div class="wizard-option-label">UV-C steriliser</div><div class="wizard-option-sub">Good for tools and small equipment</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(3,'ozone','both')" data-val="both">
+            <div class="wizard-option-icon">✅</div>
+            <div><div class="wizard-option-label">Both</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(3,'ozone','neither')" data-val="neither">
+            <div class="wizard-option-icon">➖</div>
+            <div><div class="wizard-option-label">Neither — not yet</div><div class="wizard-option-sub">We'll show you low-cost options</div></div>
+          </div>
+        </div>
+
+        <!-- Step 4: Primary concern -->
+        <div class="wizard-step" id="step-4">
+          <div class="wizard-q">🦠 What is your biggest hygiene concern?</div>
+          <div class="wizard-option" onclick="wizardSelect(4,'concern','afb')" data-val="afb">
+            <div class="wizard-option-icon">⚠️</div>
+            <div><div class="wizard-option-label">American Foulbrood</div><div class="wizard-option-sub">Highly contagious, survives decades in equipment</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(4,'concern','varroa')" data-val="varroa">
+            <div class="wizard-option-icon">🔴</div>
+            <div><div class="wizard-option-label">Varroa & associated viruses</div><div class="wizard-option-sub">The dominant threat in modern beekeeping</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(4,'concern','waxmoth')" data-val="waxmoth">
+            <div class="wizard-option-icon">🦋</div>
+            <div><div class="wizard-option-label">Wax moth / Small hive beetle</div><div class="wizard-option-sub">Pest damage to stored comb and equipment</div></div>
+          </div>
+          <div class="wizard-option" onclick="wizardSelect(4,'concern','general')" data-val="general">
+            <div class="wizard-option-icon">🌿</div>
+            <div><div class="wizard-option-label">General apiary hygiene</div><div class="wizard-option-sub">I want a comprehensive approach</div></div>
+          </div>
+        </div>
+
+        <!-- Step 5: Done — generate plan -->
+        <div class="wizard-step" id="step-5">
+          <div class="wizard-q">✅ All set — generating your personalised plan</div>
+          <div style="text-align:center;padding:20px 0;">
+            <div class="spinner" id="planSpinner"></div>
+            <div style="margin-top:12px;font-size:15px;color:var(--text3);">Analysing your hive data…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personalised plan (shown after profile complete) -->
+      <div id="planContent" style="display:none;">
+        <div class="section-header">🧹 Your Hygiene Plan</div>
+        <div class="section-sub" id="planSub">Based on your operation and current hive data</div>
+
+        <!-- Season alert banner -->
+        <div id="seasonBanner" class="card" style="background:linear-gradient(135deg,#EEF6F0,#E0F0E8);border-color:#5A8A6A;"></div>
+
+
+
+        <!-- Rule-based checklist -->
+        <div class="card">
+          <div class="card-title">📋 Your Hygiene Checklist</div>
+
+          <!-- How it works guidance -->
+          <div style="background:#F5F2EC;border-radius:8px;padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--amber);">
+            <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px;">How this checklist works</div>
+            <div style="font-size:14px;color:var(--text3);line-height:1.6;">
+              Items are generated from your profile answers, current season, and live hive data from VarroaMate. Each item is tagged with a priority category.<br><br>
+              <strong style="color:var(--text2);">Tick an item</strong> to mark it done during your current apiary visit — this is a working checklist, not a permanent record. Items reset each session so you start fresh each visit.<br><br>
+              <strong style="color:var(--text2);">Not ticking items</strong> does not generate a warning — but unticked high-priority items (marked <span style="color:#C0402A;font-weight:700;">⚠️ Overdue</span> or <span style="color:#C0402A;font-weight:700;">🚨 Action required</span>) indicate tasks your colony data flags as overdue or at threshold. These should not be deferred.<br><br>
+              To change which items appear, tap <em>Update my profile</em> below and adjust your answers — your equipment choices, primary concern, and ozone/UV access all directly determine which checklist items are included.
+            </div>
+          </div>
+
+          <!-- Priority legend -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <div style="font-size:13px;color:var(--text3);width:100%;font-weight:600;margin-bottom:2px;">Priority tags:</div>
+            <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:#FAE8E5;color:#C0402A;border:1px solid #E8C0B8;">🚨 Action required — act now</span>
+            <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:#FAE8E5;color:#C0402A;border:1px solid #E8C0B8;">⚠️ Overdue — delayed task</span>
+            <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;">High priority</span>
+            <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:#EAF3F5;color:#4A8A9A;border:1px solid #B0D4DC;">Seasonal</span>
+            <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:#F5F2EC;color:var(--text3);border:1px solid var(--border);">Equipment upgrade</span>
+          </div>
+
+          <div id="checklistContainer"></div>
+        </div>
+
+        <!-- Data summary -->
+        <div class="card" id="dataCard">
+          <div class="card-title">📊 Your Hive Data</div>
+
+          <!-- Explanation of what connecting does -->
+          <div style="font-size:14px;color:var(--text3);line-height:1.6;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            When connected to VarroaMate, this app reads your live hive records to personalise your checklist — including your hive count, most recent alcohol wash result, and any disease flags from recent inspections. This means items like <em>mite count overdue</em> or <em>count at threshold</em> are generated automatically from your actual data rather than generic defaults.
+          </div>
+
+          <!-- Disease logic explainer -->
+          <div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);background:#F5F2EC;border-radius:8px;padding:10px 12px;">
+            <strong style="color:var(--text2);display:block;margin-bottom:4px;">How disease flags work</strong>
+            Disease indicators show only what was flagged in the <strong>most recent inspection for each hive</strong>. If a subsequent inspection shows no disease, the flag clears automatically — a clean inspection means the issue has resolved. <strong>AFB is the exception</strong>: it remains flagged regardless of subsequent clean counts, given its serious notifiable status. To clear an AFB flag, record a new alcohol wash in VarroaMate for that hive and select <em>No Disease Present</em>.
+          </div>
+
+          <!-- Auth-aware content area -->
+          <div id="dataCardBody" style="font-size:15px;color:var(--text2);line-height:1.8;"></div>
+
+          <!-- Sign-in prompt (shown when not logged in) -->
+          <div id="vmSignInPrompt" style="display:none;">
+            <div style="background:#FEF6E4;border:1px solid #E8C070;border-radius:8px;padding:12px 14px;margin-bottom:12px;">
+              <div style="font-size:14px;font-weight:700;color:#8A5000;margin-bottom:4px;">💡 Already have a VarroaMate account?</div>
+              <div style="font-size:14px;color:var(--text2);line-height:1.5;">Make sure you are signed into VarroaMate in this same browser — your session is shared automatically. If you signed in on a different browser or device, sign in below.</div>
+            </div>
+            <div style="font-size:14px;color:var(--text3);margin-bottom:8px;">Sign in to load your hive data:</div>
+            <input id="vmEmail" type="email" placeholder="Your VarroaMate email"
+              style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--text1);margin-bottom:8px;box-sizing:border-box;">
+            <input id="vmPassword" type="password" placeholder="Password"
+              style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--text1);margin-bottom:10px;box-sizing:border-box;">
+            <button onclick="vmSignIn()"
+              style="width:100%;padding:11px;background:var(--forest);color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;">
+              Sign in to VarroaMate →
+            </button>
+            <div id="vmSignInError" style="font-size:14px;color:#C0402A;margin-top:8px;display:none;"></div>
+            <div style="font-size:13px;color:var(--text3);margin-top:10px;text-align:center;">
+              No account? <a href="/register" style="color:var(--sage);">Create one at VarroaMate →</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- AI analysis — at bottom after all data is visible -->
+        <div style="background:#F5F2EC;border-radius:8px;padding:11px 14px;margin-bottom:12px;border-left:3px solid var(--sage);">
+          <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:5px;">🤖 About the AI Analysis</div>
+          <div style="font-size:13px;color:var(--text3);line-height:1.6;">
+            The AI analysis reads your profile answers, current season, and live hive data — including mite counts and any disease flags — and writes a short personalised narrative. It covers your current risk level, one clear action to take this week, and a specific equipment suggestion based on what you own.<br>
+            <span style="color:var(--text3);font-style:italic;">AI output can contain errors. Always cross-check recommendations against authoritative sources.</span>
+          </div>
+        </div>
+        <div class="ai-panel" id="aiNarrative" style="display:none;margin-bottom:12px;">
+          <div class="ai-panel-title">🤖 Your personalised analysis</div>
+          <div class="ai-panel-body" id="aiNarrativeText">Generating…</div>
+        </div>
+        <button class="btn btn-forest btn-sm" id="generateAiBtn" onclick="generateAiPlan()" style="margin-bottom:14px;width:100%;">✨ Hygiene Plan AI Analysis</button>
+
+        <button class="btn btn-outline btn-sm" onclick="resetProfile()" style="margin-top:4px;">↩ Update my profile</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: DISEASE MAP ══ -->
+    <div class="screen" id="screen-map">
+      <div class="section-header">🗺️ Disease Transmission Map</div>
+      <div class="section-sub">Pathogens live in four different reservoirs — tap each to understand what lives there and how it spreads.</div>
+
+      <!-- Three Reservoirs -->
+      <div class="reservoir-card comb" onclick="toggleReservoir(this)" id="res-comb">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:29px;">🪵</div>
+          <div>
+            <div class="reservoir-title">Comb & Equipment Reservoir</div>
+            <div style="font-size:14px;color:var(--text2);">AFB · EFB · Chalkbrood · Wax Moth · SHB · Nosema spores</div>
+          </div>
+          <div style="margin-left:auto;font-size:14px;color:var(--text3);">▾</div>
+        </div>
+        <div class="reservoir-expand">
+          <div style="font-size:16px;color:var(--text2);line-height:1.6;margin-bottom:10px;">
+            These pathogens persist long after bees have left. <strong>AFB spores survive in comb for decades.</strong> EFB (<em>Melissococcus plutonius</em>) also persists in contaminated comb and equipment, though less tenaciously than AFB. The hive structure itself is the reservoir — not the bees.
+          </div>
+          <div style="margin-bottom:8px;"><span class="risk-pill risk-high">HIGH persistence</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px;">Control strategy:</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6;">🔥 Flame sterilise tools &nbsp; 🌀 Ozone stored comb &nbsp; 🚫 Never reuse contaminated comb<br><span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FAE8E5;border-left:3px solid #C0402A;border-radius:3px;font-size:13px;color:#7A2010;line-height:1.5;"><strong>⚠️ Notifiable disease:</strong> Do not destroy equipment until you have reported to your state agriculture authority and received instructions. Destroying evidence before inspection may be an offence.</span></div>
+        </div>
+      </div>
+
+      <div class="reservoir-card bee" onclick="toggleReservoir(this)" id="res-bee">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:29px;">🐝</div>
+          <div>
+            <div class="reservoir-title">Bee Population Reservoir</div>
+            <div style="font-size:14px;color:var(--text2);">EFB · Nosema · Chronic bee paralysis · Tracheal mites</div>
+          </div>
+          <div style="margin-left:auto;font-size:14px;color:var(--text3);">▾</div>
+        </div>
+        <div class="reservoir-expand">
+          <div style="font-size:16px;color:var(--text2);line-height:1.6;margin-bottom:10px;">
+            These pathogens move with living bees — through <strong>trophallaxis, drifting, and direct contact</strong>. EFB (<em>Melissococcus plutonius</em>) is primarily transmitted this way — infected nurse bees pass it to larvae during feeding. Equipment hygiene has some impact for EFB but colony strength and bee health are the primary controls for most pathogens in this reservoir.<br><br>
+            <span style="font-size:14px;color:var(--text3);">
+              <strong style="color:var(--text2);">Trophallaxis</strong> — mouth-to-mouth food sharing between bees. A fundamental colony behaviour used to distribute food, pheromones, and information throughout the hive. Because it involves direct oral contact between many individuals, it is also a highly efficient route for pathogen transfer — Nosema spores, viruses, and bacteria can pass directly from bee to bee during every feeding exchange.<br><br>
+              <strong style="color:var(--text2);">Drifting</strong> — when forager bees return to the wrong hive, usually due to wind, disorientation, or hives placed too close together in a row. A drifting bee carries its full pathogen load — including Varroa mites — into the new colony. Apiaries with hives arranged in long parallel rows have significantly higher drift rates than those with varied orientations or landmarks. Drifting is one of the primary mechanisms by which Varroa spreads between colonies in an apiary without any beekeeper intervention.
+            </span>
+          </div>
+          <div style="margin-bottom:8px;"><span class="risk-pill risk-med">MEDIUM persistence</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px;">Control strategy:</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6;">💪 Maintain strong colonies &nbsp; 🌬️ Ensure good ventilation &nbsp; 🔄 Rotate comb regularly &nbsp; 🍯 Good nutrition</div>
+        </div>
+      </div>
+
+      <div class="reservoir-card collapse" onclick="toggleReservoir(this)" id="res-collapse">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:29px;">💥</div>
+          <div style="flex:1;">
+            <div class="reservoir-title">Collapsing Colony Reservoir</div>
+            <div style="font-size:14px;color:var(--text2);">Varroa · DWV · ABPV · IAPV</div>
+          </div>
+          <div style="margin-left:auto;font-size:14px;color:var(--text3);">▾</div>
+        </div>
+        <div class="reservoir-expand">
+          <div style="font-size:16px;color:var(--text2);line-height:1.6;margin-bottom:10px;">
+            The most dangerous reservoir in the Varroa era. Virus titres can increase <strong>millions-fold</strong> as a colony collapses. One dying colony can distribute hundreds of mites to neighbours through robbing — the "Varroa bomb" effect.
+          </div>
+          <div style="margin-bottom:8px;"><span class="risk-pill risk-high">EXPLOSIVE spread</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px;">Control strategy:</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6;">🧪 Monitor mites every 4 weeks &nbsp; ⚡ Treat before threshold &nbsp; 🗑️ Remove deadouts immediately &nbsp; 🚫 Prevent robbing during dearth</div>
+
+          <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+            <div onclick="event.stopPropagation();var p=this.nextElementSibling;p.style.display=p.style.display==='block'?'none':'block';this.querySelector('.varr').textContent=p.style.display==='block'?'▾':'▸';"
+              style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;">
+              <span class="varr" style="font-size:13px;color:var(--text3);">▸</span>
+              <span style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.3px;text-transform:uppercase;">Virus profiles &amp; Australian status</span>
+            </div>
+            <div style="display:none;margin-top:10px;">
+
+              <div style="margin-bottom:12px;font-size:14px;color:var(--text3);line-height:1.6;">
+                <strong style="color:var(--text2);font-size:14px;">DWV — Deformed Wing Virus</strong><br>
+                The most destructive honey bee virus globally when Varroa is present. Vectored directly into bee haemolymph during mite feeding, causing deformed wings, shortened abdomen, and neurological damage. Varroa amplifies viral titres millions-fold in collapsing colonies.<br>
+                <span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#EEF6F0;border-left:3px solid #4A8A6A;border-radius:3px;color:#2A5A3A;">
+                  🇦🇺 <strong>Australian status:</strong> Strong evidence DWV (genotype A and B) is currently <strong>absent</strong> from Australian colonies — never detected in large-scale national surveys. Its arrival via Varroa is the single greatest emerging viral threat. Active baseline monitoring underway via varroa.org.au.
+                </span>
+              </div>
+
+              <div style="margin-bottom:12px;font-size:14px;color:var(--text3);line-height:1.6;">
+                <strong style="color:var(--text2);font-size:14px;">ABPV — Acute Bee Paralysis Virus</strong><br>
+                Part of the AKI complex with IAPV and KBV. Causes rapid paralysis and death of adult bees within days. Self-limiting without Varroa — kills bees too quickly to sustain chronic infection — but dangerous when mite populations are very high.<br>
+                <span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FFF8EE;border-left:3px solid #D4A040;border-radius:3px;color:#7A4A00;">
+                  🇦🇺 <strong>Australian status:</strong> <strong>Not detected</strong> in large-scale surveys to date (Roberts et al. 2017). Included in varroa.org.au baseline monitoring as Varroa spreads. Considered at risk of emerging once mite populations establish.
+                </span>
+              </div>
+
+              <div style="font-size:14px;color:var(--text3);line-height:1.6;">
+                <strong style="color:var(--text2);font-size:14px;">IAPV — Israeli Acute Paralysis Virus</strong><br>
+                AKI complex member. Causes trembling, inability to fly, and rapid adult die-off. First linked to Colony Collapse Disorder in the US. Typically co-occurs with DWV and ABPV in severely collapsing hives overseas.<br>
+                <span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FAE8E5;border-left:3px solid #C0402A;border-radius:3px;color:#7A2010;">
+                  🇦🇺 <strong>Australian status:</strong> <strong>Confirmed present</strong> — detected in a national survey of 1,240 colonies (Roberts et al. 2017), with high read abundance in some samples. No CCD association in absence of Varroa, but behaviour as Varroa spreads is being actively monitored.
+                </span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reservoir 4: New Arrivals -->
+      <div class="reservoir-card arrivals" onclick="toggleReservoir(this)" id="res-arrivals">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:28px;">🚪</div>
+          <div style="flex:1;">
+            <div class="reservoir-title">New Arrivals Reservoir</div>
+            <div style="font-size:13px;color:var(--text2);">Purchased colonies · Swarms · Transferred apiaries</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;color:var(--text3);">▾</div>
+        </div>
+        <div class="reservoir-expand">
+          <div style="font-size:16px;color:var(--text2);line-height:1.6;margin-bottom:10px;">
+            Every new colony entering your apiary — purchased nucleus, full hive, caught swarm, or taken-over apiary — is an unknown biosecurity risk. It may carry AFB spores, Varroa at any level, EFB, Nosema, or viruses with no visible symptoms. <strong>Quarantine is the only reliable way to contain this risk.</strong>
+          </div>
+          <div style="margin-bottom:10px;"><span class="risk-pill risk-high">PREVENTABLE entry point</span></div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px;">Quarantine protocol</div>
+
+          <div style="background:#F5F2EC;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.6;">
+            <strong>📍 Location:</strong> Place new arrivals at least 3 metres from your existing hives — ideally on the opposite side of the apiary or a separate site. The quarantine position should have a distinct entrance orientation so bees do not drift into established colonies.
+          </div>
+
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:8px;">
+            <strong>🐝 Caught swarms</strong> — Swarms are unknown-origin bees. They may originate from a feral colony carrying AFB, or from a beekeeper&#39;s colony that collapsed due to disease. Treat every swarm as high-risk. Place in quarantine, perform an alcohol wash immediately to establish a baseline mite count, and inspect brood carefully at the first opportunity (once comb is drawn). Do not allow swarm frames to contact established colony equipment.
+          </div>
+
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:8px;">
+            <strong>🛒 Purchased nucleus or colony</strong> — Request a recent alcohol wash result and inspection record from the vendor before purchase. Reputable sellers will provide this. Even so, quarantine for a minimum of 4–6 weeks and perform your own alcohol wash within the first week. Inspect brood for AFB and EFB symptoms at the first brood inspection.
+          </div>
+
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:8px;">
+            <strong>🏚️ Taken-over apiary</strong> — Taking over hives from a retiring or deceased beekeeper is high-risk. Disease management history may be unknown, equipment may be old and contaminated, and AFB spores may be present in comb that shows no current symptoms. Treat all equipment as potentially contaminated. Perform brood inspection and alcohol wash on every hive before moving them to your site. Consider replacing old dark comb progressively.
+          </div>
+
+          <div style="background:#FAE8E5;border:1px solid #C0402A40;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text2);line-height:1.6;">
+            <strong style="color:#C0402A;">⚠️ Quarantine minimum:</strong> Keep new arrivals isolated for at least 4–6 weeks — one full brood cycle. This allows any latent disease to manifest in new brood before the colony is integrated into your apiary. Do not share tools, frames, or equipment between quarantine and established hives during this period.
+          </div>
+        </div>
+      </div>
+
+      <!-- Four Pathways -->
+      <div style="margin-top:20px;">
+        <div class="section-header" style="font-size:19px;">⚡ Four Transmission Pathways</div>
+        <div class="section-sub">Ranked by frequency of disease spread in Australian apiaries. Most manuals assume the reverse — that mismatch explains why conventional hygiene advice often feels disconnected from real apiary experience.</div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;margin-top:12px;">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <!-- Rank bar header -->
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:0;min-width:440px;">
+          <div style="background:#C0402A;padding:8px 6px;text-align:center;">
+            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">RANK</div>
+            <div style="font-size:21px;font-weight:800;color:white;">#1</div>
+          </div>
+          <div style="background:#B8780A;padding:8px 6px;text-align:center;">
+            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">RANK</div>
+            <div style="font-size:21px;font-weight:800;color:white;">#2</div>
+          </div>
+          <div style="background:#4A8A9A;padding:8px 6px;text-align:center;">
+            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">RANK</div>
+            <div style="font-size:21px;font-weight:800;color:white;">#3</div>
+          </div>
+          <div style="background:#6A8A6A;padding:8px 6px;text-align:center;">
+            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">RANK</div>
+            <div style="font-size:21px;font-weight:800;color:white;">#4</div>
+          </div>
+        </div>
+
+        <!-- Icon + label row -->
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:0;min-width:440px;border-bottom:1px solid var(--border);">
+          <div style="padding:12px 8px;text-align:center;border-right:1px solid var(--border);cursor:pointer;" onclick="showPathwayInfo('bee')">
+            <div style="font-size:23px;margin-bottom:4px;">🐝</div>
+            <div style="font-size:14px;font-weight:700;color:#C0402A;">Bee-to-Bee</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;line-height:1.4;">Drifting, robbing, swarming</div>
+            <div style="font-size:11px;color:#C0402A;margin-top:5px;font-weight:700;">ⓘ more</div>
+          </div>
+          <div style="padding:12px 8px;text-align:center;border-right:1px solid var(--border);cursor:pointer;" onclick="showPathwayInfo('keeper')">
+            <div style="font-size:23px;margin-bottom:4px;">🧑‍🌾</div>
+            <div style="font-size:14px;font-weight:700;color:#B8780A;">Beekeeper</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;line-height:1.4;">Tools, frames, movement</div>
+            <div style="font-size:11px;color:#B8780A;margin-top:5px;font-weight:700;">ⓘ more</div>
+          </div>
+          <div style="padding:12px 8px;text-align:center;border-right:1px solid var(--border);cursor:pointer;" onclick="showPathwayInfo('equip')">
+            <div style="font-size:23px;margin-bottom:4px;">🔧</div>
+            <div style="font-size:14px;font-weight:700;color:#4A8A9A;">Equipment</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;line-height:1.4;">Boxes, comb, gloves</div>
+            <div style="font-size:11px;color:#4A8A9A;margin-top:5px;font-weight:700;">ⓘ more</div>
+          </div>
+          <div style="padding:12px 8px;text-align:center;cursor:pointer;" onclick="showPathwayInfo('env')">
+            <div style="font-size:23px;margin-bottom:4px;">🌿</div>
+            <div style="font-size:14px;font-weight:700;color:#6A8A6A;">Environment</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;line-height:1.4;">Soil, water, feral colonies</div>
+            <div style="font-size:11px;color:#6A8A6A;margin-top:5px;font-weight:700;">ⓘ more</div>
+          </div>
+        </div>
+
+        <!-- Severity bar -->
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:0;min-width:440px;padding:10px 0 4px;">
+          <div style="padding:0 8px;text-align:center;">
+            <div style="height:6px;background:#C0402A;border-radius:3px;opacity:0.85;width:95%;margin:0 auto;"></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">Hardest to prevent</div>
+          </div>
+          <div style="padding:0 8px;text-align:center;">
+            <div style="height:6px;background:#B8780A;border-radius:3px;opacity:0.85;width:72%;margin:0 auto;"></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">Fully preventable</div>
+          </div>
+          <div style="padding:0 8px;text-align:center;">
+            <div style="height:6px;background:#4A8A9A;border-radius:3px;opacity:0.85;width:50%;margin:0 auto;"></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">Easily controlled</div>
+          </div>
+          <div style="padding:0 8px;text-align:center;">
+            <div style="height:6px;background:#6A8A6A;border-radius:3px;opacity:0.85;width:28%;margin:0 auto;"></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">Partially controllable</div>
+          </div>
+        </div>
+
+        <!-- Key pathogens row -->
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:0;min-width:440px;padding:6px 0 12px;border-top:1px solid var(--border);margin-top:6px;">
+          <div style="padding:0 6px;text-align:center;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:4px;font-weight:600;">KEY RISKS</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Varroa<br>DWV<br>Nosema<br>EFB<br>SHB</div>
+          </div>
+          <div style="padding:0 6px;text-align:center;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:4px;font-weight:600;">KEY RISKS</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">AFB<br>Varroa<br>EFB<br>SHB</div>
+          </div>
+          <div style="padding:0 6px;text-align:center;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:4px;font-weight:600;">KEY RISKS</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">AFB<br>Chalkbrood<br>Wax moth<br>SHB</div>
+          </div>
+          <div style="padding:0 6px;text-align:center;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:4px;font-weight:600;">KEY RISKS</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Chalkbrood<br>Wax moth<br>SHB<br>Varroa</div>
+          </div>
+        </div>
+        </div><!-- end scroll wrapper -->
+
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: TOOLKIT ══ -->
+    <div class="screen" id="screen-toolkit">
+      <div class="section-header">🧰 Sanitation Toolkit</div>
+      <div class="section-sub">Mark what you own — your checklist will be filtered to methods you can actually use.</div>
+
+      <!-- Toolkit items -->
+      <div class="card">
+        <div class="card-title">My toolkit</div>
+        <div id="toolkitItems">
+          <div class="equip-row">
+            <div><div class="equip-name">🔥 Propane / butane torch</div><div class="equip-method">Best all-round sterilisation — tools, boxes, metal</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('torch')">ⓘ</button>
+            <div class="equip-toggle" id="tool-torch" onclick="toggleTool('torch',this)"></div>
+          </div>
+          <div class="equip-row">
+            <div><div class="equip-name">🧴 Bleach (sodium hypochlorite)</div><div class="equip-method">0.5–1% solution, 5–10 min contact time</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('bleach')">ⓘ</button>
+            <div class="equip-toggle" id="tool-bleach" onclick="toggleTool('bleach',this)"></div>
+          </div>
+          <div class="equip-row">
+            <div><div class="equip-name">🫧 Washing soda (sodium carbonate)</div><div class="equip-method">3–5% solution — dissolves wax and propolis</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('soda')">ⓘ</button>
+            <div class="equip-toggle" id="tool-soda" onclick="toggleTool('soda',this)"></div>
+          </div>
+          <div class="equip-row">
+            <div><div class="equip-name">💡 UV-C steriliser / cabinet</div><div class="equip-method">Line-of-sight sterilisation — tools, gloves, clothing</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('uv')">ⓘ</button>
+            <div class="equip-toggle" id="tool-uv" onclick="toggleTool('uv',this)"></div>
+          </div>
+          <div class="equip-row">
+            <div><div class="equip-name">🌀 Ozone generator</div><div class="equip-method">Penetrates cracks — comb, boxes, clothing, tools</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('ozone')">ⓘ</button>
+            <div class="equip-toggle" id="tool-ozone" onclick="toggleTool('ozone',this)"></div>
+          </div>
+          <div class="equip-row">
+            <div><div class="equip-name">🧊 Chest freezer</div><div class="equip-method">−18°C for 48h kills all wax moth and small hive beetle life stages</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('freezer')">ⓘ</button>
+            <div class="equip-toggle" id="tool-freezer" onclick="toggleTool('freezer',this)"></div>
+          </div>
+          <div class="equip-row" style="border-bottom:none;">
+            <div><div class="equip-name">🧪 Methylated spirits / ethanol ≥70%</div><div class="equip-method">Rapid surface disinfection — tools, gloves, hard surfaces</div></div>
+            <button class="tool-info-btn" onclick="showToolInfo('meths')">ⓘ</button>
+            <div class="equip-toggle" id="tool-meths" onclick="toggleTool('meths',this)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI upgrade recommendation -->
+      <!-- Hygiene Score Card -->
+      <div class="card" id="hygieneScoreCard" style="padding:0;overflow:hidden;margin-bottom:4px;">
+        <div style="background:linear-gradient(135deg,#122838 0%,#1A3A4A 100%);padding:14px 16px 12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#E8B84A;letter-spacing:0.5px;text-transform:uppercase;">Your Hygiene Score</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">Based on your current toolkit</div>
+            </div>
+            <div id="scoreBadge" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.1);border:3px solid #E8B84A;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+              <div id="scoreNumber" style="font-size:21px;font-weight:800;color:white;line-height:1;">–</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.6);">/ 100</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;">
+            <div id="scoreBar" style="height:6px;background:#E8B84A;border-radius:3px;width:0%;transition:width 0.6s ease;"></div>
+          </div>
+          <div id="scoreLabel" style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:6px;">Toggle your tools above to calculate</div>
+        </div>
+        <div id="scoreBreakdown" style="padding:12px 16px;display:none;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="ai-panel" id="toolkitAiPanel" style="display:none;margin-bottom:4px;">
+        <div class="ai-panel-title">🤖 Priority upgrade recommendation</div>
+        <div class="ai-panel-body" id="toolkitAiText">Analysing your toolkit…</div>
+      </div>
+      <button class="btn btn-forest btn-sm" id="toolkitAiBtn" onclick="generateToolkitAdvice()" style="margin-bottom:16px;">✨ Improve my score — what should I add next?</button>
+
+      <!-- Equipment matrix -->
+      <div class="section-header" style="font-size:19px;">📋 Equipment Sanitation Matrix</div>
+      <div class="section-sub">Recommended method for each equipment type, filtered to your toolkit.</div>
+
+      <div id="equipMatrix">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: SEASON ══ -->
+    <div class="screen" id="screen-season">
+      <div class="section-header">📅 Seasonal Risk Calendar</div>
+      <div class="section-sub">Disease transmission in apiaries is strongly seasonal. Focus effort when it matters most.</div>
+
+      <div id="currentWindowBanner" class="card" style="border-color:var(--amber);background:var(--amber-pale);"></div>
+
+      <div class="card">
+        <div class="season-row" data-season="Spring">
+          <div>
+            <div class="season-month">Aug–Oct</div>
+            <div><span class="season-badge season-spring">Spring</span></div>
+          </div>
+          <div>
+            <div class="season-title" style="color:#1C5A28;">🌱 Brood Disease Window</div>
+            <div class="season-actions">Rapid colony expansion, beekeepers handling many frames. <strong>AFB, EFB, Chalkbrood</strong> risk elevated.<br><br>
+            ✅ Alcohol wash every 4 weeks — first check of spring confirms whether mites survived winter and whether any treatment is needed before populations build<br>
+            ✅ Record all counts in VarroaMate<br>
+            ✅ Inspect brood carefully<br>
+            ✅ Avoid unnecessary frame exchange between hives<br>
+            ✅ Flame tools between apiaries<br>
+            ✅ Sterilise used equipment before returning to service<br>
+            ✅ Begin comb rotation — move old dark brood frames outward toward the edge of the brood nest; mark any new frames with month and year (e.g. "Sep 25") on the top bar</div>
+          </div>
+        </div>
+        <div class="season-row" data-season="Summer">
+          <div>
+            <div class="season-month">Nov–Feb</div>
+            <div><span class="season-badge season-summer">Summer</span></div>
+          </div>
+          <div>
+            <div class="season-title" style="color:#8A5000;">☀️ Peak Activity — Maintain Monitoring</div>
+            <div class="season-actions">Good conditions but mite populations building silently. Nectar dearth later in summer increases robbing and drifting risk.<br><br>
+            ✅ Alcohol wash every 4 weeks<br>
+            ✅ Record all counts in VarroaMate<br>
+            ✅ Reduce entrances if robbing observed<br>
+            ✅ Avoid open feeding or exposed honey frames</div>
+          </div>
+        </div>
+        <div class="season-row" data-season="Autumn">
+          <div>
+            <div class="season-month">Mar–May</div>
+            <div><span class="season-badge season-autumn">Autumn</span></div>
+          </div>
+          <div>
+            <div class="season-title" style="color:#9A2020;">🚨 Most Critical Window of the Year</div>
+            <div class="season-actions">Brood declines, mite populations peak, virus loads increase. Colony contraction increases robbing risk.<br><br>
+            <div style="background:#FAE8E5;border:1.5px solid #C0402A;border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+              <div style="font-size:14px;font-weight:700;color:#C0402A;margin-bottom:4px;">🚨 Critical Varroa Treatment Window</div>
+              <div style="font-size:14px;color:#7A2010;line-height:1.6;">Winter bees — the long-lived bees that must carry the colony through to spring — are produced from <strong>March to April</strong>. Any bee that emerges while mite levels are high will have a shortened lifespan and carry heavy viral loads. <strong>Treatment must be completed before the end of April</strong> to protect this cohort. Missing this window significantly reduces the colony's chance of surviving winter.</div>
+            </div>
+            🚨 Monitor mites first — alcohol wash to confirm threshold (≥3/300)<br>
+            🚨 Treat for Varroa immediately if at or above threshold<br>
+            🚨 Complete treatment before end of April<br>
+            🚨 Remove deadouts within 24 hours<br>
+            🚨 Prevent robbing cascades — reduce entrances</div>
+          </div>
+        </div>
+        <div class="season-row" style="border-bottom:none;" data-season="Winter">
+          <div>
+            <div class="season-month">May–Aug</div>
+            <div><span class="season-badge season-winter">Winter</span></div>
+          </div>
+          <div>
+            <div class="season-title" style="color:#1A3A7A;">❄️ Equipment Hygiene Window</div>
+            <div class="season-actions">Low colony activity — lowest transmission risk. Best time for equipment maintenance and forward planning.<br><br>
+            ✅ Avoid opening the hive — breaking the cluster costs bees energy<br>
+            ✅ Clean and sterilise all equipment<br>
+            ✅ Ozone or freeze stored comb<br>
+            ✅ Inspect and repair hive boxes<br>
+            ✅ Plan next season's Varroa treatment schedule in the <strong>VarroaMate Smart Planner</strong> — set your treatment rotation and mode-of-action sequence before spring arrives; record your monitoring results in VarroaMate as counts come in</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: PATHOGENS ══ -->
+    <div class="screen" id="screen-pathogens">
+      <div class="section-header">🦠 Eight Bee Health Threats</div>
+      <div class="section-sub">Most colony losses involve only a handful of biological threats. Understand these and you understand most apiary health problems.</div>
+
+
+      <!-- ── Transmission Pathway Ranking ── -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#122838 0%,#1A3A4A 100%);padding:14px 16px 10px;">
+          <div style="font-size:15px;font-weight:700;color:#E8B84A;letter-spacing:0.5px;text-transform:uppercase;">Transmission Pathways</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.65);margin-top:2px;">Ranked by frequency of disease spread in Australian apiaries</div>
+        </div>
+
+        <!-- 1. Bee-to-bee -->
+        <div style="display:flex;align-items:stretch;border-bottom:1px solid var(--border);">
+          <div style="width:5px;flex-shrink:0;background:#C0402A;"></div>
+          <div style="padding:12px 14px;flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#FAE8E5;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🐝</div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:var(--text1);">Bee-to-Bee</div>
+                <div style="font-size:13px;color:var(--text3);">Highest risk · hardest to prevent</div>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:#C0402A;background:#FAE8E5;padding:3px 8px;border-radius:20px;white-space:nowrap;">#1</div>
+            </div>
+            <div style="font-size:15px;color:var(--text2);line-height:1.5;">Drifting, robbing, and swarming spread Varroa, DWV, Nosema, and EFB directly between colonies. A single robbing event can transfer thousands of mites within hours. Strongest colonies are most at risk of attracting robbers.</div>
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Varroa</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">DWV</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Nosema</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">EFB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Beekeeper -->
+        <div style="display:flex;align-items:stretch;border-bottom:1px solid var(--border);">
+          <div style="width:5px;flex-shrink:0;background:#B8780A;"></div>
+          <div style="padding:12px 14px;flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#FEF6E4;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🧑‍🌾</div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:var(--text1);">Beekeeper</div>
+                <div style="font-size:13px;color:var(--text3);">High risk · fully preventable</div>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:#B8780A;background:#FEF6E4;padding:3px 8px;border-radius:20px;white-space:nowrap;">#2</div>
+            </div>
+            <div style="font-size:15px;color:var(--text2);line-height:1.5;">Moving frames, splitting colonies, and handling bees across hives without hygiene protocols. AFB spores travel on unsterilised hive tools in seconds. The beekeeper is the most efficient disease vector in the apiary — and the most controllable.</div>
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">AFB</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Varroa</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">EFB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Equipment -->
+        <div style="display:flex;align-items:stretch;border-bottom:1px solid var(--border);">
+          <div style="width:5px;flex-shrink:0;background:#4A8A9A;"></div>
+          <div style="padding:12px 14px;flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#EAF3F5;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🔧</div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:var(--text1);">Equipment</div>
+                <div style="font-size:13px;color:var(--text3);">Medium risk · easily controlled</div>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:#4A8A9A;background:#EAF3F5;padding:3px 8px;border-radius:20px;white-space:nowrap;">#3</div>
+            </div>
+            <div style="font-size:15px;color:var(--text2);line-height:1.5;">Second-hand hive boxes, frames, and comb are the primary reservoir for AFB spores, which survive 50+ years in wax. Borrowed or shared equipment without sterilisation is a common source of introduction to clean apiaries.</div>
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">AFB</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Chalkbrood</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Wax moth</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Environment -->
+        <div style="display:flex;align-items:stretch;">
+          <div style="width:5px;flex-shrink:0;background:#6A8A6A;"></div>
+          <div style="padding:12px 14px;flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#EDF3ED;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🌿</div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:var(--text1);">Environment</div>
+                <div style="font-size:13px;color:var(--text3);">Lower risk · partially controllable</div>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:#6A8A6A;background:#EDF3ED;padding:3px 8px;border-radius:20px;white-space:nowrap;">#4</div>
+            </div>
+            <div style="font-size:15px;color:var(--text2);line-height:1.5;">Soil, vegetation, and water sources carry chalkbrood spores, wax moth eggs, and small hive beetle adults. Wild colonies and feral swarms in the area are a background reservoir for Varroa and other pathogens. Apiary placement and local colony density matter.</div>
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Chalkbrood</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Wax moth</span>
+              <span style="font-size:13px;background:#FEF6E4;color:#B8780A;border:1px solid #E8D4A0;padding:2px 8px;border-radius:10px;">Varroa</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="pathogenCards">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: REFERENCES ══ -->
+    <div class="screen" id="screen-refs">
+      <div class="section-header">📚 References</div>
+      <div class="section-sub">All guidance in this module is based on governmental, regulatory, and peer-reviewed scientific sources.</div>
+
+      <div class="card">
+        <div class="card-title">Australian Regulatory Sources</div>
+        <div class="ref-item">
+          <div class="ref-source">Plant Health Australia / BeeAware</div>
+          <div class="ref-title">Biosecurity Manual for Beekeepers</div>
+          <a class="ref-link" href="https://beeaware.org.au" target="_blank">beeaware.org.au ↗</a>
+        </div>
+        <div class="ref-item">
+          <div class="ref-source">Plant Health Australia</div>
+          <div class="ref-title">Australian Honey Bee Industry Biosecurity Code of Practice</div>
+          <a class="ref-link" href="https://www.planthealthaustralia.com.au" target="_blank">planthealthaustralia.com.au ↗</a>
+        </div>
+        <div class="ref-item">
+          <div class="ref-source">Agriculture Victoria</div>
+          <div class="ref-title">Bee diseases and pests — identification and management</div>
+          <a class="ref-link" href="https://agriculture.vic.gov.au/biosecurity/bees" target="_blank">agriculture.vic.gov.au ↗</a>
+        </div>
+        <div class="ref-item">
+          <div class="ref-source">APVMA</div>
+          <div class="ref-title">Registered products for use in beekeeping</div>
+          <a class="ref-link" href="https://apvma.gov.au" target="_blank">apvma.gov.au ↗</a>
+        </div>
+        <div class="ref-item" style="border-bottom:none;">
+          <div class="ref-source">National Varroa Management Program</div>
+          <div class="ref-title">Varroa.org.au — national resource hub</div>
+          <a class="ref-link" href="https://varroa.org.au" target="_blank">varroa.org.au ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Peer-Reviewed Literature</div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Martin et al (2012) — Science<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">Global honey bee viral landscape altered by Varroa destructor <a href="https://doi.org/10.1126/science.1220941" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1126/science.1220941 ↗</a></div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Nazzi & Le Conte (2016) — Annual Review of Entomology<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">Ecology of Varroa destructor, the major ectoparasite of the western honey bee <a href="https://doi.org/10.1146/annurev-ento-010715-023731" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1146/annurev-ento-010715-023731 ↗</a></div>
+          <div style="font-size:13px;color:var(--text3);margin-top:2px;font-style:italic;">Free preprint available via HAL: hal.science/hal-02637353</div>
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Genersch (2010) — Journal of Invertebrate Pathology<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">American foulbrood in honeybees and its causative agent, Paenibacillus larvae <a href="https://doi.org/10.1016/j.jip.2009.06.015" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1016/j.jip.2009.06.015 ↗</a></div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">James RR (2011) — Journal of Economic Entomology<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">Potential of ozone as a fumigant to control pests in honey bee hives <a href="https://doi.org/10.1603/EC10385" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1603/EC10385 ↗</a></div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Gad et al (2025) — Hellenic Plant Protection Journal<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">Toxicity of ozone fumigation on Galleria mellonella</div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Abotaleb et al (2026) — Scientific Reports<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">Susceptibility of wax moth life stages to ozone fumigation</div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Highfield et al (2009) — Applied & Environmental Microbiology<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#EEF6F0;color:#2A6A3A;border:1px solid #6AAA7A;margin-left:6px;vertical-align:middle;">🔓 Open Access</span></div>
+          <div class="ref-title">Deformed wing virus implicated in overwintering honeybee colony losses <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2786540/" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1128/AEM.02227-09 ↗</a></div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Roberts et al (2017) — Scientific Reports<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#EEF6F0;color:#2A6A3A;border:1px solid #6AAA7A;margin-left:6px;vertical-align:middle;">🔓 Open Access</span></div>
+          <div class="ref-title">Absence of deformed wing virus and Varroa destructor in Australia: unique perspectives on honeybee viral landscapes <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5537221/" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1038/s41598-017-07290-w ↗</a></div>
+          
+        </div>
+        <div class="ref-item" style="">
+          <div class="ref-source">Higes et al (2006) — Journal of Invertebrate Pathology<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:#F5F0EC;color:#7A5A3A;border:1px solid #C0A080;margin-left:6px;vertical-align:middle;">🔒 Subscription</span></div>
+          <div class="ref-title">Nosema ceranae, a new microsporidian parasite in honeybees in Europe <a href="https://doi.org/10.1016/j.jip.2006.02.005" target="_blank" rel="noopener" style="font-size:13px;color:var(--sage);text-decoration:none;">doi:10.1016/j.jip.2006.02.005 ↗</a></div>
+          
+        </div>
+        <div class="ref-item" style="border-bottom:none;">
+          <div class="ref-source">Haseman (1961) — American Bee Journal</div>
+          <div class="ref-title">How long can spores of American foulbrood live?</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:2px;font-style:italic;">Pre-DOI era — no digital link available</div>
+        </div>
+      </div>
+    </div>
+
+
+  </div><!-- end content-area -->
+
+  <!-- BOTTOM NAV -->
+  <!-- Drop-up overlay -->
+  <div id="moreMenuOverlay" onclick="closeMoreMenu()" style="display:none;position:fixed;inset:0;z-index:199;"></div>
+  <!-- Drop-up menu -->
+  <div id="moreMenu" style="display:none;position:fixed;bottom:60px;right:0;left:0;z-index:200;background:var(--paper);border-top:1.5px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -4px 24px rgba(10,20,30,0.13);padding:8px 0 4px;">
+    <button class="more-menu-item" id="more-tab-pathogens" onclick="switchTabFromMore('pathogens')">
+      <span style="font-size:20px;">🦠</span><span>Pathogens</span>
+    </button>
+    <button class="more-menu-item" id="more-tab-refs" onclick="switchTabFromMore('refs')">
+      <span style="font-size:20px;">📚</span><span>Sources</span>
+    </button>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-tab active" onclick="switchTab('intro')" id="tab-intro">
+      <span class="nav-tab-icon">🌿</span>
+      <span class="nav-tab-label">About</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('plan')" id="tab-plan">
+      <span class="nav-tab-icon">📋</span>
+      <span class="nav-tab-label">My Plan</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('map')" id="tab-map">
+      <span class="nav-tab-icon">🗺️</span>
+      <span class="nav-tab-label">Map</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('toolkit')" id="tab-toolkit">
+      <span class="nav-tab-icon">🧰</span>
+      <span class="nav-tab-label">Toolkit</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('season')" id="tab-season">
+      <span class="nav-tab-icon">📅</span>
+      <span class="nav-tab-label">Season</span>
+    </button>
+    <button class="nav-tab" id="tab-more" onclick="toggleMoreMenu()">
+      <span class="nav-tab-icon">•••</span>
+      <span class="nav-tab-label">More</span>
+    </button>
+  </nav>
+
+
+
+  <!-- Tool info drawer -->
+  <div id="toolInfoDrawer">
+    <div id="toolInfoBackdrop" onclick="closeToolInfo()"></div>
+    <div id="toolInfoPanel">
+      <div id="toolInfoHandle"></div>
+      <div id="toolInfoContent">
+        <div id="toolInfoTitle"></div>
+        <div id="toolInfoSub"></div>
+        <div id="toolInfoSteps"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pathway info drawer -->
+  <div id="pathwayDrawer" style="position:fixed;inset:0;z-index:8001;display:none;">
+    <div id="pathwayBackdrop" style="position:absolute;inset:0;background:rgba(10,20,30,0.55);" onclick="closePathwayInfo()"></div>
+    <div id="pathwayPanel" style="position:absolute;bottom:0;left:0;right:0;background:var(--paper);border-radius:18px 18px 0 0;padding:0 0 env(safe-area-inset-bottom,16px);max-height:85vh;overflow-y:auto;box-shadow:0 -4px 32px rgba(10,20,30,0.25);">
+      <div style="width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;"></div>
+      <div style="padding:16px 20px 24px;">
+        <div id="pathwayTitle" style="font-size:18px;font-weight:700;color:var(--text1);margin-bottom:4px;"></div>
+        <div id="pathwayContent"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- end #app -->
+
+<div id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+// ══════════════════════════════════════════════
+// DISCLAIMER (one-time)
+// ══════════════════════════════════════════════
+function checkDisclaimer(){
+  try{ if(localStorage.getItem('vmhh_disclaimer')==='1'){ hideDisclaimer(); return; } } catch(e){}
+  document.getElementById('disclaimerOverlay').style.display = 'flex';
+}
+function hideDisclaimer(){
+  const el = document.getElementById('disclaimerOverlay');
+  if(el){ el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(()=>el.remove(),300); }
+}
+function toggleDisclaimer(){
+  const chk = document.getElementById('discCheck');
+  const btn = document.getElementById('discBtn');
+  chk.classList.toggle('checked');
+  btn.classList.toggle('enabled', chk.classList.contains('checked'));
+}
+function acceptDisclaimer(){
+  try{ localStorage.setItem('vmhh_disclaimer','1'); } catch(e){}
+  hideDisclaimer();
+}
+
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const SUPABASE_URL  = 'https://yadptqjsjqxqjxouqkll.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA';
+const CLAUDE_MODEL  = 'claude-opus-4-6'; // update here when Anthropic releases new models
+
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── Plan / subscription state ──────────────────────────────────────────────
+let _plan = 'free'; // 'free' | 'free_ai' | 'hobbyist' | 'beekeeper'
+const AI_PLANS = new Set(['free_ai','hobbyist','beekeeper']);
+
+async function loadPlan(userId){
+  try{
+    const {data,error} = await _sb.from('subscriptions')
+      .select('plan,status').eq('user_id',userId).single();
+    if(!error && data){
+      _plan = (data.status==='cancelled') ? 'free' : (data.plan||'free');
+    }
+  }catch(e){ console.warn('VMHH loadPlan:',e); }
+}
+
+function hasAI(){ return AI_PLANS.has(_plan); }
+
+function renderAIMarkdown(text){
+  if(!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^\#\# (.+)$/gm,'<strong style="font-size:15px;color:var(--amber-dark,#8B5200);">$1</strong>')
+    .replace(/^\# (.+)$/gm,'<strong style="font-size:16px;color:var(--amber-dark,#8B5200);">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s,'<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
+    .replace(/\n\n/g,'</p><p style="margin-top:6px;">')
+    .replace(/\n/g,'<br>');
+}
+
+function requireAIOrUpgrade(){
+  if(hasAI()) return true;
+  showToast('AI features require a paid plan — see Plans & Pricing 🐝');
+  return false;
+}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let _user = null;
+let _profile = {}; // beekeeper hygiene profile
+let _hiveData = { hives:[], miteHistory:[], diseaseHistory:[], colonyLosses:[], inspections:[] };
+let _toolkit = {}; // which tools the beekeeper owns
+let _wizardStep = 1;
+const WIZARD_TOTAL = 4;
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function toggleMoreMenu(){
+  const menu = document.getElementById('moreMenu');
+  const overlay = document.getElementById('moreMenuOverlay');
+  const open = menu.style.display !== 'none';
+  menu.style.display = open ? 'none' : 'block';
+  overlay.style.display = open ? 'none' : 'block';
+  document.getElementById('tab-more').classList.toggle('active', !open);
+}
+
+function closeMoreMenu(){
+  document.getElementById('moreMenu').style.display = 'none';
+  document.getElementById('moreMenuOverlay').style.display = 'none';
+  document.getElementById('tab-more').classList.remove('active');
+}
+
+function switchTabFromMore(id){
+  closeMoreMenu();
+  switchTab(id);
+  document.getElementById('tab-more').classList.add('active');
+  document.querySelectorAll('.more-menu-item').forEach(el=>
+    el.classList.toggle('active-more', el.id === 'more-tab-'+id));
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.more-menu-item').forEach(el=>el.classList.remove('active-more'));
+  document.getElementById('screen-'+tab)?.classList.add('active');
+  document.getElementById('tab-'+tab)?.classList.add('active');
+  document.getElementById('contentArea').scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════
+// APPS DROPDOWN
+// ══════════════════════════════════════════════
+function toggleApps(){
+  const d = document.getElementById('vmhh-apps-dropdown');
+  if(!d) return;
+  const open = d.style.display === 'block';
+  d.style.display = open ? 'none' : 'block';
+  if(!open){
+    const btn = document.getElementById('vmhh-apps-wrap');
+    const rect = btn.getBoundingClientRect();
+    d.style.top = (rect.bottom + 8) + 'px';
+    d.style.right = (window.innerWidth - rect.right) + 'px';
+    setTimeout(()=>{
+      document.addEventListener('click', function closeApps(e){
+        if(!document.getElementById('vmhh-apps-wrap')?.contains(e.target)){
+          d.style.display = 'none';
+          document.removeEventListener('click', closeApps);
+        }
+      });
+    }, 10);
+  }
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let _toastTimer;
+function showToast(msg, dur=2800){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ══════════════════════════════════════════════
+// PROFILE WIZARD
+// ══════════════════════════════════════════════
+function renderWizardProgress(){
+  const wrap = document.getElementById('wizardProgress');
+  wrap.innerHTML = '';
+  for(let i=1;i<=WIZARD_TOTAL;i++){
+    const dot = document.createElement('div');
+    dot.className = 'wizard-dot' + (i<_wizardStep?' done':i===_wizardStep?' current':'');
+    wrap.appendChild(dot);
+  }
+}
+
+function wizardSelect(step, key, val){
+  // Mark selection
+  document.querySelectorAll(`#step-${step} .wizard-option`).forEach(o=>{
+    o.classList.toggle('selected', o.dataset.val===val);
+  });
+  _profile[key] = val;
+
+  // Advance after brief delay
+  setTimeout(()=>{
+    if(step < WIZARD_TOTAL){
+      document.getElementById(`step-${step}`)?.classList.remove('active');
+      _wizardStep = step + 1;
+      document.getElementById(`step-${_wizardStep}`)?.classList.add('active');
+      renderWizardProgress();
+      updateWizardNav();
+    } else {
+      // Complete
+      saveProfile();
+      document.getElementById(`step-${step}`)?.classList.remove('active');
+      document.getElementById('step-5')?.classList.add('active');
+      generatePlan().catch(e => console.error('generatePlan error:', e));
+    }
+  }, 300);
+}
+
+function wizardBack(){
+  if(_wizardStep <= 1) return;
+  document.getElementById(`step-${_wizardStep}`)?.classList.remove('active');
+  _wizardStep--;
+  document.getElementById(`step-${_wizardStep}`)?.classList.add('active');
+  renderWizardProgress();
+  updateWizardNav();
+}
+
+function updateWizardNav(){
+  const backBtn = document.getElementById('wizardBackBtn');
+  if(backBtn) backBtn.style.display = _wizardStep > 1 ? 'block' : 'none';
+}
+
+function saveProfile(){
+  try{ localStorage.setItem('vmhh_profile', JSON.stringify(_profile)); } catch(e){}
+}
+
+function loadProfile(){
+  try{
+    const saved = localStorage.getItem('vmhh_profile');
+    if(saved){ _profile = JSON.parse(saved); return true; }
+  } catch(e){}
+  return false;
+}
+
+function resetProfile(){
+  // Keep saved profile — user may just want to tweak one answer
+  const hasSaved = Object.keys(_profile).length >= WIZARD_TOTAL;
+  _wizardStep = 1;
+  document.getElementById('planContent').style.display = 'none';
+  document.getElementById('profileWizard').style.display = 'block';
+  document.querySelectorAll('.wizard-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-1')?.classList.add('active');
+  renderWizardProgress();
+  updateWizardNav();
+  // Show skip banner if profile already exists
+  const skipBanner = document.getElementById('wizardSkipBanner');
+  if(skipBanner) skipBanner.style.display = hasSaved ? 'block' : 'none';
+  // Update title
+  const title = document.getElementById('wizardTitle');
+  const sub = document.getElementById('wizardSub');
+  if(title) title.textContent = hasSaved ? '✏️ Update Your Profile' : '👋 Welcome to Hive Hygiene';
+  if(sub) sub.textContent = hasSaved ? 'Tap any answer to change it, or skip back to your existing plan.' : 'Let\'s build your personalised hygiene plan. Answer a few quick questions about your operation.';
+  // Pre-select existing answers
+  const KEYS = ['gloves','torch','ozone','concern'];
+  KEYS.forEach((key,i)=>{
+    const step = i+1;
+    const val = _profile[key];
+    if(val){
+      document.querySelectorAll(`#step-${step} .wizard-option`).forEach(o=>{
+        o.classList.toggle('selected', o.dataset.val===val);
+      });
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// HIVE DATA LOADER
+// ══════════════════════════════════════════════
+async function loadHiveData(){
+  if(!_user) return;
+  try{
+    const [hvRes, cntRes, lossRes, inspRes, treatRes] = await Promise.all([
+      _sb.from('hives').select('*').eq('user_id',_user.id),
+      _sb.from('mite_counts').select('id,hive_id,date,value,diseases').eq('user_id',_user.id).order('date',{ascending:false}).limit(50),
+      _sb.from('colony_losses').select('hive_id,date,loss_type,cause,confirmation,last_strength,notes').eq('user_id',_user.id).order('date',{ascending:false}).limit(20),
+      _sb.from('inspections').select('hive_id,date,queen,brood,stores,mood,strength').eq('user_id',_user.id).order('date',{ascending:false}).limit(30),
+      _sb.from('treatments').select('id,hive_id,product,date,notes').eq('user_id',_user.id).order('date',{ascending:false}).limit(50),
+    ]);
+    _hiveData.hives        = hvRes.data    || [];
+    _hiveData.miteHistory  = cntRes.data   || [];
+    _hiveData.colonyLosses = lossRes.data  || [];
+    _hiveData.inspections  = inspRes.data  || [];
+    _hiveData.treatments   = treatRes.data || [];
+    // diseases are stored on mite_counts, not a separate inspections table
+    _hiveData.diseaseHistory = (cntRes.data || []).filter(c => c.diseases && c.diseases.length > 0);
+  } catch(e){
+    console.warn('loadHiveData error:', e);
+    throw e;
+  }
+}
+
+// ══════════════════════════════════════════════
+// PLAN GENERATOR (Rules engine)
+// ══════════════════════════════════════════════
+function getSeasonalWindow(){
+  if(typeof VM_CONFIG !== 'undefined' && VM_CONFIG?.getSeasonalWindow){
+    const w = VM_CONFIG.getSeasonalWindow(new Date().getMonth());
+    // map VM_CONFIG season fields to hygiene app's expected field names
+    return { ...w, colour: w.color||w.colour, border: w.color||w.border };
+  }
+  // ── fallback (AU hardcoded) ──────────────────────────────────────────────
+  const m = new Date().getMonth();
+  if(m>=7 && m<=9) return {label:'Spring', risk:'high', icon:'🌱', colour:'#1C5A28', bg:'#EEF6F0', border:'#5A8A6A',
+    msg:'Spring brood disease window. Swarm season — inspect every 1–2 weeks. Avoid unnecessary frame exchange.',
+    actions:['Inspect brood carefully — record any abnormal cells', 'Check for queen cells every visit', 'Avoid frame exchange between hives', 'Flame sterilise tools between apiaries', 'Quarantine any new colonies']};
+  if(m>=10 || m===0 || m===1) return {label:'Summer', risk:'med', icon:'☀️', colour:'#8A5000', bg:'#FFF8EE', border:'#D4A040',
+    msg:'Peak colony strength but mite populations building. Nectar dearth later in summer increases robbing and drifting.',
+    actions:['Alcohol wash every 4 weeks — record all counts in VarroaMate', 'Watch for DWV symptoms (deformed wings, crawling bees)', 'Inspect for small hive beetle — deploy traps in warm months', 'Reduce entrances if robbing observed', 'Avoid open feeding or exposed honey frames']};
+  if(m>=2 && m<=4) return {label:'Autumn', risk:'critical', icon:'🍂', colour:'#9A2020', bg:'#FFF0F0', border:'#C04040',
+    msg:'Most critical window of the year. Treat Varroa now to protect winter bees. Colony contraction increases robbing risk.',
+    actions:['Monitor mites — alcohol wash every 4 weeks', 'Treat for Varroa if ≥3/300 bees — complete before end of April', 'Reduce hive entrances to limit robbing', 'Remove deadouts within 24 hours', 'Leave adequate honey stores for winter']};
+  if(m>=5 && m<=6) return {label:'Winter', risk:'low', icon:'❄️', colour:'#1A3A7A', bg:'#EEF0F8', border:'#8090C0',
+    msg:'Low transmission risk. Avoid unnecessary inspections. Best time for equipment hygiene and comb storage.',
+    actions:['Avoid opening hive — breaking the cluster costs bees energy', 'Clean and sterilise all equipment', 'Ozone or freeze stored comb', 'Heft hive every 2–3 weeks to gauge stores', 'Plan splits and equipment for spring']};
+  return {label:'Late Winter', risk:'low', icon:'❄️', colour:'#1A3A7A', bg:'#EEF0F8', border:'#8090C0',
+    msg:'Colony beginning to build. Keep inspections minimal but watch stores.',
+    actions:['Check stores — feed if light', 'Prepare equipment for spring', 'Plan Varroa monitoring schedule', 'Order supplies before spring rush']};
+}
+
+function buildChecklist(){
+  const items = [];
+  const win = getSeasonalWindow();
+
+  // Seasonal items
+  win.actions.forEach(a=>items.push({text:a, priority:'Seasonal', checked:false}));
+
+  // Glove-based items
+  if(_profile.gloves==='leather'){
+    items.push({text:'Consider switching to disposable nitrile gloves — leather cannot be reliably sterilised and may carry AFB spores', priority:'Equipment upgrade', checked:false});
+    items.push({text:'If using leather gauntlets: scrub with washing soda solution after each apiary visit, then sunlight dry', priority:'Glove hygiene', checked:false});
+  } else if(_profile.gloves==='nitrile'){
+    items.push({text:'Change nitrile gloves between each apiary visit — dispose or carry fresh pairs', priority:'Glove hygiene', checked:false});
+  } else if(_profile.gloves==='activity'){
+    items.push({text:'Always wear nitrile gloves for full inspections and when moving frames between hives — bare hands carry mites and pathogens directly', priority:'Glove hygiene', checked:false});
+    items.push({text:'Keep a box of disposable nitrile gloves in your kit for any unplanned hive contact', priority:'Glove hygiene', checked:false});
+  } else if(_profile.gloves==='none'){
+    items.push({text:'Working bare-handed significantly increases bee-to-beekeeper-to-bee transmission risk — especially for Varroa and AFB spores', priority:'High priority', checked:false});
+    items.push({text:'Consider introducing nitrile gloves for inspections and frame handling as a minimum — your hands are a direct disease vector between hives', priority:'Equipment upgrade', checked:false});
+  } else {
+    items.push({text:'Machine wash synthetic gloves at 60°C with detergent; bleach-wipe between apiaries', priority:'Glove hygiene', checked:false});
+  }
+
+  // Torch-based items
+  if(_profile.torch==='yes'){
+    items.push({text:'Carry 2–3 hive tools — rotate to a clean tool after any suspicious hive. Sterilise all used tools at home after each apiary visit.', priority:'Tool hygiene', checked:false});
+    items.push({text:'Flame sterilise hive tools between apiaries — 10–20 seconds until propolis burns', priority:'Tool hygiene', checked:false});
+    items.push({text:'Scorch empty hive boxes with propane torch before returning to service — timber boxes only. Do NOT use flame on polystyrene (EPS) or plastic boxes — use hot washing soda solution or bleach instead.', priority:'Equipment hygiene', checked:false});
+  } else {
+    items.push({text:'No torch available — use bleach solution (1:10 household bleach:water) for 10 min, or wipe with ≥70% methylated spirits (30 sec contact time) as a quick field option', priority:'Tool hygiene', checked:false});
+    items.push({text:'Consider purchasing a propane torch ($40–50) — the single most effective sterilisation tool', priority:'Equipment upgrade', checked:false});
+  }
+
+  // Ozone items
+  if(_profile.ozone==='ozone'||_profile.ozone==='both'){
+    items.push({text:'Ozone-treat stored comb between seasons — seal in container, run overnight, ventilate before handling', priority:'Comb storage', checked:false});
+  } else if(_profile.ozone==='uv'){
+    items.push({text:'UV-C treat hive tools and small equipment — ensure all surfaces directly exposed', priority:'Tool hygiene', checked:false});
+  } else {
+    items.push({text:'Freeze stored comb at −18°C for 48h to kill wax moth and small hive beetle — most accessible alternative to ozone', priority:'Comb storage', checked:false});
+  }
+
+  // Concern-specific items
+  if(_profile.concern==='afb'){
+    items.push({text:'Never feed honey of unknown origin — AFB spores survive in honey for decades', priority:'AFB prevention', checked:false});
+    items.push({text:'Do not swap frames between colonies without inspection', priority:'AFB prevention', checked:false});
+    items.push({text:'Learn the ropy test — probe larvae with matchstick, healthy larvae do not stretch', priority:'AFB detection', checked:false});
+    items.push({text:'If AFB is suspected: report to your state agriculture authority immediately — do not destroy or move equipment until instructed. AFB is a notifiable disease in all Australian states.', priority:'🚨 Notifiable disease', checked:false});
+  }
+  if(_profile.concern==='varroa'){
+    items.push({text:'Alcohol wash every 4 weeks September–April; record all counts in VarroaMate', priority:'Varroa monitoring', checked:false});
+    items.push({text:'Treat before mite levels exceed 3/300 bees — not after colony shows symptoms', priority:'Varroa control', checked:false});
+    items.push({text:'Remove collapsing colonies immediately — a mite bomb can infect an entire apiary', priority:'Varroa control', checked:false});
+  }
+  if(_profile.concern==='waxmoth'){
+    items.push({text:'Never store comb in humid conditions — store dry and ventilated', priority:'Wax moth / SHB prevention', checked:false});
+    items.push({text:'Inspect stored supers every 4 weeks during summer', priority:'Wax moth / SHB monitoring', checked:false});
+    items.push({text:'Wax moth control options for stored comb: freeze −18°C 48h, ozone treatment overnight, or Bacillus thuringiensis (Bt) products — all effective. Bt is a naturally occurring soil bacterium toxic to wax moth larvae; follow APVMA-approved label directions.', priority:'Wax moth control', checked:false});
+    items.push({text:'Deploy small hive beetle traps inside active hives — check and empty regularly', priority:'SHB management', checked:false});
+    items.push({text:'Maintain strong colony population — strong colonies suppress SHB naturally', priority:'SHB management', checked:false});
+  }
+
+  // Hive data driven items
+  if(_hiveData.miteHistory.length > 0){
+    const latestPerHive = {};
+    _hiveData.miteHistory.forEach(c => {
+      if(!latestPerHive[c.hive_id] || c.date > latestPerHive[c.hive_id].date)
+        latestPerHive[c.hive_id] = c;
+    });
+    const counts = Object.values(latestPerHive);
+
+    // Latest treatment per hive — used to suppress duplicate "treat now" alerts
+    const latestTreatPerHive = {};
+    (_hiveData.treatments||[]).forEach(t => {
+      if(!latestTreatPerHive[t.hive_id] || t.date > latestTreatPerHive[t.hive_id].date)
+        latestTreatPerHive[t.hive_id] = t;
+    });
+    const now = Date.now();
+    // "Recently treated" = treatment applied within last 56 days (8 weeks covers Apivar / Formic PRO)
+    const recentlyTreated = hive_id => {
+      const t = latestTreatPerHive[hive_id];
+      if(!t) return false;
+      return (now - new Date(t.date).getTime()) < 56 * 24 * 60 * 60 * 1000;
+    };
+
+    const critical       = counts.filter(c => c.value >= 9 && !recentlyTreated(c.hive_id));
+    const unmanaged      = counts.filter(c => c.value >= 3 && c.value < 9 && !recentlyTreated(c.hive_id));
+    const underTreatment = counts.filter(c => c.value >= 3 && recentlyTreated(c.hive_id));
+
+    const recent    = _hiveData.miteHistory[0];
+    const daysSince = Math.floor((now - new Date(recent.date).getTime()) / (1000*60*60*24));
+    if(daysSince > 28){
+      items.push({text:`Last mite count was ${daysSince} days ago — alcohol wash overdue on all hives. Record results in VarroaMate.`, priority:'⚠️ Overdue', checked:false});
+    }
+    if(critical.length > 0){
+      items.push({text:`${critical.length} hive${critical.length!==1?'s':''} at critical mite level (≥9/300) — treat immediately. Colony loss risk is high.`, priority:'🚨 Critical — treat now', checked:false});
+    }
+    if(unmanaged.length > 0){
+      items.push({text:`${unmanaged.length} hive${unmanaged.length!==1?'s':''} above action threshold (≥3/300) — treatment decision required this visit.`, priority:'🚨 Action required', checked:false});
+    }
+    if(underTreatment.length > 0){
+      const names = underTreatment.map(c => {
+        const hive = (_hiveData.hives.find(h=>h.id===c.hive_id)||{}).name || 'Hive';
+        const t = latestTreatPerHive[c.hive_id];
+        const daysAgo = Math.floor((now - new Date(t.date).getTime()) / (1000*60*60*24));
+        return `${hive} (${t.product}, applied ${daysAgo}d ago)`;
+      }).join(', ');
+      items.push({text:`Treatment in progress: ${names}. Recount mites 4 weeks after treatment is removed to confirm efficacy.`, priority:'🧪 Treatment monitoring', checked:false});
+    }
+  }
+
+  // Disease history items
+  // Use only latest count per hive for active diseases (same logic as data card)
+  const _latestPerHive = {};
+  (_hiveData.miteHistory||[]).forEach(c=>{
+    if(!_latestPerHive[c.hive_id]||c.date>_latestPerHive[c.hive_id].date)
+      _latestPerHive[c.hive_id]=c;
+  });
+  const _latestCounts = Object.values(_latestPerHive);
+  const recentDiseases = _latestCounts
+    .flatMap(c=>c.diseases||[])
+    .filter(d=>d && d!=='No Disease Present');
+  // AFB: also check full history (persistent flag)
+  const _allHistoricDiseases = (_hiveData.miteHistory||[]).flatMap(c=>c.diseases||[]);
+  if(_allHistoricDiseases.some(d=>d==='American foulbrood'||d==='AFB') &&
+     !recentDiseases.some(d=>d==='American foulbrood'||d==='AFB')){
+    recentDiseases.push('American foulbrood'); // keep AFB in checklist until cleared
+  }
+  if(recentDiseases.includes('American foulbrood')||recentDiseases.includes('AFB')){
+    items.push({text:'AFB recorded in recent inspection — report to your state agriculture authority immediately and await instructions before destroying any equipment. Do not move equipment off site.', priority:'🚨 Notifiable disease', checked:false});
+  }
+  if(recentDiseases.includes('European foulbrood')||recentDiseases.includes('EFB')){
+    items.push({text:'EFB recorded — notify your state authority. Strengthen colony, remove heavily infected comb. Consider requeening if persistent.', priority:'🚨 Notifiable disease', checked:false});
+  }
+  if(recentDiseases.includes('Chalkbrood')){
+    items.push({text:'Chalkbrood recorded — improve hive ventilation, requeen with hygienic stock if persistent, replace heavily affected comb.', priority:'Disease response', checked:false});
+  }
+  if(recentDiseases.includes('Sacbrood')){
+    items.push({text:'Sacbrood recorded — usually self-limiting. Strengthen colony nutrition, ensure good ventilation. Requeen if persistent after two brood cycles.', priority:'Disease response', checked:false});
+  }
+  if(recentDiseases.includes('Small hive beetle')){
+    items.push({text:'Small hive beetle recorded — deploy traps immediately. Maintain strong colony population. Avoid leaving honey frames exposed. Freezing comb kills all SHB life stages.', priority:'Pest management', checked:false});
+  }
+  if(recentDiseases.includes('Wax moth')){
+    items.push({text:'Wax moth recorded — strong colonies resist naturally. Check all stored comb. Freeze at −18°C for 48h or ozone treat stored equipment. Bacillus thuringiensis (Bt) products approved for wax moth control in stored comb are also effective — follow label directions.', priority:'Pest management', checked:false});
+  }
+  if(recentDiseases.includes('Nosema')){
+    items.push({text:'Nosema recorded — improve colony nutrition with pollen supplements, rotate old comb, reduce stress. No approved treatments currently available in Australia.', priority:'Disease response', checked:false});
+  }
+  if(recentDiseases.includes('DWV')||recentDiseases.includes('Deformed wing')){
+    items.push({text:'DWV (Deformed Wing Virus) recorded — this is primarily controlled through Varroa management. Reduce mite levels urgently to reduce viral load.', priority:'🚨 Varroa-linked', checked:false});
+  }
+
+  return items;
+}
+
+function renderChecklist(items){
+  const container = document.getElementById('checklistContainer');
+  container.innerHTML = '';
+  items.forEach((item, i)=>{
+    const div = document.createElement('div');
+    div.className = 'check-item';
+    div.innerHTML = `
+      <div class="check-box ${item.checked?'checked':''}" onclick="toggleCheck(${i},this)"></div>
+      <div>
+        <div class="check-label">${item.text}</div>
+        <div class="check-priority">${item.priority}</div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function toggleCheck(i, el){
+  el.classList.toggle('checked');
+}
+
+async function generatePlan(){
+  await loadHiveData();
+
+  // Season banner
+  const win = getSeasonalWindow();
+  const banner = document.getElementById('seasonBanner');
+  banner.style.background = win.bg;
+  banner.style.borderColor = win.border;
+  banner.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">
+    <div style="font-size:25px;">${win.icon}</div>
+    <div>
+      <div style="font-size:16px;font-weight:700;color:${win.colour};">${win.label} — ${win.risk==='critical'?'Critical':'Risk: '+win.risk.charAt(0).toUpperCase()+win.risk.slice(1)}</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:2px;line-height:1.45;">${win.msg}</div>
+    </div>
+  </div>`;
+
+  // Data card
+  // Show/hide sign-in prompt based on auth state
+  const signInPrompt = document.getElementById('vmSignInPrompt');
+  if(signInPrompt) signInPrompt.style.display = 'none';
+
+  const dc = document.getElementById('dataCardBody');
+  if(_hiveData.hives.length>0){
+    const total = _hiveData.hives.length;
+
+    // Thresholds (per 300 bees)
+    const T_ACTION  = VM_CONFIG?.thresholds?.action  ?? 3;
+    const T_CRITICAL = VM_CONFIG?.thresholds?.critical ?? 9;
+
+    // Get most recent count per hive
+    const latestPerHive = {};
+    _hiveData.miteHistory.forEach(c => {
+      if(!latestPerHive[c.hive_id] || c.date > latestPerHive[c.hive_id].date)
+        latestPerHive[c.hive_id] = c;
+    });
+
+    const hivesWithCounts = Object.values(latestPerHive);
+    const hivesNoCounts   = _hiveData.hives.filter(h => !latestPerHive[h.id]);
+
+    // Categorise
+    const managed   = hivesWithCounts.filter(c => c.value < T_ACTION);
+    const unmanaged = hivesWithCounts.filter(c => c.value >= T_ACTION && c.value < T_CRITICAL);
+    const critical  = hivesWithCounts.filter(c => c.value >= T_CRITICAL);
+
+    // Most recent count across all hives
+    const allCounts = _hiveData.miteHistory;
+    const mostRecent = allCounts.length > 0 ? allCounts[0] : null;
+    const daysSince = mostRecent ? Math.floor((Date.now()-new Date(mostRecent.date))/(1000*60*60*24)) : null;
+
+    // Build status rows
+    const statusRows = [
+      critical.length  > 0 ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <div style="width:10px;height:10px;border-radius:50%;background:#C0402A;flex-shrink:0;"></div>
+        <div style="flex:1;font-size:15px;color:var(--text1);"><strong>${critical.length} hive${critical.length!==1?'s':''} critical</strong></div>
+        <div style="font-size:13px;color:#C0402A;font-weight:700;">≥${T_CRITICAL}/300 — treat now</div>
+      </div>` : '',
+      unmanaged.length > 0 ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <div style="width:10px;height:10px;border-radius:50%;background:#C07040;flex-shrink:0;"></div>
+        <div style="flex:1;font-size:15px;color:var(--text1);"><strong>${unmanaged.length} hive${unmanaged.length!==1?'s':''} above threshold</strong></div>
+        <div style="font-size:13px;color:#C07040;font-weight:700;">≥${T_ACTION}/300 — action needed</div>
+      </div>` : '',
+      managed.length   > 0 ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <div style="width:10px;height:10px;border-radius:50%;background:#4A8A6A;flex-shrink:0;"></div>
+        <div style="flex:1;font-size:15px;color:var(--text1);"><strong>${managed.length} hive${managed.length!==1?'s':''} managed</strong></div>
+        <div style="font-size:13px;color:#4A8A6A;font-weight:700;">&lt;${T_ACTION}/300 — within threshold</div>
+      </div>` : '',
+      hivesNoCounts.length > 0 ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+        <div style="flex:1;font-size:15px;color:var(--text3);"><strong>${hivesNoCounts.length} hive${hivesNoCounts.length!==1?'s':''} — no count recorded</strong></div>
+        <div style="font-size:13px;color:var(--text3);">wash overdue</div>
+      </div>` : '',
+    ].filter(Boolean).join('');
+
+    dc.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:17px;font-weight:700;color:var(--text1);">🏠 ${total} hive${total!==1?'s':''}</div>
+        ${mostRecent ? `<div style="font-size:13px;color:var(--text3);">Last count ${daysSince}d ago</div>` : ''}
+      </div>
+      ${statusRows || '<div style="font-size:15px;color:var(--text3);">No mite counts recorded yet — alcohol wash all hives to establish baseline.</div>'}
+      ${(()=>{
+        // Disease logic: only use the LATEST count per hive to determine active diseases.
+        // If the most recent count for a hive has no disease flagged, previous diseases
+        // are considered resolved. Exception: AFB is always shown if ever recorded,
+        // with a "previously recorded" label until explicitly cleared.
+
+        // Get latest count per hive
+        const latestPerHive = {};
+        (_hiveData.miteHistory||[]).forEach(c=>{
+          if(!latestPerHive[c.hive_id]||c.date>latestPerHive[c.hive_id].date)
+            latestPerHive[c.hive_id]=c;
+        });
+        const latestCounts = Object.values(latestPerHive);
+
+        // Active diseases: from latest count per hive only
+        const activeD = latestCounts
+          .flatMap(c=>c.diseases||[])
+          .filter(d=>d&&d!=='No Disease Present'&&d!=='Varroa');
+
+        // AFB anywhere in history (persistent flag)
+        const allD = (_hiveData.miteHistory||[]).flatMap(c=>c.diseases||[]);
+        const afbEver = allD.some(d=>d==='American foulbrood'||d==='AFB');
+        const afbActive = activeD.some(d=>d==='American foulbrood'||d==='AFB');
+
+        const unique = [...new Set(activeD)];
+
+        // Add AFB as historical if not already active
+        const historicalAFB = afbEver && !afbActive;
+        if(historicalAFB) unique.unshift('AFB_historical');
+
+        if(unique.length===0) return latestCounts.length>0
+          ? '<div style="font-size:12px;color:var(--text3);margin-top:8px;font-style:italic;">✅ No diseases flagged in most recent counts</div>'
+          : '';
+
+        const DC = {
+          'American foulbrood':{c:'#C0402A',bg:'#FAE8E5',l:'AFB',n:'Notifiable — report before destroying equipment'},
+          'AFB':               {c:'#C0402A',bg:'#FAE8E5',l:'AFB',n:'Notifiable — report before destroying equipment'},
+          'AFB_historical':    {c:'#C07040',bg:'#FFF4EC',l:'AFB (prev. recorded)',n:'No longer flagged in latest count — monitor closely'},
+          'European foulbrood':{c:'#C07040',bg:'#FFF0E8',l:'EFB',n:'Notify state authority'},
+          'EFB':               {c:'#C07040',bg:'#FFF0E8',l:'EFB',n:'Notify state authority'},
+          'Chalkbrood':        {c:'#8A6A20',bg:'#FFF8E8',l:'Chalkbrood',n:'Improve ventilation, hygienic stock'},
+          'Sacbrood':          {c:'#8A6A20',bg:'#FFF8E8',l:'Sacbrood',n:'Usually self-limiting — monitor'},
+          'Small hive beetle': {c:'#6A5020',bg:'#F5F0E8',l:'SHB',n:'Trap and manage'},
+          'Wax moth':          {c:'#6A5020',bg:'#F5F0E8',l:'Wax moth',n:'Freeze / ozone / Bt — check stored comb'},
+          'DWV':               {c:'#9A2020',bg:'#FAE8E5',l:'DWV',n:'Control via Varroa treatment'},
+          'Nosema':            {c:'#5A4080',bg:'#F0EEF8',l:'Nosema',n:'Improve nutrition and comb rotation'},
+        };
+        const pills = unique.map(d=>{
+          const cfg = DC[d]||{c:'#4A4A4A',bg:'#F0F0F0',l:d,n:'Monitor'};
+          return '<span style="display:inline-flex;align-items:center;gap:3px;background:'+cfg.bg+';border:1px solid '+cfg.c+'50;border-radius:4px;padding:3px 7px;margin:2px 2px 0 0;font-size:13px;font-weight:700;color:'+cfg.c+';">⚠️ '+cfg.l+'<span style="font-weight:400;opacity:0.75;"> — '+cfg.n+'</span></span>';
+        }).join('');
+        return '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:5px;">Diseases — latest count per hive</div>'+pills+'<div style="font-size:11px;color:var(--text3);margin-top:6px;font-style:italic;">Flags clear automatically when not present in a hive&#39;s most recent inspection. To clear an AFB flag: record a new alcohol wash in VarroaMate for that hive and select &#39;No Disease Present&#39;.</div></div>';
+      })()}
+      ${(()=>{
+        // Colony losses
+        const losses = _hiveData.colonyLosses || [];
+        if(losses.length === 0) return '';
+        const recentLoss = losses[0];
+        const hiveName = (_hiveData.hives.find(h=>h.id===recentLoss.hive_id)||{}).name || 'a hive';
+        const lossDate = recentLoss.date ? new Date(recentLoss.date).toLocaleDateString('en-AU',{month:'short',year:'numeric'}) : '';
+        return '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">'
+          + '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:5px;">Colony losses</div>'
+          + '<div style="display:flex;align-items:center;gap:8px;font-size:13px;">'
+          + '<span style="background:#FAE8E5;color:#C0402A;border:1px solid #E8A090;border-radius:4px;padding:2px 7px;font-weight:700;">🪦 '+losses.length+' loss record'+(losses.length!==1?'s':'')+'</span>'
+          + '<span style="color:var(--text3);font-size:12px;">Most recent: '+hiveName+' ('+lossDate+(recentLoss.cause?', '+recentLoss.cause:'')+')' +'</span>'
+          + '</div></div>';
+      })()}
+      ${(()=>{
+        // Hive health from inspections
+        const insps = _hiveData.inspections || [];
+        if(insps.length === 0) return '';
+        // Latest inspection per hive
+        const latestPerHive = {};
+        insps.forEach(i=>{
+          if(!latestPerHive[i.hive_id]||i.date>latestPerHive[i.hive_id].date) latestPerHive[i.hive_id]=i;
+        });
+        const latest = Object.values(latestPerHive);
+        // Score: queen seen=good, brood solid=good, stores full=good
+        const RATING = {good:2,full:2,yes:2,eggs:2,solid:2,ok:1,patchy:1,fair:1,active:1,none:1,poor:0,no:0,low:0,defensive:0};
+        const hiveScores = latest.map(i=>{
+          const scores = [i.queen,i.brood,i.stores,i.strength].map(v=>RATING[v]??1);
+          const avg = scores.reduce((a,b)=>a+b,0)/scores.length;
+          const label = avg>=1.6?'🟢 Good':avg>=1.0?'🟡 Fair':'🔴 Poor';
+          const hive = (_hiveData.hives.find(h=>h.id===i.hive_id)||{}).name||'Hive';
+          return {hive, label, date:i.date};
+        });
+        const pills = hiveScores.map(h=>'<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--paper);border:1px solid var(--border);margin:2px 2px 0 0;display:inline-block;">'+h.label+' '+h.hive+'</span>').join('');
+        const inspDate = latest[0]?.date ? new Date(latest[0].date).toLocaleDateString('en-AU',{day:'numeric',month:'short'}) : '';
+        return '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">'
+          + '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:5px;">Hive health — latest inspection</div>'
+          + '<div>'+pills+'</div>'
+          + '<div style="font-size:11px;color:var(--text3);margin-top:4px;">From VMP inspection records</div>'
+          + '</div>';
+      })()}
+    `;
+  } else if(!_user) {
+    dc.innerHTML = '<div style="color:var(--text3);margin-bottom:8px;">Not connected to VarroaMate — sign in below to load your hive data and get a personalised checklist.</div>';
+    document.getElementById('vmSignInPrompt').style.display = 'block';
+  } else {
+    dc.innerHTML = '<div style="color:var(--text3);">Signed in as <strong>' + (_user.email||'') + '</strong> — no hives found yet in your account. Add hives and mite counts in VarroaMate and they will appear here automatically.</div>';
+  }
+
+  // Build and render checklist
+  const items = buildChecklist();
+  renderChecklist(items);
+
+  // Show plan, hide wizard — always show planContent regardless of data state
+  document.getElementById('profileWizard').style.display = 'none';
+  document.getElementById('planContent').style.display = 'block';
+  const hiveCount = _hiveData.hives.length;
+  document.getElementById('planSub').textContent =
+    `${hiveCount > 0 ? hiveCount + ' hive' + (hiveCount!==1?'s':'') + ' · ' : ''}${win.label} · ${new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'})}`;
+}
+
+// ══════════════════════════════════════════════
+// AI PLAN NARRATIVE
+// ══════════════════════════════════════════════
+async function generateAiPlan(){
+  if(!requireAIOrUpgrade()) return;
+  const btn = document.getElementById('generateAiBtn');
+  const panel = document.getElementById('aiNarrative');
+  const text = document.getElementById('aiNarrativeText');
+
+  btn.disabled = true; btn.textContent = '⏳ Generating…';
+  panel.style.display = 'block';
+  text.innerHTML = '<span class="spinner"></span>';
+
+  const win = getSeasonalWindow();
+  const hiveCount = _hiveData.hives.length;
+  // Latest count per hive with status
+  const T_CRIT = VM_CONFIG?.thresholds?.critical ?? 9;
+  const T_ACT  = VM_CONFIG?.thresholds?.action   ?? 3;
+  const latestMitePerHive = {};
+  (_hiveData.miteHistory||[]).forEach(c=>{
+    if(!latestMitePerHive[c.hive_id]||c.date>latestMitePerHive[c.hive_id].date) latestMitePerHive[c.hive_id]=c;
+  });
+  const miteEntries = Object.values(latestMitePerHive);
+  const criticalHives    = miteEntries.filter(c=>c.value>=T_CRIT);
+  const aboveThreshHives = miteEntries.filter(c=>c.value>=T_ACT&&c.value<T_CRIT);
+  const managedHives     = miteEntries.filter(c=>c.value<T_ACT);
+  const miteSummary = miteEntries.length === 0 ? 'No mite counts on record'
+    : miteEntries.map(c=>{
+        const hive = (_hiveData.hives.find(h=>h.id===c.hive_id)||{}).name||'Hive';
+        const status = c.value>=T_CRIT ? 'CRITICAL' : c.value>=T_ACT ? 'above threshold' : 'managed';
+        const days = Math.floor((Date.now()-new Date(c.date))/(1000*60*60*24));
+        return `${hive}: ${c.value}/300 (${status}, ${days}d ago)`;
+      }).join(' | ');
+
+  // Latest treatment per hive
+  const latestTreatPerHive = {};
+  (_hiveData.treatments||[]).forEach(t=>{
+    if(!latestTreatPerHive[t.hive_id]||t.date>latestTreatPerHive[t.hive_id].date) latestTreatPerHive[t.hive_id]=t;
+  });
+  const treatEntries = Object.values(latestTreatPerHive);
+  const treatmentSummary = treatEntries.length === 0 ? 'No treatments recorded'
+    : treatEntries.map(t=>{
+        const hive = (_hiveData.hives.find(h=>h.id===t.hive_id)||{}).name||'Hive';
+        const daysAgo = Math.floor((Date.now()-new Date(t.date))/(1000*60*60*24));
+        return `${hive}: ${t.product} applied ${daysAgo} days ago${t.notes ? ' ('+t.notes+')' : ''}`;
+      }).join(' | ');
+
+  const diseases = (_hiveData.diseaseHistory||[]).flatMap(i=>i.diseases||[]).filter(d=>d&&d!=='No Disease Present');
+  const uniqueDiseases = [...new Set(diseases)];
+
+  const prompt = `You are a practical Australian beekeeping hygiene advisor for VarroaMate. 
+Write a concise, warm, practical personalised hygiene analysis for this beekeeper. Use 200–250 words maximum.
+
+Beekeeper profile:
+- Hives: ${hiveCount || 'unknown'}
+- Gloves: ${_profile.gloves || 'unknown'}
+- Has propane torch: ${_profile.torch || 'unknown'}
+- Ozone/UV access: ${_profile.ozone || 'unknown'}
+- Primary concern: ${_profile.concern || 'general'}
+- Current season window: ${win.label} (${win.msg})
+- Mite counts (latest per hive): ${miteSummary}${criticalHives.length>0 ? ' ⚠️ '+criticalHives.length+' hive(s) CRITICAL — treat now' : ''}
+- Varroa treatments on record: ${treatmentSummary}
+${uniqueDiseases.length > 0 ? `- Recent disease observations: ${uniqueDiseases.join(', ')}` : '- No recent disease observations'}
+${_hiveData.colonyLosses.length > 0 ? `- Colony losses recorded: ${_hiveData.colonyLosses.length} total. Most recent: ${_hiveData.colonyLosses[0].date} (cause: ${_hiveData.colonyLosses[0].cause||'unspecified'}, last colony strength: ${_hiveData.colonyLosses[0].last_strength||'unknown'})` : '- No colony losses recorded'}
+${(()=>{
+  const insps = _hiveData.inspections || [];
+  if(insps.length === 0) return '- No inspection health records';
+  const latestPerHive = {};
+  insps.forEach(i=>{ if(!latestPerHive[i.hive_id]||i.date>latestPerHive[i.hive_id].date) latestPerHive[i.hive_id]=i; });
+  const summaries = Object.values(latestPerHive).map(i=>{
+    const hive = (_hiveData.hives.find(h=>h.id===i.hive_id)||{}).name||i.hive_id;
+    return hive+': queen='+i.queen+', brood='+i.brood+', stores='+i.stores+', mood='+i.mood+', strength='+i.strength;
+  });
+  return '- Hive health from latest inspections: ' + summaries.join(' | ');
+})()}
+
+Structure your response with these three sections only:
+1. **Your Current Risk** — 2–3 sentences on their specific hygiene risk right now based on season and data
+2. **Top Priority Action** — one clear thing they should do this week
+3. **For Your Toolkit** — one practical improvement specific to their equipment situation
+
+Keep it direct, practical and Australian. ${VM_CONFIG?.ai?.productNameRules||'Never mention MAQS — use Formic PRO.'} Do not repeat the checklist items.
+
+TREATMENT AWARENESS — follow these exactly:
+- If a treatment was applied within the last 56 days, the beekeeper has already acted. Do NOT tell them to treat. Acknowledge the treatment by product name and advise a follow-up mite count 4 weeks after the treatment is removed to confirm efficacy.
+- If mite counts were recorded BEFORE the treatment date, do not use those counts as evidence that the situation is currently unmanaged — the treatment is addressing it.
+- Only flag mite counts as requiring action if no treatment has been applied in the last 56 days.
+
+CRITICAL FIELD HYGIENE RULES — you must follow these exactly:
+- NEVER recommend ozone or UV-C treatment between hives during an apiary inspection. Ozone generators and UV-C cabinets are home/shed equipment only — they require setup time and are completely impractical in the field.
+- For between-hive tool disinfection in the field, ALWAYS recommend carrying multiple hive tools and wiping with methylated spirits (≥70% ethanol) for rapid disinfection between hives. This is the correct, practical field method.
+- Only recommend ozone/UV-C for home use: treating stored comb, equipment between apiary visits, or gear stored in the shed.`;
+
+  const delays = [0, 4000, 8000];
+  let lastErr;
+  for(let attempt=0; attempt<3; attempt++){
+    if(attempt>0){ btn.textContent=`⏳ Retry ${attempt}/2…`; await new Promise(r=>setTimeout(r,delays[attempt])); }
+    try{
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/anthropic-proxy`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+        body:JSON.stringify({model:CLAUDE_MODEL, max_tokens:500, messages:[{role:'user',content:prompt}]})
+      });
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if(data.error?.type==='overloaded_error'){ lastErr=new Error('busy'); continue; }
+      if(data.error) throw new Error(data.error?.message||'API error');
+      const raw = data.content?.find(b=>b.type==='text')?.text||'';
+      text.innerHTML = renderAIMarkdown(raw);
+      btn.style.display = 'none';
+      setTimeout(()=>{ panel.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+      return;
+    } catch(e){ lastErr=e; if(!e.message?.includes('busy')) break; }
+  }
+  const errMsg = lastErr?.message||'';
+  const isNetwork = errMsg.includes('NetworkError') || errMsg.includes('fetch') || errMsg.includes('network');
+  t.innerHTML = isNetwork
+    ? '<em>⚠️ Could not reach the AI service — this feature requires a live internet connection and a deployed VarroaMate server. Your checklist above is fully accurate and does not require AI.</em>'
+    : `<em>Could not generate analysis: ${errMsg||'connection error'}. Your checklist above is still accurate.</em>`;
+  btn.disabled = false; btn.textContent = '✨ Try again';
+}
+
+// ══════════════════════════════════════════════
+// RESERVOIR TOGGLE (Disease Map)
+// ══════════════════════════════════════════════
+function toggleReservoir(el){
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.reservoir-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen) el.classList.add('open');
+}
+
+// ══════════════════════════════════════════════
+// TOOLKIT TOGGLES
+// ══════════════════════════════════════════════
+function toggleTool(key, el){
+  el.classList.toggle('on');
+  _toolkit[key] = el.classList.contains('on');
+  try{ localStorage.setItem('vmhh_toolkit', JSON.stringify(_toolkit)); } catch(e){}
+  renderEquipMatrix();
+  renderHygieneScore();
+}
+
+function loadToolkit(){
+  try{
+    const saved = localStorage.getItem('vmhh_toolkit');
+    if(saved){
+      _toolkit = JSON.parse(saved);
+      Object.entries(_toolkit).forEach(([k,v])=>{
+        const el = document.getElementById('tool-'+k);
+        if(el && v) el.classList.add('on');
+      });
+    }
+  } catch(e){}
+}
+
+function renderEquipMatrix(){
+  const hasOzone = _toolkit.ozone;
+  const hasTorch = _toolkit.torch;
+  const hasUV = _toolkit.uv;
+  const hasFreezer = _toolkit.freezer;
+  const hasBleach = _toolkit.bleach;
+  const hasSoda = _toolkit.soda;
+  const hasMeths = _toolkit.meths;
+
+  const EQUIP = [
+    {name:'🔧 Hive tool', risk:'HIGH', method: hasTorch ? '🔥 Flame sterilise 10–20s' : hasBleach ? '🧴 Bleach soak 10 min (1:10)' : hasMeths ? '🧪 Wipe with ≥70% methylated spirits — 30s contact time. Quick field option.' : '🧼 Wash thoroughly + sunlight'},
+    {name:'🪵 Wooden hive boxes', risk:'MEDIUM', method: hasTorch ? '🔥 Scorch surface with propane torch — timber only. EPS/plastic: hot washing soda solution or bleach.' : hasSoda ? '🫧 Hot washing soda bath, then sun dry' : '☀️ Scrape + sunlight exposure'},
+    {name:'🖼️ Frames & comb', risk:'VERY HIGH',
+      method: (hasOzone ? '🌀 Ozone treatment overnight for stored comb. ' : hasFreezer ? '🧊 Freeze −18°C for 48h for stored comb (kills wax moth and SHB). Consider Bacillus thuringiensis (Bt) spray for wax moth on stored comb. ' : '⚠️ If AFB suspected: report to state authority first — await instructions before destroying any comb or equipment. ')
+            + 'Rotation: move frames from brood nest outward to honey super position over time — this naturally cycles old dark comb out of the brood nest. Mark each frame with a permanent marker showing month and year of introduction (e.g. "Oct 24") on the top bar. Replace any frame older than 3 years, or sooner if comb is very dark, damaged, or disease-suspect.'},
+    {name:'🧤 Nitrile gloves', risk:'LOW', method:'🗑️ Dispose between apiaries'},
+    {name:'🧤 Leather gauntlets', risk:'HIGH',
+      method: hasOzone && hasUV ? '🌀 Ozone treat overnight to penetrate leather fibres, then 💡 UV-C both outer surfaces. Follow with washing soda scrub and air dry in sunlight. Best available option — but leather cannot be fully sterilised; consider replacing with nitrile.' :
+              hasOzone ? '🌀 Ozone treat overnight in sealed container to penetrate leather fibres, then wash soda scrub and sunlight dry. Significantly reduces pathogen load.' :
+              hasUV    ? '💡 UV-C both outer surfaces after washing soda scrub and air dry. Surface treatment only — does not penetrate leather.' :
+              '🫧 Wash with washing soda solution, scrub thoroughly, air dry in full sunlight. Cannot be fully sterilised — consider switching to nitrile.'},
+    {name:'👔 Bee suit', risk:'MEDIUM', method:'🫧 Machine wash 60°C with detergent + washing soda; sunlight dry'},
+    {name:'💨 Smoker', risk:'LOW', method:'🔥 Empty ash; scrape tar; occasional burn-out'},
+    {name:'🍯 Feeders & extractors', risk:'MEDIUM', method: hasSoda ? '🫧 Hot washing soda + alkaline detergent; rinse thoroughly' : '♨️ Hot water + dish detergent; rinse well'},
+    {name:'🔩 Queen excluder — metal', risk:'MEDIUM',
+      method: hasTorch ? '🔥 Flame briefly to burn wax and propolis, then scrape clean — do not overheat or warp. Between apiaries: flame sterilise before moving to a different hive.' :
+              hasBleach ? '🧴 Bleach soak 10 min (1:10), rinse thoroughly, air dry. Label each excluder to its hive and avoid swapping between colonies.' :
+              hasSoda   ? '🫧 Hot washing soda soak, scrub with stiff brush, rinse and dry. Label each excluder to its hive.' :
+              '🪣 Scrape wax and propolis; scrub with hot water; sun dry. Dedicate each excluder to one hive only.'},
+    {name:'🟡 Queen excluder — plastic', risk:'MEDIUM',
+      method: '⚠️ Never use flame on plastic. Dedicate each plastic excluder to a single hive — do not swap between colonies. '
+            + (hasBleach ? '🧴 Bleach soak 10 min (1:10), rinse thoroughly, air dry. Label with hive ID.' :
+               hasSoda   ? '🫧 Hot washing soda soak, scrub, rinse and dry. Label with hive ID.' :
+               hasUV     ? '💡 UV-C both sides after scrubbing clean. Label with hive ID.' :
+               '🪣 Hot water and detergent scrub; rinse well. Label with hive ID and restrict to that hive only.')},
+  ];
+
+  const container = document.getElementById('equipMatrix');
+  container.innerHTML = '';
+  EQUIP.forEach(e=>{
+    const riskClass = e.risk.includes('HIGH') ? 'risk-high' : e.risk==='MEDIUM' ? 'risk-med' : 'risk-low';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.padding = '12px 16px';
+    card.style.marginBottom = '8px';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-size:16px;font-weight:700;color:var(--text1);">${e.name}</div>
+        <span class="risk-pill ${riskClass}">${e.risk}</span>
+      </div>
+      <div style="font-size:15px;color:var(--text2);">${injectHazards(e.method)}</div>`;
+    container.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════════
+// SEASONAL BANNER (Season tab)
+// ══════════════════════════════════════════════
+function renderCurrentWindow(){
+  const win = getSeasonalWindow();
+  const banner = document.getElementById('currentWindowBanner');
+  if(!banner) return;
+  banner.style.borderColor = win.border;
+  banner.style.background = win.bg;
+  banner.innerHTML = `<div class="card-title" style="color:${win.colour};">${win.icon} You are in the ${win.label} window</div>
+    <div style="font-size:15px;color:var(--text2);line-height:1.5;">${win.msg}</div>`;
+  // Highlight matching season row
+  document.querySelectorAll('.season-row').forEach(row=>{
+    row.classList.remove('active-season');
+    if(row.dataset.season === win.label){
+      row.classList.add('active-season');
+      // Add "NOW" badge to month label
+      const monthEl = row.querySelector('.season-month');
+      if(monthEl && !monthEl.querySelector('.now-badge')){
+        monthEl.innerHTML += ' <span class="now-badge" style="display:inline-block;font-size:11px;font-weight:800;background:#E8C040;color:#5A3A00;padding:1px 5px;border-radius:3px;vertical-align:middle;letter-spacing:0.3px;">NOW</span>';
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// PATHOGEN CARDS
+// ══════════════════════════════════════════════
+const PATHOGENS = [
+  {icon:'🔴', name:'Varroa destructor', type:'Ectoparasitic mite', reservoir:'Collapsing Colony', risk:'CRITICAL',
+   trans:'Mite transfer via drifting bees, robbing, brood frame movement',
+   detect:'Alcohol wash — count mites per 300 bees. Action threshold: ≥3/300.',
+   control:'Monitor every 4 weeks (Sep–Apr). Rotate treatment modes of action. Treat before threshold.'},
+  {icon:'🟠', name:'Deformed Wing Virus', type:'RNA virus', reservoir:'Bee Population', risk:'HIGH',
+   trans:'Primarily through Varroa mite feeding — injects virus directly into haemolymph. Also robbing and drifting.',
+   detect:'Deformed wings, shortened abdomen, crawling bees, winter collapse. DWV is present in almost all Varroa-infested hives worldwide.',
+   control:'Varroa control is the primary intervention. DWV cannot be controlled directly — reduce mite levels to reduce viral load. 🇦🇺 Not yet detected in Australian colonies (Roberts et al. 2017). Its arrival via Varroa spread is considered the single greatest emerging viral threat to Australian bees.'},
+  {icon:'🟡', name:'American Foulbrood', type:'Spore-forming bacterium', reservoir:'Comb & Equipment', risk:'HIGH',
+   trans:'Contaminated honey, wax, hive tools, frames, second-hand equipment. Spores survive decades.',
+   detect:'Ropy test — probe larvae with matchstick, infected larvae stretch into brown thread. Sour smell.',
+   control:'Notifiable in all Australian states. Report to your state agriculture authority immediately if suspected — do not destroy or move equipment until instructed. Flame sterilise tools between hives. Never feed honey of unknown origin.'},
+    {icon:'🟠', name:'European Foulbrood', type:'Bacterium', reservoir:'Comb & Equipment · Bee Population', risk:'MEDIUM',
+   trans:'Nurse bees pass contaminated food to larvae via trophallaxis. Also spreads via contaminated comb, frames, and equipment. Less persistent than AFB — does not form tenacious spores. Often stress-related (spring, poor nutrition, overcrowding).',
+   detect:'Yellow-brown discoloured larvae in unsealed cells, often twisted. Less severe ropy test than AFB. Sour smell. Colony may recover spontaneously if the stressor is removed.',
+   control:'Notifiable in all Australian states — report to your state authority if suspected. Strengthen colony through requeening, improved nutrition, and reducing stress. Remove heavily infected comb. Treat equipment with hot washing soda solution.'},
+  {icon:'🔵', name:'Nosema ceranae', type:'Microsporidian parasite', reservoir:'Bee Population', risk:'MEDIUM',
+   trans:'Oral ingestion of spores from contaminated food or hive surfaces.',
+   detect:'Dysentery, crawling bees at entrance, reduced lifespan, K-wing, winter losses.',
+   control:'Colony nutrition, regular comb rotation, reduce stress. No approved treatments in Australia.'},
+  {icon:'⚪', name:'Chalkbrood', type:'Fungal pathogen', reservoir:'Comb & Equipment · Environment', risk:'LOW–MEDIUM',
+   trans:'Spores in hive materials, contaminated equipment, soil near apiary.',
+   detect:'Chalk-white or grey/black mummified larvae (black = sporulating), often found at entrance.',
+   control:'Improve ventilation, requeen with hygienic stock, replace affected comb, strengthen colony.'},
+  {icon:'🦋', name:'Wax Moth', type:'Lepidopteran pest', reservoir:'Comb & Equipment', risk:'LOW (in strong colonies)',
+   trans:'Adult moths lay eggs in stored or weak colony comb.',
+   detect:'Silken tunnels, frass, larvae boring through comb. Destroyed wax.',
+   control:'Strong colonies resist naturally. Stored comb options: freeze −18°C 48h, ozone treatment overnight, or Bacillus thuringiensis (Bt) spray — all effective for wax moth larvae. Store comb dry and well ventilated. Bt is a naturally occurring soil bacterium and is approved for use in beekeeping.'},
+  {icon:'🪲', name:'Small Hive Beetle', type:'Coleopteran pest', reservoir:'Environment · Comb & Equipment', risk:'HIGH in warm humid climates',
+   trans:'Adult beetles fly between hives, attracted to colony odours. Enter via gaps in hive and lay eggs in comb.',
+   detect:'Small dark beetles (5–7mm) running from light. Slimy fermented honey, larvae tunnelling through comb. Characteristic sour smell.',
+   control:'Deploy SHB traps inside hive. Maintain strong colony — bees corner and propolis-entomb beetles. Keep apiary on well-drained soil. Freeze or destroy heavily infested comb.'},
+];
+
+function renderPathogenCards(){
+  const container = document.getElementById('pathogenCards');
+  if(!container || container.children.length > 0) return;
+  PATHOGENS.forEach(p=>{
+    const riskClass = p.risk.includes('CRITICAL') ? 'risk-high' :
+                      p.risk.includes('HIGH') ? 'risk-high' :
+                      p.risk.includes('MEDIUM') ? 'risk-med' : 'risk-low';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="font-size:27px;">${p.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:17px;font-weight:700;color:var(--text1);">${p.name}</div>
+          <div style="font-size:13px;color:var(--text3);">${p.type} · <span style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:3px;">🗺️ ${p.reservoir}</span></div>
+        </div>
+        <span class="risk-pill ${riskClass}">${p.risk}</span>
+      </div>
+      <div style="display:grid;gap:8px;">
+        <div><div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Transmission</div>
+          <div style="font-size:15px;color:var(--text2);">${p.trans}</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Detection</div>
+          <div style="font-size:15px;color:var(--text2);">${p.detect}</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Control</div>
+          <div style="font-size:15px;color:var(--text2);">${injectHazards(p.control)}</div></div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+async function generateToolkitAdvice(){
+  if(!requireAIOrUpgrade()) return;
+  const btn = document.getElementById('toolkitAiBtn');
+  const panel = document.getElementById('toolkitAiPanel');
+  const textEl = document.getElementById('toolkitAiText');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analysing…';
+  panel.style.display = 'block';
+  textEl.textContent = 'Analysing your toolkit…';
+
+  // Build toolkit summary for the prompt
+  const owned = [];
+  const missing = [];
+  const allTools = [
+    {key:'torch',   name:'Propane/butane torch',  importance:'highest — flame sterilisation is the most effective method for tools and boxes'},
+    {key:'ozone',   name:'Ozone generator',        importance:'very high — the only method that penetrates stored comb reliably'},
+    {key:'freezer', name:'Chest freezer',           importance:'high — kills all wax moth and small hive beetle life stages in 48h'},
+    {key:'uv',      name:'UV-C steriliser',         importance:'medium — good for tools and clothing, limited by line-of-sight'},
+    {key:'bleach',  name:'Bleach (sodium hypochlorite)', importance:'medium — effective field backup, not suitable for comb'},
+    {key:'soda',    name:'Washing soda',            importance:'medium — excellent for dissolving wax and propolis from boxes'},
+  ];
+  allTools.forEach(t => (_toolkit[t.key] ? owned : missing).push(t));
+
+  const win = getSeasonalWindow();
+  const prompt = `You are an expert Australian apiary hygiene advisor. A beekeeper has the following sanitation toolkit:
+
+OWNED: ${owned.length > 0 ? owned.map(t=>t.name).join(', ') : 'None yet'}
+NOT YET OWNED: ${missing.length > 0 ? missing.map(t=>t.name).join(', ') : 'All tools owned — well equipped!'}
+Current season: ${win.label} (${win.msg})
+Primary concern from profile: ${_profile.concern || 'general hygiene'}
+
+In 3–4 sentences, identify the single most important tool they should add next and explain specifically why it will improve their hive hygiene outcomes. If they already own all tools, congratulate them and highlight the most important usage habit instead. Be direct and practical. Do not use bullet points — write as a single concise paragraph. Mention approximate cost in Australian dollars if relevant.`;
+
+  const delays = [0, 4000, 8000];
+  let lastErr;
+  for(let attempt=0; attempt<3; attempt++){
+    if(attempt>0){ btn.textContent=`⏳ Retry ${attempt}/2…`; await new Promise(r=>setTimeout(r,delays[attempt])); }
+    try{
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/anthropic-proxy`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+        body:JSON.stringify({model:CLAUDE_MODEL, max_tokens:400, messages:[{role:'user',content:prompt}]})
+      });
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if(data.error?.type==='overloaded_error'){ lastErr=new Error('busy'); continue; }
+      if(data.error) throw new Error(data.error?.message||'API error');
+      const text = data.content?.find(b=>b.type==='text')?.text || 'Unable to generate advice — please try again.';
+      textEl.innerHTML = renderAIMarkdown(text);
+      btn.textContent = '↻ Refresh advice';
+      btn.disabled = false;
+      return;
+    } catch(e){ lastErr=e; }
+  }
+  const errMsg2 = lastErr?.message||'';
+  const isNetwork2 = errMsg2.includes('NetworkError') || errMsg2.includes('fetch') || errMsg2.includes('network');
+  textEl.textContent = isNetwork2
+    ? '⚠️ Could not reach the AI service — this feature requires a live internet connection and a deployed VarroaMate server. Your hygiene score and checklist above are fully accurate without AI.'
+    : 'Could not connect — check your internet connection and try again.';
+  btn.textContent = '↻ Try again';
+  btn.disabled = false;
+}
+
+// ── Hazard signal helper ─────────────────────────────────────────────────────
+function hazardTag(type){
+  // GHS-style diamond SVG icons inline
+  const ghsDiamond = (inner, label, color) => `
+    <span class="hazard-badge hazard-${type}" title="${label}" style="gap:4px;">
+      <svg width="18" height="18" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;vertical-align:middle;">
+        <rect x="10" y="10" width="80" height="80" rx="4" fill="white" stroke="#E02020" stroke-width="8" transform="rotate(45 50 50)"/>
+        ${inner}
+      </svg>
+      ${label}
+    </span>`;
+
+  // Flammable — flame
+  const flameSvg = `<path d="M50 20 C50 20 35 35 35 50 C35 60 42 65 42 65 C42 55 48 50 48 50 C48 65 58 72 58 72 C62 60 55 45 55 45 C65 55 65 72 65 72 C72 60 70 42 60 32 C60 42 55 45 55 45 C58 32 50 20 50 20Z" fill="#C03010"/>`;
+  // Exclamation — harmful/corrosive  
+  const exclamSvg = `<rect x="46" y="28" width="8" height="30" rx="3" fill="#C03010"/><circle cx="50" cy="68" r="5" fill="#C03010"/>`;
+  // Health hazard — person with starburst
+  const healthSvg = `<circle cx="50" cy="33" r="8" fill="#C03010"/><path d="M50 44 L40 75 L50 68 L60 75 Z" fill="#C03010"/><path d="M32 38 L45 52 M68 38 L55 52" stroke="#C03010" stroke-width="4" stroke-linecap="round"/>`;
+  // Skull — toxic
+  const skullSvg = `<circle cx="50" cy="40" r="16" fill="#C03010"/><rect x="38" y="52" width="24" height="14" rx="2" fill="#C03010"/><circle cx="44" cy="40" r="5" fill="white"/><circle cx="56" cy="40" r="5" fill="white"/><rect x="47" y="53" width="6" height="12" fill="white"/>`;
+  // Snowflake-ish cold
+  const coldSvg = `<line x1="50" y1="22" x2="50" y2="78" stroke="#2060A0" stroke-width="6" stroke-linecap="round"/><line x1="22" y1="50" x2="78" y2="50" stroke="#2060A0" stroke-width="6" stroke-linecap="round"/><line x1="30" y1="30" x2="70" y2="70" stroke="#2060A0" stroke-width="6" stroke-linecap="round"/><line x1="70" y1="30" x2="30" y2="70" stroke="#2060A0" stroke-width="6" stroke-linecap="round"/>`;
+
+  const tags = {
+    fire: ghsDiamond(flameSvg,  'Flammable',              'fire'),
+    chem: ghsDiamond(exclamSvg, 'Corrosive / Irritant',   'chem'),
+    gas:  ghsDiamond(healthSvg, 'Health hazard — ventilate', 'gas'),
+    uv:   ghsDiamond(healthSvg, 'Health hazard — eye & skin damage', 'uv'),
+    cold: `<span class="hazard-badge hazard-cold">🧊 −18°C — handle with insulated gloves</span>`,
+  };
+  return tags[type] || '';
+}
+function injectHazards(text){
+  if(!text) return text;
+  const rules = [
+    {re:/propane|butane|torch|flame sterilise|scorch/gi, tag:'fire'},
+    {re:/bleach|sodium hypochlorite/gi,                   tag:'chem'},
+    {re:/washing soda|sodium carbonate/gi,                tag:'chem'},
+    {re:/methylated spirits|ethanol|alcohol ≥70/gi,       tag:'chem'},
+    {re:/ozone/gi,                                        tag:'gas'},
+    {re:/UV-C/gi,                                         tag:'uv'},
+    {re:/−18°C|freeze|freezer/gi,                         tag:'cold'},
+  ];
+  let tags = new Set();
+  rules.forEach(r=>{ if(r.re.test(text)) tags.add(r.tag); });
+  if(tags.size === 0) return text;
+  return text + ' ' + [...tags].map(hazardTag).join(' ');
+}
+
+
+const TOOL_INFO = {
+  torch:{
+    icon:'🔥', name:'Propane / Butane Torch',
+    sub:'Flame sterilisation — the gold standard for beekeeping tools and boxes',
+    steps:[
+      {n:1, t:'<strong>Fill and test</strong> — use a standard propane or butane canister. Test the flame before leaving home. Keep a spare canister in your kit.'},
+      {n:2, t:'<strong>Hive tools</strong> — hold the metal part in the flame for 10–20 seconds until propolis visibly burns and the metal glows slightly. Allow to cool before use. Repeat between every apiary.'},
+      {n:3, t:'<strong>Hive boxes (empty, timber only)</strong> — pass the flame slowly over all internal surfaces — corners, joints, and frame rests. You are scorching, not burning. A light brown char is correct; do not ignite the wood.'},
+      {n:4, t:'<strong>Frame rests and rebates</strong> — these areas accumulate propolis and wax and are often overlooked. Give them extra attention.'},
+      {n:5, t:'<strong>Never use on comb</strong> — flame destroys wax. Use ozone or freezer for comb and frames.'},
+    ],
+    tip:'⚠️ Always have water nearby. Do not use near dry grass or combustible material. AFB spores require sustained heat — a quick pass is not enough for suspected AFB equipment. ⚠️ If AFB is confirmed or suspected, report to your state agriculture authority first and await instructions before destroying any equipment.'
+  },
+  bleach:{
+    icon:'🧴', name:'Bleach Solution (Sodium Hypochlorite)',
+    sub:'Chemical sterilisation — effective field backup for tools and hard surfaces',
+    steps:[
+      {n:1, t:'<strong>Mix correctly</strong> — use standard household bleach (4–5% sodium hypochlorite). Dilute 1 part bleach to 10 parts water (approximately 0.5% solution). Mix fresh — bleach degrades quickly once diluted.'},
+      {n:2, t:'<strong>Pre-clean first</strong> — bleach is inactivated by organic matter (wax, propolis, honey). Scrape and wash tools before soaking. Effectiveness drops significantly on dirty surfaces.'},
+      {n:3, t:'<strong>Soak time</strong> — submerge metal tools for a minimum of 10 minutes. Plastic components can be wiped with solution and left for 5 minutes.'},
+      {n:4, t:'<strong>Rinse thoroughly</strong> — residual bleach is toxic to bees. Rinse with clean water and allow to air dry completely before use.'},
+      {n:5, t:'<strong>Field use</strong> — carry a small sealed container of pre-mixed solution. A 1L container is sufficient for a full apiary visit.'},
+    ],
+    tip:'⚠️ Bleach is not effective against AFB spores in comb — only flame or destruction is appropriate for AFB-infected material, and only after reporting to your state authority and receiving instructions. Use bleach for tools and hard surfaces only.'
+  },
+  soda:{
+    icon:'🫧', name:'Washing Soda (Sodium Carbonate)',
+    sub:'Alkaline cleaning — removes wax, propolis and organic residue from boxes and equipment',
+    steps:[
+      {n:1, t:'<strong>Mix the solution</strong> — dissolve 3–5 tablespoons of washing soda (sodium carbonate, not bicarbonate) per litre of hot water. The hotter the water, the more effective.'},
+      {n:2, t:'<strong>Soak wooden boxes</strong> — submerge or scrub internal surfaces thoroughly. The alkaline solution breaks down wax and propolis, lifting residue that bleach cannot penetrate.'},
+      {n:3, t:'<strong>Scrub and rinse</strong> — use a stiff brush. Rinse with clean water. Sun-dry completely before returning to service — moisture in boxes promotes chalkbrood and wax moth.'},
+      {n:4, t:'<strong>Leather gauntlets</strong> — scrub with washing soda solution after each apiary visit. This reduces (but does not eliminate) pathogen load. Leather cannot be fully sterilised.'},
+      {n:5, t:'<strong>Bee suits</strong> — add 2–3 tablespoons to the washing machine with regular detergent. Wash at 60°C. Sun dry.'},
+    ],
+    tip:'💡 Washing soda is not the same as baking soda (bicarbonate). Look for "washing soda" or "soda crystals" in the laundry aisle. It is inexpensive and very effective for organic residue removal.'
+  },
+  uv:{
+    icon:'💡', name:'UV-C Steriliser',
+    sub:'Ultraviolet sterilisation — effective for tools, gloves and clothing surfaces',
+    steps:[
+      {n:1, t:'<strong>Budget option — UV-C light bulb in a box</strong> — you do not need an expensive cabinet. A UV-C E27 screw-in bulb (available online for $15–40) fitted inside a wooden or heavy cardboard box makes an effective DIY steriliser. The box keeps the UV-C light contained and protects your eyes. Seal the lid during treatment. Look for bulbs labelled <em>UV-C germicidal</em> or <em>253.7nm</em> — these are the correct wavelength for sterilisation. Standard "UV" bulbs without the -C designation do not sterilise.'},
+      {n:2, t:'<strong>Understand the limitation</strong> — UV-C only sterilises surfaces in direct line of sight. Shadows, crevices, and folded material receive no dose. It is a surface treatment, not a penetrating one.'},
+      {n:3, t:'<strong>Pre-clean first</strong> — UV-C is blocked by wax, propolis, and organic debris. Scrape and wipe tools clean before exposure.'},
+      {n:4, t:'<strong>Exposure time</strong> — 10–15 minutes per side is a practical guide for DIY setups. Flip or rotate items halfway through. Closer to the bulb = more effective — keep items within 20–30cm.'},
+      {n:5, t:'<strong>Gloves and clothing</strong> — lay flat in the box. Turn over after the first cycle. Folded or bunched material will have untreated areas.'},
+      {n:6, t:'<strong>Never look directly at UV-C light</strong> — UV-C causes rapid eye and skin damage. Always treat with the lid closed. Never operate with hands or face inside the box.'},
+    ],
+    tip:'⚠️ UV-C is not sufficient as a sole method for AFB-contaminated equipment. It does not penetrate comb or wood grain. Use as a complement to torch or chemical methods, not a replacement. For a DIY box: line the inside with aluminium foil to reflect UV-C and increase dose — this significantly improves effectiveness.'
+  },
+  ozone:{
+    icon:'🌀', name:'Ozone Generator',
+    sub:'Gas-phase sterilisation — penetrates comb, wood grain and clothing fibres',
+    steps:[
+      {n:1, t:'<strong>Seal the treatment space</strong> — place equipment in a sealed container (a large tub with a lid, or a sealed room). Ozone dissipates quickly in open air and must be concentrated to be effective.'},
+      {n:2, t:'<strong>Run overnight</strong> — effective ozone treatment requires sustained exposure. Run the generator for 8–12 hours minimum for stored comb. Shorter cycles reduce effectiveness significantly.'},
+      {n:3, t:'<strong>Ventilate before handling</strong> — ozone is a respiratory irritant. After treatment, open the container outdoors and allow at least 30–60 minutes for ozone to dissipate before handling contents. Do not inhale directly.'},
+      {n:4, t:'<strong>Suitable for</strong> — stored comb (between seasons), empty boxes, clothing, gloves, and tools. One of the few methods that penetrates wax comb effectively.'},
+      {n:5, t:'<strong>Not suitable for</strong> — active hives or occupied comb. Never treat bees with ozone.'},
+    ],
+    tip:'💡 <strong>Budget option — ozone-generating UV-C bulb in a box.</strong> Some UV-C E27 bulbs also produce ozone (look for bulbs labelled <em>UV-C + Ozone</em> or <em>UV-C with O₃</em>). These are inexpensive ($15–40 online) and can be fitted into a wooden or sealed cardboard box to create a simple ozone treatment chamber. Place equipment inside, seal the box, run for 8–12 hours, then ventilate outdoors before opening. This dual-function bulb gives you both UV-C surface sterilisation and ozone penetration in one cheap unit. Dedicated ozone generators (400mg/h+) are more powerful and suitable for treating full supers, but the bulb method works well for tools, gloves, and small equipment. Never run ozone treatment in an enclosed room — always use in a sealed box or outdoors.'
+  },
+  meths:{
+    icon:'🧪', name:'Methylated Spirits / Ethanol ≥70%',
+    sub:'Rapid alcohol disinfection — best for tools and hard non-porous surfaces',
+    steps:[
+      {n:1, t:'<strong>Concentration matters</strong> — you need at least 70% alcohol to denature proteins and kill most pathogens. Standard methylated spirits (denatured ethanol) sold in Australian hardware stores is typically 95–99% — dilute to 70–80% with water for best effectiveness. Counter-intuitively, 100% alcohol evaporates too quickly to work well; a 70–80% solution has better contact time.'},
+      {n:2, t:'<strong>Pre-clean first</strong> — alcohol is inactivated by organic matter (wax, propolis, honey residue). Wipe or scrape tools clean before applying. Alcohol on a dirty surface will not sterilise it.'},
+      {n:3, t:'<strong>Application</strong> — wipe surfaces thoroughly with a cloth or cotton pad soaked in solution, or use a spray bottle. Ensure the entire surface is visibly wet. Allow at least 30 seconds contact time before wiping dry or allowing to evaporate.'},
+      {n:4, t:'<strong>Best uses</strong> — hive tools and metal implements between hives (quick field wipe-down), plastic queen excluders and feeders, smooth surfaces on hive boxes, gloves (nitrile or synthetic). Carry a small spray bottle in your kit for field use — quick and effective.'},
+      {n:5, t:'<strong>Limitations</strong> — not effective for AFB spores (spores are highly resistant to alcohol). Not suitable for porous materials like wood or leather where alcohol cannot penetrate. Does not remove wax or propolis build-up.'},
+    ],
+    tip:'💡 A 250ml spray bottle of 70% methylated spirits costs under $5 and fits in any tool bag — it is the fastest and most practical field disinfection option between hives. Not a substitute for flame sterilisation or bleach soaking, but excellent as a quick wipe between colonies during an inspection run.'
+  },
+  freezer:{
+    icon:'🧊', name:'Chest Freezer',
+    sub:'Cold treatment — kills all wax moth and small hive beetle life stages',
+    steps:[
+      {n:1, t:'<strong>Temperature requirement</strong> — must reach and hold −18°C or colder. Confirm with a thermometer — many older freezers run warmer than their dial indicates.'},
+      {n:2, t:'<strong>Freeze duration</strong> — a minimum of 48 hours at −18°C kills all life stages of wax moth and small hive beetle (eggs, larvae, pupae, adults). For extra assurance, extend to 72 hours. An alternative for wax moth specifically is <em>Bacillus thuringiensis</em> (Bt) spray applied to stored comb — effective against larvae and approved for beekeeping use.'},
+      {n:3, t:'<strong>Bag comb before freezing</strong> — place frames in sealed plastic bags before putting in the freezer. This prevents condensation forming on the comb when frames are returned to room temperature, which can promote mould.'},
+      {n:4, t:'<strong>Thaw correctly</strong> — remove from freezer still in the bag and allow to return to room temperature before opening. This allows condensation to form on the outside of the bag, not on the comb.'},
+      {n:5, t:'<strong>Storage after freezing</strong> — store treated comb in sealed, dry conditions. Freezing does not prevent re-infestation if stored in a warm, humid environment.'},
+    ],
+    tip:'💡 Freezing does not kill AFB spores — it only addresses wax moth and SHB. An alternative for wax moth in stored comb is Bacillus thuringiensis (Bt), a naturally occurring soil bacterium approved for use in beekeeping. Follow APVMA label directions. For AFB-suspect comb, destruction is the only appropriate response — but report to your state agriculture authority first and await their instructions before destroying anything. Do not freeze and reuse AFB-affected frames.'
+  },
+};
+
+function showToolInfo(key){
+  const info = TOOL_INFO[key];
+  if(!info) return;
+  document.getElementById('toolInfoTitle').textContent = info.icon + ' ' + info.name;
+  document.getElementById('toolInfoSub').textContent = info.sub;
+  const stepsEl = document.getElementById('toolInfoSteps');
+  stepsEl.innerHTML = info.steps.map(s=>`
+    <div class="info-step">
+      <div class="info-step-num">${s.n}</div>
+      <div class="info-step-text">${injectHazards(s.t)}</div>
+    </div>`).join('') +
+    (info.tip ? `<div class="info-tip">${injectHazards(info.tip)}</div>` : '');
+  const drawer = document.getElementById('toolInfoDrawer');
+  drawer.style.display = 'block';
+  document.getElementById('toolInfoPanel').scrollTop = 0;
+}
+
+function closeToolInfo(){
+  document.getElementById('toolInfoDrawer').style.display = 'none';
+}
+
+
+// ── Hygiene Score ─────────────────────────────────────────────────────────────
+function renderHygieneScore(){
+  const scoreEl   = document.getElementById('scoreNumber');
+  const barEl     = document.getElementById('scoreBar');
+  const labelEl   = document.getElementById('scoreLabel');
+  const bdEl      = document.getElementById('scoreBreakdown');
+  const badgeEl   = document.getElementById('scoreBadge');
+  if(!scoreEl) return;
+
+  // Weighted scoring — each tool has a hygiene impact weight (total = 100)
+  const TOOL_WEIGHTS = [
+    {key:'torch',   label:'🔥 Propane torch',      points:30, reason:'Most effective sterilisation — tools, boxes, metal'},
+    {key:'ozone',   label:'🌀 Ozone generator',     points:25, reason:'Only method that penetrates stored comb reliably'},
+    {key:'freezer', label:'🧊 Chest freezer',        points:15, reason:'Kills all wax moth and small hive beetle life stages in stored comb'},
+    {key:'bleach',  label:'🧴 Bleach solution',      points:12, reason:'Effective chemical backup for tools and hard surfaces'},
+    {key:'soda',    label:'🫧 Washing soda',         points:10, reason:'Dissolves wax and propolis from boxes and equipment'},
+    {key:'uv',      label:'💡 UV-C steriliser',      points:8,  reason:'Surface sterilisation for tools and clothing'},
+    {key:'meths',   label:'🧪 Methylated spirits ≥70%', points:6,  reason:'Rapid field disinfection for tools and hard surfaces'},
+  ];
+
+  let score = 0;
+  const owned = [];
+  const missing = [];
+  TOOL_WEIGHTS.forEach(t => {
+    if(_toolkit[t.key]){ score += t.points; owned.push(t); }
+    else { missing.push(t); }
+  });
+
+  // Clamp and display
+  score = Math.min(100, score);
+  scoreEl.textContent = score;
+  barEl.style.width = score + '%';
+
+  // Colour the badge and bar by score band
+  const colour = score >= 80 ? '#4A8A6A' : score >= 55 ? '#E8B84A' : score >= 30 ? '#C07040' : '#C0402A';
+  badgeEl.style.borderColor = colour;
+  barEl.style.background = colour;
+
+  // Label
+  const band = score >= 80 ? 'Strong hygiene toolkit ✅' :
+               score >= 55 ? 'Good foundation — room to improve' :
+               score >= 30 ? 'Basic toolkit — key gaps present' :
+                             'Minimal toolkit — significant risk';
+  labelEl.textContent = band;
+
+  // Breakdown
+  bdEl.style.display = 'block';
+  bdEl.innerHTML =
+    (owned.length > 0 ? `<div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">What you have</div>` +
+      owned.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:14px;">
+        <div style="color:var(--text2);">${t.label}</div>
+        <div style="color:#4A8A6A;font-weight:700;">+${t.points}</div>
+      </div>`).join('') : '') +
+    (missing.length > 0 ? `<div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-top:10px;margin-bottom:6px;">Not yet in your toolkit</div>` +
+      missing.map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-size:14px;color:var(--text2);font-weight:600;">${t.label}</div>
+          <div style="font-size:13px;color:var(--text3);flex-shrink:0;margin-left:8px;">+${t.points}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5;">${t.reason}</div>
+      </div>`).join('') : '<div style="font-size:14px;color:#4A8A6A;margin-top:8px;">🎉 Full toolkit — excellent hygiene capability!</div>') +
+    (missing.length > 0 ? `<div style="font-size:13px;color:var(--text3);margin-top:10px;padding:8px;background:var(--amber-pale);border-radius:6px;border-left:3px solid var(--amber);">
+      💡 Tap <strong>Improve my score</strong> below for a personalised recommendation on the best next addition for your situation.
+    </div>` : '');
+}
+
+
+// ── Pathway info drawer ────────────────────────────────────────────────────
+const PATHWAY_INFO = {
+  bee:{
+    title:'🐝 Bee-to-Bee Transmission',
+    colour:'#C0402A',
+    sections:[
+      {h:'Drifting',
+       b:'Forager bees returning from a nectar source sometimes enter the wrong hive — particularly in apiaries where hives are placed in long parallel rows with similar entrances facing the same direction. A drifting bee carries its full load: Varroa mites, viruses, Nosema spores. Studies show drift rates of 30–40% are common in poorly configured apiaries. <strong>Reduce drift by staggering hive positions, varying entrance colours, and placing landmarks in front of each hive.</strong>'},
+      {h:'Robbing',
+       b:'During nectar dearth (late summer and autumn), strong colonies rob weaker ones, stripping their honey stores. Robbing bees move rapidly between colonies, transferring mites and pathogens at high speed. A collapsing Varroa-infested colony during dearth is a <em>mite bomb</em> — hundreds of mites redistribute to neighbouring hives through this mechanism. <strong>Reduce hive entrances during dearth and remove weak or collapsing colonies immediately.</strong>'},
+      {h:'Swarming',
+       b:'A swarm takes approximately 50% of the colony&#39;s adult bees — and 50% of its mite load — to a new location. If the swarm settles within flight range of other apiaries, it can seed a new colony that then collapses and triggers local robbing. Equally, a virgin queen&#39;s mating flight exposes her to drones from other colonies who may carry pathogens.'},
+      {h:'Trophallaxis',
+       b:'Mouth-to-mouth food sharing is a fundamental bee behaviour that distributes food, pheromones, and information throughout the colony. It is also an efficient route for Nosema spores, EFB bacteria, and viruses to pass directly between individuals. This transmission route operates continuously inside the hive and cannot be disrupted by equipment hygiene alone.'},
+    ]
+  },
+  keeper:{
+    title:'🧑‍🌾 Beekeeper Transmission',
+    colour:'#B8780A',
+    sections:[
+      {h:'Unsterilised hive tools',
+       b:'A hive tool moved between colonies without sterilisation is the single fastest disease vector under beekeeper control. AFB spores can be transferred in seconds. <strong>Carry multiple hive tools</strong> — swap to a clean tool after handling any suspicious hive, and sterilise used tools at home. Between apiaries, flame sterilise all tools before moving on. If you only have one tool, wipe with ≥70% methylated spirits between hives as a field backup — thorough flame or bleach sterilisation can follow at home.'},
+      {h:'Wax scraps and debris',
+       b:'<strong>One of the most overlooked transmission routes.</strong> During inspection, beekeepers routinely scrape wax and propolis from frames and boxes, dropping it on the ground in front of hives. Bees immediately forage on these scraps, ingesting anything present — AFB spores, Nosema, EFB. Never leave wax scrapings, brace comb, or burr comb on the ground near hives. Collect it in a sealed container and dispose of it away from the apiary.'},
+      {h:'Frame and comb exchange',
+       b:'Moving frames between hives — to boost a weak colony, equalise stores, or reuse old comb — is one of the primary routes for AFB and EFB spread. Even a single contaminated frame can establish disease in a clean hive within one brood cycle. <strong>Never move frames between hives without knowing the health status of the source colony.</strong>'},
+      {h:'Hive movement for pollination or nectar flow',
+       b:'Moving hives into commercial pollination or mass flowering events concentrates colonies from different beekeepers in close proximity. Drift and robbing increase dramatically at high densities. <strong>Any disease present in one beekeeper&#39;s hives can spread across an entire pollination block within days.</strong> Inspect hives before movement, treat for Varroa to the lowest possible level beforehand, and be aware that you may bring diseases home from other beekeepers&#39; hives placed alongside yours.'},
+      {h:'Second-hand equipment',
+       b:'Old hive boxes, frames, and comb are a common source of AFB introduction. AFB spores survive for 50+ years in wax. Never use second-hand equipment without thorough sterilisation — scorch wooden boxes with a torch (timber only — use washing soda or bleach for EPS/plastic boxes), destroy suspect comb, and bleach all metal components.'},
+      {h:'Protective clothing',
+       b:'Bee suits, gloves, and veils pick up propolis, wax, and bee products from every hive. Machine wash at 60°C with washing soda between apiaries. Leather gauntlets cannot be fully sterilised — consider switching to nitrile for disease-risk inspections.'},
+    ]
+  },
+  equip:{
+    title:'🔧 Equipment Transmission',
+    colour:'#4A8A9A',
+    sections:[
+      {h:'Stored comb',
+       b:'Drawn comb is valuable and beekeepers are reluctant to discard it — but it is the primary reservoir for AFB spores, Nosema, and wax moth. <strong>AFB spores survive in wax for 50+ years.</strong> Comb stored in a warm, humid shed becomes a wax moth nursery and a pathogen time-bomb. Store comb frozen (−18°C, 48h), ozone-treated, or with Bt spray for wax moth. Mark every frame with month and year and rotate out frames older than three years.'},
+      {h:'Hive boxes',
+       b:'Internal surfaces of wooden boxes accumulate propolis, wax, and organic residue that harbours pathogens. Scorch empty timber boxes with a propane torch before returning to service — timber only, never EPS/polystyrene or plastic boxes (use hot washing soda or bleach for those). Hot washing soda solution dissolves wax and propolis effectively. Never return boxes from a disease-suspect colony to service without thorough sterilisation.'},
+      {h:'Shared and borrowed equipment',
+       b:'Borrowing a friend&#39;s extractor, sharing a nucleus box, or buying a second-hand hive are common pathogen entry points. Treat all borrowed or purchased equipment as potentially contaminated. This is a particularly important entry route for AFB into otherwise clean operations.'},
+      {h:'Feeders and extractors',
+       b:'Honey residue in feeders and extractors supports pathogen survival. Never feed honey of unknown origin — AFB spores survive in honey for decades and feeding contaminated honey is one of the most efficient routes for AFB introduction. Clean all honey-contact equipment with hot washing soda after every use.'},
+    ]
+  },
+  env:{
+    title:'🌿 Environmental Transmission',
+    colour:'#6A8A6A',
+    sections:[
+      {h:'Soil around the apiary',
+       b:'AFB spores shed from diseased colonies contaminate soil around hive entrances. Small hive beetle pupates in soil within 1–2 metres of hive entrances. Wax moth larvae also pupate in soil and leaf litter. <strong>Keep the area around hive stands clear of debris.</strong> Some beekeepers use compacted gravel or mats under stands to reduce SHB pupation success.'},
+      {h:'Feral and unmanaged colonies',
+       b:'Feral colonies in tree hollows, wall cavities, and abandoned hives are a permanent background reservoir for AFB, EFB, Varroa, and viruses. They cannot be treated and will collapse when Varroa populations exceed threshold, creating mite bomb events that affect nearby managed hives. Feral colonies near your apiary are a biosecurity risk that cannot be eliminated, only mitigated through good mite management in your own hives.'},
+      {h:'Water sources',
+       b:'Bees foraging on shared water sources — troughs, ponds, dripping taps — can contact bees from other apiaries. Nosema spores and some other pathogens can be transmitted this way. Providing a dedicated water source near your apiary reduces the distance bees travel for water and minimises contact with bees from unknown hives.'},
+      {h:'Flowers and forage',
+       b:'Pathogens including Nosema ceranae, EFB bacteria, and some viruses have been detected on flower surfaces visited by infected bees. This route is considered lower risk than direct bee contact but is non-zero, particularly at mass flowering events where bee density is high.'},
+    ]
+  }
+};
+
+function showPathwayInfo(key){
+  const info = PATHWAY_INFO[key];
+  if(!info) return;
+  document.getElementById('pathwayTitle').innerHTML = '<span style="color:'+info.colour+'">'+info.title+'</span>';
+  document.getElementById('pathwayContent').innerHTML = info.sections.map(s=>
+    '<div style="margin-bottom:16px;">'
+    +'<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid var(--border);">'+s.h+'</div>'
+    +'<div style="font-size:14px;color:var(--text2);line-height:1.65;">'+s.b+'</div>'
+    +'</div>'
+  ).join('');
+  const drawer = document.getElementById('pathwayDrawer');
+  drawer.style.display = 'block';
+  document.getElementById('pathwayPanel').scrollTop = 0;
+}
+
+function closePathwayInfo(){
+  document.getElementById('pathwayDrawer').style.display = 'none';
+}
+
+async function vmSignIn(){
+  const email = document.getElementById('vmEmail').value.trim();
+  const pwd   = document.getElementById('vmPassword').value;
+  const errEl = document.getElementById('vmSignInError');
+  errEl.style.display = 'none';
+  if(!email || !pwd){ errEl.textContent = 'Please enter your email and password.'; errEl.style.display='block'; return; }
+  const {data, error} = await _sb.auth.signInWithPassword({email, password:pwd});
+  if(error){ const signInErrMsg = error.message||'';
+    const isNetworkErr = signInErrMsg.includes('NetworkError') || signInErrMsg.includes('fetch');
+    errEl.textContent = isNetworkErr
+      ? '⚠️ Network error — check your internet connection and try again.'
+      : (signInErrMsg || 'Sign in failed — check your email and password.');
+    errEl.style.display='block'; return; }
+  _user = data.user;
+  const initials = (_user.email||'?')[0].toUpperCase();
+  document.getElementById('topUser').textContent = 'Sign out';
+  document.getElementById('topUser').title = _user.email||'';
+  document.getElementById('vmSignInPrompt').style.display = 'none';
+  // Show loading state in data card while fetching
+  const dcLoading = document.getElementById('dataCardBody');
+  if(dcLoading) dcLoading.innerHTML = '<div style="color:var(--text3);font-size:13px;">⏳ Loading your hive data…</div>';
+  await loadHiveData();
+  await generatePlan().catch(e => {
+    console.error('generatePlan error:', e);
+    if(dcLoading) dcLoading.innerHTML = '<div style="color:#C0402A;font-size:13px;">⚠️ Error loading plan — ' + (e.message||'please try again') + '</div>';
+  });
+}
+
+function signOut(){
+  if(!confirm('Sign out?')) return;
+  _sb.auth.signOut().then(()=>{ window.location.href='/'; });
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+document.getElementById('app').classList.add('ready');
+checkDisclaimer();
+
+// Render static content first (no auth needed)
+renderPathogenCards();
+renderCurrentWindow();
+renderEquipMatrix();
+loadToolkit();
+renderHygieneScore();
+renderWizardProgress();
+
+// Resolve auth — then load hive data and generate plan with correct user state
+// Handle Safari bfcache restore
+window.addEventListener('pageshow', async function(event){
+  if(event.persisted){
+    console.log('VMHH pageshow: bfcache restore — reloading');
+    const {data:{session}} = await _sb.auth.getSession();
+    if(session?.user){
+      _user = session.user;
+      if(typeof loadHygieneData === 'function') await loadHygieneData();
+      else if(typeof renderAll === 'function') renderAll();
+    }
+  }
+});
+
+_sb.auth.getSession().then(async ({data:{session}})=>{
+  try {
+    if(session){
+      _user = session.user;
+      await loadPlan(_user.id);
+      const initials = (_user.email||'?')[0].toUpperCase();
+      const topUser = document.getElementById('topUser');
+      if(topUser){ topUser.textContent = 'Sign out'; topUser.title = _user.email||''; }
+      await loadHiveData();
+    }
+    // Generate plan or show wizard — after auth is resolved
+    if(loadProfile() && Object.keys(_profile).length >= WIZARD_TOTAL){
+      generatePlan();
+    } else {
+      const pc = document.getElementById('planContent');
+      const pw = document.getElementById('profileWizard');
+      if(pc) pc.style.display = 'none';
+      if(pw) pw.style.display = 'block';
+      // Show skip banner if partial profile saved
+      const hasSaved = Object.keys(_profile).length > 0;
+      const skipBanner = document.getElementById('wizardSkipBanner');
+      {
+        skipBanner.style.display = 'flex';
+      }
+    }
+  } catch(err){
+    console.error('Init error:', err);
+  }
+});
+</script>
+</body>
+</html>
