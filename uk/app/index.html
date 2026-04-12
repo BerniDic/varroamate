@@ -5797,14 +5797,17 @@ async function submitFeedback(){
 
 // UK/Ireland Veterinary Medicine Administration Record Export
 function openVMRExport(){
-  const apiary=apiaries.find(a=>a.id===currentApiaryId)||apiaries[0];
-  const apiaryHives=hives[currentApiaryId]||[];
-  const hive=apiaryHives.find(h=>h.id===currentHiveId)||null;
   const userName=_sbUser?.email||'';
   const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const relevantHives=hive?[hive]:apiaryHives;
+  // Collect treatments from ALL apiaries and hives
   const hvt=[];
-  relevantHives.forEach(h=>{(treatmentsByHive[h.id]||[]).forEach(t=>{hvt.push({...t,hiveName:h.name,apiaryName:apiary?.name||''});});});
+  apiaries.forEach(ap=>{
+    (hives[ap.id]||[]).forEach(h=>{
+      (treatmentsByHive[h.id]||[]).forEach(t=>{
+        hvt.push({...t,hiveName:h.name,apiaryName:ap.name});
+      });
+    });
+  });
   hvt.sort((a,b)=>new Date(a.date)-new Date(b.date));
   const adminRows=hvt.map(t=>{
     const prod=TREATMENTS[t.product]?.name||t.product||'--';
@@ -5827,7 +5830,7 @@ function openVMRExport(){
 <div class="meta">
   <div class="mrow"><span class="ml">Beekeeper name:</span><span class="mv" contenteditable="true">${userName}</span></div>
   <div class="mrow"><span class="ml">Date printed:</span><span class="mv">${today}</span></div>
-  <div class="mrow"><span class="ml">Address:</span><span class="mv" contenteditable="true">${apiary?.address||''}</span></div>
+  <div class="mrow"><span class="ml">Apiaries covered:</span><span class="mv">${apiaries.map(a=>a.name).join(', ')}</span></div>
   <div class="mrow"><span class="ml">BeeBase / herd no.:</span><span class="mv" contenteditable="true"></span></div>
   <div class="mrow"><span class="ml">Period covered:</span><span class="mv" contenteditable="true"></span></div>
 </div>
