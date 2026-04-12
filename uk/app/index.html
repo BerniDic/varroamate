@@ -5805,7 +5805,7 @@ function openVMRExport(){
   const _allHives=Object.values(hives).flat();
   const relevantHives=hive?[hive]:(_allHives.filter?.(h=>h.apiary_id===apiary?.id)||_allHives);
   const hvt=[];
-  relevantHives.forEach(h=>{(treatments||[]).filter(t=>t.hive_id===h.id).forEach(t=>{hvt.push({...t,hiveName:h.name,apiaryName:apiary?.name||''});});});
+  relevantHives.forEach(h=>{(treatmentsByHive[h.id]||[]).forEach(t=>{hvt.push({...t,hiveName:h.name,apiaryName:apiary?.name||''});});});
   hvt.sort((a,b)=>new Date(a.date)-new Date(b.date));
   const adminRows=hvt.map(t=>{
     const prod=TREATMENTS[t.product]?.name||t.product||'--';
