@@ -610,22 +610,6 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <h1 class="page-title">Your Preferences</h1>
     <p class="page-subtitle">These two settings personalise every recommendation VarroaMate gives you. You can change them at any time.</p>
 
-    <!-- STATE SELECTOR -->
-    <div style="margin-bottom:6px;">
-      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;">📍 1. Your State or Territory</div>
-      <p style="font-size:15px;color:var(--text2);margin-bottom:12px;line-height:1.65;">Treatment products registered for use with Varroa vary by state and territory — a product available in NSW may not be registered in WA. Your state also determines which biosecurity reporting requirements apply to you. Selecting the correct state ensures VarroaMate shows only treatments you can legally use, and links you to the right reporting authority.</p>
-    </div>
-    <div class="card" style="margin-bottom:24px;" id="state-selector-card">
-      <p style="font-size:14px;color:var(--text2);margin-bottom:12px;">Data current as of January 2026 — always verify with your state authority.</p>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="state-selector">
-        <script>(function(){
-          const keys=Object.keys(VM_CONFIG?.agencies?.states||{});
-          const s=keys.length?keys:['NSW','ACT','VIC','QLD','SA','WA','TAS','NT'];
-          document.write(s.map(k=>`<div class="state-btn" onclick="selectState(this,'${k}')" data-state="${k}">${k}</div>`).join(''));
-        })()</script>
-      </div>
-      <div id="state-varroa-status" style="margin-top:12px;display:none;font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);border-left:4px solid;"></div>
-    </div>
     <div style="margin-bottom:6px;margin-top:8px;">
       <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;">🧪 2. Your Treatment Philosophy</div>
       <p style="font-size:15px;color:var(--text2);margin-bottom:12px;line-height:1.65;">Beekeepers take different approaches to Varroa treatment — from integrated chemical programmes to entirely organic or mechanical methods. Selecting your philosophy means the AI guidance, treatment suggestions, and seasonal alerts are tailored to your approach, not just generic advice. There is no single right answer — the best strategy is the one you will consistently apply.</p>
