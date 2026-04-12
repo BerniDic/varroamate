@@ -802,7 +802,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       </div>
     </div>
     <div id="tab-treatments" style="display:none;">
-      <div class="section-header"><div class="section-label">Recent Treatments</div><button class="btn btn-primary btn-sm" onclick="openModal('modal-add-treatment')">+ Add</button></div>
+      <div class="section-header"><div class="section-label">Recent Treatments</div><div style="display:flex;gap:6px;"><button class="btn btn-outline btn-sm" onclick="openVMRExport()" title="Generate Veterinary Medicine Administration Record">📋 VMR Record</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-add-treatment')">+ Add</button></div></div>
       <div id="treatment-list"></div>
       <div class="paginator"><button class="pag-btn" onclick="changePage('treatments',-1)">‹</button><span id="treatments-page-label" style="font-size:13px;color:var(--text3);padding:0 8px;"></span><button class="pag-btn" onclick="changePage('treatments',1)">›</button></div>
     </div>
@@ -887,7 +887,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div style="margin:10px 0 6px;font-size:13px;color:var(--text3);text-align:center;" id="field-notes-label">Optional: add a quick note</div>
     <input type="text" id="field-notes" placeholder="e.g. post-treatment check, queen seen…" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;">
 
-    <div style="margin:14px 0 6px;font-size:13px;color:var(--text3);text-align:center;">Hive Strength <span style="font-size:11px;">(for BeeMAX)</span></div>
+    <div style="margin:14px 0 6px;font-size:13px;color:var(--text3);text-align:center;">Hive Strength</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;">
       <button type="button" id="fhs-poor"  onclick="setFieldHiveStrength('Poor')"  class="hs-btn">😟 Poor</button>
       <button type="button" id="fhs-fair"  onclick="setFieldHiveStrength('Fair')"  class="hs-btn">😐 Fair</button>
@@ -5794,4 +5794,51 @@ async function submitFeedback(){
   };
   document.head.appendChild(s);
 })();
+
+// UK/Ireland Veterinary Medicine Administration Record Export
+function openVMRExport(){
+  const apiary=apiaries.find(a=>a.id===currentApiaryId)||apiaries[0];
+  const hive=hives.find(h=>h.id===currentHiveId)||null;
+  const userName=_sbUser?.email||'';
+  const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const relevantHives=hive?[hive]:hives.filter(h=>h.apiary_id===apiary?.id);
+  const hvt=[];
+  relevantHives.forEach(h=>{(treatments||[]).filter(t=>t.hive_id===h.id).forEach(t=>{hvt.push({...t,hiveName:h.name,apiaryName:apiary?.name||''});});});
+  hvt.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const adminRows=hvt.map(t=>{
+    const prod=TREATMENTS[t.product]?.name||t.product||'--';
+    const ds=t.date?new Date(t.date).toLocaleDateString('en-GB'):'--';
+    return`<tr><td>${prod}</td><td class="fc" contenteditable="true"></td><td>${t.hiveName}</td><td>${t.apiaryName}</td><td>${ds}</td><td class="fc" contenteditable="true"></td><td>0 days (see label)</td><td>${t.notes||''}</td></tr>`;
+  }).join('')+Array(Math.max(0,8-hvt.length)).fill('<tr><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td></tr>').join('');
+  const purRows=Array(8).fill('<tr><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td><td class="fc" contenteditable="true"></td></tr>').join('');
+  const w=window.open('','_blank','width=1200,height=900');
+  const H=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Veterinary Medicine Administration Record</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;font-size:11px;color:#000;background:#fff;padding:16px;}.alert{background:#fff3cd;border:1px solid #ffc107;padding:8px 12px;margin-bottom:12px;border-radius:4px;}.hdr{border:2px solid #000;padding:10px 14px;margin-bottom:10px;}.hdr h1{font-size:13px;font-weight:bold;text-transform:uppercase;}.hdr h2{font-size:9px;color:#333;margin-top:2px;}.legal{font-size:9px;color:#444;border-top:1px solid #ccc;padding-top:4px;margin-top:5px;}.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;border:1px solid #999;padding:8px;margin-bottom:10px;}.mrow{display:flex;gap:6px;align-items:baseline;}.ml{font-weight:bold;font-size:10px;white-space:nowrap;min-width:90px;}.mv{border-bottom:1px solid #666;flex:1;min-height:14px;}.stitle{font-size:11px;font-weight:bold;background:#e0e0e0;padding:3px 8px;margin:10px 0 3px;border:1px solid #999;}.snote{font-size:9px;color:#555;font-style:italic;margin-bottom:4px;}table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:10px;}th{background:#e0e0e0;border:1px solid #666;padding:3px 5px;text-align:left;font-size:9px;}td{border:1px solid #999;padding:2px 5px;min-height:18px;vertical-align:top;}.fc{background:#fffef0;}[contenteditable]:focus{outline:2px solid #2980b9;background:#e8f4fd;}.foot{margin-top:10px;border-top:1px solid #ccc;padding-top:5px;font-size:9px;color:#666;display:flex;justify-content:space-between;}@media print{.alert{display:none;}@page{margin:1.2cm;size:A4 landscape;}}</style></head><body>
+<div class="alert">📋 <strong>Before printing:</strong> Fill yellow cells from product packaging (batch numbers, quantities). Click any yellow cell to edit. Then <strong>Ctrl+P</strong> / \u2318+P to print or save as PDF. Keep for <strong>5 years minimum</strong>.</div>
+<div class="hdr">
+  <div style="display:flex;justify-content:space-between;">
+    <div><h1>Veterinary Medicine Administration Record &mdash; Keep for a minimum of 5 years</h1>
+    <h2>United Kingdom: Veterinary Medicines Regulations 2013 &bull; Republic of Ireland: EU Regulation 2019/6 (DAFM/HPRA)</h2></div>
+    <div style="font-size:9px;color:#555;text-align:right;">Generated: ${today}<br>VarroaMate&trade;</div>
+  </div>
+  <div class="legal">Beekeepers are required to keep proof of purchase and a record of purchase, administration and disposal of all veterinary medicines for a minimum of 5 years. Records may be requested by an NBU bee inspector (UK) or DAFM inspector (Ireland). Failure to maintain records is an offence.</div>
+</div>
+<div class="meta">
+  <div class="mrow"><span class="ml">Beekeeper name:</span><span class="mv" contenteditable="true">${userName}</span></div>
+  <div class="mrow"><span class="ml">Date printed:</span><span class="mv">${today}</span></div>
+  <div class="mrow"><span class="ml">Apiary:</span><span class="mv">${apiary?.name||''}</span></div>
+  <div class="mrow"><span class="ml">Address:</span><span class="mv" contenteditable="true">${apiary?.address||''}</span></div>
+  <div class="mrow"><span class="ml">BeeBase / herd no.:</span><span class="mv" contenteditable="true"></span></div>
+  <div class="mrow"><span class="ml">Period covered:</span><span class="mv" contenteditable="true"></span></div>
+</div>
+<div class="stitle">Administration Records &mdash; statutory (VMR 2013 / EU Reg 2019/6)</div>
+<p class="snote">Yellow cells require manual entry from product packaging. <em>Italic headers</em> are recommended but not statutory.</p>
+<table><thead><tr><th>Product name</th><th>Batch no.</th><th><em>Hive / Colony</em></th><th><em>Apiary</em></th><th>Date administered</th><th>Quantity used</th><th>Withdrawal period end</th><th><em>Notes</em></th></tr></thead><tbody>${adminRows}</tbody></table>
+<div class="stitle">Purchase Records &mdash; statutory (VMR 2013 / EU Reg 2019/6)</div>
+<p class="snote">Complete at time of purchase. Keep proof of purchase (receipt/invoice) with this record.</p>
+<table><thead><tr><th>Product name</th><th>Batch no.</th><th>Date acquired</th><th>Quantity acquired</th><th>Supplier name &amp; address</th><th><em>Cost</em></th></tr></thead><tbody>${purRows}</tbody></table>
+<div class="foot"><span>UK: nationalbeeunit.com &bull; vmd.defra.gov.uk &bull; Ireland: gov.ie/bee-health &bull; fibka.ie</span><span>VarroaMate&trade; &bull; varroamate.com &bull; Keep for 5 years minimum</span></div>
+</body></html>`;
+  w.document.write(H);w.document.close();
+}
 </script>
