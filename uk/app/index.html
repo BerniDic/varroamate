@@ -5798,10 +5798,12 @@ async function submitFeedback(){
 // UK/Ireland Veterinary Medicine Administration Record Export
 function openVMRExport(){
   const apiary=apiaries.find(a=>a.id===currentApiaryId)||apiaries[0];
-  const hive=hives.find(h=>h.id===currentHiveId)||null;
+  const _hiveArr=Array.isArray(hives)?hives:Object.values(hives).flat();
+  const hive=_hiveArr.find(h=>h.id===currentHiveId)||null;
   const userName=_sbUser?.email||'';
   const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const relevantHives=hive?[hive]:hives.filter(h=>h.apiary_id===apiary?.id);
+  const _allHives=Object.values(hives).flat();
+  const relevantHives=hive?[hive]:(_allHives.filter?.(h=>h.apiary_id===apiary?.id)||_allHives);
   const hvt=[];
   relevantHives.forEach(h=>{(treatments||[]).filter(t=>t.hive_id===h.id).forEach(t=>{hvt.push({...t,hiveName:h.name,apiaryName:apiary?.name||''});});});
   hvt.sort((a,b)=>new Date(a.date)-new Date(b.date));
