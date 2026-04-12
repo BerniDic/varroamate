@@ -429,11 +429,11 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
 <div id="s-welcome" class="screen">
   <div style="font-size:80px;margin-bottom:20px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))">🐝</div>
   <div style="font-family:'Playfair Display',serif;font-size:52px;color:#fff;margin-bottom:6px;line-height:1.1;">Varroa<em style="font-style:italic;color:#FFE082;">Mate</em><sup style="font-size:16px;vertical-align:super;font-family:Arial,sans-serif;color:#FFE082;">™</sup></div>
-  <div style="color:rgba(255,255,255,0.85);font-size:18px;margin-bottom:40px;">Smart Varroa management for Australian beekeepers</div>
+  <div style="color:rgba(255,255,255,0.85);font-size:18px;margin-bottom:40px;">Smart Varroa management for beekeepers in the UK &amp; Ireland</div>
   <div class="welcome-card">
     <h3>About VarroaMate<sup style="font-size:10px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></h3>
     <p>Varroa<em>Mate</em> is designed to complement and strengthen Varroa management across the United Kingdom and the Republic of Ireland — supporting beekeepers in doing their part to protect colonies, reduce mite loads, and maintain healthy apiaries. Aligned with NBU (UK) and DAFM (Ireland) integrated pest management guidance.</p>
-    <p style="margin-top:8px;">Australian beekeepers now face one of their greatest challenges — Varroa is established and spreading, and the decisions made in the next few years will shape the future of beekeeping across the country. VarroaMate's mission is to give every beekeeper the best possible tools, information, and guidance to protect their colonies, manage mite loads effectively, and help save Australia's bees.</p>
+    <p style="margin-top:8px;">Varroa has been established in the UK and Ireland for over 30 years. Effective, consistent management is essential to protect colonies, reduce viral loads, and maintain healthy apiaries. VarroaMate's mission is to give every beekeeper the best possible tools, information, and guidance aligned with NBU (UK) and DAFM (Ireland) integrated pest management principles.</p>
     <p style="margin-top:8px;">VarroaMate is under ongoing development and welcomes your feedback.</p>
   </div>
   <div class="welcome-card">
@@ -443,9 +443,13 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="welcome-card">
     <h3>Recommended Resources</h3>
     <ul>
-      <li>National program: <a href="https://www.varroa.org.au/" target="_blank" style="color:#FFE082;">varroa.org.au</a></li>
-      <li>AHBIC treatment guidance: <a href="https://honeybee.org.au/varroa/" target="_blank" style="color:#FFE082;">honeybee.org.au</a></li>
-      <li>Report Varroa to your state agriculture authority</li>
+      <li>UK — National Bee Unit: <a href="https://www.nationalbeeunit.com" target="_blank" style="color:#FFE082;">nationalbeeunit.com</a></li>
+      <li>UK — Register your apiary: <a href="https://www.nationalbeeunit.com/register" target="_blank" style="color:#FFE082;">BeeBase registration</a></li>
+      <li>UK — BBKA beekeeping association: <a href="https://www.bbka.org.uk" target="_blank" style="color:#FFE082;">bbka.org.uk</a></li>
+      <li>UK — VMD approved treatments: <a href="https://www.vmd.defra.gov.uk" target="_blank" style="color:#FFE082;">vmd.defra.gov.uk</a></li>
+      <li>Ireland — DAFM bee health: <a href="https://www.gov.ie/en/service/bee-health/" target="_blank" style="color:#FFE082;">gov.ie bee health</a></li>
+      <li>Ireland — FIBKA: <a href="https://fibka.ie" target="_blank" style="color:#FFE082;">fibka.ie</a></li>
+      <li>Report disease: contact your local NBU bee inspector (UK) or DAFM inspector (Ireland)</li>
     </ul>
   </div>
   <div class="welcome-btns">
@@ -522,7 +526,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:30px 24px;">
     <div class="signin-box">
       <div class="signin-logo">Varroa<em>Mate</em><sup style="font-size:14px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div>
-      <div class="signin-sub">Varroa management for Australian beekeepers</div>
+      <div class="signin-sub">Varroa management for beekeepers in the UK &amp; Ireland</div>
       <div class="signin-tab-row">
         <div class="signin-tab active" id="tab-signin" onclick="switchSigninTab('signin')">Sign In</div>
         <div class="signin-tab" id="tab-create" onclick="switchSigninTab('create')">Create Account</div>
@@ -611,7 +615,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <p class="page-subtitle">These two settings personalise every recommendation VarroaMate gives you. You can change them at any time.</p>
 
     <div style="margin-bottom:6px;margin-top:8px;">
-      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;">🧪 2. Your Treatment Philosophy</div>
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--amber-dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;">🧪 Your Treatment Philosophy</div>
       <p style="font-size:15px;color:var(--text2);margin-bottom:12px;line-height:1.65;">Beekeepers take different approaches to Varroa treatment — from integrated chemical programmes to entirely organic or mechanical methods. Selecting your philosophy means the AI guidance, treatment suggestions, and seasonal alerts are tailored to your approach, not just generic advice. There is no single right answer — the best strategy is the one you will consistently apply.</p>
     </div>
     <div class="two-col">
@@ -1863,10 +1867,10 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <div style="display:flex;gap:8px;align-items:center;">
         <select id="treatment-select" style="flex:1;padding:12px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:16px;background:var(--bg);color:var(--text);" onchange="updateTreatmentInfo()">
           <option value="">— Select treatment —</option>
-          <optgroup label="Organic Acids"><option value="oxalic">Oxalic Acid Vaporisation</option><option value="oxalic-dribble">Oxalic Acid Dribble</option><option value="formic">Formic PRO (Formic Acid)</option><option value="aluen-cap">Aluen CAP (Oxalic + Lactic acid)</option></optgroup>
-          <optgroup label="Thymol-based"><option value="apilife">ApiLife Var (Thymol)</option><option value="apiguard">Apiguard (Thymol gel)</option></optgroup>
-          <optgroup label="Synthetic Acaricides"><option value="apivar">Apivar (Amitraz)</option><option value="apitraz">Apitraz (Amitraz)</option><option value="bayvarol">Bayvarol (Flumethrin)</option><option value="apistan">Apistan (Tau-fluvalinate)</option></optgroup>
-          <optgroup label="Mechanical"><option value="drone-comb">Drone comb removal</option><option value="brood-int">Brood interruption</option><option value="heat">Heat treatment</option></optgroup>
+          <optgroup label="Organic Acids (OA)"><option value="oxalic-vap">OA Vaporisation (Api-Bioxal)</option><option value="oxalic-dribble">OA Dribble (Api-Bioxal/Oxuvar)</option><option value="oxalic-spray">OA Spray (Oxuvar)</option><option value="maqs">MAQS (Formic Acid — supers on)</option><option value="formicpro">Formicpro (Formic Acid — supers off)</option><option value="varromed">VarroMed (Formic + OA)</option></optgroup>
+          <optgroup label="Thymol-based"><option value="thymovar">Thymovar (Thymol strips)</option><option value="apilife">ApiLife Var (Thymol)</option><option value="apiguard">Apiguard (Thymol gel)</option></optgroup>
+          <optgroup label="Synthetic Acaricides"><option value="apivar">Apivar (Amitraz)</option><option value="apitraz">Apitraz (Amitraz)</option><option value="apistan">Apistan (Tau-fluvalinate)</option></optgroup>
+          <optgroup label="Mechanical"><option value="drone-comb">Drone comb removal</option><option value="brood-int">Brood interruption</option></optgroup>
         </select>
         <button class="icon-btn" id="modal-info-btn" style="font-size:22px;display:none;" onclick="showTreatmentInfoFromSelect()">ℹ️</button>
       </div>
@@ -1875,7 +1879,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="field"><label>Start Date</label><input type="date" id="treatment-date"></div>
     <div class="field"><label>Notes</label><input type="text" id="treatment-notes" placeholder="e.g. honey supers removed"></div>
     <input type="hidden" id="treatment-edit-id">
-    <div style="margin-bottom:14px;"><a href="https://honeybee.org.au/wp-content/uploads/2026/01/AHBIC-Varroa-Chemical-Treatment-Table-28-01-26.pdf" target="_blank" style="font-size:14px;color:var(--amber);text-decoration:none;font-weight:600;">📄 Full AHBIC Treatment Regulatory Table →</a></div>
+    <div style="margin-bottom:14px;"><a href="https://www.nationalbeeunit.com/diseases-and-pests/varroa/how-do-i-manage-varroa" target="_blank" style="font-size:14px;color:var(--amber);text-decoration:none;font-weight:600;">📄 NBU Varroa Treatment Guidance →</a></div>
     <button class="btn btn-primary btn-full" onclick="saveTreatment()">Save Treatment</button>
   </div>
 </div>
@@ -3759,7 +3763,7 @@ async function sendChat(){
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
-      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa. APPROVED TREATMENTS ONLY: Only recommend or discuss treatments from this list — no others: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, thymol crystals, hop beta acids, or any other unlisted method. MITE COUNTING: All mite counting in VarroaMate uses alcohol wash exclusively — do not suggest sugar rolls, sugar dusting, sticky boards, or CO2 wash as counting methods.',
+      system:VM_CONFIG?.ai?.chatSystem||'You are VarroaMate, a friendly expert assistant for beekeepers in the United Kingdom and Republic of Ireland.',
       messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
     chatHistory.push({role:'assistant',content:reply});loading.innerHTML=renderAIMarkdown(reply);
