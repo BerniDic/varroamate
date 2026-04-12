@@ -3037,7 +3037,7 @@ function renderHiveDetail(){
   const b=getHiveBadge(hive.id);
   document.getElementById('hive-detail-title').textContent=hive.name;
   document.getElementById('hive-detail-chips').innerHTML=`<div class="info-chip">🏡 ${ap?.name||''}</div><div class="info-chip"><span class="badge ${b.cls}">${b.label}</span></div><div class="info-chip">Last: <strong style="margin-left:4px;">${b.num==='—'?'No data':b.num+' mites'}</strong></div>`;
-  document.getElementById('chart-label').textContent=`${hive.name} · Alcohol wash (~300 bees)`;
+  document.getElementById('chart-label').textContent=`${hive.name} · ${VM_CONFIG?.ui?.alcoholWashLabel||'Alcohol wash (~300 bees)'}`;
   const counts=miteCountsByHive[hive.id]||[];
   const treatments=treatmentsByHive[hive.id]||[];
   let trend='—';
@@ -3353,7 +3353,7 @@ function initChart(canvasEl,maintainAR){
   const hive=Object.values(hives).flat().find(h=>h.id===currentHiveId);
   const fmtY=(d)=>d.toLocaleDateString('en-AU',{month:'short',year:'numeric'});
   const lbl=document.getElementById('chart-label');
-  if(lbl&&hive)lbl.textContent=`${hive.name} · ${fmtY(fromDate)} – ${fmtY(toDate)} · Alcohol wash (~300 bees)`;
+  if(lbl&&hive)lbl.textContent=`${hive.name} · ${fmtY(fromDate)} – ${fmtY(toDate)} · ${VM_CONFIG?.ui?.alcoholWashLabel||'Alcohol wash (~300 bees)'}`;
   const rangeLabel=chartMonths<=1?'1 month':chartMonths<12?chartMonths+' months':chartMonths===12?'1 year':Math.round(chartMonths/12*10)/10+' years';
   const rl=document.getElementById('chart-range-label');if(rl)rl.textContent=rangeLabel;
 
@@ -3549,12 +3549,12 @@ async function loadGuidance(){
 
   const month=new Date().getMonth(); // 0=Jan
   const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
-  const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||'Australia (state unknown)',varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
+  const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (${VM_CONFIG?.ai?.hemisphereLabel||'Southern Hemisphere'})`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||'Australia (state unknown)',varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
   const pyrethreidWarning=state==='NSW'||state==='ACT'?'IMPORTANT (April 2026 update): Pyrethroid resistance (L925I) AND amitraz resistance are now both confirmed in northern NSW populations. The same populations previously confirmed for pyrethroid resistance are also confirmed for amitraz resistance. Pyrethroid and amitraz resistance is also confirmed in south-east QLD. If recommending Bayvarol, Apistan, Apivar, or Apitraz in NSW or QLD, include a strong caution: these treatments may be ineffective in affected areas. Recommend a post-treatment alcohol wash at day 14–21 to confirm efficacy, and advise the beekeeper to contact NSW DPIRD if poor knock-down is observed. For beekeepers NOT in confirmed resistance zones, treatments should remain effective — but MoA rotation is essential. NSW DPIRD advises the geographical spread appears currently limited.':'';
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
   const sections=[
     {id:'guidance-summary-body',prompt:`Varroa status: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 2–3 sentences. Specific about count, trend, season, and state context. IMPORTANT: Do NOT suggest or mention any treatments — no treatment names, no treatment recommendations, no hints toward any treatment approach. Describe the mite situation only. Treatment recommendations are handled exclusively in the Next Steps panel.`},
-    {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". Only recommend treatments from the approved VarroaMate list — do not suggest any method not in: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment (Varroa Controller), Duplex-Framebox Plan. ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
+    {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". Only recommend treatments from the approved VarroaMate list — do not suggest any method not in: ${(VM_CONFIG?.treatments?.approvedList||['OA Vaporisation','OA Dribble','Formic PRO','Aluen CAP','ApiLife Var','Apiguard','Apivar','Apitraz','Bayvarol','Apistan','Drone Comb Removal','Brood Interruption','Heat Treatment (Varroa Controller)','Duplex-Framebox Plan']).join(', ')}. ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
     {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic PRO (Formic Acid) also allows supers on. Supers must be removed for: Apivar, Apitraz, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
   ];
   if(!_planLimits.ai){
@@ -3760,7 +3760,7 @@ async function sendChat(){
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
-      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa. APPROVED TREATMENTS ONLY: Only recommend or discuss treatments from this list — no others: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, thymol crystals, hop beta acids, or any other unlisted method. MITE COUNTING: All mite counting in VarroaMate uses alcohol wash exclusively — do not suggest sugar rolls, sugar dusting, sticky boards, or CO2 wash as counting methods.',
+      system:VM_CONFIG?.ai?.chatSystem||'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite.',
       messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
     chatHistory.push({role:'assistant',content:reply});loading.innerHTML=renderAIMarkdown(reply);
@@ -5180,7 +5180,7 @@ function speakHiveSummary(hiveId, btn){
   if(counts[0]&&counts[1]){
     trend = counts[0].value > counts[1].value ? 'increasing' : counts[0].value < counts[1].value ? 'decreasing' : 'stable';
   }
-  const lastCount = counts[0] ? counts[0].value + ' mites per 300 bees on ' + fmtDate(counts[0].date) : 'no mite counts recorded';
+  const lastCount = counts[0] ? counts[0].value + ` mites per ${VM_CONFIG?.thresholds?.per||300} bees on ` + fmtDate(counts[0].date) : 'no mite counts recorded';
   const lastTreat = treatments[0] ? 'Last treatment was ' + ((TREATMENTS[treatments[0].product]&&TREATMENTS[treatments[0].product].name)||treatments[0].product).split('(')[0].trim() + ', started ' + fmtDate(treatments[0].date) + '.' : 'No treatments recorded.';
   const cleanRisk = b.label.replace(/[^\w\s\-]/g,'').trim();
   const text = hiveName + ', in ' + apName + '. Latest mite count: ' + lastCount + '. Trend: ' + trend + '. Risk level: ' + cleanRisk + '. ' + lastTreat;
@@ -5218,7 +5218,7 @@ function exportCalendar(){
       for(let w=1;w<=4;w++){
         const d=new Date(today);d.setDate(d.getDate()+w*28);
         const month=d.getMonth(); // 0=Jan
-        const isWinter = month>=4 && month<=7; // May, Jun, Jul, Aug
+        const isWinter = (VM_CONFIG?.monitoringSeason?.reducedMonths||[4,5,6,7]).includes(month);
         if(isWinter) continue;
         const dateKey=icsDate(d);
         if(!washDates.has(dateKey)){
