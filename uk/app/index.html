@@ -4171,7 +4171,7 @@ function showTreatmentInfo(key){
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${tr('Active ingredient',t.active||t.moa||'—')}${tr('Temperature',`<strong style="color:${t.tempSensitive!==false?'var(--red)':'var(--green)'}">${t.tempRange||'—'}</strong>`)}
       ${tr('Honey supers',t.honeySupers)}${tr('With brood',t.withBrood)}${tr('Dosage',t.dosage)}
-      ${tr('Duration',t.duration??(t.durationDays?t.durationDays+' days':'—'))}${tr('Resistance risk',t.resistance)}${tr(VM_CONFIG?.region==='UK-IE'?'VMD Registration':'APVMA / National',t.regulatory||'—')}
+      ${tr('Duration',typeof t.duration==='string'?t.duration:(t.duration||t.durationDays)?(t.duration||t.durationDays)+' days':'—')}${tr('Resistance risk',t.resistance)}${tr(VM_CONFIG?.region==='UK-IE'?'VMD Registration':'APVMA / National',t.regulatory||'—')}
     </table>
     <div style="margin-top:12px;padding:10px 12px;background:var(--amber-pale);border-radius:var(--radius-sm);font-size:14px;border-left:3px solid var(--amber);">
       <strong>Notes:</strong> ${t.notes}
