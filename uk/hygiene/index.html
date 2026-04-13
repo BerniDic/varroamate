@@ -609,7 +609,7 @@ body{
           </div>
           <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid #8090C0;">
             <div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:3px;">🌡️ Climate variability</div>
-            <div style="font-size:14px;color:var(--text2);line-height:1.5;">Extended droughts, irregular flowering, and heat events disrupt the seasonal rhythms that bees and beekeepers rely on. Unpredictable nectar dearths increase robbing pressure and colony stress.</div>
+            <div style="font-size:14px;color:var(--text2);line-height:1.5;">Unpredictable weather, wet springs, and poor summers disrupt the seasonal rhythms that bees and beekeepers rely on. Prolonged nectar dearths increase robbing pressure and colony stress.</div>
           </div>
           <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid var(--rust);">
             <div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:3px;">🔬 Emerging pathogens</div>
@@ -621,7 +621,7 @@ body{
       <div class="card" style="background:linear-gradient(135deg,#EEF6F0,#E0F0E8);border-color:#5A8A6A;">
         <div class="card-title" style="color:#1C5A28;">💡 Why This Module Exists</div>
         <div style="font-size:15px;color:var(--text2);line-height:1.65;">
-          Comprehensive hygiene guidance for beekeepers already exists in regulatory documents — but it is scattered, focused on listing rules rather than explaining why they matter, and largely written before Varroa arrived in Australia.
+          Comprehensive hygiene guidance for beekeepers already exists in regulatory documents — but it is scattered, focused on listing rules rather than explaining why they matter, and largely written for a pre-Varroa world.
           <br><br>
           What is missing is a <strong>practical, pathogen-centred guide</strong> that explains:
         </div>
@@ -1262,11 +1262,11 @@ body{
             <div class="season-actions">Brood declines, mite populations peak, virus loads increase. Colony contraction increases robbing risk.<br><br>
             <div style="background:#FAE8E5;border:1.5px solid #C0402A;border-radius:8px;padding:10px 12px;margin-bottom:10px;">
               <div style="font-size:14px;font-weight:700;color:#C0402A;margin-bottom:4px;">🚨 Critical Varroa Treatment Window</div>
-              <div style="font-size:14px;color:#7A2010;line-height:1.6;">Winter bees — the long-lived bees that must carry the colony through to spring — are produced from <strong>March to April</strong>. Any bee that emerges while mite levels are high will have a shortened lifespan and carry heavy viral loads. <strong>Treatment must be completed before the end of April</strong> to protect this cohort. Missing this window significantly reduces the colony's chance of surviving winter.</div>
+              <div style="font-size:14px;color:#7A2010;line-height:1.6;">Winter bees — the long-lived bees that must carry the colony through to spring — are produced from <strong>July to August</strong>. Any bee that emerges while mite levels are high will have a shortened lifespan and carry heavy viral loads. <strong>Treatment must be completed before the end of August</strong> to protect this cohort. Missing this window significantly reduces the colony's chance of surviving winter.</div>
             </div>
             🚨 Monitor mites first — alcohol wash to confirm threshold (≥3/300)<br>
             🚨 Treat for Varroa immediately if at or above threshold<br>
-            🚨 Complete treatment before end of April<br>
+            🚨 Complete treatment before end of August<br>
             🚨 Remove deadouts within 24 hours<br>
             🚨 Prevent robbing cascades — reduce entrances</div>
           </div>
@@ -1829,19 +1829,19 @@ async function loadHiveData(){
 // ══════════════════════════════════════════════
 function getSeasonalWindow(){
   const m = new Date().getMonth(); // 0=Jan
-  // Australian seasons: Spring Aug–Oct (7–9), Summer Nov–Feb (10–0), Autumn Mar–May (2–4), Winter Jun–Jul (5–6)
-  if(m>=7 && m<=9) return {label:'Spring', risk:'high', icon:'🌱', colour:'#1C5A28', bg:'#EEF6F0', border:'#5A8A6A',
+  // Northern Hemisphere seasons: Spring Mar–May (2–4), Summer Jun–Aug (5–7), Autumn Sep–Nov (8–10), Winter Dec–Feb (11,0,1)
+  if(m>=2 && m<=4) return {label:'Spring', risk:'high', icon:'🌱', colour:'#1C5A28', bg:'#EEF6F0', border:'#5A8A6A',
     msg:'Spring brood disease window. Swarm season — inspect every 1–2 weeks. Avoid unnecessary frame exchange.',
     actions:['Inspect brood carefully — record any abnormal cells', 'Check for queen cells every visit', 'Avoid frame exchange between hives', 'Flame sterilise tools between apiaries', 'Quarantine any new colonies']};
-  if(m>=10 || m===0 || m===1) return {label:'Summer', risk:'med', icon:'☀️', colour:'#8A5000', bg:'#FFF8EE', border:'#D4A040',
+  if(m>=5 && m<=7) return {label:'Summer', risk:'med', icon:'☀️', colour:'#8A5000', bg:'#FFF8EE', border:'#D4A040',
     msg:'Peak colony strength but mite populations building. Nectar dearth later in summer increases robbing and drifting.',
-    actions:['Alcohol wash every 4 weeks — record all counts in VarroaMate', 'Watch for DWV symptoms (deformed wings, crawling bees)', 'Inspect for small hive beetle — deploy traps in warm months', 'Reduce entrances if robbing observed', 'Avoid open feeding or exposed honey frames']};
-  if(m>=2 && m<=4) return {label:'Autumn', risk:'critical', icon:'🍂', colour:'#9A2020', bg:'#FFF0F0', border:'#C04040',
+    actions:['Alcohol wash every 4 weeks — record all counts in VarroaMate', 'Watch for DWV symptoms (deformed wings, crawling bees)', 'Reduce entrances if robbing observed', 'Avoid open feeding or exposed honey frames', 'Plan post-harvest Varroa treatment']};
+  if(m>=8 && m<=10) return {label:'Autumn', risk:'critical', icon:'🍂', colour:'#9A2020', bg:'#FFF0F0', border:'#C04040',
     msg:'Most critical window of the year. Treat Varroa now to protect winter bees. Colony contraction increases robbing risk.',
-    actions:['Monitor mites — alcohol wash every 4 weeks', 'Treat for Varroa if ≥3/300 bees — complete before end of April', 'Reduce hive entrances to limit robbing', 'Remove deadouts within 24 hours', 'Leave adequate honey stores for winter']};
-  if(m>=5 && m<=6) return {label:'Winter', risk:'low', icon:'❄️', colour:'#1A3A7A', bg:'#EEF0F8', border:'#8090C0',
+    actions:['Monitor mites — alcohol wash every 4 weeks', 'Treat for Varroa if ≥3/300 bees — complete before end of October', 'Reduce hive entrances to limit robbing', 'Remove deadouts within 24 hours', 'Ensure adequate honey stores for winter (≥20kg)']};
+  if(m===11 || m<=1) return {label:'Winter', risk:'low', icon:'❄️', colour:'#1A3A7A', bg:'#EEF0F8', border:'#8090C0',
     msg:'Low transmission risk. Avoid unnecessary inspections. Best time for equipment hygiene and comb storage.',
-    actions:['Avoid opening hive — breaking the cluster costs bees energy', 'Clean and sterilise all equipment', 'Ozone or freeze stored comb', 'Heft hive every 2–3 weeks to gauge stores', 'Plan splits and equipment for spring']};
+    actions:['Avoid opening hive — breaking the cluster costs bees energy', 'Clean and sterilise all equipment', 'Ozone or freeze stored comb', 'Heft hive every 2–3 weeks to gauge winter stores', 'Plan splits and equipment for spring']};
   return {label:'Late Winter', risk:'low', icon:'❄️', colour:'#1A3A7A', bg:'#EEF0F8', border:'#8090C0',
     msg:'Colony beginning to build. Keep inspections minimal but watch stores.',
     actions:['Check stores — feed if light', 'Prepare equipment for spring', 'Plan Varroa monitoring schedule', 'Order supplies before spring rush']};
@@ -1897,7 +1897,7 @@ function buildChecklist(){
     items.push({text:'If AFB is suspected: report to the NBU (England/Wales/Scotland), DAERA (N. Ireland), or DAFM (Ireland) immediately — do not destroy or move equipment until instructed. AFB is a notifiable disease throughout the UK and Ireland.', priority:'🚨 Notifiable disease', checked:false});
   }
   if(_profile.concern==='varroa'){
-    items.push({text:'Alcohol wash every 4 weeks September–April; record all counts in VarroaMate', priority:'Varroa monitoring', checked:false});
+    items.push({text:'Alcohol wash every 4 weeks March–October; record all counts in VarroaMate', priority:'Varroa monitoring', checked:false});
     items.push({text:'Treat before mite levels exceed 3/300 bees — not after colony shows symptoms', priority:'Varroa control', checked:false});
     items.push({text:'Remove collapsing colonies immediately — a mite bomb can infect an entire apiary', priority:'Varroa control', checked:false});
   }
