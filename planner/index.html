@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<script src="/config/au.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>VMSP — VarroaMate Smart Planner</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
@@ -1804,7 +1803,7 @@ const TREATMENTS = {
   'apiguard':    {name:'Apiguard',              abbrev:'APG',  color:'#B5CDBB', moa:'Essential Oil', moaShort:'EO',  synthetic:false, tempRange:'>15°C',   supersOff:true,  notes:'Thymol gel. 2 × 14-day applications. Remove supers.',                          duration:28, season:['spring','autumn'], badSeasons:['winter'], badSeasonNote:'Needs >15°C — not effective in cool conditions'},
   'apivar':      {name:'Apivar',                abbrev:'APV',  color:'#3D6B52', moa:'Amitraz',       moaShort:'AMZ', synthetic:true,  tempRange:'>10°C',   supersOff:true,  notes:'Amitraz strips. Highly effective. Rotate MoA. No supers. 2 strips × 56 days.', duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'apitraz':     {name:'Apitraz',               abbrev:'APT',  color:'#3D6B52', moa:'Amitraz',       moaShort:'AMZ', synthetic:true,  tempRange:'>10°C',   supersOff:true,  notes:'Amitraz strips. Same MoA as Apivar — do not use in same season.',              duration:42, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
-  'bayvarol':    {name:'Bayvarol',              abbrev:'BAY',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'Flumethrin strips. ⚠️ Pyrethroid resistance confirmed in northern NSW and SE QLD. Monitor post-treatment efficacy with alcohol wash.',        duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
+  'bayvarol':    {name:'Bayvarol',              abbrev:'BAY',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:false,  notes:'Flumethrin strips. ⚠️ Pyrethroid resistance confirmed in northern NSW and SE QLD. Monitor post-treatment efficacy with alcohol wash.',        duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'apistan':     {name:'Apistan',               abbrev:'API',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'⚠️ Pyrethroid resistance confirmed in northern NSW and SE QLD (same populations also confirmed for amitraz resistance April 2026). Confirm efficacy post-treatment.',            duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'drone-comb':  {name:'Drone Comb Removal',    abbrev:'DCR',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Remove and freeze capped drone comb. Ongoing throughout drone-rearing season.', duration:0,  season:['spring','summer'],        badSeasons:['autumn','winter'], badSeasonNote:'⚠ Not effective in autumn — drone rearing has ceased by then'},
   'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap. Best in late summer (Jan–Feb) when mite:brood ratio is highest and winter bee rearing has not yet begun. Avoid March–April — caging the queen disrupts critical winter bee production and weakens the colony heading into winter.',    duration:25, season:['spring','summer'],  badSeasons:['winter','autumn'], badSeasonNote:'⚠ Avoid in autumn (Mar–Apr) — disrupts winter bee rearing, weakening the colony heading into winter. Cannot perform in winter — brood already absent. Best timing: Jan–Feb (late summer)'},
@@ -1816,15 +1815,15 @@ const TREATMENTS = {
 };
 
 const REG_INFO = {
-  'oxalic':         VM_CONFIG?.treatments?.products?.['oxalic']?.regNote || 'Active: Oxalic acid. APVMA registered. Supers ON permitted. Withholding period: nil. 3 applications × 7 days apart. Most effective in broodless period.',
-  'oxalic-dribble': VM_CONFIG?.treatments?.products?.['oxalic-dribble']?.regNote || 'Active: Oxalic acid. APVMA registered. Supers may remain on. Single application only. WHP: nil. Broodless colonies only — ineffective with brood present.',
-  'formic':         VM_CONFIG?.treatments?.products?.['formic']?.regNote || 'Active: Formic acid (Formic PRO). APVMA registered. Supers ON permitted. WHP: nil. 1 strip × 7 days. Min. temp 10°C, max 29°C. Penetrates capped brood.',
+  'oxalic':         'Active: Oxalic acid. APVMA registered. Supers ON permitted. Withholding period: nil. 3 applications × 7 days apart. Most effective in broodless period.',
+  'oxalic-dribble': 'Active: Oxalic acid. APVMA registered. Supers may remain on. Single application only. WHP: nil. Broodless colonies only — ineffective with brood present.',
+  'formic':         'Active: Formic acid (Formic PRO). APVMA registered. Supers ON permitted. WHP: nil. 1 strip × 7 days. Min. temp 10°C, max 29°C. Penetrates capped brood.',
   'aluen-cap':      'Active: Oxalic acid + lactic acid. APVMA registered. Supers ON permitted. WHP: nil. Up to 42 days. Effective with brood present. Temp range 5–40°C.',
   'apilife':        'Active: Thymol blend. APVMA registered. Remove supers. WHP: nil per label. 3 × 10-day applications (tablet pieces placed on top bars). Temp 15–30°C required.',
   'apiguard':       'Active: Thymol gel. APVMA registered. Remove supers. WHP: nil per label. 2 × 14-day applications. Requires >15°C. Place tray on top of frames.',
-  'apivar':         VM_CONFIG?.treatments?.products?.['apivar']?.regNote || 'Active: Amitraz. APVMA registered. Remove supers. WHP: nil per label. 2 strips × 56 days. Do not use >2 treatments/year. Rotate MoA — do not use with Apitraz same season.',
+  'apivar':         'Active: Amitraz. APVMA registered. Remove supers. WHP: nil per label. 2 strips × 56 days. Do not use >2 treatments/year. Rotate MoA — do not use with Apitraz same season.',
   'apitraz':        'Active: Amitraz. APVMA registered. Remove supers. WHP: nil per label. 42-day treatment. Same MoA as Apivar — do not use in same season. Min temp >10°C.',
-  'bayvarol':       'Active: Flumethrin. APVMA registered. Remove supers. WHP: nil per label. 4 strips × 6–8 weeks. Pyrethroid resistance documented — monitor wash counts during treatment.',
+  'bayvarol':       'Active: Flumethrin. APVMA registered. Supers on permitted. WHP: nil per label. 4 strips × 6–8 weeks. Pyrethroid resistance documented — monitor wash counts during treatment.',
   'apistan':        'Active: Tau-fluvalinate. APVMA registered. Remove supers. WHP: nil per label. 2 strips × 8 weeks. ⚠ Widespread pyrethroid resistance in Australia — alcohol wash recommended at day 14 to confirm efficacy.',
   'drone-comb':     'No APVMA registration required — mechanical method. No withholding period. Permitted under all state Varroa regulations. Use in conjunction with a registered chemical treatment.',
   'brood-int':      'No APVMA registration required — mechanical brood interruption. No WHP. Combine with registered OA vaporisation during broodless period for maximum efficacy.',
@@ -1832,8 +1831,8 @@ const REG_INFO = {
   'duplex':         'No APVMA registration required for queen caging. OA dribble applied on Day 24 must comply with APVMA label conditions. No honey WHP.',
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const SEASON_COLORS = VM_CONFIG?.seasons ? Object.fromEntries(Object.entries(VM_CONFIG.seasons).map(([k,v])=>[k,v.color])) : {summer:'#E8A020',autumn:'#C05A20',winter:'#4A7898',spring:'#5A9E60'};
-function getSeason(m){return VM_CONFIG?.getSeason?.(m)||(m>=11||m<=1?'summer':m>=2&&m<=4?'autumn':m>=5&&m<=7?'winter':'spring');}
+const SEASON_COLORS = {summer:'#E8A020',autumn:'#C05A20',winter:'#4A7898',spring:'#5A9E60'};
+function getSeason(m){if(m>=11||m<=1)return'summer';if(m>=2&&m<=4)return'autumn';if(m>=5&&m<=7)return'winter';return'spring';}
 
 const TREAT_GROUPS = [
   { label:'Organic Acids',          ids:['oxalic','oxalic-dribble','formic','aluen-cap'] },
@@ -3617,7 +3616,7 @@ async function suggestPlan(){
       : ''
   ].filter(Boolean).join('. ') || 'No treatment history';
 
-  const systemPrompt = `You are VMSP, an expert Varroa management planner for ${VM_CONFIG?.ai?.hemisphereLabel||'southern-hemisphere'} (${VM_CONFIG?.region||'Australian'}) beekeepers.
+  const systemPrompt = `You are VMSP, an expert Varroa management planner for southern-hemisphere (Australian) beekeepers.
 You suggest treatment plans as structured JSON only — no prose outside the JSON object.
 The beekeeper's philosophy is: "${currentPref.name}" — ${currentPref.desc}
 TREATMENTS YOU MAY USE — this is the COMPLETE list, use ONLY these treatIds, no others:
@@ -6391,8 +6390,6 @@ function renderAIMarkdown(text){
   if(!text) return '';
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^## (.+)$/gm,'<strong style="font-size:15px;color:var(--amber-dark,#8B5200);">$1</strong>')
-    .replace(/^# (.+)$/gm,'<strong style="font-size:16px;color:var(--amber-dark,#8B5200);">$1</strong>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
     .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
@@ -6428,7 +6425,7 @@ async function vmspSendChat(){
       method:'POST', headers,
       body: JSON.stringify({
         model:CLAUDE_MODEL, max_tokens:1000,
-        system:VM_CONFIG?.ai?.chatSystem||`You are the VarroaMate Smart Planner assistant, an expert advisor for Australian beekeepers. Help users build effective Varroa treatment plans. Always use "Formic PRO" not "MAQS". Keep answers concise and practical.
+        system:`You are the VarroaMate Smart Planner assistant, an expert advisor for Australian beekeepers. Help users build effective Varroa treatment plans. Focus on: treatment timing and windows, resistance rotation, organic vs chemical strategies, honey flow compatibility, seasonal planning for southern hemisphere, and how to interpret plan scores. Always use "Formic PRO" not "MAQS". Keep answers concise and practical.
 APPROVED TREATMENTS — HARD WHITELIST: You must ONLY ever recommend, suggest, or mention treatments from this exact list. No exceptions: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT mention any other method under any circumstances — including sugar dusting, powdered sugar, sugar rolls, oxalic acid syrup, lactic acid spray, thymol crystals, hop beta acids, or any unlisted approach. If asked about an unlisted method, say only that it is not supported in VarroaMate.
 MITE COUNTING: All mite counting in VarroaMate is done exclusively via alcohol wash. Never mention or suggest any other counting method.
 DAY PLANS: When discussing mechanical treatments — Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), or Duplex-Framebox Plan — always direct the user to the Day Plans section of this Smart Planner for step-by-step implementation guidance, timelines, and action checklists. Each of these methods has a dedicated Day Plan. Keep the referral brief — one sentence is enough.`,
