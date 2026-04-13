@@ -1777,19 +1777,19 @@ canvas.drop-blocked{cursor:not-allowed;}
 const PREFS = [
   {id:'integrated',   icon:'⚖️',  name:'Integrated Chemical & Non-Chemical',
    desc:'Full spectrum: synthetic chemicals, organic acids, and mechanical/heat with rotation.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
   {id:'organic-first',icon:'🌿',  name:'Organic-First with Emergency Synthetic',
    desc:'Organic acids as primary; synthetics only if infestation becomes critical.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
   {id:'organic-heat', icon:'🌿🌡️', name:'Organic + Heat Treatment',
    desc:'Organic acids and thymol combined with Varroa Controller heat treatment. No synthetic chemicals.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','apilife','apiguard','heat','duplex']},
   {id:'organic',      icon:'🍃',  name:'Organic-Only Strategy',
    desc:'Organic acids and thymol exclusively. No synthetics, no heat device, no mechanical methods.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard']},
+   allowed:['oxalic','oxalic-dribble','formic','apilife','apiguard']},
   {id:'mech-organic', icon:'🔩',  name:'Organic + Mechanical + Heat Strategy',
    desc:'Mechanical/heat combined with organic acids. No synthetics.',
-   allowed:['oxalic','oxalic-dribble','formic','aluen-cap','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
+   allowed:['oxalic','oxalic-dribble','formic','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
   {id:'mechanical',   icon:'🔧',  name:'Mechanical + Heat Strategy Only',
    desc:'Mechanical/heat only. Zero chemicals of any kind.',
    allowed:['drone-comb','brood-int','heat','duplex']},
@@ -1798,14 +1798,14 @@ const PREFS = [
 const TREATMENTS = {
   'oxalic':      {name:'OA Vaporisation',      abbrev:'OAV',  color:'#5A9E60', moa:'Organic Acid',  moaShort:'OA',  synthetic:false, tempRange:'3–25°C',  supersOff:false, notes:'3 × weekly applications (days 0, 7, 14). Best in broodless period. No chemical residues — supers can remain on.',            duration:21, repeats:3, repeatInterval:7, season:['winter','spring'], badSeasons:[], badSeasonNote:''},
   'oxalic-dribble':{name:'OA Dribble',         abbrev:'OAD',  color:'#5A9E60', moa:'Organic Acid',  moaShort:'OA',  synthetic:false, tempRange:'>5°C',    supersOff:false, notes:'Single application only. Broodless winter period essential.',                   duration:1,  season:['winter'],          badSeasons:['summer','spring','autumn'], badSeasonNote:'Only effective when colony is broodless'},
-  'formic':      {name:'Formicpro',            abbrev:'FPro', color:'#7A9E8A', moa:'Organic Acid',  moaShort:'OA',  synthetic:false, tempRange:'10–29°C', supersOff:false, notes:'Effective with brood present. Supers can stay on. 1 strip × 7 days.',           duration:7,  season:['spring','autumn'], badSeasons:['winter'], badSeasonNote:'Min. 10°C required — ineffective in cold'},
+  'formic':      {name:'Formicpro/MAQS',        abbrev:'FPro', color:'#7A9E8A', moa:'Organic Acid',  moaShort:'OA',  synthetic:false, tempRange:'10–25°C', supersOff:true,  notes:'Effective with brood present. Supers must be off. Max 25°C. 1-2 strips x 7 days.',  duration:7,  season:['spring','autumn'], badSeasons:['winter','summer'], badSeasonNote:'Min. 10°C required. Max 25°C — do not use in summer heat.'},
   'aluen-cap':   {name:'Aluen CAP ⚠️',             abbrev:'ACAP', color:'#5A9E60', moa:'Organic Acid',  moaShort:'OA',  synthetic:false, tempRange:'5–40°C',  supersOff:false, notes:'Slow-release OA + lactic acid. Effective with brood. Supers can stay.',        duration:42, season:['spring','autumn','summer'], badSeasons:['winter'], badSeasonNote:'Less effective in cold — colony must be active'},
   'apilife':     {name:'ApiLife Var',           abbrev:'ALV',  color:'#B5CDBB', moa:'Essential Oil', moaShort:'EO',  synthetic:false, tempRange:'15–30°C', supersOff:true,  notes:'Thymol-based. 3 × 10-day applications. Temperature critical.',                  duration:30, season:['spring','autumn'], badSeasons:['winter','summer'], badSeasonNote:'Needs 15–30°C — too cold in winter, too hot in summer'},
   'apiguard':    {name:'Apiguard',              abbrev:'APG',  color:'#B5CDBB', moa:'Essential Oil', moaShort:'EO',  synthetic:false, tempRange:'>15°C',   supersOff:true,  notes:'Thymol gel. 2 × 14-day applications. Remove supers.',                          duration:28, season:['spring','autumn'], badSeasons:['winter'], badSeasonNote:'Needs >15°C — not effective in cool conditions'},
   'apivar':      {name:'Apivar',                abbrev:'APV',  color:'#3D6B52', moa:'Amitraz',       moaShort:'AMZ', synthetic:true,  tempRange:'>10°C',   supersOff:true,  notes:'Amitraz strips. Highly effective. Rotate MoA. No supers. 2 strips × 56 days.', duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'apitraz':     {name:'Apitraz',               abbrev:'APT',  color:'#3D6B52', moa:'Amitraz',       moaShort:'AMZ', synthetic:true,  tempRange:'>10°C',   supersOff:true,  notes:'Amitraz strips. Same MoA as Apivar — do not use in same season.',              duration:42, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'bayvarol':    {name:'Bayvarol',              abbrev:'BAY',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'Flumethrin strips. ⚠️ Pyrethroid resistance confirmed in UK bee populations. Monitor post-treatment efficacy with alcohol wash.',        duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
-  'apistan':     {name:'Apistan',               abbrev:'API',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'⚠️ Pyrethroid resistance confirmed in northern NSW and SE QLD (same populations also confirmed for amitraz resistance April 2026). Confirm efficacy post-treatment.',            duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
+  'apistan':     {name:'Apistan',               abbrev:'API',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'⚠️ Pyrethroid resistance widespread in UK bee populations. Confirm efficacy with alcohol wash at day 14 post-treatment.',            duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'drone-comb':  {name:'Drone Comb Removal',    abbrev:'DCR',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Remove and freeze capped drone comb. Ongoing throughout drone-rearing season.', duration:0,  season:['spring','summer'],        badSeasons:['autumn','winter'], badSeasonNote:'⚠ Not effective in autumn — drone rearing has ceased by then'},
   'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Mechanical',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap. Best in late summer (Jul–Aug) when mite:brood ratio is highest and winter bee rearing has not yet begun. Avoid September–October — caging the queen disrupts critical winter bee production and weakens the colony heading into winter.',    duration:25, season:['spring','summer'],  badSeasons:['winter','autumn'], badSeasonNote:'⚠ Avoid in autumn (Sep–Oct) — disrupts winter bee rearing, weakening the colony heading into winter. Cannot perform in winter — brood already absent. Best timing: Jul–Aug (late summer)'},
   'heat':        {name:'Heat Treatment (Varroa Controller)', abbrev:'HT', color:'#C17B2A', moa:'Heat', moaShort:'HT', synthetic:false, tempRange:'>18°C ambient', supersOff:false, notes:'Varroa Controller early-spring treatment — removes capped brood frames one by one, heat-treats at 40–42°C. Spring-only because brood nest is smallest (2–3 frames) maximising mite concentration per frame and minimising session time. For summer heat treatment, use the Duplex-Framebox plan (duplex) instead — it is specifically designed for the expanded summer brood nest.', duration:1, season:['spring'], badSeasons:['winter','summer','autumn'], badSeasonNote:'⚠ SPRING ONLY (Mar–May, Northern Hemisphere) — brood nest must be small (2–3 frames). NEVER suggest in summer (Jun, Jul, Aug): use Duplex-Framebox (duplex) for summer heat treatment instead. Winter: no capped brood to treat.'},
@@ -1833,10 +1833,10 @@ const REG_INFO = {
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const SEASON_COLORS = {summer:'#E8A020',autumn:'#C05A20',winter:'#4A7898',spring:'#5A9E60'};
-function getSeason(m){if(m>=11||m<=1)return'summer';if(m>=2&&m<=4)return'autumn';if(m>=5&&m<=7)return'winter';return'spring';}
+function getSeason(m){if(m>=2&&m<=4)return'spring';if(m>=5&&m<=7)return'summer';if(m>=8&&m<=10)return'autumn';return'winter';}
 
 const TREAT_GROUPS = [
-  { label:'Organic Acids',          ids:['oxalic','oxalic-dribble','formic','aluen-cap'] },
+  { label:'Organic Acids',          ids:['oxalic','oxalic-dribble','formic'] },
   { label:'Thymol-based',           ids:['apilife','apiguard'] },
   { label:'Synthetic Acaricides',   ids:[], subGroups:[
     { label:'Formamidines (Amitraz)',  ids:['apivar','apitraz'] },
