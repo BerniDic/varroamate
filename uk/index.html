@@ -2056,7 +2056,7 @@ function rssRender(){
     el.innerHTML = '<div style="text-align:center;padding:24px;color:#9A7030;font-style:italic;font-size:13px;">No items in this category yet.</div>';
     return;
   }
-  const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90' };
+  const catColour = { uk:'#2C6E49', science:'#2A5A9A', international:'#7A4A90' };
   const catLabel  = { uk:'🇬🇧 UK &amp; Ireland', science:'🔬 Science', international:'🌐 International' };
   el.innerHTML = items.map(i => rssItemHTML(i, catColour, catLabel)).join('');
 }
@@ -2107,7 +2107,7 @@ function rssJournalRender(){
     if(!groups[k]) groups[k] = { cat: i.category, items: [] };
     groups[k].items.push(i);
   });
-  const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90', blogs:'#B06010' };
+  const catColour = { uk:'#2C6E49', science:'#2A5A9A', international:'#7A4A90', blogs:'#B06010' };
   el.innerHTML = Object.entries(groups).map(([label, grp]) => {
     const col = catColour[grp.cat] || '#7A5800';
     const header = `<div class="rss-section-divider" style="color:${col};">${label}</div>`;
