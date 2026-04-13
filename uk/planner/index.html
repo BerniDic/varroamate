@@ -2655,7 +2655,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadVMData();
       });
     } else {
-      window.location.href = '/app/';
+      window.location.href = '/uk/app/';
       return;
       APIARIES.length = 0;
       HIVES.length    = 0;
@@ -3229,18 +3229,23 @@ function renderRating(){
 async function loadSubscription(){
   if(!_sbUser) return;
   try {
-    const { data } = await _sb
+    const timeout = new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), 8000));
+    const query = _sb
       .from('subscriptions')
       .select('plan, status')
       .eq('user_id', _sbUser.id)
       .maybeSingle();
+    const { data } = await Promise.race([query, timeout]);
     if(data && data.status !== 'canceled'){
       _userPlan = data.plan || 'free';
     } else {
       _userPlan = 'free';
     }
     console.log('VMSP plan:', _userPlan);
-  } catch(e){ console.warn('loadSubscription:', e); }
+  } catch(e){
+    console.warn('loadSubscription:', e);
+    _userPlan = 'free'; // fail open — let user in, AI features will gate themselves
+  }
 }
 
 async function requireAIPlan(){
