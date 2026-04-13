@@ -2181,11 +2181,30 @@ function switchPlan(planName){
   redraw();
 }
 
-function promptNewPlan(){
-  if(!currentScopeKey.startsWith('hive:')){
-    alert('Please select a hive first before creating a plan.');
-    return;
+function _requireHive(action){
+  if(currentScopeKey.startsWith('hive:')) return true;
+  const sel = document.getElementById('psbHive');
+  if(sel){
+    sel.scrollIntoView({behavior:'smooth', block:'center'});
+    sel.style.transition = 'box-shadow 0.2s, outline 0.2s';
+    sel.style.outline = '3px solid #C8820A';
+    sel.style.boxShadow = '0 0 0 6px rgba(200,130,10,0.25)';
+    setTimeout(()=>{ sel.style.outline=''; sel.style.boxShadow=''; }, 2200);
+    let tip = document.getElementById('_hive-tip');
+    if(!tip){
+      tip = document.createElement('div');
+      tip.id = '_hive-tip';
+      tip.style.cssText = 'margin-top:6px;font-size:13px;color:#C8820A;font-weight:600;text-align:center;animation:fade-hint 2.5s ease-in-out forwards;';
+      sel.parentNode.insertBefore(tip, sel.nextSibling);
+    }
+    tip.textContent = '👆 Please select a hive first to ' + action;
+    setTimeout(()=>{ if(tip.parentNode) tip.parentNode.removeChild(tip); }, 2500);
   }
+  return false;
+}
+
+function promptNewPlan(){
+  if(!_requireHive('create a plan')) return;
   const name = prompt('Name for new plan:', `Plan ${getPlanList(currentScopeKey).length + 1}`);
   if(!name || !name.trim()) return;
   const trimmed = name.trim();
@@ -3253,6 +3272,7 @@ async function requireAIPlan(){
 }
 
 async function getAIAdvice(){
+  if(!_requireHive('get AI advice')) return;
   if(!await requireAIPlan()) return;
   const result = scorePlan();
   const panel = document.getElementById('aiPanel');
@@ -3560,6 +3580,7 @@ function cancelSuggest(){
 }
 
 async function suggestPlan(){
+  if(!_requireHive('ask AI to suggest a plan')) return;
   if(!await requireAIPlan()) return;
   _proposals = [];
   _suggestHistory = [];
