@@ -3959,23 +3959,24 @@ function applyAllAccepted(){
   document.querySelector('.rating-card')?.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-const ACTION_ZONE_BY_MONTH = {
+// Read thresholds from VM_CONFIG (uk.js) if available, else NH fallback
+const ACTION_ZONE_BY_MONTH = (typeof VM_CONFIG !== 'undefined' && VM_CONFIG.chartActionZone) ? VM_CONFIG.chartActionZone : {
   2:{lo:3,hi:5}, 3:{lo:3,hi:5}, 4:{lo:3,hi:5},   // Spring: Mar–May
-  5:{lo:5,hi:7}, 6:{lo:5,hi:7}, 7:{lo:5,hi:7},    // Summer: Jun–Aug
-  8:{lo:3,hi:4}, 9:{lo:3,hi:4}, 10:{lo:3,hi:4},   // Autumn: Sep–Nov
+  5:{lo:5,hi:8}, 6:{lo:5,hi:8}, 7:{lo:5,hi:8},    // Summer: Jun–Aug
+  8:{lo:4,hi:6}, 9:{lo:4,hi:6}, 10:{lo:3,hi:5},   // Autumn: Sep–Nov
   11:{lo:2,hi:3},0:{lo:2,hi:3}, 1:{lo:2,hi:3},    // Winter: Dec–Feb
 };
-const LOSS_THRESHOLD_BY_MONTH = {
+const LOSS_THRESHOLD_BY_MONTH = (typeof VM_CONFIG !== 'undefined' && VM_CONFIG.chartSeasonThreshold) ? VM_CONFIG.chartSeasonThreshold : {
   2:10, 3:10, 4:10,    // Spring: Mar–May
   5:15, 6:15, 7:15,    // Summer: Jun–Aug
-  8:8,  9:8,  10:8,    // Autumn: Sep–Nov
-  11:5, 0:5,  1:5,     // Winter: Dec–Feb
+  8:10, 9:10, 10:8,    // Autumn: Sep–Nov
+  11:6,  0:6,  1:6,    // Winter: Dec–Feb
 };
 
 const REGIONAL_CALENDAR = [
-  {label:'OA Vap window — broodless',   shortLabel:'OAV broodless',  startMonth:5, endMonth:7,  color:'#1A7A6E', row:1},
-  {label:'Spring treat window',          shortLabel:'Spring treat',   startMonth:8, endMonth:10, color:'#2D7A3A', row:1},
-  {label:'Autumn treat window',          shortLabel:'Autumn treat',   startMonth:3, endMonth:4,  color:'#2D7A3A', row:1},
+  {label:'OA Vap window — broodless',   shortLabel:'OAV broodless',  startMonth:11, endMonth:1,  color:'#1A7A6E', row:1},
+  {label:'Spring treat window',          shortLabel:'Spring treat',   startMonth:2,  endMonth:4,  color:'#2D7A3A', row:1},
+  {label:'Autumn treat window',          shortLabel:'Autumn treat',   startMonth:8,  endMonth:10, color:'#2D7A3A', row:1},
 ];
 
 const WINDOW_TYPES = {

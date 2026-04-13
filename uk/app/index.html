@@ -447,7 +447,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <li>UK — Register your apiary: <a href="https://www.nationalbeeunit.com/register" target="_blank" style="color:#FFE082;">BeeBase registration</a></li>
       <li>UK — BBKA beekeeping association: <a href="https://www.bbka.org.uk" target="_blank" style="color:#FFE082;">bbka.org.uk</a></li>
       <li>UK — VMD approved treatments: <a href="https://www.vmd.defra.gov.uk" target="_blank" style="color:#FFE082;">vmd.defra.gov.uk</a></li>
-      <li>Ireland — DAFM bee health: <a href="https://www.agriculture.gov.ie/farmingsectors/beekeepinghoney/" target="_blank" style="color:#FFE082;">gov.ie bee health</a></li>
+      <li>Ireland — DAFM bee health: <a href="https://www.gov.ie/en/department-of-agriculture-food-and-the-marine/publications/beekeeping-honey/" target="_blank" style="color:#FFE082;">gov.ie bee health</a></li>
       <li>Ireland — FIBKA: <a href="https://irishbeekeeping.ie" target="_blank" style="color:#FFE082;">fibka.ie</a></li>
       <li>Report disease: contact your local NBU bee inspector (UK) or DAFM inspector (Ireland)</li>
     </ul>
@@ -2299,7 +2299,7 @@ async function logout(){
   _sbUser=null;
   apiaries=[];hives={};miteCountsByHive={};treatmentsByHive={};notesByHive={};
   _dataLoaded=false;
-  goto('s-welcome');
+  window.location.href='/uk/';
 }
 // ══ BILLING TOGGLE ══
 let _billingAnnual=false;
