@@ -20,10 +20,10 @@ VarroaMate is an Australian beekeeping SaaS platform at varroamate.com — 4 sta
 - Local repo: `~/varroamate-site/`
 - Cloudflare DNS proxy
 - Supabase project: `yadptqjsjqxqjxouqkll`
-- Anon key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0Nzg4MjEsImV4cCI6MjA4ODA1NDgyMX0.qieg16GzLciOSYYcEk6Qn-wG3bElT4tCLI8tR1WTKJA`
-- Service role key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjQ3ODgyMSwiZXhwIjoyMDg4MDU0ODIxfQ.l6qToicMkH7oVkasu08Q-wthXrStH-89TmCCXtEKMbU`
+- Anon key: `REDACTED - see Supabase dashboard
+- Service role key: `REDACTED - see Supabase dashboard
 - AI model: Claude Opus 4.6 (main app), Claude Haiku (voice)
-- Resend API key: `re_ZFADqL9V_EXyTcexk3Tx14gBBZ4AWxY5Z` (varroamate.com domain verified)
+- Resend API key: `REDACTED - see Resend dashboard` (varroamate.com domain verified)
 
 ---
 
