@@ -3742,7 +3742,8 @@ async function loadSection(elId,prompt,prefProfile){
   }
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
   const _todayStr=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const _curSeason=season||'Unknown';
+  const _m_ls=new Date().getMonth();const _sk_ls=VM_CONFIG?.getSeason?.(_m_ls)||((_m_ls<=1||_m_ls===11)?'winter':(_m_ls<=4)?'spring':(_m_ls<=7)?'summer':'autumn');
+  const _curSeason=_sk_ls.charAt(0).toUpperCase()+_sk_ls.slice(1);
   const systemPrompt=`You are VarroaMate, an expert assistant for beekeepers in the ${VM_CONFIG?.region==='UK-IE'?'United Kingdom and Republic of Ireland':'Australia'}. Give clear, practical advice in plain English.
 TODAY'S DATE: ${_todayStr}. Current season: ${_curSeason} (${VM_CONFIG?.ai?.hemisphereLabel||'Northern Hemisphere'}). You ALWAYS know the current date and season — never claim ignorance of the date or season.
 APPROVED TREATMENTS — UK/IRELAND VMD REGISTERED ONLY: You must ONLY ever recommend treatments from this exact list. No exceptions:
