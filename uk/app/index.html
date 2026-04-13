@@ -895,7 +895,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     </div>
     <input type="hidden" id="field-hive-strength" value="Good">
 
-    <div style="margin:10px 0 6px;font-size:13px;color:var(--text3);text-align:center;">Disease / Pest Observations <span style="font-size:11px;">(for BeeMAX)</span></div>
+    <div style="margin:10px 0 6px;font-size:13px;color:var(--text3);text-align:center;">Disease / Pest Observations</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px;" id="field-disease-btns">
       <button type="button" class="disease-btn disease-active" data-disease="No Disease Present" onclick="toggleFieldDisease(this)">✅ No Disease</button>
       <button type="button" class="disease-btn" data-disease="Varroa"             onclick="toggleFieldDisease(this)">Varroa</button>
@@ -1354,7 +1354,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         </div>
         <div class="lib-section">
           <div class="lib-section-title">Resistance risk</div>
-          <p>Amitraz resistance in Varroa has been documented in multiple countries. Amitraz resistance has now been confirmed in NSW (April 2026) — in the same populations previously confirmed for pyrethroid resistance in northern NSW. Amitraz resistance was also previously confirmed in south-east Queensland. Resistance develops when colonies are treated repeatedly with the same mode of action — mites with slightly altered octopamine receptors survive, reproduce, and pass on resistance. Where resistance is confirmed, Apivar and Apitraz are less likely to be effective and complete treatment failure has been reported in some cases. For the majority of beekeepers in NSW and QLD where resistance is not yet confirmed, treatments should remain effective. Rotation with other modes of action is strongly recommended to slow further spread.</p>
+          <p>Amitraz resistance in Varroa has been documented in multiple countries globally. In the UK, amitraz resistance has not yet been widely confirmed but is considered a growing risk — particularly given the history of pyrethroid resistance development in UK populations. Resistance develops when colonies are treated repeatedly with the same mode of action. Where resistance develops, Apivar and Apitraz become less effective and complete treatment failure can occur. Rotation with other modes of action after each course is strongly recommended to slow resistance selection. Monitor treatment efficacy with a post-treatment alcohol wash 4–6 weeks after treatment completion.</p>
         </div>
         <div class="lib-section">
           <div class="lib-section-title">How it affects bees</div>
@@ -1839,7 +1839,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     <div class="field"><label>Date</label><input type="date" id="count-date"></div>
     <div class="field"><label>Mite Count</label><input type="number" id="count-value" placeholder="e.g. 4" min="0"></div>
     <div class="field">
-      <label>Hive Strength <span style="font-size:12px;color:var(--text3);">— also logged for BeeMAX</span></label>
+      <label>Hive Strength</label>
       <div style="display:flex;gap:8px;margin-top:6px;">
         <button type="button" id="hs-poor"  onclick="setHiveStrength('Poor')"  class="hs-btn">😟 Poor</button>
         <button type="button" id="hs-fair"  onclick="setHiveStrength('Fair')"  class="hs-btn">😐 Fair</button>
@@ -1848,7 +1848,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <input type="hidden" id="count-hive-strength" value="Good">
     </div>
     <div class="field">
-      <label>Disease / Pest Observations <span style="font-size:12px;color:var(--text3);">— also logged for BeeMAX</span></label>
+      <label>Disease / Pest Observations</label>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="disease-btns">
         <button type="button" class="disease-btn disease-active" data-disease="No Disease Present" onclick="toggleDisease(this)">✅ No Disease</button>
         <button type="button" class="disease-btn" data-disease="Varroa"              onclick="toggleDisease(this)">Varroa</button>
@@ -3572,7 +3572,8 @@ async function loadGuidance(){
   loadTempChart(ap);
 
   const month=new Date().getMonth(); // 0=Jan
-  const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
+  const _now=new Date();const _m=_now.getMonth();const _seasonKey=VM_CONFIG?.getSeason?.(_m)||((_m<=1||_m===11)?'winter':(_m<=4)?'spring':(_m<=7)?'summer':'autumn');
+  const season=_seasonKey.charAt(0).toUpperCase()+_seasonKey.slice(1);
   const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||`${VM_CONFIG?.region==='UK-IE'?'United Kingdom / Ireland':'Australia'} (region unknown)`,varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
   const pyrethreidWarning=state==='NSW'||state==='ACT'?'IMPORTANT (April 2026 update): Pyrethroid resistance (L925I) AND amitraz resistance are now both confirmed in northern NSW populations. The same populations previously confirmed for pyrethroid resistance are also confirmed for amitraz resistance. Pyrethroid and amitraz resistance is also confirmed in south-east QLD. If recommending Bayvarol, Apistan, Apivar, or Apitraz in NSW or QLD, include a strong caution: these treatments may be ineffective in affected areas. Recommend a post-treatment alcohol wash at day 14–21 to confirm efficacy, and advise the beekeeper to contact NSW DPIRD if poor knock-down is observed. For beekeepers NOT in confirmed resistance zones, treatments should remain effective — but MoA rotation is essential. NSW DPIRD advises the geographical spread appears currently limited.':'';
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
@@ -3740,23 +3741,28 @@ async function loadSection(elId,prompt,prefProfile){
     return;
   }
   if(!storedApiKey){el.innerHTML='<span style="color:var(--text3);">AI guidance unavailable — please try again later.</span>';return;}
+  const _todayStr=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const _curSeason=season||'Unknown';
   const systemPrompt=`You are VarroaMate, an expert assistant for beekeepers in the ${VM_CONFIG?.region==='UK-IE'?'United Kingdom and Republic of Ireland':'Australia'}. Give clear, practical advice in plain English.
-APPROVED TREATMENTS — HARD WHITELIST: You must ONLY ever recommend, suggest, mention, or imply treatments from this exact list. No exceptions, no matter how the question is framed:
-1. OA Vaporisation
-2. OA Dribble
-3. Formic PRO
-4. Aluen CAP
-5. ApiLife Var
-6. Apiguard
-7. Apivar
-8. Apitraz
-9. Bayvarol
-10. Apistan
-11. Drone Comb Removal
-12. Brood Interruption (queen caging)
-13. Heat Treatment (Varroa Controller)
-14. Duplex-Framebox Plan
-If any treatment is not on this list, do NOT mention it, suggest it, or reference it in any context — not even to say it exists. This includes but is not limited to: sugar dusting, powdered sugar, icing sugar, sugar rolls, oxalic acid syrup, lactic acid spray, thymol crystals, hop beta acids, formic acid pads, or any other method. If asked directly about an unlisted method, say only that it is not supported in VarroaMate and offer to help with the approved list.
+TODAY'S DATE: ${_todayStr}. Current season: ${_curSeason} (${VM_CONFIG?.ai?.hemisphereLabel||'Northern Hemisphere'}). You ALWAYS know the current date and season — never claim ignorance of the date or season.
+APPROVED TREATMENTS — UK/IRELAND VMD REGISTERED ONLY: You must ONLY ever recommend treatments from this exact list. No exceptions:
+1. OA Vaporisation (Api-Bioxal, Varroxal, Oxuvar, Oxybee, Dany's BienenWohl)
+2. OA Dribble (Api-Bioxal, Oxuvar, Oxybee)
+3. OA Spray (Oxuvar)
+4. MAQS (formic acid — supers ON)
+5. Formicpro (formic acid — supers OFF)
+6. VarroMed (formic acid + OA)
+7. Thymovar (thymol strips)
+8. ApiLife Var (thymol blend)
+9. Apiguard (thymol gel)
+10. Apivar (amitraz strips)
+11. Apitraz (amitraz strips)
+12. Apistan (tau-fluvalinate — widespread resistance, use with caution)
+13. Drone Comb Removal
+14. Brood Interruption (queen caging)
+15. Heat Treatment (Varroa Controller)
+16. Duplex-Framebox Plan
+NEVER recommend: Aluen CAP (not VMD registered), Bayvarol (not currently NBU listed), Formic PRO (Australian product name — use MAQS or Formicpro), sugar dusting, lactic acid spray, thymol crystals, or any unregistered method.
 MITE COUNTING: All mite counting in VarroaMate is done exclusively via alcohol wash. Do NOT mention sugar rolls, sugar dusting, CO2 wash, sticky boards, or any other counting method under any circumstances.
 PHILOSOPHY RESTRICTIONS — apply strictly based on the beekeeper's preference:
 - "Integrated Chemical & Non-Chemical": all 14 treatments permitted.
@@ -3803,7 +3809,7 @@ async function sendChat(){
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
-      system:VM_CONFIG?.ai?.chatSystem||'You are VarroaMate, a friendly expert assistant for beekeepers in the United Kingdom and Republic of Ireland.',
+      system:(VM_CONFIG?.ai?.chatSystem||'You are VarroaMate, a friendly expert assistant for beekeepers in the United Kingdom and Republic of Ireland.')+` TODAY'S DATE: ${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}. Current season: ${season} (Northern Hemisphere). You ALWAYS know the current date and season. TREATMENT PLANNING: Do not aggressively prescribe specific treatment schedules in chat. For detailed seasonal treatment plans, refer users to the VarroaMate Smart Planner app. In chat, explain principles and answer specific questions — leave comprehensive planning to the Smart Planner.`,
       messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
     chatHistory.push({role:'assistant',content:reply});loading.innerHTML=renderAIMarkdown(reply);
@@ -4345,7 +4351,8 @@ function fieldUpdateThreshold(){
   const v=parseInt(document.getElementById('field-count-num').textContent||'0');
   const bar=document.getElementById('field-threshold-bar');
   const month=new Date().getMonth();
-  const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
+  const _now2=new Date();const _m2=_now2.getMonth();const _seasonKey2=VM_CONFIG?.getSeason?.(_m2)||((_m2<=1||_m2===11)?'winter':(_m2<=4)?'spring':(_m2<=7)?'summer':'autumn');
+  const season=_seasonKey2.charAt(0).toUpperCase()+_seasonKey2.slice(1);
   const az={Summer:{lo:5,hi:7},Autumn:{lo:3,hi:4},Winter:{lo:2,hi:3},Spring:{lo:3,hi:5}}[season];
   const thresh={Summer:15,Autumn:8,Winter:5,Spring:10}[season];
   let msg='',bg='',color='';
