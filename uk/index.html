@@ -2238,14 +2238,14 @@ function addSheep(){
   const scene = document.getElementById('scene');
   // Draw a small flock of 3 sheep grazing near the right side of the scene
   const positions = [
-    { left: '77%', scale: 1.0,  delay: '0s',    dur: '3.2s' },
-    { left: '80%', scale: 0.82, delay: '-1.1s', dur: '3.8s' },
-    { left: '74%', scale: 0.70, delay: '-0.5s', dur: '4.2s' },
+    { left: '77%', scale: 0.72, delay: '0s',    dur: '3.2s' },
+    { left: '80%', scale: 0.58, delay: '-1.1s', dur: '3.8s' },
+    { left: '74%', scale: 0.50, delay: '-0.5s', dur: '4.2s' },
   ];
   positions.forEach(p => {
     const wrap = document.createElement('div');
     wrap.className = 'sheep-wrap';
-    wrap.style.cssText = `position:absolute; bottom:36%; left:${p.left}; transform:scale(${p.scale}); transform-origin:bottom center; animation: sheep-graze ${p.dur} ease-in-out infinite; animation-delay:${p.delay}; pointer-events:none; z-index:2;`;
+    wrap.style.cssText = `position:absolute; bottom:40%; left:${p.left}; transform:scale(${p.scale}); transform-origin:bottom center; animation: sheep-graze ${p.dur} ease-in-out infinite; animation-delay:${p.delay}; pointer-events:none; z-index:2;`;
     wrap.title = 'Baaaa 🐑';
     wrap.innerHTML = `<svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Legs -->
