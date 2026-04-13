@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<script src="/config/uk.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>VarroaMate · Hive Hygiene</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Bitter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/config/uk.js"></script>
 <style>
 /* ══════════════════════════════════════════════
    TOKENS
@@ -526,16 +526,16 @@ body{
 
     <div class="disc-card">
       <h4>About This Module</h4>
-      VarroaMate Hive Hygiene provides practical, evidence-based guidance on apiary sanitation and disease prevention for Australian beekeepers. Content is based on peer-reviewed research and guidance from Plant Health Australia, Agriculture Victoria, and the National Varroa Management Program.
+      VarroaMate Hive Hygiene provides practical, evidence-based guidance on apiary sanitation and disease prevention for beekeepers in the UK and Ireland. Content is based on peer-reviewed research and guidance from the National Bee Unit (NBU), DAFM, and COLOSS.
 
       <h4>Disclaimer</h4>
       The information in this module is provided in good faith for educational purposes. It does not constitute professional veterinary, biosecurity, or agronomic advice. Beekeepers are solely responsible for all management decisions and for complying with applicable state and territory biosecurity laws.
 
       <h4>Notifiable Diseases</h4>
-      American Foulbrood, European Foulbrood, and Varroa destructor are notifiable pests in all Australian states and territories. If you suspect a notifiable disease or pest, you are legally required to report it to your state or territory agriculture authority promptly. VarroaMate does not replace this obligation.
+      American Foulbrood and European Foulbrood are notifiable diseases in the UK and Ireland. Varroa destructor is a notifiable pest in Great Britain. If you suspect a notifiable disease or pest, you are legally required to report it to the National Bee Unit (England, Wales &amp; Scotland), DAERA (Northern Ireland), or DAFM (Republic of Ireland) promptly. VarroaMate does not replace this obligation.
 
       <h4>Treatment Information</h4>
-      Treatment recommendations are based on current general guidance. Approved chemicals, withholding periods, and permit conditions vary by state and change over time. Always verify current requirements with your state authority and the APVMA before treating.
+      Treatment recommendations are based on current general guidance. Approved medicines and withholding periods are regulated by the VMD (UK) and HPRA (Ireland). Always verify current requirements with the VMD product database or NBU bee medicines guidance before treating.
 
       <h4>AI-Generated Content</h4>
       Some sections of this app use AI to generate personalised hygiene plans and recommendations. AI-generated content can contain errors, omissions, or outdated information. It should be treated as a starting point for your own research — not as definitive advice. Always cross-check AI recommendations against current authoritative sources before acting on them.
@@ -564,9 +564,9 @@ body{
       <div style="position:relative;" id="vmhh-apps-wrap">
         <button class="top-icon-btn" onclick="toggleApps()" title="Switch app">🐝 Apps ▾</button>
         <div id="vmhh-apps-dropdown">
-          <a href="/app/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);"><svg width="20" height="14" viewBox="0 0 128 90" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="22" y1="44" x2="12" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="52" x2="8" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="60" x2="8" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="22" y1="68" x2="12" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="44" x2="100" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="52" x2="104" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="60" x2="104" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="68" x2="100" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="58" rx="38" ry="26" fill="#C8820A"/><ellipse cx="56" cy="54" rx="28" ry="17" fill="#A86808"/><ellipse cx="56" cy="37" rx="9" ry="6" fill="#B07008"/></svg> VarroaMate</a>
-          <a href="/productivity/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">📋 Productivity</a>
-          <a href="/planner/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">🧠 Smart Planner</a>
+          <a href="/uk/app/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);"><svg width="20" height="14" viewBox="0 0 128 90" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="22" y1="44" x2="12" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="52" x2="8" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="60" x2="8" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="22" y1="68" x2="12" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="44" x2="100" y2="36" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="52" x2="104" y2="49" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="92" y1="60" x2="104" y2="64" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="68" x2="100" y2="74" stroke="#6A4A06" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="58" rx="38" ry="26" fill="#C8820A"/><ellipse cx="56" cy="54" rx="28" ry="17" fill="#A86808"/><ellipse cx="56" cy="37" rx="9" ry="6" fill="#B07008"/></svg> VarroaMate</a>
+          <a href="/uk/productivity/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">📋 Productivity</a>
+          <a href="/uk/planner/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;border-bottom:1px solid var(--border);">🧠 Smart Planner</a>
           <a href="#" onclick="event.preventDefault();showToast('🎓 Academy — coming soon!')" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;font-weight:600;color:var(--text1);text-decoration:none;opacity:0.5;">🎓 Academy</a>
         </div>
       </div>
@@ -580,14 +580,14 @@ body{
     <div class="screen active" id="screen-intro">
 
       <div class="section-header">Why Hygiene Matters More Than Ever</div>
-      <div class="section-sub">A new era for Australian beekeeping — and why this module exists</div>
+      <div class="section-sub">Hive hygiene in the UK &amp; Ireland — and why this module exists</div>
 
       <div class="card" style="background:linear-gradient(135deg,#FFF8EE,#FFF0D8);border-color:#D4A040;">
         <div class="card-title" style="color:#8A5000;">🔴 The Varroa Turning Point</div>
         <div style="font-size:15px;color:var(--text2);line-height:1.65;">
-          Varroa destructor arrived in Australia in 2022 and is now established. This single event has fundamentally changed the disease ecology of Australian honey bee colonies — and with it, the hygiene requirements every beekeeper must meet.
+          Varroa destructor has been established in the UK and Ireland for over 30 years. Its presence as a permanent feature of British and Irish beekeeping has fundamentally shaped the disease ecology of honey bee colonies — and with it, the hygiene requirements every beekeeper must meet.
           <br><br>
-          Before Varroa, most bee diseases spread relatively slowly — primarily through contaminated equipment and beekeeper movement. The main threats (AFB, Chalkbrood) were serious but containable with good equipment hygiene.
+          Before Varroa became established, most bee diseases spread relatively slowly — primarily through contaminated equipment and beekeeper movement. The main threats (AFB, Chalkbrood) were serious but containable with good equipment hygiene.
           <br><br>
           Varroa changes this completely. It acts as a <strong>biological amplifier</strong> — vectorising viruses directly into bee haemolymph, enabling viral titres to increase <strong>millions-fold</strong> in collapsing colonies. A single dying colony can distribute hundreds of mites to neighbours through robbing, triggering cascading losses across an entire apiary.
         </div>
@@ -596,7 +596,7 @@ body{
       <div class="card">
         <div class="card-title">🌿 Beyond Varroa — Compounding Stressors</div>
         <div style="font-size:15px;color:var(--text2);line-height:1.65;">
-          Varroa does not operate in isolation. Australian beekeepers now face a convergence of stressors that collectively reduce colony resilience and amplify disease risk:
+          Varroa does not operate in isolation. UK and Irish beekeepers face a convergence of stressors that collectively reduce colony resilience and amplify disease risk:
         </div>
         <div style="margin-top:10px;display:grid;gap:8px;">
           <div style="padding:10px;background:#F8F4EE;border-radius:8px;border-left:3px solid var(--amber);">
@@ -657,7 +657,7 @@ body{
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;">
             <div style="font-size:19px;flex-shrink:0;">🦠</div>
-            <div><strong>Pathogens</strong> — the eight bee health threats every Australian beekeeper should understand, with detection and control for each.</div>
+            <div><strong>Pathogens</strong> — the key bee health threats every UK and Irish beekeeper should understand, with detection and control for each.</div>
           </div>
         </div>
         <button class="btn btn-forest btn-full" onclick="switchTab('plan')" style="margin-top:14px;">
@@ -906,7 +906,7 @@ body{
           </div>
           <div style="margin-bottom:8px;"><span class="risk-pill risk-high">HIGH persistence</span></div>
           <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px;">Control strategy:</div>
-          <div style="font-size:14px;color:var(--text2);line-height:1.6;">🔥 Flame sterilise tools &nbsp; 🌀 Ozone stored comb &nbsp; 🚫 Never reuse contaminated comb<br><span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FAE8E5;border-left:3px solid #C0402A;border-radius:3px;font-size:13px;color:#7A2010;line-height:1.5;"><strong>⚠️ Notifiable disease:</strong> Do not destroy equipment until you have reported to your state agriculture authority and received instructions. Destroying evidence before inspection may be an offence.</span></div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6;">🔥 Flame sterilise tools &nbsp; 🌀 Ozone stored comb &nbsp; 🚫 Never reuse contaminated comb<br><span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FAE8E5;border-left:3px solid #C0402A;border-radius:3px;font-size:13px;color:#7A2010;line-height:1.5;"><strong>⚠️ Notifiable disease:</strong> Do not destroy equipment until you have reported to the NBU (England/Wales/Scotland), DAERA (N. Ireland), or DAFM (Ireland) and received instructions. Destroying evidence before inspection may be an offence.</span></div>
         </div>
       </div>
 
@@ -954,7 +954,7 @@ body{
             <div onclick="event.stopPropagation();var p=this.nextElementSibling;p.style.display=p.style.display==='block'?'none':'block';this.querySelector('.varr').textContent=p.style.display==='block'?'▾':'▸';"
               style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;">
               <span class="varr" style="font-size:13px;color:var(--text3);">▸</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.3px;text-transform:uppercase;">Virus profiles &amp; Australian status</span>
+              <span style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.3px;text-transform:uppercase;">Virus profiles &amp; UK &amp; Ireland status</span>
             </div>
             <div style="display:none;margin-top:10px;">
 
@@ -962,7 +962,7 @@ body{
                 <strong style="color:var(--text2);font-size:14px;">DWV — Deformed Wing Virus</strong><br>
                 The most destructive honey bee virus globally when Varroa is present. Vectored directly into bee haemolymph during mite feeding, causing deformed wings, shortened abdomen, and neurological damage. Varroa amplifies viral titres millions-fold in collapsing colonies.<br>
                 <span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#EEF6F0;border-left:3px solid #4A8A6A;border-radius:3px;color:#2A5A3A;">
-                  🇦🇺 <strong>Australian status:</strong> Strong evidence DWV (genotype A and B) is currently <strong>absent</strong> from Australian colonies — never detected in large-scale national surveys. Its arrival via Varroa is the single greatest emerging viral threat. Active baseline monitoring underway via varroa.org.au.
+                  🇬🇧 <strong>UK &amp; Ireland status:</strong> DWV (genotype A and B) is <strong>widespread and established</strong> — the primary viral disease associated with Varroa in British and Irish colonies. Effective Varroa control is the main management lever.
                 </span>
               </div>
 
@@ -970,7 +970,7 @@ body{
                 <strong style="color:var(--text2);font-size:14px;">ABPV — Acute Bee Paralysis Virus</strong><br>
                 Part of the AKI complex with IAPV and KBV. Causes rapid paralysis and death of adult bees within days. Self-limiting without Varroa — kills bees too quickly to sustain chronic infection — but dangerous when mite populations are very high.<br>
                 <span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FFF8EE;border-left:3px solid #D4A040;border-radius:3px;color:#7A4A00;">
-                  🇦🇺 <strong>Australian status:</strong> <strong>Not detected</strong> in large-scale surveys to date (Roberts et al. 2017). Included in varroa.org.au baseline monitoring as Varroa spreads. Considered at risk of emerging once mite populations establish.
+                  🇬🇧 <strong>UK &amp; Ireland status:</strong> Present in UK colonies. Associated with Varroa infestation. Managed through effective mite control.
                 </span>
               </div>
 
@@ -978,7 +978,7 @@ body{
                 <strong style="color:var(--text2);font-size:14px;">IAPV — Israeli Acute Paralysis Virus</strong><br>
                 AKI complex member. Causes trembling, inability to fly, and rapid adult die-off. First linked to Colony Collapse Disorder in the US. Typically co-occurs with DWV and ABPV in severely collapsing hives overseas.<br>
                 <span style="display:inline-block;margin-top:5px;padding:4px 8px;background:#FAE8E5;border-left:3px solid #C0402A;border-radius:3px;color:#7A2010;">
-                  🇦🇺 <strong>Australian status:</strong> <strong>Confirmed present</strong> — detected in a national survey of 1,240 colonies (Roberts et al. 2017), with high read abundance in some samples. No CCD association in absence of Varroa, but behaviour as Varroa spreads is being actively monitored.
+                  🇬🇧 <strong>UK &amp; Ireland status:</strong> <strong>Confirmed present</strong> in UK colonies. Associated with Varroa. No CCD association confirmed, but colony health impacts increase with mite load.
                 </span>
               </div>
 
@@ -1030,7 +1030,7 @@ body{
       <!-- Four Pathways -->
       <div style="margin-top:20px;">
         <div class="section-header" style="font-size:19px;">⚡ Four Transmission Pathways</div>
-        <div class="section-sub">Ranked by frequency of disease spread in Australian apiaries. Most manuals assume the reverse — that mismatch explains why conventional hygiene advice often feels disconnected from real apiary experience.</div>
+        <div class="section-sub">Ranked by frequency of disease spread in UK and Irish apiaries. Most manuals assume the reverse — that mismatch explains why conventional hygiene advice often feels disconnected from real apiary experience.</div>
       </div>
 
       <div class="card" style="padding:0;overflow:hidden;margin-top:12px;">
@@ -1299,7 +1299,7 @@ body{
       <div class="card" style="padding:0;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#122838 0%,#1A3A4A 100%);padding:14px 16px 10px;">
           <div style="font-size:15px;font-weight:700;color:#E8B84A;letter-spacing:0.5px;text-transform:uppercase;">Transmission Pathways</div>
-          <div style="font-size:14px;color:rgba(255,255,255,0.65);margin-top:2px;">Ranked by frequency of disease spread in Australian apiaries</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.65);margin-top:2px;">Ranked by frequency of disease spread in UK &amp; Irish apiaries</div>
         </div>
 
         <!-- 1. Bee-to-bee -->
@@ -1400,7 +1400,7 @@ body{
       <div class="section-sub">All guidance in this module is based on governmental, regulatory, and peer-reviewed scientific sources.</div>
 
       <div class="card">
-        <div class="card-title">Australian Regulatory Sources</div>
+        <div class="card-title">UK &amp; Ireland Regulatory Sources</div>
         <div class="ref-item">
           <div class="ref-source">Plant Health Australia / BeeAware</div>
           <div class="ref-title">Biosecurity Manual for Beekeepers</div>
@@ -1408,23 +1408,23 @@ body{
         </div>
         <div class="ref-item">
           <div class="ref-source">Plant Health Australia</div>
-          <div class="ref-title">Australian Honey Bee Industry Biosecurity Code of Practice</div>
-          <a class="ref-link" href="https://www.planthealthaustralia.com.au" target="_blank">planthealthaustralia.com.au ↗</a>
+          <div class="ref-title">NBU Beebase — Bee Health &amp; Disease Identification</div>
+          <a class="ref-link" href="https://www.nationalbeeunit.com" target="_blank">nationalbeeunit.com ↗</a>
         </div>
         <div class="ref-item">
           <div class="ref-source">Agriculture Victoria</div>
           <div class="ref-title">Bee diseases and pests — identification and management</div>
-          <a class="ref-link" href="https://agriculture.vic.gov.au/biosecurity/bees" target="_blank">agriculture.vic.gov.au ↗</a>
+          <a class="ref-link" href="https://www.agriculture.gov.ie/farmingsectors/beekeepinghoney/" target="_blank">DAFM — Beekeeping &amp; Honey ↗</a>
         </div>
         <div class="ref-item">
-          <div class="ref-source">APVMA</div>
-          <div class="ref-title">Registered products for use in beekeeping</div>
-          <a class="ref-link" href="https://apvma.gov.au" target="_blank">apvma.gov.au ↗</a>
+          <div class="ref-source">VMD</div>
+          <div class="ref-title">Veterinary Medicines Directorate — approved bee medicines</div>
+          <a class="ref-link" href="https://www.vmd.defra.gov.uk" target="_blank">vmd.defra.gov.uk ↗</a>
         </div>
         <div class="ref-item" style="border-bottom:none;">
-          <div class="ref-source">National Varroa Management Program</div>
-          <div class="ref-title">Varroa.org.au — national resource hub</div>
-          <a class="ref-link" href="https://varroa.org.au" target="_blank">varroa.org.au ↗</a>
+          <div class="ref-source">DAERA</div>
+          <div class="ref-title">Bee health in Northern Ireland</div>
+          <a class="ref-link" href="https://www.daera-ni.gov.uk/topics/animal-and-plant-health/bees" target="_blank">daera-ni.gov.uk ↗</a>
         </div>
       </div>
 
@@ -1609,8 +1609,6 @@ function renderAIMarkdown(text){
   if(!text) return '';
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^\#\# (.+)$/gm,'<strong style="font-size:15px;color:var(--amber-dark,#8B5200);">$1</strong>')
-    .replace(/^\# (.+)$/gm,'<strong style="font-size:16px;color:var(--amber-dark,#8B5200);">$1</strong>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
     .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
@@ -1830,13 +1828,8 @@ async function loadHiveData(){
 // PLAN GENERATOR (Rules engine)
 // ══════════════════════════════════════════════
 function getSeasonalWindow(){
-  if(typeof VM_CONFIG !== 'undefined' && VM_CONFIG?.getSeasonalWindow){
-    const w = VM_CONFIG.getSeasonalWindow(new Date().getMonth());
-    // map VM_CONFIG season fields to hygiene app's expected field names
-    return { ...w, colour: w.color||w.colour, border: w.color||w.border };
-  }
-  // ── fallback (AU hardcoded) ──────────────────────────────────────────────
-  const m = new Date().getMonth();
+  const m = new Date().getMonth(); // 0=Jan
+  // Australian seasons: Spring Aug–Oct (7–9), Summer Nov–Feb (10–0), Autumn Mar–May (2–4), Winter Jun–Jul (5–6)
   if(m>=7 && m<=9) return {label:'Spring', risk:'high', icon:'🌱', colour:'#1C5A28', bg:'#EEF6F0', border:'#5A8A6A',
     msg:'Spring brood disease window. Swarm season — inspect every 1–2 weeks. Avoid unnecessary frame exchange.',
     actions:['Inspect brood carefully — record any abnormal cells', 'Check for queen cells every visit', 'Avoid frame exchange between hives', 'Flame sterilise tools between apiaries', 'Quarantine any new colonies']};
@@ -1901,7 +1894,7 @@ function buildChecklist(){
     items.push({text:'Never feed honey of unknown origin — AFB spores survive in honey for decades', priority:'AFB prevention', checked:false});
     items.push({text:'Do not swap frames between colonies without inspection', priority:'AFB prevention', checked:false});
     items.push({text:'Learn the ropy test — probe larvae with matchstick, healthy larvae do not stretch', priority:'AFB detection', checked:false});
-    items.push({text:'If AFB is suspected: report to your state agriculture authority immediately — do not destroy or move equipment until instructed. AFB is a notifiable disease in all Australian states.', priority:'🚨 Notifiable disease', checked:false});
+    items.push({text:'If AFB is suspected: report to the NBU (England/Wales/Scotland), DAERA (N. Ireland), or DAFM (Ireland) immediately — do not destroy or move equipment until instructed. AFB is a notifiable disease throughout the UK and Ireland.', priority:'🚨 Notifiable disease', checked:false});
   }
   if(_profile.concern==='varroa'){
     items.push({text:'Alcohol wash every 4 weeks September–April; record all counts in VarroaMate', priority:'Varroa monitoring', checked:false});
@@ -1911,7 +1904,7 @@ function buildChecklist(){
   if(_profile.concern==='waxmoth'){
     items.push({text:'Never store comb in humid conditions — store dry and ventilated', priority:'Wax moth / SHB prevention', checked:false});
     items.push({text:'Inspect stored supers every 4 weeks during summer', priority:'Wax moth / SHB monitoring', checked:false});
-    items.push({text:'Wax moth control options for stored comb: freeze −18°C 48h, ozone treatment overnight, or Bacillus thuringiensis (Bt) products — all effective. Bt is a naturally occurring soil bacterium toxic to wax moth larvae; follow APVMA-approved label directions.', priority:'Wax moth control', checked:false});
+    items.push({text:'Wax moth control options for stored comb: freeze −18°C 48h, ozone treatment overnight, or Bacillus thuringiensis (Bt) products — all effective. Bt is a naturally occurring soil bacterium toxic to wax moth larvae; follow label directions.', priority:'Wax moth control', checked:false});
     items.push({text:'Deploy small hive beetle traps inside active hives — check and empty regularly', priority:'SHB management', checked:false});
     items.push({text:'Maintain strong colony population — strong colonies suppress SHB naturally', priority:'SHB management', checked:false});
   }
@@ -1932,7 +1925,7 @@ function buildChecklist(){
         latestTreatPerHive[t.hive_id] = t;
     });
     const now = Date.now();
-    // "Recently treated" = treatment applied within last 56 days (8 weeks covers Apivar / Formic PRO)
+    // "Recently treated" = treatment applied within last 56 days (8 weeks covers Apivar / Formicpro)
     const recentlyTreated = hive_id => {
       const t = latestTreatPerHive[hive_id];
       if(!t) return false;
@@ -1983,10 +1976,10 @@ function buildChecklist(){
     recentDiseases.push('American foulbrood'); // keep AFB in checklist until cleared
   }
   if(recentDiseases.includes('American foulbrood')||recentDiseases.includes('AFB')){
-    items.push({text:'AFB recorded in recent inspection — report to your state agriculture authority immediately and await instructions before destroying any equipment. Do not move equipment off site.', priority:'🚨 Notifiable disease', checked:false});
+    items.push({text:'AFB recorded in recent inspection — report to the NBU (England/Wales/Scotland), DAERA (N. Ireland), or DAFM (Ireland) immediately and await instructions before destroying any equipment. Do not move equipment off site.', priority:'🚨 Notifiable disease', checked:false});
   }
   if(recentDiseases.includes('European foulbrood')||recentDiseases.includes('EFB')){
-    items.push({text:'EFB recorded — notify your state authority. Strengthen colony, remove heavily infected comb. Consider requeening if persistent.', priority:'🚨 Notifiable disease', checked:false});
+    items.push({text:'EFB recorded — notify the NBU or DAFM. Strengthen colony, remove heavily infected comb. Consider requeening if persistent.', priority:'🚨 Notifiable disease', checked:false});
   }
   if(recentDiseases.includes('Chalkbrood')){
     items.push({text:'Chalkbrood recorded — improve hive ventilation, requeen with hygienic stock if persistent, replace heavily affected comb.', priority:'Disease response', checked:false});
@@ -2056,8 +2049,8 @@ async function generatePlan(){
     const total = _hiveData.hives.length;
 
     // Thresholds (per 300 bees)
-    const T_ACTION  = VM_CONFIG?.thresholds?.action  ?? 3;
-    const T_CRITICAL = VM_CONFIG?.thresholds?.critical ?? 9;
+    const T_ACTION  = 3;   // ≥3 = action required
+    const T_CRITICAL = 9;  // ≥9 = colony at serious risk
 
     // Get most recent count per hive
     const latestPerHive = {};
@@ -2144,11 +2137,11 @@ async function generatePlan(){
           : '';
 
         const DC = {
-          'American foulbrood':{c:'#C0402A',bg:'#FAE8E5',l:'AFB',n:'Notifiable — report before destroying equipment'},
-          'AFB':               {c:'#C0402A',bg:'#FAE8E5',l:'AFB',n:'Notifiable — report before destroying equipment'},
+          'American foulbrood':{c:'#C0402A',bg:'#FAE8E5',l:'AFB',n:'Notifiable — report to NBU/DAERA/DAFM before destroying equipment'},
+          'AFB':               {c:'#C0402A',bg:'#FAE8E5',l:'AFB',n:'Notifiable — report to NBU/DAERA/DAFM before destroying equipment'},
           'AFB_historical':    {c:'#C07040',bg:'#FFF4EC',l:'AFB (prev. recorded)',n:'No longer flagged in latest count — monitor closely'},
-          'European foulbrood':{c:'#C07040',bg:'#FFF0E8',l:'EFB',n:'Notify state authority'},
-          'EFB':               {c:'#C07040',bg:'#FFF0E8',l:'EFB',n:'Notify state authority'},
+          'European foulbrood':{c:'#C07040',bg:'#FFF0E8',l:'EFB',n:'Notify NBU or DAFM'},
+          'EFB':               {c:'#C07040',bg:'#FFF0E8',l:'EFB',n:'Notify NBU or DAFM'},
           'Chalkbrood':        {c:'#8A6A20',bg:'#FFF8E8',l:'Chalkbrood',n:'Improve ventilation, hygienic stock'},
           'Sacbrood':          {c:'#8A6A20',bg:'#FFF8E8',l:'Sacbrood',n:'Usually self-limiting — monitor'},
           'Small hive beetle': {c:'#6A5020',bg:'#F5F0E8',l:'SHB',n:'Trap and manage'},
@@ -2239,8 +2232,7 @@ async function generateAiPlan(){
   const win = getSeasonalWindow();
   const hiveCount = _hiveData.hives.length;
   // Latest count per hive with status
-  const T_CRIT = VM_CONFIG?.thresholds?.critical ?? 9;
-  const T_ACT  = VM_CONFIG?.thresholds?.action   ?? 3;
+  const T_CRIT = 9, T_ACT = 3;
   const latestMitePerHive = {};
   (_hiveData.miteHistory||[]).forEach(c=>{
     if(!latestMitePerHive[c.hive_id]||c.date>latestMitePerHive[c.hive_id].date) latestMitePerHive[c.hive_id]=c;
@@ -2273,7 +2265,7 @@ async function generateAiPlan(){
   const diseases = (_hiveData.diseaseHistory||[]).flatMap(i=>i.diseases||[]).filter(d=>d&&d!=='No Disease Present');
   const uniqueDiseases = [...new Set(diseases)];
 
-  const prompt = `You are a practical Australian beekeeping hygiene advisor for VarroaMate. 
+  const prompt = `You are a practical beekeeping hygiene advisor for VarroaMate, specialising in the UK and Ireland. 
 Write a concise, warm, practical personalised hygiene analysis for this beekeeper. Use 200–250 words maximum.
 
 Beekeeper profile:
@@ -2304,7 +2296,7 @@ Structure your response with these three sections only:
 2. **Top Priority Action** — one clear thing they should do this week
 3. **For Your Toolkit** — one practical improvement specific to their equipment situation
 
-Keep it direct, practical and Australian. ${VM_CONFIG?.ai?.productNameRules||'Never mention MAQS — use Formic PRO.'} Do not repeat the checklist items.
+Keep it direct and practical. Use UK-registered product names (MAQS, Formicpro, Api-Bioxal, Apivar, Thymovar etc). Do not repeat the checklist items.
 
 TREATMENT AWARENESS — follow these exactly:
 - If a treatment was applied within the last 56 days, the beekeeper has already acted. Do NOT tell them to treat. Acknowledge the treatment by product name and advise a follow-up mite count 4 weeks after the treatment is removed to confirm efficacy.
@@ -2391,7 +2383,7 @@ function renderEquipMatrix(){
     {name:'🔧 Hive tool', risk:'HIGH', method: hasTorch ? '🔥 Flame sterilise 10–20s' : hasBleach ? '🧴 Bleach soak 10 min (1:10)' : hasMeths ? '🧪 Wipe with ≥70% methylated spirits — 30s contact time. Quick field option.' : '🧼 Wash thoroughly + sunlight'},
     {name:'🪵 Wooden hive boxes', risk:'MEDIUM', method: hasTorch ? '🔥 Scorch surface with propane torch — timber only. EPS/plastic: hot washing soda solution or bleach.' : hasSoda ? '🫧 Hot washing soda bath, then sun dry' : '☀️ Scrape + sunlight exposure'},
     {name:'🖼️ Frames & comb', risk:'VERY HIGH',
-      method: (hasOzone ? '🌀 Ozone treatment overnight for stored comb. ' : hasFreezer ? '🧊 Freeze −18°C for 48h for stored comb (kills wax moth and SHB). Consider Bacillus thuringiensis (Bt) spray for wax moth on stored comb. ' : '⚠️ If AFB suspected: report to state authority first — await instructions before destroying any comb or equipment. ')
+      method: (hasOzone ? '🌀 Ozone treatment overnight for stored comb. ' : hasFreezer ? '🧊 Freeze −18°C for 48h for stored comb (kills wax moth and SHB). Consider Bacillus thuringiensis (Bt) spray for wax moth on stored comb. ' : '⚠️ If AFB suspected: report to NBU/DAERA/DAFM first — await instructions before destroying any comb or equipment. ')
             + 'Rotation: move frames from brood nest outward to honey super position over time — this naturally cycles old dark comb out of the brood nest. Mark each frame with a permanent marker showing month and year of introduction (e.g. "Oct 24") on the top bar. Replace any frame older than 3 years, or sooner if comb is very dark, damaged, or disease-suspect.'},
     {name:'🧤 Nitrile gloves', risk:'LOW', method:'🗑️ Dispose between apiaries'},
     {name:'🧤 Leather gauntlets', risk:'HIGH',
@@ -2469,15 +2461,15 @@ const PATHOGENS = [
   {icon:'🟠', name:'Deformed Wing Virus', type:'RNA virus', reservoir:'Bee Population', risk:'HIGH',
    trans:'Primarily through Varroa mite feeding — injects virus directly into haemolymph. Also robbing and drifting.',
    detect:'Deformed wings, shortened abdomen, crawling bees, winter collapse. DWV is present in almost all Varroa-infested hives worldwide.',
-   control:'Varroa control is the primary intervention. DWV cannot be controlled directly — reduce mite levels to reduce viral load. 🇦🇺 Not yet detected in Australian colonies (Roberts et al. 2017). Its arrival via Varroa spread is considered the single greatest emerging viral threat to Australian bees.'},
+   control:'Varroa control is the primary intervention. DWV cannot be controlled directly — reduce mite levels to reduce viral load. DWV is the most significant viral threat in UK and Irish apiaries.'},
   {icon:'🟡', name:'American Foulbrood', type:'Spore-forming bacterium', reservoir:'Comb & Equipment', risk:'HIGH',
    trans:'Contaminated honey, wax, hive tools, frames, second-hand equipment. Spores survive decades.',
    detect:'Ropy test — probe larvae with matchstick, infected larvae stretch into brown thread. Sour smell.',
-   control:'Notifiable in all Australian states. Report to your state agriculture authority immediately if suspected — do not destroy or move equipment until instructed. Flame sterilise tools between hives. Never feed honey of unknown origin.'},
+   control:'Notifiable throughout the UK and Ireland. Report to NBU (England/Wales/Scotland), DAERA (N. Ireland), or DAFM (Ireland) immediately if suspected — do not destroy or move equipment until instructed. Flame sterilise tools between hives. Never feed honey of unknown origin.'},
     {icon:'🟠', name:'European Foulbrood', type:'Bacterium', reservoir:'Comb & Equipment · Bee Population', risk:'MEDIUM',
    trans:'Nurse bees pass contaminated food to larvae via trophallaxis. Also spreads via contaminated comb, frames, and equipment. Less persistent than AFB — does not form tenacious spores. Often stress-related (spring, poor nutrition, overcrowding).',
    detect:'Yellow-brown discoloured larvae in unsealed cells, often twisted. Less severe ropy test than AFB. Sour smell. Colony may recover spontaneously if the stressor is removed.',
-   control:'Notifiable in all Australian states — report to your state authority if suspected. Strengthen colony through requeening, improved nutrition, and reducing stress. Remove heavily infected comb. Treat equipment with hot washing soda solution.'},
+   control:'Notifiable in the UK and Ireland — report to NBU or DAFM if suspected. Strengthen colony through requeening, improved nutrition, and reducing stress. Remove heavily infected comb. Treat equipment with hot washing soda solution.'},
   {icon:'🔵', name:'Nosema ceranae', type:'Microsporidian parasite', reservoir:'Bee Population', risk:'MEDIUM',
    trans:'Oral ingestion of spores from contaminated food or hive surfaces.',
    detect:'Dysentery, crawling bees at entrance, reduced lifespan, K-wing, winter losses.',
@@ -2553,14 +2545,14 @@ async function generateToolkitAdvice(){
   allTools.forEach(t => (_toolkit[t.key] ? owned : missing).push(t));
 
   const win = getSeasonalWindow();
-  const prompt = `You are an expert Australian apiary hygiene advisor. A beekeeper has the following sanitation toolkit:
+  const prompt = `You are an expert apiary hygiene advisor for the UK and Ireland. A beekeeper has the following sanitation toolkit:
 
 OWNED: ${owned.length > 0 ? owned.map(t=>t.name).join(', ') : 'None yet'}
 NOT YET OWNED: ${missing.length > 0 ? missing.map(t=>t.name).join(', ') : 'All tools owned — well equipped!'}
 Current season: ${win.label} (${win.msg})
 Primary concern from profile: ${_profile.concern || 'general hygiene'}
 
-In 3–4 sentences, identify the single most important tool they should add next and explain specifically why it will improve their hive hygiene outcomes. If they already own all tools, congratulate them and highlight the most important usage habit instead. Be direct and practical. Do not use bullet points — write as a single concise paragraph. Mention approximate cost in Australian dollars if relevant.`;
+In 3–4 sentences, identify the single most important tool they should add next and explain specifically why it will improve their hive hygiene outcomes. If they already own all tools, congratulate them and highlight the most important usage habit instead. Be direct and practical. Do not use bullet points — write as a single concise paragraph. Mention approximate cost in GBP if relevant.`;
 
   const delays = [0, 4000, 8000];
   let lastErr;
@@ -2653,7 +2645,7 @@ const TOOL_INFO = {
       {n:4, t:'<strong>Frame rests and rebates</strong> — these areas accumulate propolis and wax and are often overlooked. Give them extra attention.'},
       {n:5, t:'<strong>Never use on comb</strong> — flame destroys wax. Use ozone or freezer for comb and frames.'},
     ],
-    tip:'⚠️ Always have water nearby. Do not use near dry grass or combustible material. AFB spores require sustained heat — a quick pass is not enough for suspected AFB equipment. ⚠️ If AFB is confirmed or suspected, report to your state agriculture authority first and await instructions before destroying any equipment.'
+    tip:'⚠️ Always have water nearby. Do not use near dry grass or combustible material. AFB spores require sustained heat — a quick pass is not enough for suspected AFB equipment. ⚠️ If AFB is confirmed or suspected, report to NBU/DAERA/DAFM first and await instructions before destroying any equipment.'
   },
   bleach:{
     icon:'🧴', name:'Bleach Solution (Sodium Hypochlorite)',
@@ -2665,7 +2657,7 @@ const TOOL_INFO = {
       {n:4, t:'<strong>Rinse thoroughly</strong> — residual bleach is toxic to bees. Rinse with clean water and allow to air dry completely before use.'},
       {n:5, t:'<strong>Field use</strong> — carry a small sealed container of pre-mixed solution. A 1L container is sufficient for a full apiary visit.'},
     ],
-    tip:'⚠️ Bleach is not effective against AFB spores in comb — only flame or destruction is appropriate for AFB-infected material, and only after reporting to your state authority and receiving instructions. Use bleach for tools and hard surfaces only.'
+    tip:'⚠️ Bleach is not effective against AFB spores in comb — only flame or destruction is appropriate for AFB-infected material, and only after reporting to NBU/DAERA/DAFM and receiving instructions. Use bleach for tools and hard surfaces only.'
   },
   soda:{
     icon:'🫧', name:'Washing Soda (Sodium Carbonate)',
@@ -2726,7 +2718,7 @@ const TOOL_INFO = {
       {n:4, t:'<strong>Thaw correctly</strong> — remove from freezer still in the bag and allow to return to room temperature before opening. This allows condensation to form on the outside of the bag, not on the comb.'},
       {n:5, t:'<strong>Storage after freezing</strong> — store treated comb in sealed, dry conditions. Freezing does not prevent re-infestation if stored in a warm, humid environment.'},
     ],
-    tip:'💡 Freezing does not kill AFB spores — it only addresses wax moth and SHB. An alternative for wax moth in stored comb is Bacillus thuringiensis (Bt), a naturally occurring soil bacterium approved for use in beekeeping. Follow APVMA label directions. For AFB-suspect comb, destruction is the only appropriate response — but report to your state agriculture authority first and await their instructions before destroying anything. Do not freeze and reuse AFB-affected frames.'
+    tip:'💡 Freezing does not kill AFB spores — it only addresses wax moth and SHB. An alternative for wax moth in stored comb is Bacillus thuringiensis (Bt), a naturally occurring soil bacterium approved for use in beekeeping. Follow label directions. For AFB-suspect comb, destruction is the only appropriate response — but report to NBU/DAERA/DAFM first and await their instructions before destroying anything. Do not freeze and reuse AFB-affected frames.'
   },
 };
 
