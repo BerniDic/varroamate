@@ -703,7 +703,7 @@ body{
           <div class="wizard-q">🧤 What gloves do you use?</div>
           <div class="wizard-option" onclick="wizardSelect(1,'gloves','nitrile')" data-val="nitrile">
             <div class="wizard-option-icon">🟢</div>
-            <div><div class="wizard-option-label">Disposable nitrile</div><div class="wizard-option-sub">Best hygiene — change between apiaries</div></div>
+            <div><div class="wizard-option-label">Disposable nitrile</div><div class="wizard-option-sub">Best hygiene — change between apiaries. Thin enough to sting through, but bees are rarely provoked by the smooth, scent-free surface.</div></div>
           </div>
           <div class="wizard-option" onclick="wizardSelect(1,'gloves','synthetic')" data-val="synthetic">
             <div class="wizard-option-icon">🔵</div>
@@ -1860,7 +1860,7 @@ function buildChecklist(){
     items.push({text:'Consider switching to disposable nitrile gloves — leather cannot be reliably sterilised and may carry AFB spores', priority:'Equipment upgrade', checked:false});
     items.push({text:'If using leather gauntlets: scrub with washing soda solution after each apiary visit, then sunlight dry', priority:'Glove hygiene', checked:false});
   } else if(_profile.gloves==='nitrile'){
-    items.push({text:'Change nitrile gloves between each apiary visit — dispose or carry fresh pairs', priority:'Glove hygiene', checked:false});
+    items.push({text:'Change nitrile gloves between each apiary visit — dispose or carry fresh pairs. 💡 Despite being thin enough for bees to sting through, nitrile gloves confuse bees due to their smooth surface and lack of alarm pheromones — meaning stings are rare in normal handling. Fresh nitrile gloves carry none of the alarm substances that accumulate on leather or fabric, allowing a much calmer approach to beekeeping. Note: if a bee is directly crushed or trapped, a sting will still occur.', priority:'Glove hygiene', checked:false});
   } else if(_profile.gloves==='activity'){
     items.push({text:'Always wear nitrile gloves for full inspections and when moving frames between hives — bare hands carry mites and pathogens directly', priority:'Glove hygiene', checked:false});
     items.push({text:'Keep a box of disposable nitrile gloves in your kit for any unplanned hive contact', priority:'Glove hygiene', checked:false});
