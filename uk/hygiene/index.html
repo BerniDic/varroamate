@@ -1865,7 +1865,7 @@ function buildChecklist(){
     items.push({text:'Always wear nitrile gloves for full inspections and when moving frames between hives — bare hands carry mites and pathogens directly', priority:'Glove hygiene', checked:false});
     items.push({text:'Keep a box of disposable nitrile gloves in your kit for any unplanned hive contact', priority:'Glove hygiene', checked:false});
   } else if(_profile.gloves==='none'){
-    items.push({text:'Working bare-handed significantly increases bee-to-beekeeper-to-bee transmission risk — especially for Varroa and AFB spores', priority:'High priority', checked:false});
+    items.push({text:'Working bare-handed significantly increases bee-to-beekeeper-to-bee transmission risk — especially for AFB spores and EFB. Always wear nitrile gloves for full inspections.', priority:'High priority', checked:false});
     items.push({text:'Consider introducing nitrile gloves for inspections and frame handling as a minimum — your hands are a direct disease vector between hives', priority:'Equipment upgrade', checked:false});
   } else {
     items.push({text:'Machine wash synthetic gloves at 60°C with detergent; bleach-wipe between apiaries', priority:'Glove hygiene', checked:false});
@@ -2500,7 +2500,7 @@ function renderPathogenCards(){
     card.className = 'card';
     card.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="font-size:27px;">${p.icon}</div>
+        <div style="font-size:27px;${p.name==='Small Hive Beetle'?'filter:grayscale(1) brightness(0.2);':''}">${p.icon}</div>
         <div style="flex:1;">
           <div style="font-size:17px;font-weight:700;color:var(--text1);">${p.name}</div>
           <div style="font-size:13px;color:var(--text3);">${p.type} · <span style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:3px;">🗺️ ${p.reservoir}</span></div>
