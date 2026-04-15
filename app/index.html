@@ -2406,7 +2406,7 @@ async function doSignIn(e){
   await loadDataFromSupabase();
   await loadPlan();
   currentApiaryId=apiaries[0]?.id??0;
-  if(hasAcceptedDisclaimer()){const _rp=new URLSearchParams(window.location.search).get('redirect');if(_rp==='planner'){window.location.href='/planner/';return;}if(hasAcceptedDisclaimer()){goto('s-apiaries');}else{goto('s-disclaimer');}
+  const _rp=new URLSearchParams(window.location.search).get("redirect");if(_rp==="planner"){window.location.href="/planner/";return;}if(hasAcceptedDisclaimer()){goto("s-apiaries");}else{goto("s-disclaimer");}
 }
 async function doCreateAccount(e){
   e.preventDefault();
@@ -5504,7 +5504,7 @@ document.addEventListener('DOMContentLoaded', async function(){
         await loadPlan();
         currentApiaryId=apiaries[0]?.id??0;
         if(ls)ls.classList.remove('active');
-        if(hasAcceptedDisclaimer()){const _rp=new URLSearchParams(window.location.search).get('redirect');if(_rp==='planner'){window.location.href='/planner/';return;}if(hasAcceptedDisclaimer()){goto('s-apiaries');}else{goto('s-disclaimer');}
+        const _rp=new URLSearchParams(window.location.search).get("redirect");if(_rp==="planner"){window.location.href="/planner/";return;}if(hasAcceptedDisclaimer()){goto("s-apiaries");}else{goto("s-disclaimer");}
       }
     } else {
       // Not logged in — save QR code for after login
