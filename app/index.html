@@ -5324,8 +5324,16 @@ function restoreData(event){
       showToast('Uploading to cloud…');
       const uid=_sbUser.id;
       for(const a of d.apiaries){
-        const {data:ap,error:apErr}=await _sb.from('apiaries').insert({user_id:uid,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0}).select().single();
-        if(apErr){showToast('Restore error: '+apErr.message);return;}
+        // Check for existing apiary with same name to prevent duplicates
+        const {data:existing}=await _sb.from('apiaries').select('id').eq('user_id',uid).eq('name',a.name).single();
+        let ap;
+        if(existing){
+          ap=existing;
+        } else {
+          const {data:newAp,error:apErr}=await _sb.from('apiaries').insert({user_id:uid,name:a.name,address:a.address||'',lat:a.lat||0,lon:a.lon||0}).select().single();
+          if(apErr){showToast('Restore error: '+apErr.message);return;}
+          ap=newAp;
+        }
         const hvList=(d.hives||{})[a.id]||[];
         for(const h of hvList){
           const {data:hv,error:hvErr}=await _sb.from('hives').insert({user_id:uid,apiary_id:ap.id,name:h.name}).select().single();
