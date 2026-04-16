@@ -955,71 +955,70 @@ html, body {
 .legal-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:13px;}
 .legal-table td{padding:8px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.6;}
 .legal-table td:first-child{white-space:nowrap;font-weight:600;width:140px;background:var(--bg2);}
+
+/* ── TICKER BAND ── */
+#ticker-band{
+  position:fixed;top:0;left:0;right:0;z-index:10000;
+  height:38px;overflow:hidden;
+  font-family:'DM Sans',sans-serif;font-size:13.5px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.25);
+  display:flex;align-items:center;
+}
+#ticker-track{
+  display:flex;align-items:center;
+  white-space:nowrap;
+  animation:ticker-scroll linear infinite;
+  will-change:transform;
+}
+#ticker-track.paused{ animation-play-state:paused; }
+@keyframes ticker-scroll{
+  0%  { transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+.ticker-item{
+  display:inline-flex;align-items:center;
+  padding:0 32px;
+  color:white;
+  line-height:1.3;
+  flex-shrink:0;
+}
+.ticker-item.green{ background:rgba(0,0,0,0); }
+.ticker-item.red{
+  background:rgba(0,0,0,0.18);
+  border-left:3px solid rgba(255,255,255,0.4);
+  border-right:3px solid rgba(255,255,255,0.4);
+}
+.ticker-sep{
+  color:rgba(255,255,255,0.35);
+  padding:0 8px;
+  flex-shrink:0;
+  font-size:16px;
+}
+#ticker-close{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,0.18);border:none;color:white;
+  width:24px;height:24px;border-radius:50%;font-size:14px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  z-index:1;flex-shrink:0;
+}
+#ticker-close:hover{background:rgba(255,255,255,0.32);}
+
 </style>
 </head>
 <body>
 
-<!-- ══ DID YOU KNOW BANNER ══ -->
-<div id="dyk-banner" style="
-  position:fixed;top:0;left:0;right:0;z-index:10000;
-  background:linear-gradient(90deg,#2C6E49,#3A9463);
-  color:white;
-  padding:11px 48px 11px 16px;
-  font-family:'DM Sans',sans-serif;font-size:14px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.25);
-  min-height:42px;display:flex;align-items:center;justify-content:center;">
-  <span id="dyk-text" style="text-align:center;line-height:1.4;transition:opacity 0.4s;"></span>
-  <button onclick="dykDismiss()" aria-label="Dismiss" style="
-    position:absolute;right:12px;top:50%;transform:translateY(-50%);
-    background:rgba(255,255,255,0.18);border:none;color:white;
-    width:26px;height:26px;border-radius:50%;font-size:16px;line-height:1;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+
+<!-- ══ TICKER BAND ══ -->
+<div id="ticker-band" style="background:linear-gradient(90deg,#1A5C2A,#2C7A3A);">
+  <div id="ticker-track" style="animation-duration:434s;"
+       onmouseenter="this.classList.add('paused')"
+       onmouseleave="this.classList.remove('paused')">
+    <span class="ticker-item green">💡 <strong>Did you know?</strong> You can use <strong>voice entry</strong> and <strong>QR codes</strong> to enter mite counts — and log entire hive inspections in the Productivity App — without typing a thing.</span><span class="ticker-sep">·</span><span class="ticker-item green">🧼 <strong>Did you know?</strong> The <strong>Hygiene App</strong> provides sanitation advice tailored to your toolset — so you clean what matters, the right way, every time.</span><span class="ticker-sep">·</span><span class="ticker-item green">📅 <strong>Did you know?</strong> The <strong>Smart Planner</strong> generates a seasonal Varroa treatment plan in seconds — with resistance rotation, timing windows, and a live plan score.</span><span class="ticker-sep">·</span><span class="ticker-item green">🤙 <strong>Did you know?</strong> The best way to get useful answers from the <strong>AI assistant</strong> is to talk to it like a mate — plain language, your real situation, no jargon needed.</span><span class="ticker-sep">·</span><span class="ticker-item green">👑 <strong>Did you know?</strong> The <strong>Productivity App queen register</strong> tracks your queens over time and warns you when productivity is declining — before it becomes a problem.</span><span class="ticker-sep">·</span><span class="ticker-item green">📋 <strong>Did you know?</strong> VarroaMate keeps a <strong>veterinary medicine record</strong> pre-filled with your treatment data — ready for the 5-year VMD record-keeping requirement.</span><span class="ticker-sep">·</span><span class="ticker-item green">⏰ <strong>Did you know?</strong> VarroaMate lets you generate <strong>calendar reminders</strong> — so you never forget to remove a treatment strip on time or miss your next alcohol wash.</span><span class="ticker-sep">·</span><span class="ticker-item green">📚 <strong>Did you know?</strong> The VarroaMate <strong>treatment library</strong> covers every VMD-registered treatment in depth — mode of action, bee safety, honey considerations, and resistance risks.</span><span class="ticker-sep">·</span><span class="ticker-item green">🗺️ <strong>Did you know?</strong> VarroaMate uses VMD-registered treatment names and NBU guidance for UK beekeepers, and HPRA/DAFM guidance for Ireland — so you always know what's permitted where you keep bees.</span><span class="ticker-sep">·</span><span class="ticker-item green">💡 <strong>Did you know?</strong> You can use <strong>voice entry</strong> and <strong>QR codes</strong> to enter mite counts — and log entire hive inspections in the Productivity App — without typing a thing.</span><span class="ticker-sep">·</span><span class="ticker-item green">🧼 <strong>Did you know?</strong> The <strong>Hygiene App</strong> provides sanitation advice tailored to your toolset — so you clean what matters, the right way, every time.</span><span class="ticker-sep">·</span><span class="ticker-item green">📅 <strong>Did you know?</strong> The <strong>Smart Planner</strong> generates a seasonal Varroa treatment plan in seconds — with resistance rotation, timing windows, and a live plan score.</span><span class="ticker-sep">·</span><span class="ticker-item green">🤙 <strong>Did you know?</strong> The best way to get useful answers from the <strong>AI assistant</strong> is to talk to it like a mate — plain language, your real situation, no jargon needed.</span><span class="ticker-sep">·</span><span class="ticker-item green">👑 <strong>Did you know?</strong> The <strong>Productivity App queen register</strong> tracks your queens over time and warns you when productivity is declining — before it becomes a problem.</span><span class="ticker-sep">·</span><span class="ticker-item green">📋 <strong>Did you know?</strong> VarroaMate keeps a <strong>veterinary medicine record</strong> pre-filled with your treatment data — ready for the 5-year VMD record-keeping requirement.</span><span class="ticker-sep">·</span><span class="ticker-item green">⏰ <strong>Did you know?</strong> VarroaMate lets you generate <strong>calendar reminders</strong> — so you never forget to remove a treatment strip on time or miss your next alcohol wash.</span><span class="ticker-sep">·</span><span class="ticker-item green">📚 <strong>Did you know?</strong> The VarroaMate <strong>treatment library</strong> covers every VMD-registered treatment in depth — mode of action, bee safety, honey considerations, and resistance risks.</span><span class="ticker-sep">·</span><span class="ticker-item green">🗺️ <strong>Did you know?</strong> VarroaMate uses VMD-registered treatment names and NBU guidance for UK beekeepers, and HPRA/DAFM guidance for Ireland — so you always know what's permitted where you keep bees.</span><span class="ticker-sep">·</span>
+  </div>
+  <button id="ticker-close" onclick="document.getElementById('ticker-band').style.display='none';document.getElementById('scene').style.paddingTop='0';" aria-label="Dismiss">×</button>
 </div>
-<script>
-(function(){
-  const tips = [
-    '🆕 <strong>New in VarroaMate:</strong> Hives can now be moved between apiaries — QR codes and hive IDs stay put. Perfect for pollination runs and chasing honey flows. 🍯',
-    '💡 <strong>Did you know?</strong> You can use <strong>voice entry</strong> and <strong>QR codes</strong> to enter mite counts in VarroaMate — and log entire hive inspections in the Productivity App — without typing a thing.',
-    '🧼 <strong>Did you know?</strong> Our <strong>Hygiene App</strong> provides sanitation advice tailored specifically to your toolset — so you clean what matters, the right way, every time.',
-    '📅 <strong>Did you know?</strong> The <strong>Smart Planner</strong> lets you generate a seasonal Varroa treatment plan in seconds, or build your own from scratch — with resistance rotation, timing windows, and a live plan score.',
-    '🤙 <strong>Did you know?</strong> The best way to get useful answers from the <strong>AI assistant</strong> in VarroaMate apps is to talk to it like you\'d talk to a mate — plain language, your real situation, no jargon needed.',
-    '👑 <strong>Did you know?</strong> The <strong>Productivity App queen register</strong> tracks your queens over time and will warn you when a queen\'s productivity is declining — before it becomes a problem.',
-    '📋 <strong>Did you know?</strong> VarroaMate keeps a <strong>veterinary medicine record</strong> for you — pre-filled with your treatment dates, products, and hive data, ready for the 5-year VMD record-keeping requirement.',
-    '⏰ <strong>Did you know?</strong> VarroaMate lets you generate <strong>calendar reminders</strong> — so you never forget to remove a treatment strip on time or miss your next alcohol wash.',
-    '📚 <strong>Did you know?</strong> The VarroaMate <strong>treatment library</strong> covers every registered treatment in depth — mode of action, impact on mites and bees, honey and wax considerations, and resistance risks.',
-    '🗺️ <strong>Did you know?</strong> VarroaMate uses VMD-registered treatment names and NBU guidance for UK beekeepers, and HPRA/DAFM guidance for Ireland — so you always know what\'s permitted where you keep bees.',
-  ];
-  let idx = 0;
-  const el = document.getElementById('dyk-text');
-  const banner = document.getElementById('dyk-banner');
 
-  function show(i){
-    el.style.opacity = 0;
-    setTimeout(()=>{
-      el.innerHTML = tips[i];
-      el.style.opacity = 1;
-    }, 400);
-  }
-
-  function advance(){
-    idx = (idx + 1) % tips.length;
-    show(idx);
-  }
-
-  window.dykDismiss = function(){
-    banner.style.transition = 'opacity 0.3s';
-    banner.style.opacity = 0;
-    setTimeout(()=>{ banner.style.display = 'none'; }, 300);
-    clearInterval(window._dykTimer);
-  };
-
-  // Start on a random tip so repeat visitors see variety
-  idx = Math.floor(Math.random() * tips.length);
-  show(idx);
-  window._dykTimer = setInterval(advance, 20000);
-})();
-</script>
-
+<!-- ══ DID YOU KNOW BANNER ══ -->
 <div id="scene">
   <!-- Sky -->
   <div id="sky" aria-hidden="true"></div>
@@ -2056,14 +2055,14 @@ function rssRender(){
     el.innerHTML = '<div style="text-align:center;padding:24px;color:#9A7030;font-style:italic;font-size:13px;">No items in this category yet.</div>';
     return;
   }
-  const catColour = { uk:'#2C6E49', science:'#2A5A9A', international:'#7A4A90' };
+  const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90' };
   const catLabel  = { uk:'🇬🇧 UK &amp; Ireland', science:'🔬 Science', international:'🌐 International' };
   el.innerHTML = items.map(i => rssItemHTML(i, catColour, catLabel)).join('');
 }
 
 // ── JOURNALS & BLOGS tab ───────────────────────────
 const JOURNAL_COLOUR = {
-  uk           : '#2C6E49',
+  australia    : '#2C6E49',
   science      : '#2A5A9A',
   international: '#7A4A90',
   blogs        : '#B06010',
@@ -2107,7 +2106,7 @@ function rssJournalRender(){
     if(!groups[k]) groups[k] = { cat: i.category, items: [] };
     groups[k].items.push(i);
   });
-  const catColour = { uk:'#2C6E49', science:'#2A5A9A', international:'#7A4A90', blogs:'#B06010' };
+  const catColour = { australia:'#2C6E49', science:'#2A5A9A', international:'#7A4A90', blogs:'#B06010' };
   el.innerHTML = Object.entries(groups).map(([label, grp]) => {
     const col = catColour[grp.cat] || '#7A5800';
     const header = `<div class="rss-section-divider" style="color:${col};">${label}</div>`;
@@ -2196,7 +2195,7 @@ function dismissBanner(){
 (function(){ try{ if(sessionStorage.getItem('banner_dismissed')==='1') dismissBanner(); }catch(e){} })();
 
 const APP_URLS = {
-  vm:     '/uk/app/',
+  vm:     '/app/',
   vmsp:   '/uk/planner/',
   prod:   '/uk/productivity/',
   health: null,  // academy coming soon
@@ -2671,7 +2670,7 @@ function showToast(msg){
 
 // ── MOBILE HIVE POPUP ────────────────────────────
 const APP_INFO = {
-  vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: '', url: '/uk/app/' },
+  vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: '', url: '/app/' },
   vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'release', badgeText: '',             url: '/uk/planner/' },
   prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: '',            url: '/uk/productivity/' },
   health:   { title: 'Beekeeper Academy',   sub: 'structured learning pathway',  badge: 'soon', badgeText: 'coming soon', url: null },
