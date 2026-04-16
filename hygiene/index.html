@@ -514,6 +514,28 @@ body{
 .legal-table{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:12px;}
 .legal-table td{padding:7px 9px;border:1px solid var(--border);vertical-align:top;line-height:1.55;}
 .legal-table td:first-child{white-space:nowrap;font-weight:600;width:130px;background:var(--paper);}
+
+/* ── HYGIENE CHAT ── */
+.hygiene-chat-fab{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));right:16px;width:56px;height:56px;border-radius:50%;background:#2C6E49;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.25);z-index:1501;border:none;transition:all 0.2s;}
+.hygiene-chat-fab:hover{transform:scale(1.08);opacity:0.9;}
+.hygiene-chat-panel{position:fixed;bottom:148px;right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border,#e0d0b0);z-index:1500;display:none;flex-direction:column;max-height:460px;overflow:hidden;}
+.hygiene-chat-panel.open{display:flex;}
+.hygiene-chat-header{background:#2C6E49;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-radius:18px 18px 0 0;flex-shrink:0;}
+.hygiene-chat-header-info{flex:1;}
+.hygiene-chat-header-title{font-weight:700;font-size:16px;}
+.hygiene-chat-header-sub{font-size:12px;opacity:0.8;}
+.hygiene-chat-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0 4px;line-height:1;}
+.hygiene-chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.hygiene-chat-msg{max-width:88%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.5;}
+.hygiene-chat-msg.bot{background:#EAF4EE;color:#1A3A2A;border-bottom-left-radius:4px;align-self:flex-start;}
+.hygiene-chat-msg.user{background:#2C6E49;color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.hygiene-chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border,#e0d0b0);flex-shrink:0;}
+.hygiene-chat-input{flex:1;padding:9px 14px;border-radius:20px;border:2px solid var(--border,#e0d0b0);font-family:inherit;font-size:15px;background:var(--bg,#fdfaf4);}
+.hygiene-chat-input:focus{outline:none;border-color:#2C6E49;}
+.hygiene-chat-send{background:#2C6E49;color:#fff;border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:16px;flex-shrink:0;}
+.hygiene-chat-send:hover{opacity:0.85;}
+@media(max-width:480px){.hygiene-chat-panel{width:calc(100vw - 20px);right:10px;bottom:150px;}}
+
 </style>
 </head>
 <body>
@@ -2992,6 +3014,79 @@ _sb.auth.getSession().then(async ({data:{session}})=>{
     console.error('Init error:', err);
   }
 });
+
+// ══ HYGIENE CHAT ASSISTANT ══
+let _hygieneHistory = [];
+function toggleHygieneChat(){
+  const p = document.getElementById('hygiene-chat-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) setTimeout(()=>document.getElementById('hygiene-chat-input').focus(), 100);
+}
+async function sendHygieneChat(){
+  const input = document.getElementById('hygiene-chat-input');
+  const msg = input.value.trim(); if(!msg) return;
+  input.value = '';
+  addHygieneMsg(msg, 'user');
+  _hygieneHistory.push({role:'user', content:msg});
+  const loading = addHygieneMsg('…', 'bot');
+  if(!hasAI()){
+    loading.textContent = 'The Hygiene Assistant requires a paid plan (Free+AI, Hobbyist, or Beekeeper). Upgrade via Plans & Pricing in the VarroaMate app. 🐝';
+    return;
+  }
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/anthropic-proxy`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 600,
+        system: `You are VarroaMate Hygiene Assistant, a friendly expert on apiary sanitation and bee health for Australian beekeepers. Help with hygiene questions — sterilisation methods, disease transmission routes, equipment care, field protocols, and biosecurity. Keep answers concise and practical. Reference Australian regulatory guidance (AHBIC, state agriculture authorities) where relevant. APPROVED TREATMENTS ONLY: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment, Duplex-Framebox Plan. Do not suggest unregistered methods. AFB and EFB are notifiable diseases — always advise reporting to state agriculture authority.`,
+        messages: _hygieneHistory
+      })
+    });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error?.message || 'API error');
+    const reply = data.content?.find(b=>b.type==='text')?.text || 'Sorry, could not respond.';
+    _hygieneHistory.push({role:'assistant', content:reply});
+    loading.innerHTML = renderAIMarkdown(reply);
+  } catch(e){
+    loading.textContent = 'Connection failed. Please try again.';
+  }
+  const msgs = document.getElementById('hygiene-chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function addHygieneMsg(text, type){
+  const msgs = document.getElementById('hygiene-chat-messages');
+  const el = document.createElement('div');
+  el.className = 'hygiene-chat-msg ' + type;
+  el.textContent = text;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
 </script>
+
+<!-- HYGIENE CHAT FAB -->
+<button class="hygiene-chat-fab" id="hygiene-chat-fab" onclick="toggleHygieneChat()" title="Ask the Hygiene Assistant">🧹</button>
+<div class="hygiene-chat-panel" id="hygiene-chat-panel">
+  <div class="hygiene-chat-header">
+    <div style="font-size:22px;">🧹</div>
+    <div class="hygiene-chat-header-info">
+      <div class="hygiene-chat-header-title">Hygiene Assistant</div>
+      <div class="hygiene-chat-header-sub">Ask anything about apiary sanitation</div>
+    </div>
+    <button class="hygiene-chat-close" onclick="toggleHygieneChat()">✕</button>
+  </div>
+  <div class="hygiene-chat-messages" id="hygiene-chat-messages">
+    <div class="hygiene-chat-msg bot">G'day! 👋 I'm your Hygiene Assistant. Ask me anything about apiary sanitation, disease transmission, sterilisation, or biosecurity.</div>
+  </div>
+  <div class="hygiene-chat-input-row">
+    <input class="hygiene-chat-input" id="hygiene-chat-input" placeholder="Ask about hygiene…" onkeydown="if(event.key==='Enter')sendHygieneChat()">
+    <button class="hygiene-chat-send" onclick="sendHygieneChat()">➤</button>
+  </div>
+</div>
+
 </body>
 </html>
