@@ -2819,6 +2819,31 @@ function deleteApiary(id,name){
 }
 
 // ══ HIVE STATUS ══
+
+function getHiveEfficacy(hid){
+  const counts = (miteCountsByHive[hid]||[]).slice().sort((a,b)=>a.date>b.date?-1:1);
+  const treats = (treatmentsByHive[hid]||[]).slice().sort((a,b)=>a.date>b.date?-1:1);
+  if(!treats.length || counts.length < 2) return null;
+  const t = treats[0];
+  const dur = TREATMENTS[t.product]?.durationDays || 42;
+  const tStart = new Date(t.date + 'T12:00:00');
+  const tEnd   = new Date(tStart.getTime() + dur * 24*60*60*1000);
+  // pre = most recent count ON or BEFORE treatment start
+  const pre = counts.find(c => new Date(c.date+'T12:00:00') <= tStart);
+  // post = oldest count AFTER treatment end
+  const postCounts = counts.filter(c => new Date(c.date+'T12:00:00') > tEnd);
+  const post = postCounts.length ? postCounts[postCounts.length-1] : null;
+  if(!pre || !post || pre.value === 0) return null;
+  const pct = Math.round(((pre.value - post.value) / pre.value) * 100);
+  return {pct, pre:pre.value, post:post.value, product:TREATMENTS[t.product]?.name||t.product};
+}
+function efficacyBadgeHtml(hid){
+  const e = getHiveEfficacy(hid);
+  if(!e) return '';
+  const col = e.pct >= 90 ? '#27AE60' : e.pct >= 80 ? '#E67E22' : '#E74C3C';
+  const lbl = e.pct >= 90 ? '✓ Effective' : e.pct >= 80 ? '~ Moderate' : '⚠ Low';
+  return `<span title="Treatment efficacy: ${e.pre}→${e.post} mites/300 (${e.product})" style="font-size:11px;padding:2px 7px;border-radius:10px;background:${col}22;color:${col};border:1px solid ${col}55;font-weight:600;">${lbl} ${e.pct}%</span>`;
+}
 function getHiveBadge(hid){
   const c=miteCountsByHive[hid]||[];
   if(!c.length)return{label:'No counts yet',cls:'badge-yellow',color:'var(--text3)',num:'—'};
@@ -2864,7 +2889,7 @@ function renderHives(){
         <div class="hive-name">${h.name} <span style="font-family:monospace;font-size:11px;color:var(--text3);font-weight:400;">${code}</span></div>
         <div class="hive-status">${lastC}</div>
         <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-          <span class="badge ${b.cls}">${b.label}</span>
+          <span class="badge ${b.cls}">${b.label}</span>${efficacyBadgeHtml(h.id)}
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();speakHiveSummary(${h.id},this)">🔊 Summary</button>
           <button class="icon-btn" title="Edit hive" onclick="event.stopPropagation();editHive(${h.id})">✏️</button>
