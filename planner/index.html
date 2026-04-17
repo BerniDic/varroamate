@@ -6840,7 +6840,6 @@ function _effRenderMonthChart(records){
 async function loadEfficacyAdvice(){
   const btn = document.getElementById('eff-advice-btn');
   const body = document.getElementById('eff-advice-body');
-  if(!_requireHive('get efficacy advice')) return;
   if(!await requireAIPlan()) return;
   const records = _effFilteredRecords().filter(r=>r.efficacyPct!==null);
   if(!records.length){
