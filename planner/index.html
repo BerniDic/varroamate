@@ -6428,9 +6428,6 @@ function renderAIMarkdown(text){
   if(!text) return '';
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^### (.+)$/gm,'<h4 style="margin:10px 0 4px;font-size:14px;color:var(--forest,#2C6E49);">$1</h4>')
-    .replace(/^## (.+)$/gm,'<h3 style="margin:10px 0 4px;font-size:15px;color:var(--forest,#2C6E49);">$1</h3>')
-    .replace(/^# (.+)$/gm,'<h3 style="margin:10px 0 4px;font-size:16px;color:var(--forest,#2C6E49);">$1</h3>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
     .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
