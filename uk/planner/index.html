@@ -3591,11 +3591,17 @@ function cancelSuggest(){
 async function suggestPlan(){
   if(!_requireHive('ask AI to suggest a plan')) return;
   if(!await requireAIPlan()) return;
-  // If manual plan already exists, ask user to clear first
-  const manualEvents = planEvents.filter(e => !e._aiSuggested);
-  if(manualEvents.length > 0){
-    if(!confirm('Your plan already has ' + manualEvents.length + ' treatment' + (manualEvents.length>1?'s':'') + ' added manually.\n\nThe AI Suggest feature works best on a clean slate.\n\nClear all treatments before generating an AI plan?')) return;
-    clearAllTreatments();
+  // If plan already has treatments, require clear before AI suggest
+  if(planEvents.length > 0){
+    const n = planEvents.length;
+    if(!confirm('Your plan already has ' + n + ' treatment' + (n>1?'s':'') + '.\n\nPlease start a new plan before using AI Suggest — the AI works best on a clean slate.\n\nClick OK to clear all treatments and continue, or Cancel to go back.')) return;
+    planEvents = [];
+    nextId = 1;
+    savePlan(currentScopeKey, currentPlanName);
+    renderPlanList();
+    renderRating();
+    redraw();
+    await new Promise(r => setTimeout(r, 100));
   }
   _proposals = [];
   _suggestHistory = [];
