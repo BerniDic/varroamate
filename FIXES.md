@@ -76,3 +76,8 @@ Uploads are for reference/inspection only.
 - UK feeds added: NBU, BBKA, BeeCraft, Beelistener, Urban Bees (category: `uk`)
 - AU feeds retained: AHBIC, AgVic, NSW DPI (category: `australia`)
 - User-Agent updated: `varroamate.com` (was `varroamate.com.au`)
+
+## `planner/index.html` + `uk/planner/index.html` (AU+UK Smart Planner)
+- Nectar flow windows: `× delete button` suppressed for `_itinLeg:true` windows
+  - Condition `&& !win._itinLeg` added to delete rect draw block
+  - Flow windows remain draggable but cannot be deleted
