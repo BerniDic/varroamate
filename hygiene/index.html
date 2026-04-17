@@ -3030,7 +3030,7 @@ async function sendHygieneChat(){
   _hygieneHistory.push({role:'user', content:msg});
   const loading = addHygieneMsg('…', 'bot');
   if(!hasAI()){
-    loading.textContent = 'The Hygiene Assistant requires a paid plan (Free+AI, Hobbyist, or Beekeeper). Upgrade via Plans & Pricing in the VarroaMate app. 🐝';
+    loading.textContent = 'The Hygiene Assistant requires a paid plan (Free+AI, Hobbyist, or Beekeeper) — or sign in to VarroaMate first if you already have one. 🐝';
     return;
   }
   try{
