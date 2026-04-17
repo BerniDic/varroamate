@@ -441,6 +441,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 .legal-table td{padding:8px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.6;}
 .legal-table td:first-child{white-space:nowrap;font-weight:600;width:140px;background:var(--bg2);}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 <div id="plan-gate-overlay" style="position:fixed;inset:0;background:#FFFDF5;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:'DM Sans',sans-serif;">
@@ -1767,6 +1768,9 @@ canvas.drop-blocked{cursor:not-allowed;}
   </div>
   <div class="tab-item" id="tab-dayplanner" onclick="requireDisclaimer('screen-dayplanner')">
     <span class="tab-icon">🗓️</span>Day Plans
+  </div>
+  <div class="tab-item" id="tab-efficacy" onclick="requireDisclaimer('screen-efficacy')">
+    <span class="tab-icon">📊</span>Efficacy
   </div>
 </div>
 </nav>
@@ -6286,6 +6290,10 @@ function gotoScreen(id) {
   document.getElementById(id).classList.add('active');
   _currentScreen = id;
   if(id === 'screen-planner')    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(typeof redraw==='function') redraw(); }));
+  if(id === 'screen-efficacy'){
+    if(!_effRecords.length) _effLoadFromSupabase();
+    else renderEfficacyTab();
+  }
   if(id === 'screen-dayplanner') requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const today = new Date().toISOString().slice(0,10);
     ['drone-date','bb-date','dx-date'].forEach(id=>{ const el=document.getElementById(id); if(el&&!el.value) el.value=today; });
@@ -6299,6 +6307,7 @@ function gotoScreen(id) {
     'screen-disclaimer':  'tab-disclaimer',
     'screen-planner':     'tab-planner',
     'screen-dayplanner':  'tab-dayplanner',
+    'screen-efficacy':     'tab-efficacy',
   };
   const tabId = tabMap[id];
   if(tabId) document.getElementById(tabId)?.classList.add('active');
@@ -6507,6 +6516,361 @@ function hideChipInfo(){
   document.getElementById('chipInfoPopup')?.classList.remove('show');
 }
 
+
+// ══════════════════════════════════════════════════════════
+// EFFICACY TAB
+// ══════════════════════════════════════════════════════════
+const EFF_SKIP = new Set(['brood-int']);
+let _effRecords   = []; // computed efficacy records
+let _effScope     = 'all'; // 'all' | apiary id | hive id
+let _effCharts    = {};
+
+function _effGetSeason(month){ // 0-indexed
+  if(month>=7&&month<=9) return 'Spring';
+  if(month>=10||month<=0) return 'Summer'; // Nov,Dec,Jan
+  if(month>=1&&month<=3) return 'Autumn'; // Feb,Mar,Apr
+  return 'Winter'; // May,Jun,Jul
+}
+
+function _effGrade(pct){
+  if(pct===null||pct===undefined) return {lbl:'No data',cls:'',col:'#999'};
+  if(pct>=90) return {lbl:'Excellent',cls:'eff-excellent',col:'#27AE60'};
+  if(pct>=80) return {lbl:'Good',cls:'eff-good',col:'#5BA35A'};
+  if(pct>=70) return {lbl:'Moderate',cls:'eff-moderate',col:'#E67E22'};
+  return {lbl:'Low',cls:'eff-low',col:'#E74C3C'};
+}
+
+function calcAndSaveAllEfficacy(){
+  _effRecords = [];
+  const allTreatments = HISTORY.filter(e => e.type==='treatment' && !EFF_SKIP.has(e.treatId));
+  for(const tx of allTreatments){
+    const hiveId  = tx.hiveId;
+    const txDate  = new Date(tx.year, tx.month, 1);
+    const dur     = TREATMENTS[tx.treatId]?.durationDays || 42;
+    const txEnd   = new Date(txDate.getTime() + dur*24*60*60*1000);
+    const hiveCounts = HISTORY
+      .filter(e => e.type==='count' && e.hiveId===hiveId && e.count!=null)
+      .sort((a,b) => (a.year*12+a.month) - (b.year*12+b.month));
+    // pre = most recent count on or before txDate
+    const pre = [...hiveCounts].reverse().find(e => new Date(e.year,e.month,1) <= txDate);
+    // post = first count after txEnd
+    const post = hiveCounts.find(e => new Date(e.year,e.month,1) > txEnd);
+    if(!pre || !post) continue;
+    const pct = pre.count===0 ? null : Math.round(((pre.count-post.count)/pre.count)*100);
+    const hive    = HIVES.find(h=>h.id===hiveId);
+    const apiary  = APIARIES.find(a=>a.id===hive?.apiaryId);
+    const txMonth = tx.month; // 0-indexed
+    _effRecords.push({
+      treatId:    tx.treatId,
+      product:    TREATMENTS[tx.treatId]?.name || tx.treatId,
+      hiveId,
+      hiveName:   hive?.name||'Unknown',
+      apiaryId:   hive?.apiaryId,
+      apiaryName: apiary?.name||'Unknown',
+      month:      txMonth,
+      monthName:  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][txMonth],
+      season:     _effGetSeason(txMonth),
+      year:       tx.year,
+      preCount:   pre.count,
+      postCount:  post.count,
+      efficacyPct: pct,
+    });
+  }
+  // Save to Supabase
+  _effSaveToSupabase();
+  renderEfficacyTab();
+}
+
+async function _effSaveToSupabase(){
+  if(!_sbUser || !_effRecords.length) return;
+  // Upsert — we use hiveId+treatId+year+month as a natural key
+  // We store as JSON in a simple key-value cache row for now
+  try{
+    const payload = {
+      user_id: _sbUser.id,
+      key: 'treatment_efficacy_v1',
+      value: JSON.stringify(_effRecords),
+      updated_at: new Date().toISOString(),
+    };
+    await _sb.from('app_cache').upsert(payload, {onConflict:'user_id,key'});
+  }catch(e){ console.warn('Efficacy save:', e); }
+}
+
+async function _effLoadFromSupabase(){
+  if(!_sbUser) return;
+  try{
+    const {data} = await _sb.from('app_cache')
+      .select('value')
+      .eq('user_id', _sbUser.id)
+      .eq('key','treatment_efficacy_v1')
+      .single();
+    if(data?.value){
+      _effRecords = JSON.parse(data.value);
+      renderEfficacyTab();
+    } else {
+      calcAndSaveAllEfficacy();
+    }
+  }catch(e){
+    calcAndSaveAllEfficacy();
+  }
+}
+
+function setEfficacyScope(btn, scope){
+  _effScope = scope;
+  document.querySelectorAll('.eff-scope-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderEfficacyTab();
+}
+
+function _effFilteredRecords(){
+  const productFilter = document.getElementById('eff-filter-product')?.value||'';
+  const seasonFilter  = document.getElementById('eff-filter-season')?.value||'';
+  return _effRecords.filter(r => {
+    if(_effScope !== 'all'){
+      if(_effScope.startsWith('ap-') && r.apiaryId !== parseInt(_effScope.slice(3))) return false;
+      if(_effScope.startsWith('hv-') && r.hiveId   !== parseInt(_effScope.slice(3))) return false;
+    }
+    if(productFilter && r.product !== productFilter) return false;
+    if(seasonFilter  && r.season  !== seasonFilter)  return false;
+    return true;
+  });
+}
+
+function renderEfficacyTab(){
+  const records = _effFilteredRecords();
+
+  // ── Scope buttons ─────────────────────────────────────────
+  const scopeBar = document.getElementById('efficacy-scope-bar');
+  if(scopeBar && scopeBar.children.length === 1){
+    APIARIES.forEach(ap => {
+      const btn = document.createElement('button');
+      btn.className = 'eff-scope-btn';
+      btn.dataset.scope = 'ap-'+ap.id;
+      btn.textContent = '🏡 '+ap.name;
+      btn.onclick = ()=>setEfficacyScope(btn,'ap-'+ap.id);
+      scopeBar.appendChild(btn);
+      const hivesInAp = HIVES.filter(h=>h.apiaryId===ap.id);
+      hivesInAp.forEach(hv => {
+        const hbtn = document.createElement('button');
+        hbtn.className = 'eff-scope-btn';
+        hbtn.dataset.scope = 'hv-'+hv.id;
+        hbtn.textContent = '🐝 '+hv.name;
+        hbtn.onclick = ()=>setEfficacyScope(hbtn,'hv-'+hv.id);
+        scopeBar.appendChild(hbtn);
+      });
+    });
+  }
+
+  // ── Product filter dropdown ───────────────────────────────
+  const prodSel = document.getElementById('eff-filter-product');
+  if(prodSel && prodSel.options.length === 1){
+    const prods = [...new Set(_effRecords.map(r=>r.product))].sort();
+    prods.forEach(p=>{
+      const o=document.createElement('option');o.value=p;o.textContent=p;
+      prodSel.appendChild(o);
+    });
+  }
+
+  // ── Summary cards ─────────────────────────────────────────
+  const cardsEl = document.getElementById('efficacy-summary-cards');
+  if(cardsEl){
+    if(!records.length){
+      cardsEl.innerHTML='<div style="color:var(--text2);font-size:14px;grid-column:span 4;padding:12px 0;">No efficacy data yet — add mite counts before and after treatments, then click Recalculate.</div>';
+    } else {
+      const withData = records.filter(r=>r.efficacyPct!==null);
+      const avg = withData.length ? Math.round(withData.reduce((s,r)=>s+r.efficacyPct,0)/withData.length) : null;
+      const g = _effGrade(avg);
+      const excellent = withData.filter(r=>r.efficacyPct>=90).length;
+      const low       = withData.filter(r=>r.efficacyPct<70).length;
+      // Best product
+      const byProduct = {};
+      withData.forEach(r=>{
+        if(!byProduct[r.product]) byProduct[r.product]={sum:0,n:0};
+        byProduct[r.product].sum+=r.efficacyPct; byProduct[r.product].n++;
+      });
+      const bestProd = Object.entries(byProduct).sort((a,b)=>(b[1].sum/b[1].n)-(a[1].sum/a[1].n))[0];
+      cardsEl.innerHTML = [
+        {label:'Avg Efficacy',val: avg!==null?avg+'%':'—',sub:g.lbl,col:g.col},
+        {label:'Treatments',val:records.length,sub:withData.length+' with data',col:'var(--forest)'},
+        {label:'Excellent (≥90%)',val:excellent,sub:'of '+withData.length+' assessed',col:'#27AE60'},
+        {label:'Low (<70%)',val:low,sub:'possible resistance',col:low>0?'#E74C3C':'#999'},
+        bestProd?{label:'Best Product',val:bestProd[0].split(' ')[0],sub:Math.round(bestProd[1].sum/bestProd[1].n)+'% avg',col:'var(--amber-dark)'}:null,
+      ].filter(Boolean).map(s=>`
+        <div style="background:white;border-radius:10px;border:1px solid var(--border);padding:14px 16px;">
+          <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${s.label}</div>
+          <div style="font-size:26px;font-weight:700;color:${s.col};">${s.val}</div>
+          <div style="font-size:12px;color:var(--text2);">${s.sub}</div>
+        </div>`).join('');
+    }
+  }
+
+  // ── Charts ────────────────────────────────────────────────
+  _effRenderProductChart(records);
+  _effRenderMonthChart(records);
+
+  // ── Table ─────────────────────────────────────────────────
+  const tableEl = document.getElementById('efficacy-table');
+  if(tableEl){
+    if(!records.length){
+      tableEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--text2);">No records match the current filter.</div>';
+    } else {
+      const sorted = [...records].sort((a,b)=>b.year*12+b.month-(a.year*12+a.month));
+      tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead><tr style="background:var(--cream-dark);">
+          <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--forest);">Hive</th>
+          <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--forest);">Apiary</th>
+          <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--forest);">Product</th>
+          <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--forest);">Month</th>
+          <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--forest);">Season</th>
+          <th style="padding:10px 8px;text-align:center;font-weight:600;color:var(--forest);">Pre</th>
+          <th style="padding:10px 8px;text-align:center;font-weight:600;color:var(--forest);">Post</th>
+          <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--forest);">Efficacy</th>
+        </tr></thead>
+        <tbody>${sorted.map((r,i)=>{
+          const g = _effGrade(r.efficacyPct);
+          return `<tr style="border-bottom:1px solid var(--border);background:${i%2?'var(--cream)':'white'};">
+            <td style="padding:10px 14px;">${r.hiveName}</td>
+            <td style="padding:10px 14px;color:var(--text2);">${r.apiaryName}</td>
+            <td style="padding:10px 14px;font-weight:600;">${r.product}</td>
+            <td style="padding:10px 14px;">${r.monthName} ${r.year}</td>
+            <td style="padding:10px 14px;">${r.season}</td>
+            <td style="padding:10px 8px;text-align:center;">${r.preCount}</td>
+            <td style="padding:10px 8px;text-align:center;">${r.postCount}</td>
+            <td style="padding:10px 14px;text-align:center;">
+              ${r.efficacyPct!==null
+                ? `<span style="background:${g.col}22;color:${g.col};border:1px solid ${g.col}55;border-radius:10px;padding:2px 10px;font-weight:700;">${r.efficacyPct}%</span>`
+                : '<span style="color:#999;">—</span>'}
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+    }
+  }
+}
+
+function _effRenderProductChart(records){
+  const ctx = document.getElementById('eff-by-product-chart');
+  if(!ctx) return;
+  if(_effCharts.product){ _effCharts.product.destroy(); }
+  const withData = records.filter(r=>r.efficacyPct!==null);
+  if(!withData.length){ ctx.getContext('2d')?.clearRect(0,0,ctx.width,ctx.height); return; }
+  const byProd = {};
+  withData.forEach(r=>{
+    if(!byProd[r.product]){byProd[r.product]={sum:0,n:0};}
+    byProd[r.product].sum+=r.efficacyPct; byProd[r.product].n++;
+  });
+  const labels = Object.keys(byProd);
+  const data   = labels.map(p=>Math.round(byProd[p].sum/byProd[p].n));
+  const colors = data.map(v=>v>=90?'#27AE60':v>=80?'#5BA35A':v>=70?'#E67E22':'#E74C3C');
+  _effCharts.product = new Chart(ctx, {
+    type:'bar',
+    data:{labels,datasets:[{label:'Avg Efficacy %',data,backgroundColor:colors,borderRadius:6}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{font:{size:11}}}
+      }
+    }
+  });
+}
+
+function _effRenderMonthChart(records){
+  const ctx = document.getElementById('eff-by-month-chart');
+  if(!ctx) return;
+  if(_effCharts.month){ _effCharts.month.destroy(); }
+  const withData = records.filter(r=>r.efficacyPct!==null);
+  if(!withData.length){ ctx.getContext('2d')?.clearRect(0,0,ctx.width,ctx.height); return; }
+  const byMonth = {};
+  withData.forEach(r=>{
+    const key = r.monthName+' '+r.year;
+    if(!byMonth[key]){byMonth[key]={sum:0,n:0,sortKey:r.year*12+r.month};}
+    byMonth[key].sum+=r.efficacyPct; byMonth[key].n++;
+  });
+  const sorted = Object.entries(byMonth).sort((a,b)=>a[1].sortKey-b[1].sortKey);
+  const labels = sorted.map(e=>e[0]);
+  const data   = sorted.map(e=>Math.round(e[1].sum/e[1].n));
+  _effCharts.month = new Chart(ctx, {
+    type:'line',
+    data:{labels,datasets:[{
+      label:'Avg Efficacy %',data,
+      borderColor:'#1C3829',backgroundColor:'rgba(28,56,41,0.08)',
+      borderWidth:2,pointRadius:5,pointBackgroundColor:data.map(v=>v>=90?'#27AE60':v>=80?'#5BA35A':v>=70?'#E67E22':'#E74C3C'),
+      tension:0.3,fill:true,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{font:{size:11}}}
+      }
+    }
+  });
+}
+
+async function loadEfficacyAdvice(){
+  const btn = document.getElementById('eff-advice-btn');
+  const body = document.getElementById('eff-advice-body');
+  if(!_requireHive('get efficacy advice')) return;
+  if(!await requireAIPlan()) return;
+  const records = _effFilteredRecords().filter(r=>r.efficacyPct!==null);
+  if(!records.length){
+    body.innerHTML='<em>No efficacy data available yet. Add mite counts before and after treatments, then recalculate.</em>';
+    return;
+  }
+  btn.disabled=true; btn.textContent='⏳ Analysing…';
+  body.innerHTML='<span class="spinner"></span> Analysing your efficacy data…';
+
+  // Build summary for AI
+  const byProd = {};
+  records.forEach(r=>{
+    if(!byProd[r.product]){byProd[r.product]={vals:[],seasons:{}};}
+    byProd[r.product].vals.push(r.efficacyPct);
+    if(!byProd[r.product].seasons[r.season]) byProd[r.product].seasons[r.season]=[];
+    byProd[r.product].seasons[r.season].push(r.efficacyPct);
+  });
+  const summary = Object.entries(byProd).map(([prod,d])=>{
+    const avg = Math.round(d.vals.reduce((a,b)=>a+b,0)/d.vals.length);
+    const seaStr = Object.entries(d.seasons).map(([s,v])=>s+':'+Math.round(v.reduce((a,b)=>a+b,0)/v.length)+'%').join(', ');
+    return prod+': avg '+avg+'% (n='+d.vals.length+', by season: '+seaStr+')';
+  }).join('\n');
+
+  const prompt = `You are an expert Varroa management advisor. A beekeeper has the following treatment efficacy data from their hives:\n${summary}\n\nPlease provide:\n1. **What's Working** — which products are most effective\n2. **Seasonal Patterns** — any month/season trends worth noting\n3. **Resistance Concerns** — flag any products with consistently low efficacy (<80%) that may indicate resistance\n4. **Top Recommendation** — one clear actionable suggestion\n\nKeep it under 200 words. Be specific about product names and percentages.`;
+
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/anthropic-proxy`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+      body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error?.message||'API error');
+    const text = data.content?.find(b=>b.type==='text')?.text||'No response.';
+    body.innerHTML = renderAIMarkdown(text);
+  }catch(e){
+    body.innerHTML='<em>Could not load advice: '+e.message+'</em>';
+  }
+  btn.disabled=false; btn.textContent='✨ Refresh Advice';
+}
+
+// ── CSS for scope buttons ─────────────────────────────────
+(function(){
+  const style = document.createElement('style');
+  style.textContent = `
+    .eff-scope-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:16px;font-size:12px;font-weight:600;color:var(--text2);background:white;cursor:pointer;transition:all 0.15s;}
+    .eff-scope-btn:hover{border-color:var(--forest);color:var(--forest);}
+    .eff-scope-btn.active{background:var(--forest);border-color:var(--forest);color:white;}
+    @media(max-width:600px){.eff-chart-row{grid-template-columns:1fr!important;}}
+  `;
+  document.head.appendChild(style);
+})();
+
+// ── Load when tab is activated ────────────────────────────
+const _origGotoScreen = gotoScreen;
+
 </script>
 
 <div id="chipInfoPopup" style="position:fixed;">
@@ -6534,5 +6898,67 @@ function hideChipInfo(){
     <button class="vmsp-chat-send" onclick="vmspSendChat()">➤</button>
   </div><!-- close vmsp-chat-input-row -->
 </div><!-- close vmsp-chat-panel -->
+
+<!-- ══ EFFICACY SCREEN ══ -->
+<div class="screen" id="screen-efficacy" style="display:none;">
+  <div class="page-body" style="max-width:900px;margin:0 auto;padding:20px 16px 120px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+      <div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--forest);margin:0 0 4px;">Treatment Efficacy</h1>
+        <p style="color:var(--text2);font-size:14px;margin:0;">How well are your treatments working? Pre vs post mite counts across all hives.</p>
+      </div>
+      <button onclick="calcAndSaveAllEfficacy()" style="background:var(--forest);color:white;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">🔄 Recalculate</button>
+    </div>
+
+    <!-- Scope selector -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;margin-top:12px;" id="efficacy-scope-bar">
+      <button class="eff-scope-btn active" data-scope="all" onclick="setEfficacyScope(this,'all')">🌏 All Apiaries</button>
+    </div>
+
+    <!-- Summary cards -->
+    <div id="efficacy-summary-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;"></div>
+
+    <!-- Chart row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;" class="eff-chart-row">
+      <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;">
+        <div style="font-weight:700;font-size:14px;color:var(--forest);margin-bottom:12px;">Efficacy by Product</div>
+        <canvas id="eff-by-product-chart" height="220"></canvas>
+      </div>
+      <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;">
+        <div style="font-weight:700;font-size:14px;color:var(--forest);margin-bottom:12px;">Efficacy by Month</div>
+        <canvas id="eff-by-month-chart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Efficacy table -->
+    <div style="background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:24px;">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-weight:700;font-size:14px;color:var(--forest);">All Treatment Records</div>
+        <div style="display:flex;gap:8px;">
+          <select id="eff-filter-product" onchange="renderEfficacyTab()" style="font-size:12px;border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--cream);">
+            <option value="">All Products</option>
+          </select>
+          <select id="eff-filter-season" onchange="renderEfficacyTab()" style="font-size:12px;border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--cream);">
+            <option value="">All Seasons</option>
+            <option value="Spring">Spring</option>
+            <option value="Summer">Summer</option>
+            <option value="Autumn">Autumn</option>
+            <option value="Winter">Winter</option>
+          </select>
+        </div>
+      </div>
+      <div id="efficacy-table" style="overflow-x:auto;"></div>
+    </div>
+
+    <!-- AI advice panel -->
+    <div style="background:linear-gradient(135deg,var(--forest),var(--forest-mid));border-radius:12px;padding:20px;color:white;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:16px;">🤖 AI Treatment Advice</div>
+        <button onclick="loadEfficacyAdvice()" id="eff-advice-btn" style="background:var(--amber);color:white;border:none;border-radius:16px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;">✨ Get Advice</button>
+      </div>
+      <div id="eff-advice-body" style="font-size:14px;line-height:1.7;opacity:0.9;">Click "Get Advice" for AI analysis of your efficacy data — which products work best, seasonal patterns, and resistance warnings.</div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
