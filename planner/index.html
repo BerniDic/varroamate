@@ -6676,14 +6676,17 @@ function renderEfficacyTab(){
     });
   }
 
-  // ── Product filter dropdown ───────────────────────────────
+  // ── Product filter dropdown — rebuild every render ──────────
   const prodSel = document.getElementById('eff-filter-product');
-  if(prodSel && prodSel.options.length === 1){
+  if(prodSel){
+    const savedProd = prodSel.value;
+    prodSel.innerHTML = '<option value="">All Products</option>';
     const prods = [...new Set(_effRecords.map(r=>r.product))].sort();
     prods.forEach(p=>{
       const o=document.createElement('option');o.value=p;o.textContent=p;
       prodSel.appendChild(o);
     });
+    if(savedProd) prodSel.value = savedProd;
   }
 
   // ── Summary cards ─────────────────────────────────────────
@@ -6881,7 +6884,14 @@ async function loadEfficacyAdvice(){
     .eff-scope-hive{font-size:11px;padding:4px 10px;border-color:rgba(28,56,41,0.2);}
     .eff-scope-hive.active{background:var(--forest-light);border-color:var(--forest-light);}
     #efficacy-scope-bar{display:flex;flex-direction:column;gap:8px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;}
-    @media(max-width:600px){.eff-chart-row{grid-template-columns:1fr!important;}}
+    @media(max-width:600px){
+      .eff-chart-row{grid-template-columns:1fr!important;}
+      #screen-efficacy .page-body{font-size:13px;}
+      #screen-efficacy h1{font-size:20px!important;}
+      #screen-efficacy .eff-scope-btn{font-size:11px;padding:4px 10px;}
+      #screen-efficacy table{font-size:12px;}
+      #screen-efficacy th,#screen-efficacy td{padding:7px 8px!important;}
+    }
   `;
   document.head.appendChild(style);
 })();
