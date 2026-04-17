@@ -3368,7 +3368,7 @@ Always use MoA from the plan summary — never infer from context.`;
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:CLAUDE_MODEL,
-        max_tokens:600,
+        max_tokens:900,
         messages:[{role:'user', content:prompt}]
       })
     });
@@ -3582,6 +3582,12 @@ function cancelSuggest(){
 async function suggestPlan(){
   if(!_requireHive('ask AI to suggest a plan')) return;
   if(!await requireAIPlan()) return;
+  // If manual plan already exists, ask user to clear first
+  const manualEvents = planEvents.filter(e => !e._aiSuggested);
+  if(manualEvents.length > 0){
+    if(!confirm('Your plan already has ' + manualEvents.length + ' treatment' + (manualEvents.length>1?'s':'') + ' added manually.\n\nThe AI Suggest feature works best on a clean slate.\n\nClear all treatments before generating an AI plan?')) return;
+    clearAllTreatments();
+  }
   _proposals = [];
   _suggestHistory = [];
   _suggestNextId = 1;
@@ -3722,7 +3728,7 @@ async function _callSuggestAPI(systemPrompt, btn){
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body: JSON.stringify({
         model:CLAUDE_MODEL,
-        max_tokens:900,
+        max_tokens:1600,
         system: systemPrompt,
         messages: _suggestHistory
       })
@@ -3809,7 +3815,7 @@ function _renderProposals(treatments, rationale, systemPrompt){
         <div class="proposal-name">${t.name}</div>
         <div class="proposal-season">${MONTHS[item.month]} ${item.year} · ${season}</div>
       </div>
-      <div class="proposal-body">${item.rationale||t.notes?.slice(0,120)+'…'}</div>
+      <div class="proposal-body">${renderAIMarkdown(item.rationale||t.notes?.slice(0,120)+'…')}</div>
       <div class="proposal-actions" id="proposal-actions-${id}">
         <button class="proposal-accept" onclick="acceptProposal(${id})">✓ Accept</button>
         <button class="proposal-reject" onclick="rejectProposal(${id})">✕ Reject — suggest alternative</button>
@@ -3828,7 +3834,7 @@ function _renderProposals(treatments, rationale, systemPrompt){
   if(rationale && !container.querySelector('.suggest-rationale')){
     const rat = document.createElement('div');
     rat.className = 'suggest-rationale';
-    rat.innerHTML = `<strong>Plan strategy:</strong> ${rationale}`;
+    rat.innerHTML = `<strong>Plan strategy:</strong> ${renderAIMarkdown(rationale)}`;
     container.insertBefore(rat, container.firstChild);
   }
   const rationaleBelow = document.getElementById('suggestRationaleBelow');
