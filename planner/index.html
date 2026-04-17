@@ -2062,6 +2062,7 @@ function _buildHistoryFromVM(treatments, miteCounts){
       row:     2,
       vmId:    t.id,
       hiveId:  t.hive_id,  // for per-hive filtering
+      exactDate: t.date,   // YYYY-MM-DD for efficacy calc
     });
   });
 
@@ -2080,6 +2081,7 @@ function _buildHistoryFromVM(treatments, miteCounts){
       row:    3,
       vmId:   c.id,
       hiveId: c.hive_id,   // for per-hive filtering
+      exactDate: c.date,   // YYYY-MM-DD for efficacy calc
     });
   });
 }
@@ -6545,16 +6547,22 @@ function calcAndSaveAllEfficacy(){
   const allTreatments = HISTORY.filter(e => e.type==='treatment' && !EFF_SKIP.has(e.treatId));
   for(const tx of allTreatments){
     const hiveId  = tx.hiveId;
-    const txDate  = new Date(tx.year, tx.month, 1);
+    const txDate  = new Date((tx.exactDate||tx.year+'-'+(String(tx.month+1).padStart(2,'0'))+'-01')+'T12:00:00');
     const dur     = TREATMENTS[tx.treatId]?.durationDays || 42;
     const txEnd   = new Date(txDate.getTime() + dur*24*60*60*1000);
     const hiveCounts = HISTORY
       .filter(e => e.type==='count' && e.hiveId===hiveId && e.count!=null)
-      .sort((a,b) => (a.year*12+a.month) - (b.year*12+b.month));
-    // pre = most recent count on or before txDate
-    const pre = [...hiveCounts].reverse().find(e => new Date(e.year,e.month,1) <= txDate);
-    // post = first count after txEnd
-    const post = hiveCounts.find(e => new Date(e.year,e.month,1) > txEnd);
+      .sort((a,b) => new Date(a.exactDate||a.year+'-'+(String(a.month+1).padStart(2,'0'))+'-01') - new Date(b.exactDate||b.year+'-'+(String(b.month+1).padStart(2,'0'))+'-01'));
+    // pre = most recent count on or before txDate (within 90 days)
+    const pre = [...hiveCounts].reverse().find(e => {
+      const d = new Date((e.exactDate||e.year+'-'+(String(e.month+1).padStart(2,'0'))+'-01')+'T12:00:00');
+      return d <= txDate && (txDate-d) <= 90*24*60*60*1000;
+    });
+    // post = first count after txEnd (within 90 days)
+    const post = hiveCounts.find(e => {
+      const d = new Date((e.exactDate||e.year+'-'+(String(e.month+1).padStart(2,'0'))+'-01')+'T12:00:00');
+      return d > txEnd && (d-txEnd) <= 90*24*60*60*1000;
+    });
     if(!pre || !post) continue;
     const pct = pre.count===0 ? null : Math.round(((pre.count-post.count)/pre.count)*100);
     const hive    = HIVES.find(h=>h.id===hiveId);
