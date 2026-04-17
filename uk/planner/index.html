@@ -6597,7 +6597,7 @@ async function _effSaveToSupabase(){
   try{
     const payload = {
       user_id: _sbUser.id,
-      key: 'treatment_efficacy_v1',
+      key: 'treatment_efficacy_uk_v1',
       value: JSON.stringify(_effRecords),
       updated_at: new Date().toISOString(),
     };
@@ -6606,22 +6606,8 @@ async function _effSaveToSupabase(){
 }
 
 async function _effLoadFromSupabase(){
-  if(!_sbUser) return;
-  try{
-    const {data} = await _sb.from('app_cache')
-      .select('value')
-      .eq('user_id', _sbUser.id)
-      .eq('key','treatment_efficacy_v1')
-      .single();
-    if(data?.value){
-      _effRecords = JSON.parse(data.value);
-      renderEfficacyTab();
-    } else {
-      calcAndSaveAllEfficacy();
-    }
-  }catch(e){
-    calcAndSaveAllEfficacy();
-  }
+  // Always recalculate from live HISTORY — cache is write-only backup
+  calcAndSaveAllEfficacy();
 }
 
 function setEfficacyScope(btn, scope){

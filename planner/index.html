@@ -6605,22 +6605,8 @@ async function _effSaveToSupabase(){
 }
 
 async function _effLoadFromSupabase(){
-  if(!_sbUser) return;
-  try{
-    const {data} = await _sb.from('app_cache')
-      .select('value')
-      .eq('user_id', _sbUser.id)
-      .eq('key','treatment_efficacy_v1')
-      .single();
-    if(data?.value){
-      _effRecords = JSON.parse(data.value);
-      renderEfficacyTab();
-    } else {
-      calcAndSaveAllEfficacy();
-    }
-  }catch(e){
-    calcAndSaveAllEfficacy();
-  }
+  // Always recalculate from live HISTORY — cache is write-only backup
+  calcAndSaveAllEfficacy();
 }
 
 function setEfficacyScope(btn, scope){
