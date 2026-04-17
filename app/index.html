@@ -2842,7 +2842,7 @@ function efficacyBadgeHtml(hid){
   const e = getHiveEfficacy(hid);
   if(!e) return '';
   const col = e.pct >= 90 ? '#27AE60' : e.pct >= 80 ? '#E67E22' : '#E74C3C';
-  const lbl = e.pct >= 90 ? '✓ Effective' : e.pct >= 80 ? '~ Moderate' : '⚠ Low';
+  const lbl = e.pct >= 90 ? '✓ Efficacy: Effective' : e.pct >= 80 ? '~ Efficacy: Moderate' : '⚠ Efficacy: Low';
   return `<span title="Treatment efficacy: ${e.pre}→${e.post} mites/300 (${e.product})" style="font-size:11px;padding:2px 7px;border-radius:10px;background:${col}22;color:${col};border:1px solid ${col}55;font-weight:600;">${lbl} ${e.pct}%</span>`;
 }
 function getHiveBadge(hid){
