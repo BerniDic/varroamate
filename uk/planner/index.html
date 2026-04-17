@@ -329,7 +329,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 .palette-head { padding: 10px 18px; display:flex; align-items:center; }
 .vmsp-chat-fab{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:var(--forest);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(28,56,41,0.35);z-index:400;border:none;transition:all 0.2s;}
 .vmsp-chat-fab:hover{background:var(--forest-mid);transform:scale(1.08);}
-.vmsp-chat-panel{position:fixed;bottom:calc(140px + env(safe-area-inset-bottom));right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border);z-index:401;display:none;flex-direction:column;max-height:440px;overflow:hidden;}
+.vmsp-chat-panel{position:fixed;bottom:calc(140px + env(safe-area-inset-bottom));right:22px;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.22);border:1px solid var(--border);z-index:401;display:none;flex-direction:column;max-height:min(440px, calc(100dvh - 160px));overflow:hidden;}
 .vmsp-chat-panel.open{display:flex;}
 .vmsp-chat-header{background:var(--forest);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-radius:18px 18px 0 0;flex-shrink:0;}
 .vmsp-chat-header-info{flex:1;}
