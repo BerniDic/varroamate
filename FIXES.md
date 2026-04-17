@@ -81,3 +81,6 @@ Uploads are for reference/inspection only.
 - Nectar flow windows: `× delete button` suppressed for `_itinLeg:true` windows
   - Condition `&& !win._itinLeg` added to delete rect draw block
   - Flow windows remain draggable but cannot be deleted
+
+- Chat assistant: input and send button were missing from vmsp-chat-input-row — restored directly in repo
+- Chat panel: overflow:hidden restored (was briefly set to visible during height debugging)
