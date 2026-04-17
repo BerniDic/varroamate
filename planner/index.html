@@ -1932,6 +1932,8 @@ async function loadVMData(){
     }
 
     _showVMSyncStatus('ok');
+    // Recalculate efficacy whenever fresh data loads
+    if(typeof calcAndSaveAllEfficacy === 'function') calcAndSaveAllEfficacy();
     if(currentScopeKey.startsWith('hive:')){
       loadPlan(currentScopeKey, currentPlanName);
     }
@@ -6293,7 +6295,7 @@ function gotoScreen(id) {
   _currentScreen = id;
   if(id === 'screen-planner')    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(typeof redraw==='function') redraw(); }));
   if(id === 'screen-efficacy'){
-    if(!_effRecords.length) _effLoadFromSupabase();
+    if(HISTORY.length) calcAndSaveAllEfficacy();
     else renderEfficacyTab();
   }
   if(id === 'screen-dayplanner') requestAnimationFrame(()=>requestAnimationFrame(()=>{
