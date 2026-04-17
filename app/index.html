@@ -2890,7 +2890,7 @@ function renderHives(){
         <div class="hive-name">${h.name} <span style="font-family:monospace;font-size:11px;color:var(--text3);font-weight:400;">${code}</span></div>
         <div class="hive-status">${lastC}</div>
         <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-          <span class="badge ${b.cls}">${b.label}</span>${efficacyBadgeHtml(h.id)}
+          <span class="badge ${b.cls}">${b.label}</span>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();speakHiveSummary(${h.id},this)">🔊 Summary</button>
           <button class="icon-btn" title="Edit hive" onclick="event.stopPropagation();editHive(${h.id})">✏️</button>
@@ -3083,7 +3083,7 @@ function renderHiveDetail(){
   document.getElementById('hive-status-card').innerHTML=`
     <div><strong>Latest count:</strong> <span style="color:${b.color};font-weight:700;">${b.num==='—'?'No data':b.num+' mites'}</span>${counts[0]?' ('+fmtDate(counts[0].date)+')':''}</div>
     <div><strong>Trend:</strong> ${trend}</div>
-    <div><strong>Last treated:</strong> ${lastT}</div>
+    <div><strong>Last treated:</strong> ${lastT} ${efficacyBadgeHtml(hive.id)}</div>
     <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>`;
   countsPage=0;treatmentsPage=0;notesPage=0;
   renderCountsList();renderTreatmentsList();renderNotesList();
