@@ -4148,7 +4148,7 @@ function drawTimeline(){
       [0.3,0.5,0.7].forEach(t=>{ ctx.beginPath(); ctx.arc(x2-2, uw_by+uw_bh*t, 1.2, 0, Math.PI*2); ctx.fill(); });
     }
 
-    if(bw > 22 && cx2 > PAD_L + 14){
+    if(bw > 22 && cx2 > PAD_L + 14 && !win._itinLeg){
       const bx = Math.min(cx2, PAD_L+TW) - 14, by2 = uw_by + 3;
       const bsz = 12;
       ctx.fillStyle = wt.color + 'CC';
