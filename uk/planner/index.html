@@ -6303,6 +6303,10 @@ function gotoScreen(id) {
   document.getElementById(id).classList.add('active');
   _currentScreen = id;
   if(id === 'screen-planner')    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(typeof redraw==='function') redraw(); }));
+  if(id === 'screen-efficacy'){
+    if(HISTORY.length) calcAndSaveAllEfficacy();
+    else renderEfficacyTab();
+  }
   if(id === 'screen-dayplanner') requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const today = new Date().toISOString().slice(0,10);
     ['drone-date','bb-date','dx-date'].forEach(id=>{ const el=document.getElementById(id); if(el&&!el.value) el.value=today; });
