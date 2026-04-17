@@ -6639,25 +6639,44 @@ function _effFilteredRecords(){
 function renderEfficacyTab(){
   const records = _effFilteredRecords();
 
-  // ── Scope buttons ─────────────────────────────────────────
+  // ── Scope selector — rebuild every render ────────────────
   const scopeBar = document.getElementById('efficacy-scope-bar');
-  if(scopeBar && scopeBar.children.length === 1){
+  if(scopeBar){
+    scopeBar.innerHTML = '';
+    // All apiaries button
+    const allBtn = document.createElement('button');
+    allBtn.className = 'eff-scope-btn' + (_effScope==='all'?' active':'');
+    allBtn.textContent = '🌏 All Apiaries';
+    allBtn.onclick = ()=>setEfficacyScope(allBtn,'all');
+    scopeBar.appendChild(allBtn);
+
+    // Apiary groups with hives indented
     APIARIES.forEach(ap => {
-      const btn = document.createElement('button');
-      btn.className = 'eff-scope-btn';
-      btn.dataset.scope = 'ap-'+ap.id;
-      btn.textContent = '🏡 '+ap.name;
-      btn.onclick = ()=>setEfficacyScope(btn,'ap-'+ap.id);
-      scopeBar.appendChild(btn);
+      // Apiary group header
+      const apDiv = document.createElement('div');
+      apDiv.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+
+      const apBtn = document.createElement('button');
+      apBtn.className = 'eff-scope-btn eff-scope-apiary' + (_effScope==='ap-'+ap.id?' active':'');
+      apBtn.textContent = '🏡 '+ap.name;
+      apBtn.onclick = ()=>setEfficacyScope(apBtn,'ap-'+ap.id);
+      apDiv.appendChild(apBtn);
+
+      // Hives indented under apiary
       const hivesInAp = HIVES.filter(h=>h.apiaryId===ap.id);
-      hivesInAp.forEach(hv => {
-        const hbtn = document.createElement('button');
-        hbtn.className = 'eff-scope-btn';
-        hbtn.dataset.scope = 'hv-'+hv.id;
-        hbtn.textContent = '🐝 '+hv.name;
-        hbtn.onclick = ()=>setEfficacyScope(hbtn,'hv-'+hv.id);
-        scopeBar.appendChild(hbtn);
-      });
+      if(hivesInAp.length){
+        const hiveRow = document.createElement('div');
+        hiveRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;padding-left:14px;';
+        hivesInAp.forEach(hv => {
+          const hbtn = document.createElement('button');
+          hbtn.className = 'eff-scope-btn eff-scope-hive' + (_effScope==='hv-'+hv.id?' active':'');
+          hbtn.textContent = '🐝 '+hv.name;
+          hbtn.onclick = ()=>setEfficacyScope(hbtn,'hv-'+hv.id);
+          hiveRow.appendChild(hbtn);
+        });
+        apDiv.appendChild(hiveRow);
+      }
+      scopeBar.appendChild(apDiv);
     });
   }
 
@@ -6860,9 +6879,13 @@ async function loadEfficacyAdvice(){
 (function(){
   const style = document.createElement('style');
   style.textContent = `
-    .eff-scope-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:16px;font-size:12px;font-weight:600;color:var(--text2);background:white;cursor:pointer;transition:all 0.15s;}
+    .eff-scope-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:16px;font-size:12px;font-weight:600;color:var(--text2);background:white;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
     .eff-scope-btn:hover{border-color:var(--forest);color:var(--forest);}
     .eff-scope-btn.active{background:var(--forest);border-color:var(--forest);color:white;}
+    .eff-scope-apiary{font-size:13px;}
+    .eff-scope-hive{font-size:11px;padding:4px 10px;border-color:rgba(28,56,41,0.2);}
+    .eff-scope-hive.active{background:var(--forest-light);border-color:var(--forest-light);}
+    #efficacy-scope-bar{display:flex;flex-direction:column;gap:8px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;}
     @media(max-width:600px){.eff-chart-row{grid-template-columns:1fr!important;}}
   `;
   document.head.appendChild(style);
