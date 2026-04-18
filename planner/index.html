@@ -6587,6 +6587,9 @@ function calcAndSaveAllEfficacy(){
       postCount:  post.count,
       efficacyPct: pct,
       noPost,
+      vmTreatId:  tx.vmId   ?? null,
+      preDate:    pre?.exactDate ?? null,
+      postDate:   post?.exactDate ?? null,
     });
   }
   // Render immediately — don't wait for or depend on save
@@ -6596,8 +6599,23 @@ function calcAndSaveAllEfficacy(){
 }
 
 async function _effSaveToSupabase(){
-  // No-op — efficacy is always recalculated from live HISTORY
-  // Future: save to treatment_efficacy table once created in Supabase
+  if(!_sbUser || !_effRecords.length) return;
+  try{
+    const rows = _effRecords.map(r => ({
+      user_id:      _sbUser.id,
+      hive_id:      r.hiveId,
+      treatment_id: r.vmTreatId || 0,
+      product:      r.treatId,
+      pre_count:    r.preCount  ?? null,
+      pre_date:     r.preDate   ?? null,
+      post_count:   r.postCount ?? null,
+      post_date:    r.postDate  ?? null,
+      efficacy_pct: r.efficacyPct ?? null,
+      calculated_at: new Date().toISOString(),
+    }));
+    await _sb.from('treatment_efficacy')
+      .upsert(rows, {onConflict:'user_id,treatment_id', ignoreDuplicates:false});
+  }catch(e){ console.warn('Efficacy save:', e); }
 }
 
 async function _effLoadFromSupabase(){
