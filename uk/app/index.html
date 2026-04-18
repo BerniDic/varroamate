@@ -2849,7 +2849,7 @@ function efficacyBadgeHtml(hid){
   const e = getHiveEfficacy(hid);
   if(!e) return '';
   if(e.noPost){
-    return '<span style="display:inline-block;white-space:nowrap;font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(150,150,150,0.1);color:#888;border:1px solid rgba(150,150,150,0.3);font-weight:600;" title="No mite count recorded within 14 days of treatment end">⊘ Efficacy: no post-count</span>';
+    return '<span style="display:inline-block;white-space:nowrap;font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(150,150,150,0.1);color:#888;border:1px solid rgba(150,150,150,0.3);font-weight:600;" title="No mite count recorded within 4 weeks of treatment end">⊘ Efficacy: no post-count</span>';
   }
   const col = e.pct >= 90 ? '#27AE60' : e.pct >= 80 ? '#E67E22' : '#E74C3C';
   const lbl = e.pct >= 90 ? '✓ Efficacy: Effective' : e.pct >= 80 ? '~ Efficacy: Moderate' : '⚠ Efficacy: Low';
