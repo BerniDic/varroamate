@@ -6540,7 +6540,7 @@ let _effCharts    = {};
 
 function _effGetSeason(month){ // 0-indexed — Southern Hemisphere
   if(month>=7&&month<=9) return 'Spring';   // Aug,Sep,Oct
-  if(month>=10||month<=0) return 'Summer';  // Nov,Dec,Jan
+  if(month>=10||month===11||month===0) return 'Summer'; // Nov,Dec,Jan
   if(month>=1&&month<=3) return 'Autumn';   // Feb,Mar,Apr
   return 'Winter'; // May,Jun,Jul
 }
@@ -6933,13 +6933,14 @@ async function loadEfficacyAdvice(){
     .eff-advice-body strong{color:rgba(255,255,255,0.95);}
     .eff-advice-body em{color:rgba(255,255,255,0.85);}
     .eff-advice-body ul{color:rgba(255,255,255,0.9);}
-    @media(max-width:600px){
-      .eff-chart-row{grid-template-columns:1fr!important;}
+    @media(max-width:768px){
       #screen-efficacy .page-body{font-size:13px;}
       #screen-efficacy h1{font-size:20px!important;}
       #screen-efficacy .eff-scope-btn{font-size:11px;padding:4px 10px;}
-      #screen-efficacy table{font-size:12px;}
-      #screen-efficacy th,#screen-efficacy td{padding:7px 8px!important;}
+      #screen-efficacy table{font-size:11px;min-width:480px;}
+      #screen-efficacy th,#screen-efficacy td{padding:6px 8px!important;white-space:nowrap;}
+      #efficacy-summary-cards>div{padding:10px 12px!important;}
+      #efficacy-summary-cards .eff-sum-val{font-size:22px!important;}
     }
   `;
   document.head.appendChild(style);
@@ -6977,8 +6978,8 @@ const _origGotoScreen = gotoScreen;
 </div><!-- close vmsp-chat-panel -->
 
 <!-- ══ EFFICACY SCREEN ══ -->
-<div class="screen" id="screen-efficacy">
-  <div class="page-body" style="max-width:900px;margin:0 auto;padding:20px 16px 120px;">
+<div class="screen" id="screen-efficacy" style="overflow-x:hidden;">
+  <div class="page-body" style="max-width:900px;margin:0 auto;padding:20px 12px 120px;box-sizing:border-box;overflow-x:hidden;width:100%;">
     <div style="margin-bottom:6px;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
         <div style="flex:1;min-width:0;">
@@ -6993,10 +6994,10 @@ const _origGotoScreen = gotoScreen;
     <div id="efficacy-scope-bar" style="margin-bottom:18px;margin-top:12px;"></div>
 
     <!-- Summary cards -->
-    <div id="efficacy-summary-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;"></div>
+    <div id="efficacy-summary-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;"></div>
 
     <!-- Chart row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;" class="eff-chart-row">
+    <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:24px;" class="eff-chart-row">
       <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;overflow:hidden;min-width:0;">
         <div style="font-weight:700;font-size:14px;color:var(--forest);margin-bottom:12px;">Efficacy by Product</div>
         <div style="position:relative;height:200px;width:100%;">
@@ -7012,9 +7013,9 @@ const _origGotoScreen = gotoScreen;
     </div>
 
     <!-- Efficacy table -->
-    <div style="background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:24px;">
-      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-weight:700;font-size:14px;color:var(--forest);">All Treatment Records</div>
+    <div style="background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:24px;width:100%;box-sizing:border-box;">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:13px;color:var(--forest);">All Treatment Records</div>
         <div style="display:flex;gap:8px;">
           <select id="eff-filter-product" onchange="renderEfficacyTab()" style="font-size:12px;border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--cream);">
             <option value="">All Products</option>
@@ -7028,7 +7029,7 @@ const _origGotoScreen = gotoScreen;
           </select>
         </div>
       </div>
-      <div id="efficacy-table" style="overflow-x:auto;"></div>
+      <div id="efficacy-table" style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;"></div>
     </div>
 
     <!-- AI advice panel -->
