@@ -2834,7 +2834,7 @@ function getHiveEfficacy(hid){
     return d <= tStart && (tStart-d) <= 90*24*60*60*1000;
   });
   // post = first count AFTER treatment end, within 14 days (AU: high reinfestation rate)
-  const POST_WINDOW = 14 * 24*60*60*1000;
+  const POST_WINDOW = 28 * 24*60*60*1000; // 4 weeks
   const post = counts.slice().reverse().find(c => {
     const d = new Date(c.date+'T12:00:00');
     return d > tEnd && (d-tEnd) <= POST_WINDOW;
