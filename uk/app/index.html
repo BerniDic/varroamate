@@ -2828,21 +2828,32 @@ function getHiveEfficacy(hid){
   const dur = TREATMENTS[t.product]?.durationDays || 42;
   const tStart = new Date(t.date + 'T12:00:00');
   const tEnd   = new Date(tStart.getTime() + dur * 24*60*60*1000);
-  // pre = most recent count ON or BEFORE treatment start
-  const pre = counts.find(c => new Date(c.date+'T12:00:00') <= tStart);
-  // post = oldest count AFTER treatment end
-  const postCounts = counts.filter(c => new Date(c.date+'T12:00:00') > tEnd);
-  const post = postCounts.length ? postCounts[postCounts.length-1] : null;
-  if(!pre || !post || pre.value === 0) return null;
+  // pre = most recent count ON or BEFORE treatment start (within 90 days)
+  const pre = counts.find(c => {
+    const d = new Date(c.date+'T12:00:00');
+    return d <= tStart && (tStart-d) <= 90*24*60*60*1000;
+  });
+  // post = first count AFTER treatment end, within 14 days (AU: high reinfestation rate)
+  const POST_WINDOW = 14 * 24*60*60*1000;
+  const post = counts.slice().reverse().find(c => {
+    const d = new Date(c.date+'T12:00:00');
+    return d > tEnd && (d-tEnd) <= POST_WINDOW;
+  });
+  if(!pre) return null;
+  if(!post) return {pct:null, pre:pre.value, post:null, product:TREATMENTS[t.product]?.name||t.product, noPost:true};
+  if(pre.value === 0) return null;
   const pct = Math.round(((pre.value - post.value) / pre.value) * 100);
   return {pct, pre:pre.value, post:post.value, product:TREATMENTS[t.product]?.name||t.product};
 }
 function efficacyBadgeHtml(hid){
   const e = getHiveEfficacy(hid);
   if(!e) return '';
+  if(e.noPost){
+    return '<span style="display:inline-block;white-space:nowrap;font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(150,150,150,0.1);color:#888;border:1px solid rgba(150,150,150,0.3);font-weight:600;" title="No mite count recorded within 14 days of treatment end">⊘ Efficacy: no post-count</span>';
+  }
   const col = e.pct >= 90 ? '#27AE60' : e.pct >= 80 ? '#E67E22' : '#E74C3C';
   const lbl = e.pct >= 90 ? '✓ Efficacy: Effective' : e.pct >= 80 ? '~ Efficacy: Moderate' : '⚠ Efficacy: Low';
-  return `<span title="Treatment efficacy: ${e.pre}→${e.post} mites/300 (${e.product})" style="font-size:11px;padding:2px 7px;border-radius:10px;background:${col}22;color:${col};border:1px solid ${col}55;font-weight:600;">${lbl} ${e.pct}%</span>`;
+  return `<span title="Efficacy: ${e.pre}→${e.post} mites/300 (${e.product})" style="display:inline-block;white-space:nowrap;font-size:11px;padding:2px 7px;border-radius:10px;background:${col}22;color:${col};border:1px solid ${col}55;font-weight:600;">${lbl} ${e.pct}%</span>`;
 }
 function getHiveBadge(hid){
   const c=miteCountsByHive[hid]||[];
@@ -3082,7 +3093,7 @@ function renderHiveDetail(){
   document.getElementById('hive-status-card').innerHTML=`
     <div><strong>Latest count:</strong> <span style="color:${b.color};font-weight:700;">${b.num==='—'?'No data':b.num+' mites'}</span>${counts[0]?' ('+fmtDate(counts[0].date)+')':''}</div>
     <div><strong>Trend:</strong> ${trend}</div>
-    <div><strong>Last treated:</strong> ${lastT} ${efficacyBadgeHtml(hive.id)}</div>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><strong>Last treated:</strong> <span>${lastT}</span> ${efficacyBadgeHtml(hive.id)}</div>
     <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>`;
   countsPage=0;treatmentsPage=0;notesPage=0;
   renderCountsList();renderTreatmentsList();renderNotesList();
