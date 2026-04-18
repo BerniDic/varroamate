@@ -6596,18 +6596,8 @@ function calcAndSaveAllEfficacy(){
 }
 
 async function _effSaveToSupabase(){
-  if(!_sbUser || !_effRecords.length) return;
-  // Upsert — we use hiveId+treatId+year+month as a natural key
-  // We store as JSON in a simple key-value cache row for now
-  try{
-    const payload = {
-      user_id: _sbUser.id,
-      key: 'treatment_efficacy_v1',
-      value: JSON.stringify(_effRecords),
-      updated_at: new Date().toISOString(),
-    };
-    await _sb.from('app_cache').upsert(payload, {onConflict:'user_id,key'});
-  }catch(e){ console.warn('Efficacy save:', e); }
+  // No-op — efficacy is always recalculated from live HISTORY
+  // Future: save to treatment_efficacy table once created in Supabase
 }
 
 async function _effLoadFromSupabase(){
