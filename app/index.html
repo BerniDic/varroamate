@@ -5403,7 +5403,7 @@ function restoreData(event){
         for(const harvest of (d.harvests||[])){
           const newHiveId = hiveIdMap[harvest.hive_id];
           if(!newHiveId) continue;
-          await _sb.from('harvests').insert({user_id:uid, hive_id:newHiveId, date:harvest.date, weight_kg:harvest.weight_kg, notes:harvest.notes||''});
+          await _sb.from('harvests').insert({user_id:uid, hive_id:newHiveId, date:harvest.date, kg:harvest.kg??harvest.weight_kg??0, system:harvest.system||null, label:harvest.label||null, supers:harvest.supers||null, notes:harvest.notes||''});
         }
         for(const inspection of (d.inspections||[])){
           const newHiveId = hiveIdMap[inspection.hive_id];
