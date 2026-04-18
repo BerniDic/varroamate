@@ -6589,9 +6589,10 @@ function calcAndSaveAllEfficacy(){
       noPost,
     });
   }
-  // Save to Supabase
-  _effSaveToSupabase();
+  // Render immediately — don't wait for or depend on save
   renderEfficacyTab();
+  // Save to Supabase in background (non-blocking)
+  _effSaveToSupabase().catch(e=>console.warn('Efficacy save failed:',e));
 }
 
 async function _effSaveToSupabase(){
