@@ -84,3 +84,31 @@ Uploads are for reference/inspection only.
 
 - Chat assistant: input and send button were missing from vmsp-chat-input-row — restored directly in repo
 - Chat panel: overflow:hidden restored (was briefly set to visible during height debugging)
+
+## 2026-04-18 Session
+
+### `app/index.html` + `uk/app/index.html`
+- Backup (v4): includes productivity data — harvests, inspections, queens, colony_losses
+- Restore: hiveIdMap tracks old→new hive IDs; restores all productivity tables
+- Harvest restore: correct field name `kg` (not `weight_kg`), includes system/label/supers
+- CSV export: fetches all data fresh from Supabase (not in-memory cache); includes all productivity data
+- CSV harvest: correct `kg` field with fallback chain; includes system/label/supers in notes
+- Efficacy badge: 28-day post-treatment window; `noPost` pill when no count within window; `white-space:nowrap` fix
+- Efficacy badge tooltip: updated to "4 weeks"
+- Treatment efficacy: `getHiveEfficacy` uses exact dates, 90-day pre window, 28-day post window
+
+### `planner/index.html` + `uk/planner/index.html`
+- Efficacy tab: added to both AU and UK planners
+- Efficacy tab: recalculates from live HISTORY after `loadVMData` completes
+- Efficacy tab: 28-day post-treatment window (matching app)
+- Efficacy tab: `noPost` records shown in table
+- Efficacy tab: mobile layout — stacked charts, overflow:hidden, table horizontal scroll
+- Efficacy tab: per-product line chart for "Efficacy by Month"
+- Efficacy tab: AI advice removes `_requireHive` gate
+- Efficacy tab: AI advice prompt emphasises MoA rotation and resistance prevention
+- Efficacy tab: season filter dropdowns wrap on mobile
+- MoA rotation score: includes last 12 months of treatment history
+- AI advice: full treatment history + MoA violation check injected into prompt
+- AU `_effGetSeason`: fixed Dec to show Summer (was Winter)
+- UK `_effGetSeason`: Northern Hemisphere seasons
+- Touch delete: `windowDeleteRects` checked in `touchstart` for mobile window deletion
