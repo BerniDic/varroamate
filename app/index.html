@@ -5500,12 +5500,15 @@ async function exportAllCSV(){
   // ── Productivity data ──
   for(const r of harvests){
     const ctx=_hiveCtx(r.hive_id);
-    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Harvest,${r.kg!=null?r.kg+'kg':''},${esc(r.notes)}\n`;
+    const harvestKg = r.kg ?? r.weight_kg ?? r.weight ?? r.yield_kg ?? r.honey_kg ?? null;
+    const harvestNotes=[r.notes,r.system?'System: '+r.system:null,r.label?'Label: '+r.label:null,r.supers?'Supers: '+r.supers:null].filter(Boolean).join('; ');
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Harvest,${harvestKg!=null?harvestKg+'kg':''},${esc(harvestNotes)}\n`;
   }
   for(const r of inspections){
     const ctx=_hiveCtx(r.hive_id);
-    const val=r.overall_health||r.temperament||'';
-    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Inspection,${esc(val)},${esc(r.notes)}\n`;
+    const val=[r.overall_health,r.temperament,r.queen_seen!=null?(r.queen_seen?'Queen seen':'No queen seen'):null].filter(Boolean).join('; ')||'';
+    const inspNotes=[r.notes,r.brood_pattern?'Brood: '+r.brood_pattern:null,r.honey_stores?'Honey: '+r.honey_stores:null].filter(Boolean).join('; ');
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date||r.created_at?.slice(0,10)||''},Inspection,${esc(val)},${esc(inspNotes)}\n`;
   }
   for(const r of queens){
     const ctx=_hiveCtx(r.hive_id);
