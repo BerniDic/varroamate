@@ -5449,10 +5449,40 @@ function restoreData(event){
             await _sb.from('notes').insert({user_id:uid,hive_id:hv.id,date:n.date,text:n.text});
         }
       }
+      // Restore productivity data if present (v4+ backups)
+      if(d.harvests?.length || d.inspections?.length || d.queens?.length || d.colonyLosses?.length){
+        showToast('Restoring productivity data…');
+        // Build hive id map: old id → new id (from the hive inserts above)
+        // We need to track old→new hive id mapping during restore
+        // hiveIdMap was built in the loop above
+        for(const harvest of (d.harvests||[])){
+          const newHiveId = hiveIdMap[harvest.hive_id];
+          if(!newHiveId) continue;
+          await _sb.from('harvests').insert({user_id:uid, hive_id:newHiveId, date:harvest.date, weight_kg:harvest.weight_kg, notes:harvest.notes||''});
+        }
+        for(const inspection of (d.inspections||[])){
+          const newHiveId = hiveIdMap[inspection.hive_id];
+          if(!newHiveId) continue;
+          const {hive_id, id, user_id, ...rest} = inspection;
+          await _sb.from('inspections').insert({user_id:uid, hive_id:newHiveId, ...rest});
+        }
+        for(const queen of (d.queens||[])){
+          const newHiveId = hiveIdMap[queen.hive_id];
+          if(!newHiveId) continue;
+          const {hive_id, id, user_id, ...rest} = queen;
+          await _sb.from('queens').insert({user_id:uid, hive_id:newHiveId, ...rest});
+        }
+        for(const loss of (d.colonyLosses||[])){
+          const newHiveId = hiveIdMap[loss.hive_id];
+          if(!newHiveId) continue;
+          const {hive_id, id, user_id, ...rest} = loss;
+          await _sb.from('colony_losses').insert({user_id:uid, hive_id:newHiveId, ...rest});
+        }
+      }
       await loadDataFromSupabase();
       currentApiaryId=apiaries[0]?.id??0;
       renderApiaries();
-      showToast('✅ Restored '+d.apiaries.length+' apiaries!');
+      showToast('✅ Restored '+d.apiaries.length+' apiaries + all productivity data!');
     }catch(err){showToast('Restore failed: '+err.message);}
     event.target.value='';
   };
