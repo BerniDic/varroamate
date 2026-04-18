@@ -2890,7 +2890,23 @@ function scorePlan(){
 
   const MOA_REPEAT_PENALTY   = {'Organic Acid':5, 'Essential Oil':12, 'Amitraz':25, 'Pyrethroid':25};
   const MOA_CONFLICT_PENALTY = {'Organic Acid':6, 'Essential Oil':10, 'Amitraz':18, 'Pyrethroid':18};
-  const chemSorted = scoringSorted.filter(e => TREATMENTS[e.treatId]?.moa !== 'Heat');
+
+  // Include recent treatment history (last 12 months) in rotation check
+  // so past MoA choices inform the rotation score for the current plan
+  const histTx = _filteredHistory()
+    .filter(e => e.type==='treatment')
+    .filter(e => {
+      const f = e.year*12+e.month;
+      return f >= todayFrac-12 && f < todayFrac; // last 12 months, not in future
+    })
+    .sort((a,b)=>(a.year*12+a.month)-(b.year*12+b.month))
+    .map(e=>({treatId:e.treatId, month:e.month, year:e.year, _fromHistory:true}));
+
+  // Combine history + scoring plan events, sorted chronologically
+  const chemSorted = [...histTx, ...scoringSorted]
+    .filter(e => TREATMENTS[e.treatId]?.moa !== 'Heat')
+    .sort((a,b)=>(a.year*12+a.month)-(b.year*12+b.month));
+
   let rotPenalty = 0;
   for(let i=1;i<chemSorted.length;i++){
     const prevMoA = TREATMENTS[chemSorted[i-1].treatId]?.moa;
