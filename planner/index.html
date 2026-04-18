@@ -6584,7 +6584,7 @@ function calcAndSaveAllEfficacy(){
       season:     _effGetSeason(txMonth),
       year:       tx.year,
       preCount:   pre.count,
-      postCount:  post.count,
+      postCount:  post?.count ?? null,
       efficacyPct: pct,
       noPost,
       vmTreatId:  tx.vmId   ?? null,
