@@ -5051,6 +5051,15 @@ canvas.addEventListener('touchstart', e=>{
   const t = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   const mx = t.clientX - rect.left, my = t.clientY - rect.top;
+  // Check delete rects first — if tapping ×, delete the window (not _itinLeg)
+  for(const dr of windowDeleteRects){
+    if(mx>=dr.x && mx<=dr.x+dr.w && my>=dr.y && my<=dr.y+dr.h){
+      e.preventDefault();
+      const idx = userWindows.findIndex(w=>w.id===dr.winId && !w._itinLeg);
+      if(idx !== -1){ userWindows.splice(idx,1); windowDeleteRects=[]; redraw(); autoSave(); }
+      return;
+    }
+  }
   const hit = hitTestWindows(mx, my, drawnData);
   if(!hit) return;
   e.preventDefault();
