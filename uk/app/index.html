@@ -5491,21 +5491,35 @@ function restoreData(event){
 
 async function exportAllCSV(){
   showToast('Preparing export… 🐝');
-  // Fetch productivity data
+  // Fetch ALL data fresh from Supabase to ensure completeness
   let harvests=[], inspections=[], queens=[], colonyLosses=[];
+  let allCounts=[], allTreatments=[], allNotes=[];
   if(_sbUser){
     const uid=_sbUser.id;
-    const [hvRes,inRes,qRes,clRes]=await Promise.all([
+    const [hvRes,inRes,qRes,clRes,cntRes,trtRes,noteRes]=await Promise.all([
       _sb.from('harvests').select('*').eq('user_id',uid),
       _sb.from('inspections').select('*').eq('user_id',uid),
       _sb.from('queens').select('*').eq('user_id',uid),
       _sb.from('colony_losses').select('*').eq('user_id',uid),
+      _sb.from('mite_counts').select('*').eq('user_id',uid).order('date',{ascending:true}),
+      _sb.from('treatments').select('*').eq('user_id',uid).order('date',{ascending:true}),
+      _sb.from('notes').select('*').eq('user_id',uid).order('date',{ascending:true}),
     ]);
     harvests     = hvRes.data  || [];
     inspections  = inRes.data  || [];
     queens       = qRes.data   || [];
     colonyLosses = clRes.data  || [];
+    allCounts    = cntRes.data || [];
+    allTreatments= trtRes.data || [];
+    allNotes     = noteRes.data|| [];
   }
+  // Build fresh lookup maps from Supabase data
+  const _allCountsByHive = {};
+  allCounts.forEach(c=>{ if(!_allCountsByHive[c.hive_id]) _allCountsByHive[c.hive_id]=[]; _allCountsByHive[c.hive_id].push(c); });
+  const _allTreatsByHive = {};
+  allTreatments.forEach(t=>{ if(!_allTreatsByHive[t.hive_id]) _allTreatsByHive[t.hive_id]=[]; _allTreatsByHive[t.hive_id].push(t); });
+  const _allNotesByHive = {};
+  allNotes.forEach(n=>{ if(!_allNotesByHive[n.hive_id]) _allNotesByHive[n.hive_id]=[]; _allNotesByHive[n.hive_id].push(n); });
   // Helper: get apiary+hive name from hive id
   function _hiveCtx(hiveId){
     for(const a of apiaries){
@@ -5523,9 +5537,9 @@ async function exportAllCSV(){
     const hvList=hives[a.id]||[];
     if(!hvList.length){ csv+=`${esc(a.name)},${esc(a.address)},,,,, \n`; continue; }
     for(const h of hvList){
-      const counts=miteCountsByHive[h.id]||[];
-      const trmts=treatmentsByHive[h.id]||[];
-      const notes=notesByHive[h.id]||[];
+      const counts=_allCountsByHive[h.id]||miteCountsByHive[h.id]||[];
+      const trmts=_allTreatsByHive[h.id]||treatmentsByHive[h.id]||[];
+      const notes=_allNotesByHive[h.id]||notesByHive[h.id]||[];
       if(!counts.length&&!trmts.length&&!notes.length){
         csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},,,, \n`; continue;
       }
@@ -5541,7 +5555,7 @@ async function exportAllCSV(){
   // ── Productivity data ──
   for(const r of harvests){
     const ctx=_hiveCtx(r.hive_id);
-    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Harvest,${r.weight_kg}kg,${esc(r.notes)}\n`;
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Harvest,${r.kg!=null?r.kg+'kg':''},${esc(r.notes)}\n`;
   }
   for(const r of inspections){
     const ctx=_hiveCtx(r.hive_id);
