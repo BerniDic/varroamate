@@ -3308,6 +3308,33 @@ async function getAIAdvice(){
       }).join('; ')
     : 'No treatments planned yet';
 
+  // Full treatment history for MoA rotation analysis
+  const allHistoryTx = _filteredHistory()
+    .filter(e => e.type==='treatment')
+    .sort((a,b) => (b.year*12+b.month)-(a.year*12+a.month));
+  const historyTxSummary = allHistoryTx.length
+    ? allHistoryTx.map(e=>{
+        const t=TREATMENTS[e.treatId]||{};
+        return `${t.name||e.label} (${MONTHS[e.month]} ${e.year}, MoA: ${t.moa||'unknown'})`;
+      }).join('; ')
+    : 'No treatment history recorded';
+
+  // Check for MoA rotation violations in history + plan combined
+  const allTxChronological = [
+    ...allHistoryTx.map(e=>({name:(TREATMENTS[e.treatId]||{}).name||e.label, moa:(TREATMENTS[e.treatId]||{}).moa||'unknown', month:e.month, year:e.year, source:'history'})),
+    ...planEvents.map(e=>({name:TREATMENTS[e.treatId]?.name, moa:TREATMENTS[e.treatId]?.moa, month:e.month, year:e.year, source:'planned'})),
+  ].sort((a,b)=>(a.year*12+a.month)-(b.year*12+b.month));
+  const moaViolations = [];
+  for(let i=1;i<allTxChronological.length;i++){
+    const prev=allTxChronological[i-1], curr=allTxChronological[i];
+    if(prev.moa && curr.moa && prev.moa===curr.moa && !prev.moa.includes('Organic Acid')){
+      moaViolations.push(`${curr.name} (${MONTHS[curr.month]} ${curr.year}) repeats same MoA as ${prev.name} (${MONTHS[prev.month]} ${prev.year}): ${curr.moa}`);
+    }
+  }
+  const moaViolationNote = moaViolations.length
+    ? `CRITICAL MoA ROTATION VIOLATIONS DETECTED (history + plan): ${moaViolations.join('; ')}. These MUST be flagged as resistance risks — high efficacy does NOT make repeated MoA safe.`
+    : 'No consecutive MoA repeats detected across history and plan.';
+
   const conflictNote = result?.conflictCount>0
     ? `IMPORTANT: ${result.conflictCount} chemical treatment(s) have overlapping duration bars with the same MoA — this is a resistance risk. Penalty severity depends on MoA: synthetics (pyrethroids, amitraz) carry the highest resistance risk and largest penalty; essential oils (thymol) are medium; organic acids (OA, formic) are lowest risk and carry a smaller penalty.`
     : 'No chemical MoA duration conflicts detected. Note: physical treatments (heat, Duplex-Framebox) carry no resistance risk and are excluded from MoA rotation scoring. Organic acid repetition (OA/formic) carries lower resistance risk than synthetic acaricide repetition.';
@@ -3358,6 +3385,10 @@ The beekeeper's treatment philosophy is: "${currentPref.name}" — ${currentPref
 
 Their planned treatments (with treatment durations): ${planSummary}
 
+FULL TREATMENT HISTORY (chronological, including past treatments): ${historyTxSummary}
+
+MoA ROTATION CHECK (history + plan combined): ${moaViolationNote}
+
 ${scoreHeadline}
 
 ${conflictNote}
@@ -3377,7 +3408,8 @@ Treatment classification (never mislabel):
 - Essential oils (NOT synthetic): Apiguard, ApiLife VAR
 - Synthetic acaricides ONLY: Apivar/Apitraz (amitraz), Bayvarol/Apistan (pyrethroids)
 - Heat: Varroa Controller heat, Duplex-Framebox. Mechanical: Drone Comb Removal, Brood Interruption
-Always use MoA from the plan summary — never infer from context.`;
+Always use MoA from the plan summary — never infer from context.
+CRITICAL RESISTANCE RULE: If the MoA ROTATION CHECK above shows any violations, you MUST flag these prominently in "What to Improve" regardless of the plan score. A high score does NOT override resistance concerns. Consecutive use of the same MoA — especially amitraz (Apivar/Apitraz) or pyrethroids (Bayvarol/Apistan) — is a serious resistance risk even when treatments are working well. Always recommend the next treatment use a DIFFERENT MoA group.`;
 
   try {
     const r = await fetch('https://yadptqjsjqxqjxouqkll.supabase.co/functions/v1/anthropic-proxy', {
