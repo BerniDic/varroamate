@@ -5434,30 +5434,74 @@ function restoreData(event){
   reader.readAsText(file);
 }
 
-function exportAllCSV(){
+async function exportAllCSV(){
+  showToast('Preparing export… 🐝');
+  // Fetch productivity data
+  let harvests=[], inspections=[], queens=[], colonyLosses=[];
+  if(_sbUser){
+    const uid=_sbUser.id;
+    const [hvRes,inRes,qRes,clRes]=await Promise.all([
+      _sb.from('harvests').select('*').eq('user_id',uid),
+      _sb.from('inspections').select('*').eq('user_id',uid),
+      _sb.from('queens').select('*').eq('user_id',uid),
+      _sb.from('colony_losses').select('*').eq('user_id',uid),
+    ]);
+    harvests     = hvRes.data  || [];
+    inspections  = inRes.data  || [];
+    queens       = qRes.data   || [];
+    colonyLosses = clRes.data  || [];
+  }
+  // Helper: get apiary+hive name from hive id
+  function _hiveCtx(hiveId){
+    for(const a of apiaries){
+      const h=(hives[a.id]||[]).find(h=>h.id===hiveId);
+      if(h) return {apiary:a.name, address:a.address||'', hive:h.name};
+    }
+    return {apiary:'Unknown',address:'',hive:'Unknown'};
+  }
+  const esc = v => `"${String(v||'').replace(/"/g,"'")}"`;
+
   let csv='Apiary,Apiary Address,Hive,Date,Type,Value / Product,Notes\n';
+
+  // ── VM data ──
   for(const a of apiaries){
     const hvList=hives[a.id]||[];
-    if(!hvList.length){
-      csv+=`"${a.name}","${a.address}",,,,, \n`;
-      continue;
-    }
+    if(!hvList.length){ csv+=`${esc(a.name)},${esc(a.address)},,,,, \n`; continue; }
     for(const h of hvList){
       const counts=miteCountsByHive[h.id]||[];
       const trmts=treatmentsByHive[h.id]||[];
       const notes=notesByHive[h.id]||[];
       if(!counts.length&&!trmts.length&&!notes.length){
-        csv+=`"${a.name}","${a.address}","${h.name}",,,, \n`;
-        continue;
+        csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},,,, \n`; continue;
       }
       for(const c of counts)
-        csv+=`"${a.name}","${a.address}","${h.name}",${c.date},Mite Count,${c.value},\n`;
+        csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${c.date},Mite Count,${c.value},\n`;
       for(const t of trmts)
-        csv+=`"${a.name}","${a.address}","${h.name}",${t.date},Treatment,"${TREATMENTS[t.product]?.name||t.product}","${(t.notes||'').replace(/"/g,"'")}"\n`;
+        csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${t.date},Treatment,${esc(TREATMENTS[t.product]?.name||t.product)},${esc(t.notes)}\n`;
       for(const n of notes)
-        csv+=`"${a.name}","${a.address}","${h.name}",${n.date},Note,,"${(n.text||'').replace(/"/g,"'")}"\n`;
+        csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${n.date},Note,,${esc(n.text)}\n`;
     }
   }
+
+  // ── Productivity data ──
+  for(const r of harvests){
+    const ctx=_hiveCtx(r.hive_id);
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Harvest,${r.weight_kg}kg,${esc(r.notes)}\n`;
+  }
+  for(const r of inspections){
+    const ctx=_hiveCtx(r.hive_id);
+    const val=r.overall_health||r.temperament||'';
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Inspection,${esc(val)},${esc(r.notes)}\n`;
+  }
+  for(const r of queens){
+    const ctx=_hiveCtx(r.hive_id);
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.introduced_date||r.created_at?.slice(0,10)||''},Queen,${esc(r.breed||r.status||'')},${esc(r.notes)}\n`;
+  }
+  for(const r of colonyLosses){
+    const ctx=_hiveCtx(r.hive_id);
+    csv+=`${esc(ctx.apiary)},${esc(ctx.address)},${esc(ctx.hive)},${r.date},Colony Loss,${esc(r.cause||'')},${esc(r.notes)}\n`;
+  }
+
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;
