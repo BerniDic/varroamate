@@ -6674,7 +6674,7 @@ function renderEfficacyTab(){
       const hivesInAp = HIVES.filter(h=>h.apiaryId===ap.id);
       if(hivesInAp.length){
         const hiveRow = document.createElement('div');
-        hiveRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;padding-left:14px;';
+        hiveRow.className = 'eff-scope-hive-row';
         hivesInAp.forEach(hv => {
           const hbtn = document.createElement('button');
           hbtn.className = 'eff-scope-btn eff-scope-hive' + (_effScope==='hv-'+hv.id?' active':'');
@@ -6917,7 +6917,9 @@ async function loadEfficacyAdvice(){
     .eff-scope-apiary{font-size:13px;}
     .eff-scope-hive{font-size:11px;padding:4px 10px;border-color:rgba(28,56,41,0.2);}
     .eff-scope-hive.active{background:var(--forest-light);border-color:var(--forest-light);}
-    #efficacy-scope-bar{display:flex;flex-direction:column;gap:8px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;}
+    #efficacy-scope-bar{display:flex;flex-direction:column;gap:8px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;overflow:hidden;}
+    .eff-scope-hive-row{display:flex;flex-wrap:wrap;gap:4px;padding-left:10px;}
+    .eff-scope-apiary{width:100%;text-align:left;border-radius:8px!important;}
     @media(max-width:600px){
       .eff-chart-row{grid-template-columns:1fr!important;}
       #screen-efficacy .page-body{font-size:13px;}
@@ -6964,33 +6966,33 @@ const _origGotoScreen = gotoScreen;
 <!-- ══ EFFICACY SCREEN ══ -->
 <div class="screen" id="screen-efficacy">
   <div class="page-body" style="max-width:900px;margin:0 auto;padding:20px 16px 120px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
-      <div>
-        <h1 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--forest);margin:0 0 4px;">Treatment Efficacy</h1>
-        <p style="color:var(--text2);font-size:14px;margin:0;">How well are your treatments working? Pre vs post mite counts across all hives.</p>
+    <div style="margin-bottom:6px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <h1 style="font-family:'Playfair Display',serif;font-size:22px;color:var(--forest);margin:0 0 4px;">Treatment Efficacy</h1>
+          <p style="color:var(--text2);font-size:13px;margin:0;line-height:1.4;">Pre vs post mite counts across all hives.</p>
+        </div>
+        <button onclick="calcAndSaveAllEfficacy()" style="flex-shrink:0;background:var(--forest);color:white;border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;">↺ Recalculate</button>
       </div>
-      <button onclick="calcAndSaveAllEfficacy()" style="background:var(--forest);color:white;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">🔄 Recalculate</button>
     </div>
 
     <!-- Scope selector -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;margin-top:12px;" id="efficacy-scope-bar">
-      <button class="eff-scope-btn active" data-scope="all" onclick="setEfficacyScope(this,'all')">🌏 All Apiaries</button>
-    </div>
+    <div id="efficacy-scope-bar" style="margin-bottom:18px;margin-top:12px;"></div>
 
     <!-- Summary cards -->
     <div id="efficacy-summary-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;"></div>
 
     <!-- Chart row -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;" class="eff-chart-row">
-      <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;">
+      <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;overflow:hidden;min-width:0;">
         <div style="font-weight:700;font-size:14px;color:var(--forest);margin-bottom:12px;">Efficacy by Product</div>
-        <div style="position:relative;height:220px;">
+        <div style="position:relative;height:200px;width:100%;">
           <canvas id="eff-by-product-chart"></canvas>
         </div>
       </div>
-      <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;">
+      <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;overflow:hidden;min-width:0;">
         <div style="font-weight:700;font-size:14px;color:var(--forest);margin-bottom:12px;">Efficacy by Month</div>
-        <div style="position:relative;height:220px;">
+        <div style="position:relative;height:200px;width:100%;">
           <canvas id="eff-by-month-chart"></canvas>
         </div>
       </div>
