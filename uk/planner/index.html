@@ -6565,13 +6565,15 @@ function calcAndSaveAllEfficacy(){
       const d = new Date((e.exactDate||e.year+'-'+(String(e.month+1).padStart(2,'0'))+'-01')+'T12:00:00');
       return d <= txDate && (txDate-d) <= 90*24*60*60*1000;
     });
-    // post = first count after txEnd (within 90 days)
+    // post = first count after txEnd (within 28 days — 4 week window)
+    const POST_WINDOW_MS = 28 * 24*60*60*1000;
     const post = hiveCounts.find(e => {
       const d = new Date((e.exactDate||e.year+'-'+(String(e.month+1).padStart(2,'0'))+'-01')+'T12:00:00');
-      return d > txEnd && (d-txEnd) <= 90*24*60*60*1000;
+      return d > txEnd && (d-txEnd) <= POST_WINDOW_MS;
     });
-    if(!pre || !post) continue;
-    const pct = pre.count===0 ? null : Math.round(((pre.count-post.count)/pre.count)*100);
+    if(!pre) continue;
+    const pct = (!post || pre.count===0) ? null : Math.round(((pre.count-post.count)/pre.count)*100);
+    const noPost = !post;
     const hive    = HIVES.find(h=>h.id===hiveId);
     const apiary  = APIARIES.find(a=>a.id===hive?.apiaryId);
     const txMonth = tx.month; // 0-indexed
@@ -6589,6 +6591,7 @@ function calcAndSaveAllEfficacy(){
       preCount:   pre.count,
       postCount:  post.count,
       efficacyPct: pct,
+      noPost,
     });
   }
   // Save to Supabase
