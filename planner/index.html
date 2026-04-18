@@ -6803,26 +6803,48 @@ function _effRenderMonthChart(records){
   if(_effCharts.month){ _effCharts.month.destroy(); }
   const withData = records.filter(r=>r.efficacyPct!==null);
   if(!withData.length){ ctx.getContext('2d')?.clearRect(0,0,ctx.width,ctx.height); return; }
-  const byMonth = {};
+
+  // Build sorted month labels across all records
+  const monthKeys = {};
   withData.forEach(r=>{
     const key = r.monthName+' '+r.year;
-    if(!byMonth[key]){byMonth[key]={sum:0,n:0,sortKey:r.year*12+r.month};}
-    byMonth[key].sum+=r.efficacyPct; byMonth[key].n++;
+    if(!monthKeys[key]) monthKeys[key] = r.year*12+r.month;
   });
-  const sorted = Object.entries(byMonth).sort((a,b)=>a[1].sortKey-b[1].sortKey);
-  const labels = sorted.map(e=>e[0]);
-  const data   = sorted.map(e=>Math.round(e[1].sum/e[1].n));
+  const sortedLabels = Object.entries(monthKeys).sort((a,b)=>a[1]-b[1]).map(e=>e[0]);
+
+  // One dataset per product
+  const products = [...new Set(withData.map(r=>r.product))].sort();
+  const PALETTE = ['#1C3829','#D4820A','#2980B9','#8E44AD','#E74C3C','#27AE60','#E67E22','#16A085'];
+  const datasets = products.map((prod,i)=>{
+    const col = PALETTE[i % PALETTE.length];
+    const data = sortedLabels.map(lbl=>{
+      const matches = withData.filter(r=>r.product===prod && r.monthName+' '+r.year===lbl);
+      if(!matches.length) return null;
+      return Math.round(matches.reduce((s,r)=>s+r.efficacyPct,0)/matches.length);
+    });
+    return {
+      label: prod,
+      data,
+      borderColor: col,
+      backgroundColor: col+'22',
+      borderWidth: 2,
+      pointRadius: 5,
+      pointBackgroundColor: data.map(v=>v===null?col:v>=90?'#27AE60':v>=80?'#5BA35A':v>=70?'#E67E22':'#E74C3C'),
+      tension: 0.3,
+      fill: false,
+      spanGaps: false,
+    };
+  });
+
   _effCharts.month = new Chart(ctx, {
     type:'line',
-    data:{labels,datasets:[{
-      label:'Avg Efficacy %',data,
-      borderColor:'#1C3829',backgroundColor:'rgba(28,56,41,0.08)',
-      borderWidth:2,pointRadius:5,pointBackgroundColor:data.map(v=>v>=90?'#27AE60':v>=80?'#5BA35A':v>=70?'#E67E22':'#E74C3C'),
-      tension:0.3,fill:true,
-    }]},
+    data:{labels:sortedLabels, datasets},
     options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true, position:'bottom', labels:{font:{size:11}, boxWidth:12, padding:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw!==null?c.raw+'%':'—')}}
+      },
       scales:{
         y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}},
         x:{ticks:{font:{size:11}}}
