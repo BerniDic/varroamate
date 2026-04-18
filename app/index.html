@@ -5333,11 +5333,29 @@ function exportCalendar(){
 }
 
 // ══ BACKUP / RESTORE ══
-function backupData(){
+async function backupData(){
   try{
+    showToast('Preparing backup… 🐝');
+    const uid = _sbUser?.id;
+    // Fetch productivity data from Supabase
+    let harvests=[], inspections=[], queens=[], colonyLosses=[];
+    if(uid){
+      const [hvRes,inRes,qRes,clRes] = await Promise.all([
+        _sb.from('harvests').select('*').eq('user_id',uid),
+        _sb.from('inspections').select('*').eq('user_id',uid),
+        _sb.from('queens').select('*').eq('user_id',uid),
+        _sb.from('colony_losses').select('*').eq('user_id',uid),
+      ]);
+      harvests     = hvRes.data  || [];
+      inspections  = inRes.data  || [];
+      queens       = qRes.data   || [];
+      colonyLosses = clRes.data  || [];
+    }
     const payload = {
-      v:3, exportedAt: new Date().toISOString(),
-      apiaries, hives, miteCountsByHive, treatmentsByHive, notesByHive
+      v:4, exportedAt: new Date().toISOString(),
+      apiaries, hives, miteCountsByHive, treatmentsByHive, notesByHive,
+      // Productivity data
+      harvests, inspections, queens, colonyLosses,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
