@@ -6534,11 +6534,11 @@ let _effRecords   = []; // computed efficacy records
 let _effScope     = 'all'; // 'all' | apiary id | hive id
 let _effCharts    = {};
 
-function _effGetSeason(month){ // 0-indexed
-  if(month>=7&&month<=9) return 'Spring';
-  if(month>=10||month<=0) return 'Summer'; // Nov,Dec,Jan
-  if(month>=1&&month<=3) return 'Autumn'; // Feb,Mar,Apr
-  return 'Winter'; // May,Jun,Jul
+function _effGetSeason(month){ // 0-indexed — Northern Hemisphere
+  if(month>=2&&month<=4) return 'Spring';   // Mar,Apr,May
+  if(month>=5&&month<=7) return 'Summer';   // Jun,Jul,Aug
+  if(month>=8&&month<=10) return 'Autumn';  // Sep,Oct,Nov
+  return 'Winter'; // Dec,Jan,Feb
 }
 
 function _effGrade(pct){
