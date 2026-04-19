@@ -1003,6 +1003,12 @@ html, body {
 }
 #ticker-close:hover{background:rgba(255,255,255,0.32);}
 
+#trial-banner{position:fixed;top:0;left:0;width:100%;z-index:201;background:linear-gradient(90deg,#7A3A00,#C17B2A,#7A3A00);padding:10px 48px 10px 16px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+#trial-banner .tb-text{color:white;font-size:13px;font-weight:500;line-height:1.4;text-align:center;}
+#trial-banner .tb-cta{background:white;color:#7A3A00;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;border:none;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0;font-family:'DM Sans',sans-serif;}
+#trial-banner .tb-cta:hover{background:#FFF3DC;}
+#trial-banner .tb-close{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.7);font-size:20px;cursor:pointer;padding:4px;line-height:1;}
+#trial-banner .tb-close:hover{color:white;}
 </style>
 </head>
 <body>
@@ -1019,6 +1025,27 @@ html, body {
 </div>
 
 <!-- ══ DID YOU KNOW BANNER ══ -->
+<div id="trial-banner" style="display:none;">
+  <div class="tb-text">✨ <strong>New — 7-Day Free Trial:</strong> Try VarroaMate AI free for 7 days. AI guidance, Smart Planner, Treatment Efficacy &amp; more. No credit card required.</div>
+  <a href="/uk/app/" class="tb-cta" onclick="dismissTrialBanner()">Start Free Trial →</a>
+  <button class="tb-close" onclick="dismissTrialBanner()" aria-label="Dismiss">×</button>
+</div>
+<script>
+(function(){
+  if(!localStorage.getItem('vm_trial_banner_dismissed')){
+    document.getElementById('trial-banner').style.display='flex';
+    var scene=document.getElementById('scene');
+    if(scene) scene.style.marginTop='44px';
+  }
+})();
+function dismissTrialBanner(){
+  localStorage.setItem('vm_trial_banner_dismissed','1');
+  var b=document.getElementById('trial-banner');
+  if(b) b.style.display='none';
+  var scene=document.getElementById('scene');
+  if(scene) scene.style.marginTop='0';
+}
+</script>
 <div id="scene">
   <!-- Sky -->
   <div id="sky" aria-hidden="true"></div>
@@ -1813,18 +1840,28 @@ const FRAME_CONTENT = {
   </ul>
 </div>
 
-<div style="border:2px solid #C8820A;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#FFFBF0;">
-  <div style="font-size:16px;font-weight:700;color:#3A2000;margin-bottom:2px;">🤖 Free + AI — £2.49/mo or £20.99/yr</div>
-  <div style="font-size:12px;color:#9A7030;margin-bottom:10px;">= £1.75/mo · save £8.89 annually</div>
-  <ul style="margin:0;padding-left:18px;font-size:13px;color:#4A3010;line-height:2;">
-    <li>Up to <strong>3 hives</strong></li>
-    <li>Everything in Free</li>
-    <li>AI guidance panels</li>
-    <li>AI chat assistant</li>
-    <li>Smart Planner (seasonal AI treatment planning)</li>
-    <li>Hive Hygiene AI analysis</li>
-    <li>Facebook community</li>
-  </ul>
+<div style="border:2px solid #C8820A;border-radius:10px;margin-bottom:12px;overflow:hidden;">
+  <div style="background:linear-gradient(90deg,#1C3829,#2D5440);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="background:#D4820A;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;">7 DAYS FREE</span>
+      <span style="color:rgba(255,255,255,0.9);font-size:12px;font-weight:600;">No credit card required</span>
+    </div>
+    <a href="/uk/app/" style="background:white;color:#1C3829;font-size:11px;font-weight:700;padding:4px 12px;border-radius:12px;text-decoration:none;white-space:nowrap;">Start Free Trial →</a>
+  </div>
+  <div style="padding:14px 16px;background:#FFFBF0;">
+    <div style="font-size:16px;font-weight:700;color:#3A2000;margin-bottom:2px;">🤖 Free + AI — £2.49/mo or £20.99/yr</div>
+    <div style="font-size:12px;color:#9A7030;margin-bottom:10px;">= £1.75/mo · save £8.89 annually</div>
+    <ul style="margin:0;padding-left:18px;font-size:13px;color:#4A3010;line-height:2;">
+      <li>Up to <strong>3 hives</strong></li>
+      <li>Everything in Free</li>
+      <li>AI guidance panels &amp; chat assistant</li>
+      <li>Smart Planner — seasonal AI treatment planning</li>
+      <li>Treatment Efficacy tracking &amp; AI analysis</li>
+      <li>Productivity Insights — harvests, queens, inspections</li>
+      <li>Hive Hygiene AI analysis</li>
+      <li>Facebook community</li>
+    </ul>
+  </div>
 </div>
 
 <div style="border:1.5px solid #E8D5A0;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#FFFDF5;">
