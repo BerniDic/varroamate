@@ -2239,7 +2239,8 @@ function toggleLib(id){
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
 const STRIPE_PRICES = {
-  free_ai:   { monthly: 'price_1THbQDBTHUgFRMZplmHLuXKM', annual: 'price_1THdiDBTHUgFRMZp6qJ81WLY' },
+  free_ai:        { monthly: 'price_1THbQDBTHUgFRMZplmHLuXKM', annual: 'price_1THdiDBTHUgFRMZp6qJ81WLY' },
+  free_ai_trial:  { monthly: 'price_1THbQDBTHUgFRMZplmHLuXKM', annual: 'price_1THdiDBTHUgFRMZp6qJ81WLY' },
   hobbyist:  { monthly: 'price_1THdjfBTHUgFRMZpx6hJVDAh', annual: 'price_1THdk8BTHUgFRMZpWAFaCdA7' },
   beekeeper: { monthly: 'price_1THdkdBTHUgFRMZpNEntFpEp', annual: 'price_1THdkzBTHUgFRMZpKp2bbiSI' },
 };
@@ -2282,7 +2283,7 @@ async function startCheckout(tier) {
         'Authorization': 'Bearer ' + session.access_token,
         'apikey': SUPABASE_ANON,
       },
-      body: JSON.stringify({ price_id: priceId }),
+      body: JSON.stringify({ price_id: priceId, trial: tier === 'free_ai_trial' }),
     });
     if (!res.ok) {
       const txt = await res.text();
