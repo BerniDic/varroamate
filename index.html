@@ -775,6 +775,30 @@ html, body {
 #popup-overlay.show { display: block; }
 
 /* ── Launch announcement banner ── */
+#trial-banner{
+  position:fixed;top:0;left:0;width:100%;z-index:201;
+  background:linear-gradient(90deg,#7A3A00,#C17B2A,#7A3A00);
+  padding:10px 48px 10px 16px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  flex-wrap:wrap;
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);
+}
+#trial-banner .tb-text{
+  color:white;font-size:13px;font-weight:500;line-height:1.4;text-align:center;
+}
+#trial-banner .tb-cta{
+  background:white;color:#7A3A00;font-size:12px;font-weight:700;
+  padding:5px 14px;border-radius:20px;border:none;cursor:pointer;
+  white-space:nowrap;text-decoration:none;flex-shrink:0;
+  font-family:'DM Sans',sans-serif;
+}
+#trial-banner .tb-cta:hover{background:#FFF3DC;}
+#trial-banner .tb-close{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,0.7);font-size:20px;
+  cursor:pointer;padding:4px;line-height:1;
+}
+#trial-banner .tb-close:hover{color:white;}
 /* ── Frame bar ── */
 #frame-bar {
   position: fixed;
@@ -1010,6 +1034,11 @@ html, body {
 
 
 <!-- ══ TICKER BAND ══ -->
+<div id="trial-banner" style="display:none;">
+  <div class="tb-text">✨ <strong>New — 7-Day Free Trial:</strong> Try VarroaMate AI free for 7 days. AI guidance, Smart Planner, Treatment Efficacy, Productivity Insights &amp; more. No credit card required.</div>
+  <a href="/app/#s-subscription" class="tb-cta" onclick="dismissTrialBanner()">Start Free Trial →</a>
+  <button class="tb-close" onclick="dismissTrialBanner()" aria-label="Dismiss">×</button>
+</div>
 <div id="ticker-band" style="background:linear-gradient(90deg,#1A5C2A,#2C7A3A);">
   <div id="ticker-track" style="animation-duration:100s;"
        onmouseenter="this.classList.add('paused')"
@@ -1019,6 +1048,23 @@ html, body {
   <button id="ticker-close" onclick="document.getElementById('ticker-band').style.display='none';document.getElementById('scene').style.paddingTop='0';" aria-label="Dismiss">×</button>
 </div>
 
+<script>
+(function(){
+  if(!localStorage.getItem('vm_trial_banner_dismissed')){
+    document.getElementById('trial-banner').style.display='flex';
+    // Stack on top of ticker — shift scene down
+    const scene = document.getElementById('scene');
+    if(scene) scene.style.marginTop = '44px';
+  }
+})();
+function dismissTrialBanner(){
+  localStorage.setItem('vm_trial_banner_dismissed','1');
+  const b = document.getElementById('trial-banner');
+  if(b) b.style.display='none';
+  const scene = document.getElementById('scene');
+  if(scene) scene.style.marginTop='0';
+}
+</script>
 <div id="scene">
   <!-- Sky -->
   <div id="sky" aria-hidden="true"></div>
