@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
       subscriptionData.trial_period_days = 7
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: any = {
       customer: customerId,
       line_items: [{ price: price_id, quantity: 1 }],
       mode: 'subscription',
@@ -111,7 +111,14 @@ Deno.serve(async (req) => {
       subscription_data: subscriptionData,
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
-    })
+    }
+
+    // No card required upfront for trials
+    if (trial) {
+      sessionParams.payment_method_collection = 'if_required'
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams)
 
     console.log('Session created:', session.id)
 
