@@ -776,7 +776,7 @@ html, body {
 
 /* ── Launch announcement banner ── */
 #trial-banner{
-  position:fixed;top:0;left:0;width:100%;z-index:201;
+  position:fixed;top:0;left:0;width:100%;z-index:10001;
   background:linear-gradient(90deg,#7A3A00,#C17B2A,#7A3A00);
   padding:10px 48px 10px 16px;
   display:flex;align-items:center;justify-content:center;gap:12px;
@@ -982,8 +982,8 @@ html, body {
 .legal-table td:first-child{white-space:nowrap;font-weight:600;width:140px;background:var(--bg2);}
 
 /* ── TICKER BAND ── */
-#ticker-band{top:0;transition:top 0.2s;
-  position:fixed;top:0;left:0;right:0;z-index:10000;
+#ticker-band{transition:top 0.2s;
+  position:fixed;top:0;left:0;right:0;z-index:200;
   height:38px;overflow:hidden;
   font-family:'DM Sans',sans-serif;font-size:13.5px;
   box-shadow:0 2px 10px rgba(0,0,0,0.25);
