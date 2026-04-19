@@ -113,10 +113,8 @@ Deno.serve(async (req) => {
       billing_address_collection: 'auto',
     }
 
-    // No card required upfront for trials
-    if (trial) {
-      sessionParams.payment_method_collection = 'if_required'
-    }
+    // Always collect card — charged after trial ends
+    // Stripe shows "free until [date], then $X/mo" at checkout
 
     const session = await stripe.checkout.sessions.create(sessionParams)
 
