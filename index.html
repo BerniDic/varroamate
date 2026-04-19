@@ -982,7 +982,7 @@ html, body {
 .legal-table td:first-child{white-space:nowrap;font-weight:600;width:140px;background:var(--bg2);}
 
 /* ── TICKER BAND ── */
-#ticker-band{
+#ticker-band{top:0;transition:top 0.2s;
   position:fixed;top:0;left:0;right:0;z-index:10000;
   height:38px;overflow:hidden;
   font-family:'DM Sans',sans-serif;font-size:13.5px;
@@ -1045,23 +1045,28 @@ html, body {
        onmouseleave="this.classList.remove('paused')">
     <span class="ticker-item red">🚨 <strong>AHBIC April 2026:</strong> Amitraz resistance confirmed in northern NSW (in addition to SE QLD). Use Smart Planner for MoA rotation. Measure mite counts before <em>and</em> after each treatment. <a href="https://honeybee.org.au/ahbic-biosecurity-update-resistant-varroa-mite-10-april-2026/" target="_blank" rel="noopener" style="color:#FFD0D0;text-decoration:underline;">Read the update →</a></span><span class="ticker-sep">·</span><span class="ticker-item green">🆕 <strong>New:</strong> Hives can now be moved between apiaries — QR codes and hive IDs stay put. Perfect for pollination runs and chasing honey flows. 🍯</span><span class="ticker-sep">·</span><span class="ticker-item green">💡 <strong>Did you know?</strong> You can use <strong>voice entry</strong> and <strong>QR codes</strong> to enter mite counts — and log entire hive inspections in the Productivity App — without typing a thing.</span><span class="ticker-sep">·</span><span class="ticker-item green">🧼 <strong>Did you know?</strong> The <strong>Hygiene App</strong> provides sanitation advice tailored to your toolset — so you clean what matters, the right way, every time.</span><span class="ticker-sep">·</span><span class="ticker-item green">📅 <strong>Did you know?</strong> The <strong>Smart Planner</strong> generates a seasonal Varroa treatment plan in seconds — with resistance rotation, timing windows, and a live plan score.</span><span class="ticker-sep">·</span><span class="ticker-item green">👑 <strong>Did you know?</strong> The <strong>Productivity App queen register</strong> tracks your queens over time and warns you when productivity is declining — before it becomes a problem.</span><span class="ticker-sep">·</span><span class="ticker-item green">⏰ <strong>Did you know?</strong> VarroaMate lets you generate <strong>calendar reminders</strong> — so you never forget to remove a treatment strip on time or miss your next alcohol wash.</span><span class="ticker-sep">·</span><span class="ticker-item green">📚 <strong>Did you know?</strong> The VarroaMate <strong>treatment library</strong> covers every registered treatment in depth — mode of action, bee safety, honey considerations, and resistance risks.</span><span class="ticker-sep">·</span><span class="ticker-item green">🗺️ <strong>Did you know?</strong> VarroaMate gives you <strong>up-to-date regulatory treatment information</strong> for every state and territory — so you always know what's permitted where you keep bees.</span><span class="ticker-sep">·</span><span class="ticker-item red">🚨 <strong>AHBIC April 2026:</strong> Amitraz resistance confirmed in northern NSW (in addition to SE QLD). Use Smart Planner for MoA rotation. Measure mite counts before <em>and</em> after each treatment. <a href="https://honeybee.org.au/ahbic-biosecurity-update-resistant-varroa-mite-10-april-2026/" target="_blank" rel="noopener" style="color:#FFD0D0;text-decoration:underline;">Read the update →</a></span><span class="ticker-sep">·</span><span class="ticker-item green">🆕 <strong>New:</strong> Hives can now be moved between apiaries — QR codes and hive IDs stay put. Perfect for pollination runs and chasing honey flows. 🍯</span><span class="ticker-sep">·</span><span class="ticker-item green">💡 <strong>Did you know?</strong> You can use <strong>voice entry</strong> and <strong>QR codes</strong> to enter mite counts — and log entire hive inspections in the Productivity App — without typing a thing.</span><span class="ticker-sep">·</span><span class="ticker-item green">🧼 <strong>Did you know?</strong> The <strong>Hygiene App</strong> provides sanitation advice tailored to your toolset — so you clean what matters, the right way, every time.</span><span class="ticker-sep">·</span><span class="ticker-item green">📅 <strong>Did you know?</strong> The <strong>Smart Planner</strong> generates a seasonal Varroa treatment plan in seconds — with resistance rotation, timing windows, and a live plan score.</span><span class="ticker-sep">·</span><span class="ticker-item green">👑 <strong>Did you know?</strong> The <strong>Productivity App queen register</strong> tracks your queens over time and warns you when productivity is declining — before it becomes a problem.</span><span class="ticker-sep">·</span><span class="ticker-item green">⏰ <strong>Did you know?</strong> VarroaMate lets you generate <strong>calendar reminders</strong> — so you never forget to remove a treatment strip on time or miss your next alcohol wash.</span><span class="ticker-sep">·</span><span class="ticker-item green">📚 <strong>Did you know?</strong> The VarroaMate <strong>treatment library</strong> covers every registered treatment in depth — mode of action, bee safety, honey considerations, and resistance risks.</span><span class="ticker-sep">·</span><span class="ticker-item green">🗺️ <strong>Did you know?</strong> VarroaMate gives you <strong>up-to-date regulatory treatment information</strong> for every state and territory — so you always know what's permitted where you keep bees.</span><span class="ticker-sep">·</span>
   </div>
-  <button id="ticker-close" onclick="document.getElementById('ticker-band').style.display='none';document.getElementById('scene').style.paddingTop='0';" aria-label="Dismiss">×</button>
+  <button id="ticker-close" onclick="document.getElementById('ticker-band').style.display='none';var s=document.getElementById('scene');if(s)s.style.marginTop=document.getElementById('trial-banner')?.style.display!=='none'?'44px':'0';" aria-label="Dismiss">×</button>
 </div>
 
 <script>
 (function(){
   if(!localStorage.getItem('vm_trial_banner_dismissed')){
-    document.getElementById('trial-banner').style.display='flex';
-    // Stack on top of ticker — shift scene down
-    const scene = document.getElementById('scene');
-    if(scene) scene.style.marginTop = '44px';
+    var tb=document.getElementById('trial-banner');
+    if(tb) tb.style.display='flex';
+    var ticker=document.getElementById('ticker-band');
+    if(ticker) ticker.style.top='44px';
+    var scene=document.getElementById('scene');
+    var tickerVisible = ticker && ticker.style.display!=='none';
+    if(scene) scene.style.marginTop = tickerVisible ? '80px' : '44px';
   }
 })();
 function dismissTrialBanner(){
   localStorage.setItem('vm_trial_banner_dismissed','1');
-  const b = document.getElementById('trial-banner');
+  var b=document.getElementById('trial-banner');
   if(b) b.style.display='none';
-  const scene = document.getElementById('scene');
+  var ticker=document.getElementById('ticker-band');
+  if(ticker) ticker.style.top='0';
+  var scene=document.getElementById('scene');
   if(scene) scene.style.marginTop='0';
 }
 </script>
