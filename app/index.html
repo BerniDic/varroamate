@@ -5215,7 +5215,6 @@ const entries=${JSON.stringify(entries)};
 const list=document.getElementById('entries-list');
 entries.forEach(({apiary,hive,count,hiveCount})=>{
   const diseases=Array.isArray(count.diseases)&&count.diseases.length?count.diseases:['No Disease Present'];
-  console.log('BeeMax entry:', hive.name, 'diseases:', JSON.stringify(diseases));
   const noDisease=diseases.length===1&&diseases[0]==='No Disease Present';
   const strength=count.hiveStrength||'Good';
   const strengthClass='strength-'+strength.toLowerCase();
