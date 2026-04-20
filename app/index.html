@@ -2200,6 +2200,33 @@ async function loadDataFromSupabase(){
     hvRes.data.forEach(h=>{if(!hives[h.apiary_id])hives[h.apiary_id]=[];hives[h.apiary_id].push({id:h.id,name:h.name});});
     miteCountsByHive={};
     cntRes.data.forEach(c=>{if(!miteCountsByHive[c.hive_id])miteCountsByHive[c.hive_id]=[];miteCountsByHive[c.hive_id].push({id:String(c.id),date:c.date,value:c.value,hiveStrength:c.hive_strength||'Good',diseases:c.diseases||['No Disease Present']});});
+    // Merge pest/disease observations from VMP inspections — most recent source wins per hive
+    try {
+      const {data:_inspDx} = await _sb.from('inspections')
+        .select('hive_id,date,diseases')
+        .eq('user_id', uid)
+        .not('diseases','is',null);
+      if(Array.isArray(_inspDx)){
+        for(const ins of _inspDx){
+          if(!ins || !ins.hive_id || !ins.date) continue;
+          if(!Array.isArray(ins.diseases) || !ins.diseases.length) continue;
+          if(ins.diseases.length===1 && ins.diseases[0]==='No Disease Present') continue;
+          if(!miteCountsByHive[ins.hive_id]) miteCountsByHive[ins.hive_id]=[];
+          miteCountsByHive[ins.hive_id].push({
+            id:'insp_'+(ins.id||ins.date),
+            date: ins.date,
+            value: null,
+            hiveStrength: null,
+            diseases: ins.diseases,
+            _fromInspection: true
+          });
+        }
+        // Re-sort each hive's entries by date desc so counts[0] is the most recent of either source
+        for(const hid in miteCountsByHive){
+          miteCountsByHive[hid].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+        }
+      }
+    } catch(e){ console.warn('inspection disease merge failed', e); }
     treatmentsByHive={};
     trtRes.data.forEach(t=>{if(!treatmentsByHive[t.hive_id])treatmentsByHive[t.hive_id]=[];treatmentsByHive[t.hive_id].push({id:String(t.id),date:t.date,product:t.product,notes:t.notes||''});});
     notesByHive={};
@@ -2628,7 +2655,7 @@ function restorePrefSelection(){
 // ══ APIARY STATUS ══
 function getApiaryStatus(aid){
   const hvList=hives[aid]||[];let maxV=-1,noCount=false;
-  for(const h of hvList){const c=miteCountsByHive[h.id]||[];if(!c.length)noCount=true;else maxV=Math.max(maxV,c[0].value);}
+  for(const h of hvList){const c=(miteCountsByHive[h.id]||[]).filter(x=>!x._fromInspection);if(!c.length)noCount=true;else maxV=Math.max(maxV,c[0].value);}
   if(maxV>=6)return{dot:'dot-red',label:'High infestation alert',color:'var(--red)'};
   if(noCount)return{dot:'dot-yellow',label:'Mite count overdue',color:'var(--yellow)'};
   return{dot:'dot-blue',label:'Managed — continue monitoring',color:'var(--blue)'};
@@ -3152,12 +3179,13 @@ function renderHiveDetail(){
   document.getElementById('hive-detail-chips').innerHTML=`<div class="info-chip">🏡 ${ap?.name||''}</div><div class="info-chip"><span class="badge ${b.cls}">${b.label}</span></div><div class="info-chip">Last: <strong style="margin-left:4px;">${b.num==='—'?'No data':b.num+' mites'}</strong></div>`;
   document.getElementById('chart-label').textContent=`${hive.name} · Alcohol wash (~300 bees)`;
   const counts=miteCountsByHive[hive.id]||[];
+  const _mv=counts.filter(c=>!c._fromInspection);
   const treatments=treatmentsByHive[hive.id]||[];
   let trend='—';
-  if(counts[0]&&counts[1])trend=counts[0].value>counts[1].value?`<span style="color:var(--red);">↑ Increasing</span>`:counts[0].value<counts[1].value?`<span style="color:var(--green);">↓ Decreasing</span>`:`<span style="color:var(--text3);">→ Stable</span>`;
+  if(_mv[0]&&_mv[1])trend=_mv[0].value>_mv[1].value?`<span style="color:var(--red);">↑ Increasing</span>`:_mv[0].value<_mv[1].value?`<span style="color:var(--green);">↓ Decreasing</span>`:`<span style="color:var(--text3);">→ Stable</span>`;
   const lastT=treatments[0]?`${(TREATMENTS[treatments[0].product]?.name||treatments[0].product).split('(')[0].trim()} (${fmtDate(treatments[0].date)})`:'None recorded';
   document.getElementById('hive-status-card').innerHTML=`
-    <div><strong>Latest count:</strong> <span style="color:${b.color};font-weight:700;">${b.num==='—'?'No data':b.num+' mites'}</span>${counts[0]?' ('+fmtDate(counts[0].date)+')':''}</div>
+    <div><strong>Latest count:</strong> <span style="color:${b.color};font-weight:700;">${b.num==='—'?'No data':b.num+' mites'}</span>${_mv[0]?' ('+fmtDate(_mv[0].date)+')':''}</div>
     <div><strong>Trend:</strong> ${trend}</div>
     <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><strong>Last treated:</strong> <span>${lastT}</span> ${efficacyBadgeHtml(hive.id)}</div>
     <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>`;
@@ -3173,7 +3201,7 @@ function changePage(type,delta){
   if(type==='notes'){notesPage=Math.max(0,notesPage+delta);renderNotesList();}
 }
 function renderCountsList(){
-  const all=miteCountsByHive[currentHiveId]||[];
+  const all=(miteCountsByHive[currentHiveId]||[]).filter(c=>!c._fromInspection);
   const el=document.getElementById('counts-list');el.innerHTML='';
   if(!all.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);">No mite counts yet. Tap + Add.</div>';document.getElementById('counts-page-label').textContent='';return;}
   const page=all.slice(countsPage*PAGE_SIZE,(countsPage+1)*PAGE_SIZE);
@@ -3664,7 +3692,9 @@ async function loadGuidance(){
 
   const month=new Date().getMonth(); // 0=Jan
   const season=month<=1||month===11?'Summer':month<=4?'Autumn':month<=7?'Winter':'Spring';
-  const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:counts[0]?.value??'none',countDate:counts[0]?fmtDate(counts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:counts.slice(0,5).map(c=>c.value),state:state||'Australia (state unknown)',varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
+  const _mvCounts=counts.filter(c=>!c._fromInspection);
+  const _recentObs=counts.filter(c=>Array.isArray(c.diseases)&&c.diseases.length&&!(c.diseases.length===1&&c.diseases[0]==='No Disease Present')).slice(0,5).map(c=>({date:fmtDate(c.date),diseases:c.diseases,source:c._fromInspection?'inspection':'mite count'}));
+  const hd={hive:hive?.name,apiary:ap?.address,lat:ap?.lat,lon:ap?.lon,latestCount:_mvCounts[0]?.value??'none',countDate:_mvCounts[0]?fmtDate(_mvCounts[0].date):'none',lastTreatment:lastT,previousTreatment:prevT,preferenceProfile:pref,season:`${season} (Southern Hemisphere)`,recentCounts:_mvCounts.slice(0,5).map(c=>c.value),recentDiseaseObservations:_recentObs,state:state||'Australia (state unknown)',varroaDetectedInState:varroaPresent,stateAuthorityNote:sd?`Report positive detections via ${sd.reportingSystem}. Authority: ${sd.authority}.`:'Check your state authority for reporting requirements.'};
   const pyrethreidWarning=state==='NSW'||state==='ACT'?'IMPORTANT (April 2026 update): Pyrethroid resistance (L925I) AND amitraz resistance are now both confirmed in northern NSW populations. The same populations previously confirmed for pyrethroid resistance are also confirmed for amitraz resistance. Pyrethroid and amitraz resistance is also confirmed in south-east QLD. If recommending Bayvarol, Apistan, Apivar, or Apitraz in NSW or QLD, include a strong caution: these treatments may be ineffective in affected areas. Recommend a post-treatment alcohol wash at day 14–21 to confirm efficacy, and advise the beekeeper to contact NSW DPIRD if poor knock-down is observed. For beekeepers NOT in confirmed resistance zones, treatments should remain effective — but MoA rotation is essential. NSW DPIRD advises the geographical spread appears currently limited.':'';
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
   const sections=[
@@ -5288,7 +5318,7 @@ function speakSection(sectionId){
 
 function speakHiveSummary(hiveId, btn){
   const hive = Object.values(hives).flat().find(h=>h.id===hiveId);
-  const counts = miteCountsByHive[hiveId] || [];
+  const counts = (miteCountsByHive[hiveId] || []).filter(c=>!c._fromInspection);
   const treatments = treatmentsByHive[hiveId] || [];
   const ap = apiaries.find(a=>(hives[a.id]||[]).some(h=>h.id===hiveId));
   const apName = ap ? ap.name : 'unknown apiary';
