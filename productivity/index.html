@@ -1795,26 +1795,6 @@ body::before{
       <textarea class="form-textarea" id="iNotes" placeholder="Observations, actions taken, anything unusual…" rows="3"></textarea>
     </div>
 
-    <!-- ── Disease / Pest Observations (always visible) ── -->
-    <div class="form-row" style="margin-top:12px;">
-      <label class="form-label">Disease / Pest Observations <span style="font-size:10px;color:var(--text3);">— syncs to VarroaMate &amp; BeeMAX</span></label>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="iDiseaseBtnsMain">
-        <button type="button" class="disease-toggle-btn active-none" data-disease="No Disease Present" onclick="toggleInspDiseaseMain(this)">✅ No Disease</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Varroa"              onclick="toggleInspDiseaseMain(this)">🕷 Varroa</button>
-        <button type="button" class="disease-toggle-btn notifiable" data-disease="American foulbrood" onclick="toggleInspDiseaseMain(this)">⚠️ AFB</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Chalkbrood"          onclick="toggleInspDiseaseMain(this)">🍄 Chalkbrood</button>
-        <button type="button" class="disease-toggle-btn notifiable" data-disease="European foulbrood" onclick="toggleInspDiseaseMain(this)">⚠️ EFB</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Nosema"              onclick="toggleInspDiseaseMain(this)">🦠 Nosema</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Small hive beetle"   onclick="toggleInspDiseaseMain(this)">🪲 SHB</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Wax moth"            onclick="toggleInspDiseaseMain(this)">🦋 Wax moth</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Braula fly"          onclick="toggleInspDiseaseMain(this)">🪰 Braula fly</button>
-        <button type="button" class="disease-toggle-btn" data-disease="Sacbrood"            onclick="toggleInspDiseaseMain(this)">🔴 Sacbrood</button>
-      </div>
-      <div id="iNotifiableWarningMain" class="notifiable-warning" style="display:none;margin-top:6px;">
-        ⚠️ <strong>Notifiable disease selected.</strong> AFB and EFB must be reported to your state authority immediately.
-      </div>
-    </div>
-
     <!-- ── Mite count (optional — writes to VM's mite_counts table) ── -->
     <div style="margin-top:14px;padding:12px 14px;background:var(--wax-pale);border:1.5px solid var(--border);border-radius:var(--radius-sm);">
       <div style="font-size:12px;font-weight:700;color:var(--timber);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
@@ -2906,10 +2886,6 @@ function renderInspections(){
           mitePillHtml = `<span class="mite-pill ${cls}">🔬 ${v}/300${src}</span>`;
         }
 
-        // Disease pills
-        const diseasePillsHtml = (Array.isArray(i.diseases) && i.diseases.length && !i.diseases.includes('No Disease Present'))
-          ? i.diseases.map(d=>`<span style="display:inline-flex;align-items:center;font-size:11px;padding:2px 7px;border-radius:8px;background:rgba(180,60,40,0.1);color:#B03020;border:1px solid rgba(180,60,40,0.3);font-weight:600;margin-top:2px;">${d}</span>`).join('')
-          : '';
         // Source badge for the inspection itself
         const srcBadge = i.source==='vmp'
           ? '<span class="source-badge" style="margin-left:4px;">VMP</span>' : '';
@@ -2925,7 +2901,7 @@ function renderInspections(){
               <span style="font-size:10px;color:var(--text3);">tap to edit</span>
             </div>
           </div>
-          <div class="insp-ratings">${pills}${mitePillHtml}${diseasePillsHtml}</div>
+          <div class="insp-ratings">${pills}${mitePillHtml}</div>
           ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
         </div>`;
       });
@@ -4172,8 +4148,6 @@ let _voiceTranscript = '';
 function openInspModal(editId=null, preselectedHiveId=null){
   _editingInspId = editId;
   document.getElementById('inspModalTitle').textContent = editId ? '🔍 Edit Inspection' : '🔍 Inspection';
-  // Reset main disease buttons
-  restoreInspDiseaseMain(['No Disease Present']);
   document.getElementById('iDate').value = new Date().toISOString().slice(0,10);
   document.getElementById('iNotes').value = '';
   document.getElementById('iHiveLabel').textContent = '';
@@ -4189,7 +4163,6 @@ function openInspModal(editId=null, preselectedHiveId=null){
       document.getElementById('iHive').value = i.hive_id;
       document.getElementById('iDate').value = i.date||'';
       document.getElementById('iNotes').value = i.notes||'';
-      if(i.diseases) restoreInspDiseaseMain(i.diseases);
       if(i.queen)   preSelectRating('iQueenGroup',    i.queen);
       if(i.brood)   preSelectRating('iBroodGroup',    i.brood);
       if(i.stores)  preSelectRating('iStoresGroup',   i.stores);
@@ -4270,7 +4243,6 @@ async function saveInspection(){
     swarm:   getRating('iSwarmGroup'),
     strength:getRating('iStrengthGroup'),
     notes:   document.getElementById('iNotes').value||null,
-    diseases: getInspDiseasesMain(),
     source:  'vmp',
   };
 
@@ -4303,7 +4275,7 @@ async function saveInspection(){
           date,
           value:        miteCount,
           hive_strength: getRating('iMiteStrengthGroup') || 'Good',
-          diseases:     getInspDiseasesMain(), // use main disease selector
+          diseases:     getInspDiseases(),
           notes:        document.getElementById('iMiteNotes').value || null,
           method:       'alcohol_wash',
           source:       'vmp',
@@ -4373,53 +4345,6 @@ function onMiteMethodChange(){
   const method = document.getElementById('iMiteMethod')?.value;
   const hint   = document.getElementById('miteMethodHint');
   if(hint) hint.style.display = (method && method !== 'alcohol_wash') ? 'block' : 'none';
-}
-
-function getInspDiseasesMain(){
-  const btns = document.querySelectorAll('#iDiseaseBtnsMain .disease-toggle-btn');
-  // active = disease selected; active-none = "No Disease Present" selected
-  const selected = [...btns].filter(b=>b.classList.contains('active') && !b.classList.contains('active-none')).map(b=>b.dataset.disease);
-  return selected.length ? selected : ['No Disease Present'];
-}
-function toggleInspDiseaseMain(btn){
-  const disease = btn.dataset.disease;
-  const container = document.getElementById('iDiseaseBtnsMain');
-  const allBtns = container.querySelectorAll('.disease-toggle-btn');
-  if(disease === 'No Disease Present'){
-    allBtns.forEach(b=>{ b.classList.remove('active'); b.classList.remove('active-none'); });
-    btn.classList.add('active-none');
-  } else {
-    const noneBtn = container.querySelector('[data-disease="No Disease Present"]');
-    if(noneBtn){ noneBtn.classList.remove('active'); noneBtn.classList.remove('active-none'); }
-    btn.classList.toggle('active');
-    if(![...allBtns].some(b=>b.classList.contains('active')&&!b.classList.contains('active-none'))){
-      if(noneBtn) noneBtn.classList.add('active-none');
-    }
-  }
-  // Show notifiable warning
-  const hasNotifiable = [...allBtns].filter(b=>b.classList.contains('active')&&b.classList.contains('notifiable')).length > 0;
-  const warn = document.getElementById('iNotifiableWarningMain');
-  if(warn) warn.style.display = hasNotifiable ? '' : 'none';
-  // Sync to mite count disease buttons if visible
-  const diseases = getInspDiseasesMain();
-  restoreInspDiseases('iDiseaseBtns', diseases);
-}
-function restoreInspDiseaseMain(diseases){
-  const list = Array.isArray(diseases)&&diseases.length ? diseases : ['No Disease Present'];
-  const container = document.getElementById('iDiseaseBtnsMain');
-  if(!container) return;
-  container.querySelectorAll('.disease-toggle-btn').forEach(b=>{
-    const isNoDisease = b.dataset.disease === 'No Disease Present';
-    const isSelected = list.includes(b.dataset.disease);
-    b.classList.remove('active', 'active-none');
-    if(isSelected){
-      if(isNoDisease) b.classList.add('active-none');
-      else b.classList.add('active');
-    }
-  });
-  const hasNotifiable = list.some(d=>d==='American foulbrood'||d==='European foulbrood');
-  const warn = document.getElementById('iNotifiableWarningMain');
-  if(warn) warn.style.display = hasNotifiable ? '' : 'none';
 }
 
 function toggleInspDisease(btn){
