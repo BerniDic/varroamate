@@ -4377,7 +4377,8 @@ function onMiteMethodChange(){
 
 function getInspDiseasesMain(){
   const btns = document.querySelectorAll('#iDiseaseBtnsMain .disease-toggle-btn');
-  const selected = [...btns].filter(b=>b.classList.contains('active')).map(b=>b.dataset.disease);
+  // active = disease selected; active-none = "No Disease Present" selected
+  const selected = [...btns].filter(b=>b.classList.contains('active') && !b.classList.contains('active-none')).map(b=>b.dataset.disease);
   return selected.length ? selected : ['No Disease Present'];
 }
 function toggleInspDiseaseMain(btn){
@@ -4385,13 +4386,14 @@ function toggleInspDiseaseMain(btn){
   const container = document.getElementById('iDiseaseBtnsMain');
   const allBtns = container.querySelectorAll('.disease-toggle-btn');
   if(disease === 'No Disease Present'){
-    allBtns.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
+    allBtns.forEach(b=>{ b.classList.remove('active'); b.classList.remove('active-none'); });
+    btn.classList.add('active-none');
   } else {
-    container.querySelector('[data-disease="No Disease Present"]')?.classList.remove('active');
+    const noneBtn = container.querySelector('[data-disease="No Disease Present"]');
+    if(noneBtn){ noneBtn.classList.remove('active'); noneBtn.classList.remove('active-none'); }
     btn.classList.toggle('active');
-    if(![...allBtns].some(b=>b.classList.contains('active'))){
-      container.querySelector('[data-disease="No Disease Present"]')?.classList.add('active');
+    if(![...allBtns].some(b=>b.classList.contains('active')&&!b.classList.contains('active-none'))){
+      if(noneBtn) noneBtn.classList.add('active-none');
     }
   }
   // Show notifiable warning
@@ -4407,7 +4409,13 @@ function restoreInspDiseaseMain(diseases){
   const container = document.getElementById('iDiseaseBtnsMain');
   if(!container) return;
   container.querySelectorAll('.disease-toggle-btn').forEach(b=>{
-    b.classList.toggle('active', list.includes(b.dataset.disease));
+    const isNoDisease = b.dataset.disease === 'No Disease Present';
+    const isSelected = list.includes(b.dataset.disease);
+    b.classList.remove('active', 'active-none');
+    if(isSelected){
+      if(isNoDisease) b.classList.add('active-none');
+      else b.classList.add('active');
+    }
   });
   const hasNotifiable = list.some(d=>d==='American foulbrood'||d==='European foulbrood');
   const warn = document.getElementById('iNotifiableWarningMain');
