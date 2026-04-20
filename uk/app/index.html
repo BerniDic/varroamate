@@ -3155,11 +3155,21 @@ function renderHiveDetail(){
   let trend='—';
   if(counts[0]&&counts[1])trend=counts[0].value>counts[1].value?`<span style="color:var(--red);">↑ Increasing</span>`:counts[0].value<counts[1].value?`<span style="color:var(--green);">↓ Decreasing</span>`:`<span style="color:var(--text3);">→ Stable</span>`;
   const lastT=treatments[0]?`${(TREATMENTS[treatments[0].product]?.name||treatments[0].product).split('(')[0].trim()} (${fmtDate(treatments[0].date)})`:'None recorded';
+  // Build disease pills from most recent count
+  const latestDiseases = counts[0]?.diseases || ['No Disease Present'];
+  const noDisease = latestDiseases.length===1 && latestDiseases[0]==='No Disease Present';
+  const diseasePillsHtml = noDisease ? '' : latestDiseases.map(d=>{
+    const isNotifiable = d==='American foulbrood'||d==='European foulbrood';
+    const col = isNotifiable ? '#C0392B' : '#6A5020';
+    const bg  = isNotifiable ? 'rgba(192,57,43,0.1)' : 'rgba(106,80,32,0.1)';
+    return `<span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;background:${bg};color:${col};border:1px solid ${col}40;font-weight:600;">${isNotifiable?'⚠️ ':''}${d}</span>`;
+  }).join('');
   document.getElementById('hive-status-card').innerHTML=`
     <div><strong>Latest count:</strong> <span style="color:${b.color};font-weight:700;">${b.num==='—'?'No data':b.num+' mites'}</span>${counts[0]?' ('+fmtDate(counts[0].date)+')':''}</div>
     <div><strong>Trend:</strong> ${trend}</div>
     <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><strong>Last treated:</strong> <span>${lastT}</span> ${efficacyBadgeHtml(hive.id)}</div>
-    <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>`;
+    <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>
+    ${diseasePillsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${diseasePillsHtml}</div>` : ''}`;
   countsPage=0;treatmentsPage=0;notesPage=0;
   renderCountsList();renderTreatmentsList();renderNotesList();
   // initChart is called by goto() after the screen is visible — do not call it here
