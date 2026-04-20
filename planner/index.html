@@ -770,6 +770,7 @@ canvas.drop-blocked{cursor:not-allowed;}
             <button onclick="promptNewPlan()" title="New plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--border);background:var(--cream);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;" id="psbNewPlan">+ New</button>
             <button onclick="promptRenamePlan()" title="Rename plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--border);background:var(--cream);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;" id="psbRenamePlan">✏ Rename</button>
             <button onclick="promptDeletePlan()" title="Delete plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid rgba(184,92,56,0.3);background:rgba(184,92,56,0.06);color:var(--rust);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;" id="psbDeletePlan">🗑</button>
+            <button onclick="forceSyncPlansToCloud()" title="Sync plans to cloud" style="padding:4px 9px;border-radius:5px;border:1.5px solid rgba(28,56,41,0.3);background:rgba(28,56,41,0.06);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;" id="psbSync">☁️ Sync</button>
           </div>
           <span class="plan-sel-name" id="planSelName"></span>
           <span class="plan-sel-badge new" id="planSelBadge" style="display:none;">new plan</span>
@@ -2150,6 +2151,15 @@ function _rebuildSelectorDropdowns(){
   }
 
   _rebuildPlanDropdown(currentScopeKey);
+}
+
+async function forceSyncPlansToCloud(){
+  if(!_sbUser){ alert('Please sign in first.'); return; }
+  localStorage.removeItem('vmsp_migrated_v1'); // clear flag to allow re-run
+  await _migrateLocalPlansToSupabase();
+  // Also sync current plan immediately
+  await _sbSavePlan(currentScopeKey, currentPlanName);
+  alert('Plans synced to cloud! \n\nOpen the planner on your other device and select the same hive to see your plans.');
 }
 
 async function _migrateLocalPlansToSupabase(){
