@@ -2609,6 +2609,8 @@ function selectPlanScope(key){
   _rebuildPlanDropdown(key);
   _updatePlanSelName();
   updateAll();
+  // Sync plan list from Supabase — updates dropdown with plans from other devices
+  if(key && key.startsWith('hive:')) _sbSyncPlanList(key);
 }
 
 function _initPlanSelector(){
