@@ -1937,6 +1937,7 @@ async function loadVMData(){
     if(typeof calcAndSaveAllEfficacy === 'function') calcAndSaveAllEfficacy();
     if(currentScopeKey.startsWith('hive:')){
       loadPlan(currentScopeKey, currentPlanName);
+  _sbSyncPlanList(currentScopeKey);
     }
     updateAll();
 
@@ -2149,6 +2150,19 @@ function _rebuildSelectorDropdowns(){
   _rebuildPlanDropdown(currentScopeKey);
 }
 
+async function _sbSyncPlanList(scopeKey){
+  // Merge Supabase plan names into local plan list
+  if(!_sbUser) return;
+  const sbNames = await _sbLoadAllPlanNames(scopeKey);
+  if(!sbNames.length) return;
+  const local = _getPlanList(scopeKey);
+  const merged = [...new Set([...local, ...sbNames])];
+  if(merged.length !== local.length){
+    _setPlanList(scopeKey, merged);
+    _rebuildSelectorDropdowns();
+  }
+}
+
 function _rebuildPlanDropdown(scopeKey){
   const pSel   = document.getElementById('psbPlan');
   const pNew   = document.getElementById('psbNewPlan');
@@ -2327,6 +2341,7 @@ function renamePlan(scopeKey, oldName, newName){
   const data = localStorage.getItem(_planStorageKey(scopeKey, oldName));
   if(data) localStorage.setItem(_planStorageKey(scopeKey, newName), data);
   localStorage.removeItem(_planStorageKey(scopeKey, oldName));
+  _sbRenamePlan(scopeKey, oldName, newName);
 }
 function deletePlan(scopeKey, name){
   let list = getPlanList(scopeKey);
@@ -2334,6 +2349,7 @@ function deletePlan(scopeKey, name){
   if(!list.length) list = ['Plan 1'];
   _savePlanList(scopeKey, list);
   localStorage.removeItem(_planStorageKey(scopeKey, name));
+  _sbDeletePlan(scopeKey, name);
   return list[0];
 }
 
@@ -2349,6 +2365,7 @@ function savePlan(scopeKey, planName){
 }
 
 function loadPlan(scopeKey, planName){
+  // Try localStorage first for instant display, then sync from Supabase in background
   try {
     const raw = localStorage.getItem(_planStorageKey(scopeKey, planName || currentPlanName));
     if(raw){
@@ -2357,18 +2374,116 @@ function loadPlan(scopeKey, planName){
       userWindows  = data.userWindowsData || DEFAULT_WINDOWS();
       nextId       = data.nextId       || (planEvents.length ? Math.max(...planEvents.map(e=>e.id))+1 : 1);
       _winNextId   = data.winNextId    || 7;
-      return true;
+    } else {
+      planEvents  = [];
+      userWindows = DEFAULT_WINDOWS();
+      nextId      = 1;
+      _winNextId  = 7;
     }
-  } catch(e){}
-  planEvents  = [];
-  userWindows = DEFAULT_WINDOWS();
-  nextId      = 1;
-  _winNextId  = 7;
-  return false;
+  } catch(e){
+    planEvents  = [];
+    userWindows = DEFAULT_WINDOWS();
+    nextId      = 1;
+    _winNextId  = 7;
+  }
+  // Load from Supabase in background — overrides local if found
+  _sbLoadPlan(scopeKey, planName).then(found=>{
+    if(found){ redraw(); renderPlanList(); renderRating(); }
+  });
+  return planEvents.length > 0;
 }
 
 function hasSavedPlan(scopeKey, planName){
   return !!localStorage.getItem(_planStorageKey(scopeKey, planName || currentPlanName));
+}
+
+// ── SUPABASE PLAN SYNC ──────────────────────────────────────
+let _planSyncTimer = null;
+let _planSyncBusy  = false;
+
+async function _sbSavePlan(scopeKey, planName){
+  if(!_sbUser) return;
+  const data = {
+    planEvents, userWindowsData: userWindows,
+    nextId, winNextId: _winNextId, savedAt: Date.now(),
+  };
+  try {
+    await _sb.from('treatment_plans').upsert({
+      user_id:   _sbUser.id,
+      scope_key: scopeKey,
+      plan_name: planName || currentPlanName,
+      plan_data: data,
+      updated_at: new Date().toISOString(),
+    }, {onConflict:'user_id,scope_key,plan_name'});
+  } catch(e){ console.warn('Plan save failed:', e); }
+}
+
+async function _sbLoadPlan(scopeKey, planName){
+  if(!_sbUser) return false;
+  try {
+    const {data} = await _sb.from('treatment_plans')
+      .select('plan_data')
+      .eq('user_id',   _sbUser.id)
+      .eq('scope_key', scopeKey)
+      .eq('plan_name', planName || currentPlanName)
+      .single();
+    if(data?.plan_data){
+      const d = data.plan_data;
+      planEvents  = d.planEvents  || [];
+      userWindows = d.userWindowsData || DEFAULT_WINDOWS();
+      nextId      = d.nextId      || (planEvents.length ? Math.max(...planEvents.map(e=>e.id))+1 : 1);
+      _winNextId  = d.winNextId   || 7;
+      // Also update localStorage cache
+      try { localStorage.setItem(_planStorageKey(scopeKey, planName || currentPlanName), JSON.stringify(d)); } catch(e){}
+      return true;
+    }
+  } catch(e){ console.warn('Plan load failed:', e); }
+  return false;
+}
+
+async function _sbLoadAllPlanNames(scopeKey){
+  if(!_sbUser) return [];
+  try {
+    const {data} = await _sb.from('treatment_plans')
+      .select('plan_name, updated_at')
+      .eq('user_id',   _sbUser.id)
+      .eq('scope_key', scopeKey)
+      .order('updated_at', {ascending:false});
+    return (data||[]).map(r=>r.plan_name);
+  } catch(e){ return []; }
+}
+
+async function _sbDeletePlan(scopeKey, planName){
+  if(!_sbUser) return;
+  try {
+    await _sb.from('treatment_plans')
+      .delete()
+      .eq('user_id',   _sbUser.id)
+      .eq('scope_key', scopeKey)
+      .eq('plan_name', planName);
+  } catch(e){ console.warn('Plan delete failed:', e); }
+}
+
+async function _sbRenamePlan(scopeKey, oldName, newName){
+  if(!_sbUser) return;
+  try {
+    // Load old, save as new, delete old
+    const {data} = await _sb.from('treatment_plans')
+      .select('plan_data')
+      .eq('user_id',   _sbUser.id)
+      .eq('scope_key', scopeKey)
+      .eq('plan_name', oldName)
+      .single();
+    if(data?.plan_data){
+      await _sb.from('treatment_plans').upsert({
+        user_id: _sbUser.id, scope_key: scopeKey,
+        plan_name: newName, plan_data: data.plan_data,
+        updated_at: new Date().toISOString(),
+      }, {onConflict:'user_id,scope_key,plan_name'});
+      await _sb.from('treatment_plans').delete()
+        .eq('user_id', _sbUser.id).eq('scope_key', scopeKey).eq('plan_name', oldName);
+    }
+  } catch(e){ console.warn('Plan rename failed:', e); }
 }
 
 function autoSave(){
@@ -2817,6 +2932,9 @@ function clearPlan(){
   _resetAdvicePanel();
   updateAll();
   savePlan(currentScopeKey, currentPlanName);
+  // Debounced Supabase sync
+  if(_planSyncTimer) clearTimeout(_planSyncTimer);
+  _planSyncTimer = setTimeout(()=>{ _sbSavePlan(currentScopeKey, currentPlanName); }, 2500);
 }
 
 const DIMS = [
