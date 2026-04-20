@@ -2906,6 +2906,10 @@ function renderInspections(){
           mitePillHtml = `<span class="mite-pill ${cls}">🔬 ${v}/300${src}</span>`;
         }
 
+        // Disease pills
+        const diseasePillsHtml = (Array.isArray(i.diseases) && i.diseases.length && !i.diseases.includes('No Disease Present'))
+          ? i.diseases.map(d=>`<span style="display:inline-flex;align-items:center;font-size:11px;padding:2px 7px;border-radius:8px;background:rgba(180,60,40,0.1);color:#B03020;border:1px solid rgba(180,60,40,0.3);font-weight:600;margin-top:2px;">${d}</span>`).join('')
+          : '';
         // Source badge for the inspection itself
         const srcBadge = i.source==='vmp'
           ? '<span class="source-badge" style="margin-left:4px;">VMP</span>' : '';
@@ -2921,7 +2925,7 @@ function renderInspections(){
               <span style="font-size:10px;color:var(--text3);">tap to edit</span>
             </div>
           </div>
-          <div class="insp-ratings">${pills}${mitePillHtml}</div>
+          <div class="insp-ratings">${pills}${mitePillHtml}${diseasePillsHtml}</div>
           ${i.notes?`<div class="insp-notes">${i.notes}</div>`:''}
         </div>`;
       });

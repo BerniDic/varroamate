@@ -5113,6 +5113,15 @@ async function exportBeeMAX(){
   await loadDataFromSupabase();
   // Build set of current hive IDs to strictly filter out any orphaned data
   const currentHiveIds=new Set(Object.values(hives).flat().map(h=>h.id));
+  // Fetch inspections to supplement disease data for BeeMax
+  let _inspForBeemax = [];
+  try {
+    const {data:inspData} = await _sb.from('inspections')
+      .select('hive_id,date,diseases')
+      .eq('user_id', _sbUser.id)
+      .not('diseases', 'is', null);
+    _inspForBeemax = inspData || [];
+  } catch(e){}
   // Collect mite count entries — strictly from current apiaries and hives only
   const entries=[];
   for(const a of apiaries){
@@ -5123,6 +5132,15 @@ async function exportBeeMAX(){
       if(!counts.length) continue;
       // Only the most recent count per hive
       const latest=counts.sort((a,b)=>b.date.localeCompare(a.date))[0];
+      // Supplement diseases from linked inspection if mite count has none
+      if(!latest.diseases || latest.diseases.includes('No Disease Present')){
+        const linkedInsp = _inspForBeemax.find(insp=>
+          String(insp.hive_id)===String(h.id) && insp.date===latest.date
+        );
+        if(linkedInsp?.diseases && !linkedInsp.diseases.includes('No Disease Present')){
+          latest.diseases = linkedInsp.diseases;
+        }
+      }
       entries.push({apiary:a,hive:h,count:latest,hiveCount});
     }
   }
