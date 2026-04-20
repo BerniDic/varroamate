@@ -5132,12 +5132,17 @@ async function exportBeeMAX(){
       if(!counts.length) continue;
       // Only the most recent count per hive
       const latest=counts.sort((a,b)=>b.date.localeCompare(a.date))[0];
-      // Supplement diseases from linked inspection if mite count has none
+      // Supplement diseases from most recent inspection within 60 days of mite count
       if(!latest.diseases || latest.diseases.includes('No Disease Present')){
-        const linkedInsp = _inspForBeemax.find(insp=>
-          String(insp.hive_id)===String(h.id) && insp.date===latest.date
-        );
-        if(linkedInsp?.diseases && !linkedInsp.diseases.includes('No Disease Present')){
+        const countDate = new Date(latest.date + 'T12:00:00').getTime();
+        const hiveInspections = _inspForBeemax
+          .filter(insp => String(insp.hive_id)===String(h.id) && insp.diseases && !insp.diseases.includes('No Disease Present'))
+          .sort((a,b) => b.date.localeCompare(a.date));
+        const linkedInsp = hiveInspections.find(insp => {
+          const inspDate = new Date(insp.date + 'T12:00:00').getTime();
+          return Math.abs(countDate - inspDate) <= 60 * 24 * 60 * 60 * 1000;
+        });
+        if(linkedInsp?.diseases){
           latest.diseases = linkedInsp.diseases;
         }
       }
