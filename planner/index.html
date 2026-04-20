@@ -2301,16 +2301,23 @@ function promptNewPlan(){
   const name = prompt('Name for new plan:', `Plan ${getPlanList(currentScopeKey).length + 1}`);
   if(!name || !name.trim()) return;
   const trimmed = name.trim();
-  savePlan(currentScopeKey, currentPlanName); // save current first
-  _sbSavePlan(currentScopeKey, currentPlanName); // push current to Supabase
+  savePlan(currentScopeKey, currentPlanName); // save current to localStorage
+  const _prevScope = currentScopeKey;
+  const _prevName  = currentPlanName;
   addNewPlan(currentScopeKey, trimmed);
   currentPlanName = trimmed;
-  loadPlan(currentScopeKey, trimmed); // load fresh (empty)
+  // Clear plan events for new plan BEFORE saving to Supabase
+  planEvents  = [];
+  userWindows = DEFAULT_WINDOWS();
+  nextId      = 1;
+  _winNextId  = 7;
+  savePlan(currentScopeKey, trimmed); // save empty plan to localStorage
+  // Now push both to Supabase with correct data
+  _sbSavePlan(_prevScope, _prevName);   // current plan with its events
+  _sbSavePlan(currentScopeKey, trimmed); // new empty plan
   _rebuildPlanDropdown(currentScopeKey);
   updateAll();
   _updatePlanSelName();
-  // Save new empty plan to Supabase immediately so it's visible on other devices
-  _sbSavePlan(currentScopeKey, trimmed);
 }
 
 function promptRenamePlan(){
