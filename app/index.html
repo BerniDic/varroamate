@@ -5154,7 +5154,6 @@ async function exportBeeMAX(){
   if(!entries.length){showToast('No mite count entries to export');return;}
   // Sort by date desc
   entries.sort((a,b)=>b.count.date.localeCompare(a.count.date));
-  console.log('[BeeMax] diseases:', JSON.stringify(entries.map(e=>({h:e.hive.name,d:e.count.diseases}))));
 
   const generated=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
 
