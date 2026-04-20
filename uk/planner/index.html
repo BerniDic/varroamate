@@ -2263,6 +2263,7 @@ function _rebuildPlanDropdown(scopeKey){
 
 function switchPlan(planName){
   savePlan(currentScopeKey, currentPlanName);
+  _sbSavePlan(currentScopeKey, currentPlanName);
   _resetProposalUI(); // clear AI suggestions — they belong to the previous plan
   _resetAdvicePanel(); // clear AI advice — it belongs to the previous plan
   currentPlanName = planName;
@@ -2300,12 +2301,15 @@ function promptNewPlan(){
   if(!name || !name.trim()) return;
   const trimmed = name.trim();
   savePlan(currentScopeKey, currentPlanName); // save current first
+  _sbSavePlan(currentScopeKey, currentPlanName); // push current to Supabase
   addNewPlan(currentScopeKey, trimmed);
   currentPlanName = trimmed;
   loadPlan(currentScopeKey, trimmed); // load fresh (empty)
   _rebuildPlanDropdown(currentScopeKey);
   updateAll();
   _updatePlanSelName();
+  // Save new empty plan to Supabase immediately so it's visible on other devices
+  _sbSavePlan(currentScopeKey, trimmed);
 }
 
 function promptRenamePlan(){
