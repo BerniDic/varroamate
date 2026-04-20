@@ -2512,7 +2512,7 @@ const PATHOGENS = [
    trans:'Adult moths lay eggs in stored or weak colony comb.',
    detect:'Silken tunnels, frass, larvae boring through comb. Destroyed wax.',
    control:'Strong colonies resist naturally. Stored comb options: freeze −18°C 48h, ozone treatment overnight, or Bacillus thuringiensis (Bt) spray — all effective for wax moth larvae. Store comb dry and well ventilated. Bt is a naturally occurring soil bacterium and is approved for use in beekeeping.'},
-  {icon:'🪲︎', name:'Small Hive Beetle', type:'Coleopteran pest', reservoir:'Environment · Comb & Equipment', risk:'HIGH in warm humid climates',
+  {icon:'<svg viewBox="0 0 24 24" width="27" height="27" fill="#3A2A10"><ellipse cx="12" cy="13" rx="6" ry="7"/><ellipse cx="12" cy="7" rx="3.5" ry="3"/><line x1="6" y1="10" x2="2" y2="7" stroke="#3A2A10" stroke-width="1.5"/><line x1="6" y1="13" x2="1" y2="13" stroke="#3A2A10" stroke-width="1.5"/><line x1="6" y1="16" x2="2" y2="19" stroke="#3A2A10" stroke-width="1.5"/><line x1="18" y1="10" x2="22" y2="7" stroke="#3A2A10" stroke-width="1.5"/><line x1="18" y1="13" x2="23" y2="13" stroke="#3A2A10" stroke-width="1.5"/><line x1="18" y1="16" x2="22" y2="19" stroke="#3A2A10" stroke-width="1.5"/></svg>', name:'Small Hive Beetle', type:'Coleopteran pest', reservoir:'Environment · Comb & Equipment', risk:'HIGH in warm humid climates',
    trans:'Adult beetles fly between hives, attracted to colony odours. Enter via gaps in hive and lay eggs in comb.',
    detect:'Small dark beetles (5–7mm) running from light. Slimy fermented honey, larvae tunnelling through comb. Characteristic sour smell.',
    control:'Deploy SHB traps inside hive. Maintain strong colony — bees corner and propolis-entomb beetles. Keep apiary on well-drained soil. Freeze or destroy heavily infested comb.'},
@@ -2529,7 +2529,7 @@ function renderPathogenCards(){
     card.className = 'card';
     card.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="font-size:27px;">${p.icon}</div>
+        <div style="font-size:27px;line-height:1;display:flex;align-items:center;">${p.icon}</div>
         <div style="flex:1;">
           <div style="font-size:17px;font-weight:700;color:var(--text1);">${p.name}</div>
           <div style="font-size:13px;color:var(--text3);">${p.type} · <span style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:3px;">🗺️ ${p.reservoir}</span></div>
