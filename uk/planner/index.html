@@ -2226,10 +2226,14 @@ async function _sbSyncPlanList(scopeKey){
   const local = getPlanList(scopeKey);
   const merged = [...new Set([...sbNames, ...local])]; // Supabase first = authoritative
   _savePlanList(scopeKey, merged);
-  // Rebuild dropdown with merged list
+  // Rebuild dropdown with merged list — must happen after await
   _rebuildPlanDropdown(scopeKey);
-  // If current plan not in local but exists in Supabase, load it
-  if(!local.includes(currentPlanName) && sbNames.includes(currentPlanName)){
+  // Also rebuild main selector dropdowns
+  _rebuildSelectorDropdowns();
+  console.log('[VMSP] Plan list synced from Supabase:', merged);
+  // Load current plan from Supabase if not in local cache
+  const localRaw = localStorage.getItem(_planStorageKey(scopeKey, currentPlanName));
+  if(!localRaw){
     const found = await _sbLoadPlan(scopeKey, currentPlanName);
     if(found){ redraw(); renderPlanList(); renderRating(); }
   }
