@@ -2153,48 +2153,44 @@ function _rebuildSelectorDropdowns(){
 }
 
 async function _migrateLocalPlansToSupabase(){
-  // One-time migration: push all localStorage plans to Supabase
+  // One-time migration: use planlist keys to find all scope+plan combinations
   if(!_sbUser) return;
-  if(localStorage.getItem('vmsp_migrated_v1')) return; // already done
+  if(localStorage.getItem('vmsp_migrated_v1')) return;
   console.log('Migrating local plans to Supabase…');
   let migrated = 0;
-  // Find all localStorage keys that look like plan data
+  // Find all vmsp_planlist_ keys — these tell us exactly which scopes have plans
+  const listKeys = [];
   for(let i = 0; i < localStorage.length; i++){
-    const key = localStorage.key(i);
-    if(!key || !key.startsWith('vmsp_plan_')) continue;
-    // key format: vmsp_plan_{scopeKey}_{planName}
-    // strip vmsp_plan_ prefix, then split on last _ to get planName
-    const withoutPrefix = key.slice('vmsp_plan_'.length);
-    // scopeKey is hive:ID or apiary:ID — find the planName after it
-    const match = withoutPrefix.match(/^((?:hive|apiary):[^_]+)_(.+)$/);
-    if(!match) continue;
-    const [, scopeKey, planName] = match;
-    try {
-      const raw = localStorage.getItem(key);
-      if(!raw) continue;
-      const data = JSON.parse(raw);
-      if(!data.planEvents) continue;
-      // Check if already in Supabase
-      const {data:existing} = await _sb.from('treatment_plans')
-        .select('id')
-        .eq('user_id',   _sbUser.id)
-        .eq('scope_key', scopeKey)
-        .eq('plan_name', planName)
-        .maybeSingle();
-      if(existing) continue; // already synced
-      // Push to Supabase
-      await _sb.from('treatment_plans').upsert({
-        user_id:    _sbUser.id,
-        scope_key:  scopeKey,
-        plan_name:  planName,
-        plan_data:  data,
-        updated_at: new Date().toISOString(),
-      }, {onConflict:'user_id,scope_key,plan_name'});
-      migrated++;
-    } catch(e){ console.warn('Migration error for', key, e); }
+    const k = localStorage.key(i);
+    if(k && k.startsWith('vmsp_planlist_')) listKeys.push(k);
+  }
+  console.log('Found plan lists:', listKeys);
+  for(const listKey of listKeys){
+    const scopeKey = listKey.slice('vmsp_planlist_'.length);
+    let planNames = [];
+    try { planNames = JSON.parse(localStorage.getItem(listKey) || '[]'); } catch(e){ continue; }
+    console.log('Scope:', scopeKey, 'Plans:', planNames);
+    for(const planName of planNames){
+      const storageKey = _planStorageKey(scopeKey, planName);
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if(!raw) continue;
+        const data = JSON.parse(raw);
+        if(!data.planEvents) continue;
+        await _sb.from('treatment_plans').upsert({
+          user_id:    _sbUser.id,
+          scope_key:  scopeKey,
+          plan_name:  planName,
+          plan_data:  data,
+          updated_at: new Date().toISOString(),
+        }, {onConflict:'user_id,scope_key,plan_name'});
+        migrated++;
+        console.log('Migrated:', scopeKey, planName);
+      } catch(e){ console.warn('Migration error:', scopeKey, planName, e); }
+    }
   }
   localStorage.setItem('vmsp_migrated_v1', '1');
-  if(migrated > 0) console.log(`Migrated ${migrated} plan(s) to Supabase`);
+  console.log('Migration complete:', migrated, 'plan(s) pushed to Supabase');
 }
 
 async function _sbSyncPlanList(scopeKey){
