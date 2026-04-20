@@ -4185,6 +4185,7 @@ function openInspModal(editId=null, preselectedHiveId=null){
       document.getElementById('iHive').value = i.hive_id;
       document.getElementById('iDate').value = i.date||'';
       document.getElementById('iNotes').value = i.notes||'';
+      if(i.diseases) restoreInspDiseaseMain(i.diseases);
       if(i.queen)   preSelectRating('iQueenGroup',    i.queen);
       if(i.brood)   preSelectRating('iBroodGroup',    i.brood);
       if(i.stores)  preSelectRating('iStoresGroup',   i.stores);
@@ -4298,7 +4299,7 @@ async function saveInspection(){
           date,
           value:        miteCount,
           hive_strength: getRating('iMiteStrengthGroup') || 'Good',
-          diseases:     getInspDiseases(),
+          diseases:     getInspDiseasesMain(), // use main disease selector
           notes:        document.getElementById('iMiteNotes').value || null,
           method:       'alcohol_wash',
           source:       'vmp',
