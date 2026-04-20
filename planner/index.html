@@ -770,7 +770,7 @@ canvas.drop-blocked{cursor:not-allowed;}
             <button onclick="promptNewPlan()" title="New plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--border);background:var(--cream);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;" id="psbNewPlan">+ New</button>
             <button onclick="promptRenamePlan()" title="Rename plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--border);background:var(--cream);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;" id="psbRenamePlan">✏ Rename</button>
             <button onclick="promptDeletePlan()" title="Delete plan" style="padding:4px 9px;border-radius:5px;border:1.5px solid rgba(184,92,56,0.3);background:rgba(184,92,56,0.06);color:var(--rust);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;" id="psbDeletePlan">🗑</button>
-            <button onclick="forceSyncPlansToCloud()" title="Sync plans to cloud" style="padding:4px 9px;border-radius:5px;border:1.5px solid rgba(28,56,41,0.3);background:rgba(28,56,41,0.06);color:var(--forest);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;" id="psbSync">☁️ Sync</button>
+            <button onclick="showSyncHelp()" title="Sync plans to cloud" style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--amber);background:var(--amber-pale);color:var(--amber-dark);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;" id="psbSync">☁️ Sync to cloud</button>
           </div>
           <span class="plan-sel-name" id="planSelName"></span>
           <span class="plan-sel-badge new" id="planSelBadge" style="display:none;">new plan</span>
@@ -2151,6 +2151,18 @@ function _rebuildSelectorDropdowns(){
   }
 
   _rebuildPlanDropdown(currentScopeKey);
+}
+
+function showSyncHelp(){
+  const msg = 'Sync Plans to Cloud\n\n' +
+    'Use this to make your plans available on all your devices.\n\n' +
+    '1. Tap "Sync Now" on this device to upload all plans to the cloud.\n' +
+    '2. Open the Smart Planner on your other device.\n' +
+    '3. Select the same hive — your plans will load automatically.\n\n' +
+    'This only needs to be done once per device.';
+  if(confirm(msg + '\n\nSync now?')){
+    forceSyncPlansToCloud();
+  }
 }
 
 async function forceSyncPlansToCloud(){
