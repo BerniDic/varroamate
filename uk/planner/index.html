@@ -2219,15 +2219,19 @@ async function _migrateLocalPlansToSupabase(){
 }
 
 async function _sbSyncPlanList(scopeKey){
-  // Merge Supabase plan names into local plan list
+  // Load all plan names from Supabase and merge into local + rebuild dropdown
   if(!_sbUser) return;
   const sbNames = await _sbLoadAllPlanNames(scopeKey);
   if(!sbNames.length) return;
   const local = _getPlanList(scopeKey);
-  const merged = [...new Set([...local, ...sbNames])];
-  if(merged.length !== local.length){
-    _setPlanList(scopeKey, merged);
-    _rebuildSelectorDropdowns();
+  const merged = [...new Set([...sbNames, ...local])]; // Supabase first = authoritative
+  _setPlanList(scopeKey, merged);
+  // Rebuild dropdown with merged list
+  _rebuildPlanDropdown(scopeKey);
+  // If current plan not in local but exists in Supabase, load it
+  if(!local.includes(currentPlanName) && sbNames.includes(currentPlanName)){
+    const found = await _sbLoadPlan(scopeKey, currentPlanName);
+    if(found){ redraw(); renderPlanList(); renderRating(); }
   }
 }
 
