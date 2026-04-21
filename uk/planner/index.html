@@ -6038,7 +6038,7 @@ function renderSplitPlanner(){
 
     rows = [
       {
-        label: '👑 Queenright — brood',
+        label: '👑 Queenright',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci <= 20) return {color: DP_COL.capped}; // existing capped hatching out
           if(ci <= 23) return {color: DP_COL.emerged};
@@ -6047,7 +6047,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '🚫 Queenless — hatching',
+        label: '🚫 Queenless',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci <= 2)  return {color: DP_COL.capped}; // heavily capped at split
           if(ci <= 21) return {color: DP_COL.capped}; // progressively hatching
@@ -6058,7 +6058,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '👸 Queen cell / mating',
+        label: '👸 Queen cell',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci < 1)   return {color: DP_COL.empty};
           if(ci <= 7)  return {color: 'rgba(255,210,50,0.55)', text: ci===1?'QC':undefined}; // open cell / building
@@ -6069,7 +6069,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '🎯 Drone frame (queenless)',
+        label: '🎯 Drone frame',
         cells: Array.from({length:COLS}, (_, ci) => {
           const p = dronePhase(ci + 1);
           const isRemoveWindow = ci >= 19 && ci <= 23;
@@ -6080,14 +6080,14 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '🔴 Mite pressure (queenless)',
+        label: '🔴 Mite pressure',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci >= 3 && ci <= 24) return {color: DP_COL.phoretic};
           return {color: DP_COL.empty};
         })
       },
       {
-        label: '💨 OA treatment window',
+        label: '💨 OA window',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci >= 18 && ci <= 24) return {color: DP_COL.oav, text: ci===20?'OA':undefined};
           return {color: DP_COL.empty};
@@ -6108,7 +6108,7 @@ function renderSplitPlanner(){
 
     rows = [
       {
-        label: '👑 Original hive (moved)',
+        label: '👑 Orig. hive',
         cells: Array.from({length:COLS}, (_, ci) => {
           const dfl = ci;
           if(ci <= 20) return {color: DP_COL.capped}; // existing capped hatching
@@ -6116,7 +6116,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '🐝 Foragers → orig. stand',
+        label: '🐝 Foragers',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci < 1)  return {color: DP_COL.empty};
           if(ci <= 4) return {color: 'rgba(168,200,122,0.55)', text: ci===2?'↩ bees':undefined};
@@ -6125,7 +6125,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '🚫 Queenless box — brood',
+        label: '🚫 Queenless',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci <= 2)  return {color: DP_COL.egg};     // transferred young brood
           if(ci <= 20) return {color: DP_COL.capped};  // progressively capping/hatching
@@ -6136,7 +6136,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '👸 Queen cell / mating',
+        label: '👸 Queen cell',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci < 1)    return {color: DP_COL.empty};
           if(ci <= 7)   return {color: 'rgba(255,210,50,0.55)', text: ci===1?'QC':undefined};
@@ -6147,7 +6147,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '🎯 Drone frame (orig. stand)',
+        label: '🎯 Drone frame',
         cells: Array.from({length:COLS}, (_, ci) => {
           const p = dronePhase(ci + 1);
           const isRemoveWindow = ci >= 19 && ci <= 23;
@@ -6158,7 +6158,7 @@ function renderSplitPlanner(){
         })
       },
       {
-        label: '💨 OA treatment window',
+        label: '💨 OA window',
         cells: Array.from({length:COLS}, (_, ci) => {
           if(ci >= 18 && ci <= 24) return {color: DP_COL.oav, text: ci===20?'OA':undefined};
           return {color: DP_COL.empty};
