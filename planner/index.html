@@ -2575,6 +2575,9 @@ function autoSave(){
   if(!currentScopeKey.startsWith('hive:')) return;
   clearTimeout(_autoSaveTimer);
   _autoSaveTimer = setTimeout(()=>{ savePlan(currentScopeKey, currentPlanName); }, 600);
+  // Debounced Supabase sync
+  if(_planSyncTimer) clearTimeout(_planSyncTimer);
+  _planSyncTimer = setTimeout(()=>{ _sbSavePlan(currentScopeKey, currentPlanName); }, 2500);
 }
 
 function selectPlanScope(key){
