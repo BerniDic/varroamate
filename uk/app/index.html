@@ -2986,6 +2986,15 @@ function renderHives(){
     const lastT=t[0]?` · Treated: ${(TREATMENTS[t[0].product]?.name||t[0].product).split(' ').slice(0,2).join(' ')} (${fmtDate(t[0].date)})`:'';
     const lastC=c[0]?`Last count: ${fmtDate(c[0].date)}${lastT}`:'No mite counts yet';
     const code=makeHiveCode(h.id);
+    // Disease pills for hive card
+    const hDiseases = c[0]?.diseases || ['No Disease Present'];
+    const hNoDisease = hDiseases.length===1 && hDiseases[0]==='No Disease Present';
+    const hDiseasePills = hNoDisease ? '' : hDiseases.map(d=>{
+      const isNotifiable = d==='American foulbrood'||d==='European foulbrood';
+      const col = isNotifiable ? '#C0392B' : '#6A5020';
+      const bg  = isNotifiable ? 'rgba(192,57,43,0.1)' : 'rgba(106,80,32,0.1)';
+      return `<span style="display:inline-block;font-size:11px;padding:2px 7px;border-radius:8px;background:${bg};color:${col};border:1px solid ${col}40;font-weight:600;">${isNotifiable?'⚠️ ':''}${d}</span>`;
+    }).join('');
     const div=document.createElement('div');div.className='hive-row';
     div.onclick=()=>{currentHiveId=h.id;goto('s-hive-detail');};
     div.innerHTML=`<div style="font-size:28px;">🐝</div>
@@ -2994,6 +3003,7 @@ function renderHives(){
         <div class="hive-status">${lastC}</div>
         <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
           <span class="badge ${b.cls}">${b.label}</span>
+          ${hDiseasePills}
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();showQR(${h.id})">📱 QR</button>
           <button class="btn btn-sm" style="font-size:11px;padding:2px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;" onclick="event.stopPropagation();speakHiveSummary(${h.id},this)">🔊 Summary</button>
           <button class="icon-btn" title="Edit hive" onclick="event.stopPropagation();editHive(${h.id})">✏️</button>
