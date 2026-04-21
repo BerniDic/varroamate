@@ -3211,7 +3211,8 @@ function renderHiveDetail(){
     <div><strong>Trend:</strong> ${trend}</div>
     <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><strong>Last treated:</strong> <span>${lastT}</span> ${efficacyBadgeHtml(hive.id)}</div>
     <div><strong>Risk level:</strong> <span class="badge ${b.cls}">${b.label}</span></div>
-    ${diseasePillsHtml ? `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><strong>Pest / Disease:</strong> <span style="display:inline-flex;flex-wrap:wrap;gap:4px;">${diseasePillsHtml}</span></div>` : ''}`;
+    ${diseasePillsHtml ? `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><strong>Pest / Disease:</strong> <span style="display:inline-flex;flex-wrap:wrap;gap:4px;">${diseasePillsHtml}</span></div>` : ''}
+    <div style="font-size:11px;color:var(--text3);margin-top:4px;">Disease status reflects your most recent alcohol wash. Select <em>No Disease Present</em> on your next count to clear a flag. AFB flags should only be cleared once you have confirmed resolution with your state authority.</div>`;
   countsPage=0;treatmentsPage=0;notesPage=0;
   renderCountsList();renderTreatmentsList();renderNotesList();
   // initChart is called by goto() after the screen is visible — do not call it here
