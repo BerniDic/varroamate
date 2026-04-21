@@ -6533,12 +6533,12 @@ function renderDxPlanner(){
   const COLS = 28; // days 0–27
 
   const rows = [
-    { label:'🏠 Brood outside box',    cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d<=8?DP_COL.capped : d<=12?DP_COL.emerged : DP_COL.empty}; }) },
-    { label:'📋 Box Frame A (→ D12)',  cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d>12?DP_COL.empty : d<=9?DP_COL.capped : DP_COL.emerged}; }) },
-    { label:'📋 Box Frame B (→ D24)',  cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d<1?DP_COL.egg : d<=9?DP_COL.egg : d<=24?DP_COL.capped : DP_COL.empty}; }) },
-    { label:'📋 Frame A2 (D12→ D24)', cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d<12?DP_COL.empty : d<=15?DP_COL.egg : d<=24?DP_COL.capped : DP_COL.empty}; }) },
-    { label:'🔴 Mite concentration',   cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d>=8&&d<=12?DP_COL.phoretic : d>=20&&d<=24?DP_COL.phoretic : d>=24?DP_COL.phoretic : DP_COL.empty}; }) },
-    { label:'🍯 Honey + treat',         cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d===24?DP_COL.oav : DP_COL.empty, text:d===24?'D24':undefined}; }) },
+    { label:'🏠 Brood out',    cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d<=8?DP_COL.capped : d<=12?DP_COL.emerged : DP_COL.empty}; }) },
+    { label:'📋 Frame A',  cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d>12?DP_COL.empty : d<=9?DP_COL.capped : DP_COL.emerged}; }) },
+    { label:'📋 Frame B',  cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d<1?DP_COL.egg : d<=9?DP_COL.egg : d<=24?DP_COL.capped : DP_COL.empty}; }) },
+    { label:'📋 Frame A2', cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d<12?DP_COL.empty : d<=15?DP_COL.egg : d<=24?DP_COL.capped : DP_COL.empty}; }) },
+    { label:'🔴 Mites',   cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d>=8&&d<=12?DP_COL.phoretic : d>=20&&d<=24?DP_COL.phoretic : d>=24?DP_COL.phoretic : DP_COL.empty}; }) },
+    { label:'🍯 Harvest',         cells: Array.from({length:COLS},(_,ci)=>{ const d=ci; return {color: d===24?DP_COL.oav : DP_COL.empty, text:d===24?'D24':undefined}; }) },
   ];
 
   const milestones = [
