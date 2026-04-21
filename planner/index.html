@@ -3283,9 +3283,9 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
   }
   const light    = score >= 70 ? '🟢' : score >= 40 ? '🟡' : '🔴';
   const barColor = score >= 70 ? '#5A9E60' : score >= 40 ? '#D4820A' : '#B83A1A';
-  const verdict  = score >= 85 ? 'Excellent survival outlook'
-                 : score >= 70 ? 'Good survival outlook'
-                 : score >= 55 ? 'Moderate survival risk'
+  const verdict  = score >= 90 ? 'Excellent survival outlook'
+                 : score >= 80 ? 'Good survival outlook'
+                 : score >= 70 ? 'Moderate survival risk'
                  : score >= 40 ? 'Elevated survival risk'
                  : score >= 20 ? 'High survival risk'
                  :               'Critical — colony likely to collapse';
@@ -3347,8 +3347,8 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
       ${capNote}
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;padding-top:7px;border-top:1px solid var(--border);">
         <span style="font-size:10px;color:var(--text3);font-weight:600;align-self:center;margin-right:2px;">KEY:</span>
-        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#5A9E60;flex-shrink:0;"></span>85–100% Excellent</span>
-        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#7AB860;flex-shrink:0;"></span>70–84% Good</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#5A9E60;flex-shrink:0;"></span>90–100% Excellent</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#7AB860;flex-shrink:0;"></span>80–89% Good</span>
         <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#D4820A;flex-shrink:0;"></span>40–69% At risk</span>
         <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#B83A1A;flex-shrink:0;"></span>&lt;40% Critical</span>
       </div>
@@ -3363,11 +3363,11 @@ function ratingColor(score){
   return 'var(--rust)';
 }
 function ratingWord(score){
-  if(score>=85) return 'Excellent';
-  if(score>=70) return 'Good';
+  if(score>=90) return 'Excellent';
+  if(score>=80) return 'Good';
   if(score>=55) return 'Fair';
   if(score>=35) return 'Needs Work';
-  return 'Poor';
+  return 'Low';
 }
 
 function renderRating(){
