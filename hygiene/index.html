@@ -2439,6 +2439,17 @@ function renderEquipMatrix(){
 
   const container = document.getElementById('equipMatrix');
   container.innerHTML = '';
+  // Add legend
+  const legend = document.createElement('div');
+  legend.style.cssText = 'margin-bottom:12px;padding:10px 14px;background:var(--bg2);border-radius:var(--radius-sm);border:1px solid var(--border);';
+  legend.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Risk rating guide</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span class="risk-pill risk-high" style="font-size:11px;">VERY HIGH</span> Primary disease vector — AFB spores, Varroa. Strict sterilisation essential every use.</span>
+      <span style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span class="risk-pill risk-high" style="font-size:11px;">HIGH</span> Significant transmission risk. Sterilise between apiaries and after handling suspect hives.</span>
+      <span style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span class="risk-pill risk-med" style="font-size:11px;">MEDIUM</span> Moderate risk. Regular cleaning required; sterilise if disease is suspected.</span>
+      <span style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span class="risk-pill risk-low" style="font-size:11px;">LOW</span> Low transmission risk. Basic hygiene sufficient under normal conditions.</span>
+    </div>`;
+  container.appendChild(legend);
   EQUIP.forEach(e=>{
     const riskClass = e.risk.includes('HIGH') ? 'risk-high' : e.risk==='MEDIUM' ? 'risk-med' : 'risk-low';
     const card = document.createElement('div');
