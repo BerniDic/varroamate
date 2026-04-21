@@ -7278,6 +7278,10 @@ const _origGotoScreen = gotoScreen;
     <!-- Summary cards -->
     <div id="efficacy-summary-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;"></div>
 
+    <!-- Scope instruction -->
+    <div style="background:var(--amber-pale);border:1.5px solid var(--amber);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.6;">
+      💡 <strong>Select a scope above</strong> to view efficacy data — choose <em>All Apiaries</em> for an overview across your whole operation, a specific apiary to compare hives within it, or an individual hive for a detailed treatment history. Efficacy is calculated from alcohol wash counts taken before and within 28 days after each treatment.
+    </div>
     <!-- Chart row -->
     <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:24px;" class="eff-chart-row">
       <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;overflow:hidden;min-width:0;">
@@ -7285,11 +7289,22 @@ const _origGotoScreen = gotoScreen;
         <div style="position:relative;height:200px;width:100%;">
           <canvas id="eff-by-product-chart"></canvas>
         </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border);padding-top:8px;">
+          <strong style="color:var(--text2);">How to read this chart:</strong> Each bar shows the average mite reduction (%) achieved by that product across all recorded treatments in the selected scope.
+          <span style="color:#27AE60;font-weight:600;">Excellent ≥90%</span> — product is working well, resistance unlikely.
+          <span style="color:#5BA35A;font-weight:600;">Good 80–89%</span> — effective, monitor trend over time.
+          <span style="color:#E67E22;font-weight:600;">Moderate 70–79%</span> — consider whether conditions affected the result (temperature, brood levels) before concluding resistance.
+          <span style="color:#E74C3C;font-weight:600;">Low &lt;70%</span> — poor knock-down. Repeat with an alternative MoA and report to your state authority if amitraz or pyrethroid resistance is suspected.
+          A single low result may reflect application error or timing — look for a pattern across multiple treatments before drawing conclusions.
+        </div>
       </div>
       <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:16px;overflow:hidden;min-width:0;">
         <div style="font-weight:700;font-size:14px;color:var(--forest);margin-bottom:12px;">Efficacy by Month</div>
         <div style="position:relative;height:200px;width:100%;">
           <canvas id="eff-by-month-chart"></canvas>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border);padding-top:8px;">
+          <strong style="color:var(--text2);">How to read this chart:</strong> Each bar shows average efficacy across all treatments applied in that calendar month. Seasonal patterns matter — organic acids perform better when colonies are broodless or near-broodless (winter/early spring). Thymol-based products require temperatures above 15°C to volatilise effectively. A low result in an otherwise good product may simply reflect an off-season application rather than resistance.
         </div>
       </div>
     </div>
