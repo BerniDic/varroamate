@@ -6249,7 +6249,7 @@ function drawDpGrid(canvasId, rows, milestones, labelEl, startDate, opts){
   const availForCells = Math.max(containerW - DW - DW2 - MW, NUM_ELEMENTS * 24);
   const CW   = Math.floor(availForCells / NUM_ELEMENTS);
   const RH   = 28;
-  const HDRH = horizHeaders ? 34 : 110;
+  const HDRH = horizHeaders ? 34 : 140;
 
   const totalW = DW + CW * NUM_ELEMENTS + DW2 + MW;
   const totalH = HDRH + RH * NUM_DAYS;
@@ -6295,9 +6295,10 @@ function drawDpGrid(canvasId, rows, milestones, labelEl, startDate, opts){
       ctx.translate(x + CW/2 + 4, HDRH - 6);
       ctx.rotate(-Math.PI / 2);
       ctx.fillStyle = '#3A4A40';
-      ctx.font = `500 10px 'DM Sans',sans-serif`;
+      ctx.font = `500 9px 'DM Sans',sans-serif`;
       ctx.textAlign = 'left';
-      ctx.fillText(emoji + (emoji?' ':'') + text, 0, 0);
+      const fullLabel = emoji + (emoji?' ':'') + text;
+      ctx.fillText(fullLabel, 0, 0);
     }
     ctx.restore();
   });
