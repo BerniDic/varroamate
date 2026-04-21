@@ -6249,7 +6249,7 @@ function drawDpGrid(canvasId, rows, milestones, labelEl, startDate, opts){
   const availForCells = Math.max(containerW - DW - DW2 - MW, NUM_ELEMENTS * 24);
   const CW   = Math.floor(availForCells / NUM_ELEMENTS);
   const RH   = 28;
-  const HDRH = horizHeaders ? 34 : 140;
+  const HDRH = horizHeaders ? 34 : 180;
 
   const totalW = DW + CW * NUM_ELEMENTS + DW2 + MW;
   const totalH = HDRH + RH * NUM_DAYS;
