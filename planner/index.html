@@ -6292,13 +6292,15 @@ function drawDpGrid(canvasId, rows, milestones, labelEl, startDate, opts){
       while(label.length > 2 && ctx.measureText(label).width > CW - 4) label = label.slice(0,-1);
       ctx.fillText(label, x + CW/2, HDRH * 0.65);
     } else {
+      const fullLabel = emoji + (emoji?' ':'') + text;
+      ctx.restore(); // restore before drawing to remove clip
+      ctx.save();
       ctx.translate(x + CW/2 + 4, HDRH - 6);
       ctx.rotate(-Math.PI / 2);
       ctx.fillStyle = '#3A4A40';
       ctx.font = `500 9px 'DM Sans',sans-serif`;
       ctx.textAlign = 'left';
-      const fullLabel = emoji + (emoji?' ':'') + text;
-      ctx.fillText(fullLabel, 0, 0);
+      ctx.fillText(fullLabel, 4, 0);
     }
     ctx.restore();
   });
