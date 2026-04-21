@@ -2311,17 +2311,17 @@ function promptNewPlan(){
   savePlan(currentScopeKey, currentPlanName); // save current to localStorage
   const _prevScope = currentScopeKey;
   const _prevName  = currentPlanName;
+  // Save current plan to Supabase BEFORE clearing events
+  _sbSavePlan(_prevScope, _prevName);
   addNewPlan(currentScopeKey, trimmed);
   currentPlanName = trimmed;
-  // Clear plan events for new plan BEFORE saving to Supabase
+  // Now clear events for the new plan
   planEvents  = [];
   userWindows = DEFAULT_WINDOWS();
   nextId      = 1;
   _winNextId  = 7;
   savePlan(currentScopeKey, trimmed); // save empty plan to localStorage
-  // Now push both to Supabase with correct data
-  _sbSavePlan(_prevScope, _prevName);   // current plan with its events
-  _sbSavePlan(currentScopeKey, trimmed); // new empty plan
+  _sbSavePlan(currentScopeKey, trimmed); // save new empty plan to Supabase
   _rebuildPlanDropdown(currentScopeKey);
   updateAll();
   _updatePlanSelName();
