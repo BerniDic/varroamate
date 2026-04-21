@@ -3974,7 +3974,11 @@ month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${
     ? `Latest mite count: ${_suggestLatestCount.count} mites/300 bees (${MONTHS[_suggestLatestCount.month]} ${_suggestLatestCount.year}) — pressure is ${_suggestLatestCount.count>=15?'CRITICAL':_suggestLatestCount.count>=8?'HIGH':_suggestLatestCount.count>=3?'ELEVATED':'LOW'}.`
     : 'No mite count on record — IMPORTANT: recommend an alcohol wash BEFORE starting any treatment. Do not suggest treating without a count.';
 
+  const checkedNames = activeAllowed.length
+    ? activeAllowed.map(id=>TREATMENTS[id]?.name||id).join(', ')
+    : 'All treatments permitted by philosophy';
   const userMsg = `Today is ${todayLabel}. ${suggestMiteContext}
+CRITICAL — USER-SELECTED TREATMENTS ONLY: The beekeeper has specifically selected these treatments to consider: ${checkedNames}. You MUST ONLY suggest treatments from this list. Do NOT suggest any other treatment even if it is permitted by the philosophy. This is a hard constraint.
 The beekeeper's treatment history: ${historyContext}.
 Please suggest a plan for the next 12 months (from ${todayLabel}) using only their allowed treatments.
 Target approximately 2 chemical + 2 mechanical/heat treatments for a full year.
