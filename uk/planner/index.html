@@ -6662,9 +6662,10 @@ function selectDayPlan(id) {
     if(id === 'split')       renderSplitPlanner?.();
     if(id === 'duplex')      renderDxPlanner?.();
     if(id === 'heat')        renderHeatPlanner?.();
+    // sync selected value only — options already populated by _initDpScope
     const sc2 = document.getElementById('dpScopeSelect2');
     const sc1 = document.getElementById('dpScopeSelect');
-    if(sc2 && sc1) sc2.innerHTML = sc1.innerHTML;
+    if(sc2 && sc1) sc2.value = sc1.value;
   }
   _activeDayPlan = id;
 }
