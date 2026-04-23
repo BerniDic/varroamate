@@ -6449,9 +6449,13 @@ function renderDronePlanner(){
   const cards = [
     [1,   'amber', '🖼 Place drone frame',          dpFmt(dpAddDays(start,0)),  'Insert a drone-cell-sized frame at the edge of the brood nest. Queens preferentially lay drones at the nest periphery. Mark the hive with the date.'],
     [10,  '',      '🔍 Check frame is capping',     dpFmt(dpAddDays(start,9)),  'Larval stage should be complete. Look for the colony beginning to cap drone cells. Confirm the queen is using the frame well.'],
-    [20,  'teal',  '✂️ Remove & treat — ideal',     dpFmt(dpAddDays(start,19)), 'Frame fully capped — all mites trapped inside. Remove the frame immediately. Freeze 48h or heat-treat in the Varroa Controller. Replace with a fresh drone frame to start cycle 2.'],
-    [24,  'teal',  '✂️ Remove — still safe',        dpFmt(dpAddDays(start,23)), 'Last safe day. Brood still fully capped. Remove now. Any later and drones will begin emerging, releasing mites back into the colony.'],
-    [25,  'red',   '⚠️ Emergency removal',          dpFmt(dpAddDays(start,24)), 'Drones may begin emerging. Remove and freeze immediately — some mites will already have escaped. Earlier is always better.'],
+    [20,  'teal',  '✂️ Cycle 1 — Remove & replace (ideal)',  dpFmt(dpAddDays(start,19)), 'Frame fully capped — all mites trapped inside. Remove and freeze 48h or heat-treat in the Varroa Controller. Replace immediately with a fresh drone frame to start Cycle 2.'],
+    [24,  'teal',  '✂️ Cycle 1 — Last safe removal day',      dpFmt(dpAddDays(start,23)), 'Last safe day for Cycle 1. Brood still fully capped. Remove now and replace with fresh frame. Any later and drones begin emerging, releasing mites.'],
+    [25,  'red',   '⚠️ Cycle 1 — Emergency removal',          dpFmt(dpAddDays(start,24)), 'Drones may begin emerging. Remove and freeze immediately — some mites will already have escaped.'],
+    [39,  'teal',  '✂️ Cycle 2 — Remove & treat (ideal)',     dpFmt(dpAddDays(start,38)), 'Cycle 2 frame fully capped — all mites trapped. Remove and freeze 48h or heat-treat. This completes the two-cycle protocol.'],
+    [43,  'teal',  '✂️ Cycle 2 — Last safe removal day',      dpFmt(dpAddDays(start,42)), 'Last safe day for Cycle 2. Remove now — any later and drones begin emerging.'],
+    [44,  'red',   '⚠️ Cycle 2 — Emergency removal',          dpFmt(dpAddDays(start,43)), 'Drones may begin emerging from Cycle 2 frame. Remove and freeze immediately.'],
+    [45,  '',      '🔍 Post-treatment check',                  dpFmt(dpAddDays(start,44)), 'Two full cycles complete. Perform an alcohol wash to assess mite reduction. Record results in VarroaMate.'],
   ];
   ac.innerHTML = cards.map(([d,c,t,ds,desc])=>dpActionCard(d,c,t,ds,desc)).join('');
 }
