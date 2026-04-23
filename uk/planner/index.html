@@ -6431,7 +6431,7 @@ function renderDronePlanner(){
   const val = document.getElementById('drone-date')?.value;
   if(!val) return;
   const start = new Date(val);
-  const COLS = 42; // 6 weeks
+  const COLS = 45; // 6.5 weeks — covers two full drone comb removal cycles
 
   function dronePhase(d){
     if(d<1) return 'empty';
