@@ -5732,12 +5732,14 @@ let _dpScopeName = 'All Apiaries';
 
 let _dpScopeInited = false;
 function _initDpScope(){
-  if(_dpScopeInited) return;
-  _dpScopeInited = true;
+  // Always repopulate in case data wasn't loaded on first call
   const sel  = document.getElementById('dpScopeSelect');
   const sel2 = document.getElementById('dpScopeSelect2');
   [sel, sel2].forEach(s=>{
     if(!s) return;
+    // Clear existing options except the first (All Apiaries)
+    while(s.options.length > 1) s.remove(1);
+    if(!APIARIES.length) return;
     APIARIES.forEach(a=>{
       const o = document.createElement('option'); o.value=`apiary:${a.id}`; o.textContent=`🏡 ${a.name}`; s.appendChild(o);
     });
