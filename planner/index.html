@@ -1949,6 +1949,8 @@ async function loadVMData(){
     if(typeof calcAndSaveAllEfficacy === 'function') calcAndSaveAllEfficacy();
     // One-time migration of localStorage plans to Supabase
     _migrateLocalPlansToSupabase();
+    // Refresh day plan scope selectors with loaded hives/apiaries
+    _initDpScope();
     if(currentScopeKey.startsWith('hive:')){
       loadPlan(currentScopeKey, currentPlanName);
   _sbSyncPlanList(currentScopeKey);
