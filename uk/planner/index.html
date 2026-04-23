@@ -6444,16 +6444,20 @@ function renderDronePlanner(){
   const phaseColor = {egg:DP_COL.egg, larva:DP_COL.egg, capped:DP_COL.capped, emerged:DP_COL.emerged, empty:DP_COL.empty};
 
   const rows = [
-    { label:'🐝 Drone development', cells: Array.from({length:COLS},(_,i)=>{ const p=dronePhase(i+1); return {color:phaseColor[p]||DP_COL.empty}; }) },
-    { label:'🔴 Mite trap zone',    cells: Array.from({length:COLS},(_,i)=>{ const d=i+1; return {color: d>=9&&d<=24 ? DP_COL.phoretic : DP_COL.empty}; }) },
-    { label:'✂️ Remove frame',      cells: Array.from({length:COLS},(_,i)=>{ const d=i+1; return {color: d>=20&&d<=24 ? DP_COL.remove : d>=25&&d<=30 ? DP_COL.danger : DP_COL.empty, text: d===22?'REMOVE':undefined}; }) },
-    { label:'🔄 Cycle 2 (day 20+)', cells: Array.from({length:COLS},(_,i)=>{ const d2=i+1-19; const p=dronePhase(d2); return {color:d2<1?DP_COL.empty:phaseColor[p]||DP_COL.empty}; }) },
+    { label:'🐝 C1 drone dev.',  cells: Array.from({length:COLS},(_,i)=>{ const p=dronePhase(i+1); return {color:i<19?phaseColor[p]||DP_COL.empty:DP_COL.empty}; }) },
+    { label:'✂️ C1 remove',      cells: Array.from({length:COLS},(_,i)=>{ const d=i+1; return {color: d>=20&&d<=24 ? DP_COL.remove : d>=25&&d<=30 ? DP_COL.danger : DP_COL.empty, text: d===22?'REMOVE':undefined}; }) },
+    { label:'🐝 C2 drone dev.',  cells: Array.from({length:COLS},(_,i)=>{ const d2=i+1-19; const p=dronePhase(d2); return {color:d2<1?DP_COL.empty:d2<=19?phaseColor[p]||DP_COL.empty:DP_COL.empty}; }) },
+    { label:'✂️ C2 remove',      cells: Array.from({length:COLS},(_,i)=>{ const d2=i+1-19; return {color: d2>=20&&d2<=24 ? DP_COL.remove : d2>=25&&d2<=30 ? DP_COL.danger : DP_COL.empty, text: d2===22?'REMOVE':undefined}; }) },
+    { label:'🔴 Mite trap',      cells: Array.from({length:COLS},(_,i)=>{ const d=i+1; const d2=i+1-19; return {color: (d>=9&&d<=24)||(d2>=9&&d2<=24) ? DP_COL.phoretic : DP_COL.empty}; }) },
   ];
 
   const milestones = [
-    {col:0, label:'Frame in', color:DP_COL.milestoneHead},
-    {col:19, label:'Remove ✂', color:DP_COL.milestoneTeal},
-    {col:24, label:'⚠ Too late', color:'#C04040'},
+    {col:0,  label:'C1 frame in', color:DP_COL.milestoneHead},
+    {col:19, label:'C1 remove ✂', color:DP_COL.milestoneTeal},
+    {col:24, label:'⚠ C1 late',   color:'#C04040'},
+    {col:19, label:'C2 frame in', color:DP_COL.milestoneAmber},
+    {col:38, label:'C2 remove ✂', color:DP_COL.milestoneTeal},
+    {col:43, label:'⚠ C2 late',   color:'#C04040'},
   ];
 
   drawDpGrid('droneCanvas', rows, milestones, document.getElementById('drone-timeline-label'), start, {horizontalHeaders:true});
