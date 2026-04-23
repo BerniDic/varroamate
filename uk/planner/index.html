@@ -5734,14 +5734,17 @@ let _dpScopeInited = false;
 function _initDpScope(){
   if(_dpScopeInited) return;
   _dpScopeInited = true;
-  const sel = document.getElementById('dpScopeSelect');
-  if(!sel) return;
-  APIARIES.forEach(a=>{
-    const o = document.createElement('option'); o.value=`apiary:${a.id}`; o.textContent=`🏡 ${a.name}`; sel.appendChild(o);
-  });
-  HIVES.forEach(h=>{
-    const a = APIARIES.find(x=>x.id===h.apiaryId);
-    const o = document.createElement('option'); o.value=`hive:${h.id}`; o.textContent=`🐝 ${h.name} (${a?.name||''})`; sel.appendChild(o);
+  const sel  = document.getElementById('dpScopeSelect');
+  const sel2 = document.getElementById('dpScopeSelect2');
+  [sel, sel2].forEach(s=>{
+    if(!s) return;
+    APIARIES.forEach(a=>{
+      const o = document.createElement('option'); o.value=`apiary:${a.id}`; o.textContent=`🏡 ${a.name}`; s.appendChild(o);
+    });
+    HIVES.forEach(h=>{
+      const a = APIARIES.find(x=>x.id===h.apiaryId);
+      const o = document.createElement('option'); o.value=`hive:${h.id}`; o.textContent=`🐝 ${h.name} (${a?.name||''})`; s.appendChild(o);
+    });
   });
 }
 
