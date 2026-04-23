@@ -5879,9 +5879,13 @@ function dpExportCal(){
     events = [
       { day:0,  summary:`🖼 Place drone frame — ${scope}`,        desc:'Insert drone-cell foundation frame at the edge of the brood nest.' },
       { day:9,  summary:`🔍 Check drone frame capping — ${scope}`, desc:'Confirm queen is using the frame and capping has begun.' },
-      { day:19, summary:`✂️ REMOVE drone frame (ideal) — ${scope}`,desc:'Frame fully capped — all mites trapped. Remove and freeze/heat-treat. Replace with fresh frame for cycle 2.', alarm:true },
-      { day:23, summary:`✂️ REMOVE drone frame (last day) — ${scope}`, desc:'Last safe removal day. Any later and drones begin emerging.', alarm:true },
-      { day:24, summary:`⚠️ Drone frame — emergency removal — ${scope}`, desc:'Drones may begin emerging. Remove and freeze immediately.' },
+      { day:19, summary:`✂️ Cycle 1 — Remove drone frame (ideal) — ${scope}`, desc:'Frame fully capped — all mites trapped. Remove and freeze/heat-treat. Replace with fresh frame for Cycle 2.', alarm:true },
+      { day:23, summary:`✂️ Cycle 1 — Last safe removal — ${scope}`, desc:'Last safe day for Cycle 1. Remove now and replace with fresh frame.', alarm:true },
+      { day:24, summary:`⚠️ Cycle 1 — Emergency removal — ${scope}`, desc:'Drones may begin emerging. Remove and freeze immediately.' },
+      { day:38, summary:`✂️ Cycle 2 — Remove drone frame (ideal) — ${scope}`, desc:'Cycle 2 frame fully capped — all mites trapped. Remove and freeze/heat-treat. Two-cycle protocol complete.', alarm:true },
+      { day:42, summary:`✂️ Cycle 2 — Last safe removal — ${scope}`, desc:'Last safe day for Cycle 2. Remove now — any later drones begin emerging.', alarm:true },
+      { day:43, summary:`⚠️ Cycle 2 — Emergency removal — ${scope}`, desc:'Drones may begin emerging from Cycle 2 frame. Remove and freeze immediately.' },
+      { day:44, summary:`🔍 Post-treatment check — ${scope}`, desc:'Two full drone comb removal cycles complete. Perform alcohol wash to assess mite reduction. Record in VarroaMate.' },
     ];
   } else if(key==='brood-break'){
     events = [
