@@ -1631,11 +1631,12 @@ function renderAIMarkdown(text){
   if(!text) return '';
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^\#\#\# (.+)$/gm,'<strong style="font-size:14px;color:var(--amber-dark,#8B5200);">$1</strong>')
     .replace(/^\#\# (.+)$/gm,'<strong style="font-size:15px;color:var(--amber-dark,#8B5200);">$1</strong>')
     .replace(/^\# (.+)$/gm,'<strong style="font-size:16px;color:var(--amber-dark,#8B5200);">$1</strong>')
+    .replace(/^[-•*] (.+)$/gm,'<li>$1</li>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*([^*]+?)\*/g,'<em>$1</em>')
-    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/\*([^*\s][^*]*?)\*/g,'<em>$1</em>')
     .replace(/(<li>.*<\/li>)/s,'<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
     .replace(/\n\n/g,'</p><p style="margin-top:6px;">')
     .replace(/\n/g,'<br>');
@@ -3051,7 +3052,7 @@ async function sendHygieneChat(){
       body: JSON.stringify({
         model: CLAUDE_MODEL,
         max_tokens: 600,
-        system: `You are VarroaMate Hygiene Assistant, a friendly expert on apiary sanitation and bee health for Australian beekeepers. Help with hygiene questions — sterilisation methods, disease transmission routes, equipment care, field protocols, and biosecurity. Keep answers concise and practical. Reference Australian regulatory guidance (AHBIC, state agriculture authorities) where relevant. APPROVED TREATMENTS ONLY: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment, Duplex-Framebox Plan. Do not suggest unregistered methods. AFB and EFB are notifiable diseases — always advise reporting to state agriculture authority.`,
+        system: `You are VarroaMate Hygiene Assistant, a friendly expert on apiary sanitation and bee health for Australian beekeepers. Help with hygiene questions — sterilisation methods, disease transmission routes, equipment care, field protocols, and biosecurity. Keep answers concise and practical. Reference Australian regulatory guidance (AHBIC, state agriculture authorities) where relevant. APPROVED TREATMENTS ONLY: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment, Duplex-Framebox Plan. Do not suggest unregistered methods. AFB and EFB are notifiable diseases — always advise reporting to state agriculture authority. Respond in plain prose. Avoid markdown headers (no #, ##, ###). For short lists, use hyphens (-), not asterisks. Do not use bold or italic markdown — rely on clear phrasing instead.`,
         messages: _hygieneHistory
       })
     });
