@@ -1060,10 +1060,14 @@ canvas.drop-blocked{cursor:not-allowed;}
         <select class="dp-scope-select" id="dpScopeSelect" onchange="dpSetScope(this.value)">
           <option value="all">🌐 All Apiaries</option>
         </select>
+        <select class="dp-scope-select" id="dpSavedSelect" onchange="dpLoadSavedPlan(this.value)" style="margin-left:6px;">
+          <option value="">📁 Saved plans…</option>
+        </select>
         <div class="dp-toolbar-spacer"></div>
         <button class="dp-btn print" onclick="dpPrint()">🖨 Print plan</button>
         <button class="dp-btn cal"   onclick="dpExportCal()">📅 Add to calendar</button>
         <button class="dp-btn preview" id="dpPreviewBtn" onclick="dpPreview()" title="Animate the progress shading to see how the timeline looks as days pass">▶ Preview progress</button>
+        <button class="dp-btn save" id="dpSaveBtn" onclick="dpSaveDayPlan()" title="Save this day plan to your account">💾 Save plan</button>
       </div>
 
       <!-- Sub-nav tabs -->
@@ -1799,10 +1803,14 @@ canvas.drop-blocked{cursor:not-allowed;}
         <select class="dp-scope-select" id="dpScopeSelect2" onchange="dpSetScope(this.value)">
           <option value="all">🌐 All Apiaries</option>
         </select>
+        <select class="dp-scope-select" id="dpSavedSelect2" onchange="dpLoadSavedPlan(this.value)" style="margin-left:6px;">
+          <option value="">📁 Saved plans…</option>
+        </select>
         <div class="dp-toolbar-spacer"></div>
         <button class="dp-btn preview" id="dpPreviewBtn2" onclick="dpPreview()" title="Animate the progress shading to see how the timeline looks as days pass">▶ Preview progress</button>
         <button class="dp-btn print" onclick="dpPrint()">🖨 Print plan</button>
         <button class="dp-btn cal"   onclick="dpExportCal()">📅 Add to calendar</button>
+        <button class="dp-btn save" id="dpSaveBtn2" onclick="dpSaveDayPlan()" title="Save this day plan to your account">💾 Save plan</button>
       </div>
       <!-- The dp-pages render here via switchDayPlanDetail() -->
       <div id="dayplan-pages-wrap" style="margin-top:16px;"></div>
@@ -2543,6 +2551,129 @@ function hasSavedPlan(scopeKey, planName){
 let _planSyncTimer = null;
 let _planSyncBusy  = false;
 
+// ══════════════════════════════════════════════
+// DAY PLAN SAVES (separate from Smart Planner timeline plans)
+// Table: day_plan_saves   |   keyed (user, treatment, scope_key)
+// ══════════════════════════════════════════════
+const _DP_DATE_ID_MAP = {
+  'drone': 'drone-date',
+  'brood-break': 'bb-date',
+  'split': 'split-date',
+  'duplex': 'dx-date'
+};
+
+function _dpReadCurrentDayPlanState(){
+  const t = (typeof _activeDayPlan !== 'undefined') ? _activeDayPlan : null;
+  if(!t || t === 'heat') return null;
+  const dateInputId = _DP_DATE_ID_MAP[t];
+  if(!dateInputId) return null;
+  const dateEl = document.getElementById(dateInputId);
+  const dateVal = dateEl?.value;
+  if(!dateVal) return null;
+  return {
+    treatment: t,
+    scope_key: _dpScope || 'all',
+    scope_name: _dpScopeName || 'All Apiaries',
+    start_date: dateVal
+  };
+}
+
+async function dpSaveDayPlan(){
+  if(!_sbUser){ try{ showToast('Sign in to save day plans'); }catch(e){} return; }
+  const state = _dpReadCurrentDayPlanState();
+  if(!state){ try{ showToast('Pick a treatment and start date first'); }catch(e){} return; }
+  try {
+    const { error } = await _sb.from('day_plan_saves').upsert({
+      user_id: _sbUser.id,
+      treatment: state.treatment,
+      scope_key: state.scope_key,
+      scope_name: state.scope_name,
+      start_date: state.start_date,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id,treatment,scope_key' });
+    if(error) throw error;
+    try{ showToast('Day plan saved 💾'); }catch(e){}
+    await _dpRefreshSavedList();
+  } catch(e){
+    console.warn('Day plan save failed:', e);
+    try{ showToast('Save failed — check connection'); }catch(_){}
+  }
+}
+
+async function _dpRefreshSavedList(){
+  if(!_sbUser) return;
+  let plans = [];
+  try {
+    const { data, error } = await _sb.from('day_plan_saves')
+      .select('*')
+      .eq('user_id', _sbUser.id)
+      .order('updated_at', { ascending: false });
+    if(error) throw error;
+    plans = data || [];
+  } catch(e){
+    console.warn('Day plan list fetch failed:', e);
+    return;
+  }
+  const titleMap = {
+    'drone': 'Drone Comb Removal',
+    'brood-break': 'Brood Break — Cage Queen',
+    'split': 'Brood Break — Split',
+    'duplex': 'Duplex-Framebox'
+  };
+  const opts = ['<option value="">📁 Saved plans…</option>']
+    .concat(plans.map(p => {
+      const label = (titleMap[p.treatment] || p.treatment) + ' · ' + (p.scope_name || p.scope_key) + ' · ' + p.start_date;
+      return '<option value="' + p.id + '">' + label.replace(/</g,'&lt;') + '</option>';
+    }));
+  ['dpSavedSelect','dpSavedSelect2'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = opts.join('');
+  });
+}
+
+async function dpLoadSavedPlan(planId){
+  if(!planId || !_sbUser) return;
+  try {
+    const { data, error } = await _sb.from('day_plan_saves')
+      .select('*').eq('id', planId).single();
+    if(error) throw error;
+    if(!data) return;
+    // Restore scope on both selectors
+    const sc1 = document.getElementById('dpScopeSelect');
+    const sc2 = document.getElementById('dpScopeSelect2');
+    if(sc1) sc1.value = data.scope_key;
+    if(sc2) sc2.value = data.scope_key;
+    if(typeof dpSetScope === 'function') dpSetScope(data.scope_key);
+    // Switch to the saved treatment
+    if(typeof selectDayPlan === 'function') selectDayPlan(data.treatment);
+    // Restore date and trigger redraw
+    const dateInputId = _DP_DATE_ID_MAP[data.treatment];
+    if(dateInputId){
+      const dateEl = document.getElementById(dateInputId);
+      if(dateEl){
+        dateEl.value = data.start_date;
+        dateEl.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+    // Reset the dropdown to the placeholder
+    ['dpSavedSelect','dpSavedSelect2'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+  } catch(e){
+    console.warn('Day plan load failed:', e);
+    try{ showToast('Load failed — check connection'); }catch(_){}
+  }
+}
+
+function _dpToggleSaveButtonForHeat(){
+  const isHeat = (typeof _activeDayPlan !== 'undefined') && _activeDayPlan === 'heat';
+  ['dpSaveBtn','dpSaveBtn2'].forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.style.display = isHeat ? 'none' : '';
+  });
+}
+
 async function _sbSavePlan(scopeKey, planName){
   if(!_sbUser) return;
   const data = {
@@ -2942,6 +3073,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('plan-gate-overlay');
         if(overlay) overlay.style.display = 'none';
         loadVMData();
+        try { _dpRefreshSavedList(); } catch(e){ console.warn('day-plan saved list refresh failed', e); }
       });
     } else {
       window.location.href = '/uk/app/?redirect=planner';
@@ -6726,6 +6858,7 @@ function selectDayPlan(id) {
     if(sc2 && sc1) sc2.value = sc1.value;
   }
   _activeDayPlan = id;
+  try { _dpToggleSaveButtonForHeat(); } catch(e){}
 }
 
 window.addEventListener('pageshow', async function(event){
