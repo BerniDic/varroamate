@@ -6464,7 +6464,7 @@ function renderDronePlanner(){
 
   const ac = document.getElementById('drone-actions');
   const cards = [
-    [1,   'amber', '🖼 Place drone frame',          dpFmt(dpAddDays(start,0)),  'Insert a drone-cell-sized frame at the edge of the brood nest. Queens preferentially lay drones at the nest periphery. Mark the hive with the date.'],
+    [0,   'amber', '🖼 Place drone frame',          dpFmt(dpAddDays(start,0)),  'Insert a drone-cell-sized frame at the edge of the brood nest. Queens preferentially lay drones at the nest periphery. Mark the hive with the date.'],
     [10,  '',      '🔍 Check frame is capping',     dpFmt(dpAddDays(start,9)),  'Larval stage should be complete. Look for the colony beginning to cap drone cells. Confirm the queen is using the frame well.'],
     [20,  'teal',  '✂️ Cycle 1 — Remove & replace (ideal)',  dpFmt(dpAddDays(start,19)), 'Frame fully capped — all mites trapped inside. Remove and freeze 48h or heat-treat in the Varroa Controller. Replace immediately with a fresh drone frame to start Cycle 2.'],
     [24,  'teal',  '✂️ Cycle 1 — Last safe removal day',      dpFmt(dpAddDays(start,23)), 'Last safe day for Cycle 1. Brood still fully capped. Remove now and replace with fresh frame. Any later and drones begin emerging, releasing mites.'],
@@ -6538,7 +6538,7 @@ function renderBBPlanner(){
 
   const ac = document.getElementById('bb-actions');
   const cards = [
-    [1,  'amber', '🔒 Cage the queen',         dpFmt(start),                    'Find and cage your queen. No new eggs can be laid. All existing brood will progressively hatch over the next 21 days. Ensure adequate stores.'],
+    [0,  'amber', '🔒 Cage the queen',         dpFmt(start),                    'Find and cage your queen. No new eggs can be laid. All existing brood will progressively hatch over the next 21 days. Ensure adequate stores.'],
     [7,  '',      '🔍 Mid-point check',         dpFmt(dpAddDays(start,6)),       'Check queen is secure and colony is calm. Increased nurse bees is normal — more adult bees available when brood finishes hatching.'],
     [15, 'amber', '🔓 Release the queen',       dpFmt(dpAddDays(start,14)),      'Release the queen. She resumes laying immediately. Eggs she lays today won\'t be capped until ~day 24, so OA treatment at days 21–22 remains in the clear broodless window.'],
     [21, 'teal',  '💨 OAV — Application 1',    dpFmt(dpAddDays(start,20)),      'Colony is broodless. All Varroa mites are phoretic (on adult bees, not in cells). Apply first OA treatment: OA vaporisation or OA dribble (Api-Bioxal/Varroxal, VMD registered). Maximum possible efficacy. Use manufacturer\'s recommended dose per hive body.'],
