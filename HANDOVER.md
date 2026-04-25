@@ -1,5 +1,5 @@
 # VarroaMate Development Handover
-## Session date: 13 April 2026
+## Session date: 25 April 2026
 ## Use this document to start a new Claude chat with full context
 
 ---
@@ -65,6 +65,30 @@ The app uses a region config system. Each region has a JS config file loaded bef
 
 ---
 
+## DAY PLAN SAVES (added 25 April 2026)
+
+**Table:** `day_plan_saves` — separate from `treatment_plans` (which is for the Smart Planner timeline editor). Do not conflate the two.
+
+Schema:
+- `id` (uuid pk), `user_id` (fk to auth.users), `treatment` (drone/brood-break/split/duplex), `scope_key` (mirrors `_dpScope`: `'all'` | `'apiary:<uuid>'` | `'hive:<id>'`), `scope_name` (denormalised display name), `start_date` (date), `created_at`, `updated_at`
+- Unique constraint: `(user_id, treatment, scope_key)` — one saved plan per (user, treatment, scope); upsert overwrites
+- RLS: 4 policies (select/insert/update/delete) all gated on `auth.uid() = user_id`
+- Heat treatment intentionally excluded — Save button hidden when `_activeDayPlan === 'heat'`
+
+**JS surface (in `planner/index.html` and `uk/planner/index.html`):**
+- `_DP_DATE_ID_MAP` — maps treatment id → date input element id
+- `_dpReadCurrentDayPlanState()` — returns `{treatment, scope_key, scope_name, start_date}` or `null`
+- `dpSaveDayPlan()` — checks for existing row, prompts overwrite confirm via `window.confirm()`, upserts
+- `_dpRefreshSavedList()` — fetches user's saved plans, populates both `dpSavedSelect` and `dpSavedSelect2`
+- `dpLoadSavedPlan(planId)` — restores scope, treatment, start date; triggers renderer via `input` event
+- `_dpToggleSaveButtonForHeat()` — hides Save button when Heat is active
+
+Hooks: `_dpRefreshSavedList()` called after `loadVMData()` in `onAuthStateChange`; `_dpToggleSaveButtonForHeat()` called at end of `selectDayPlan(id)`.
+
+UI: 💾 Save plan button + 📁 Saved plans dropdown injected into both toolbars (top + inline). Helper line under Save button explains overwrite behaviour.
+
+---
+
 ## DEPLOY WORKFLOW
 
 ```bash
@@ -123,7 +147,8 @@ git push origin main
 - uk.js: properly distinguishes UK (VMD/NBU) from Ireland (HPRA/DAFM/FIBKA)
 
 **Still to do:**
-- `uk/hygiene/`, `uk/planner/`, `uk/productivity/` — same fixes as main app
+- `uk/hygiene/` — AI chat wired up (25 Apr); other parity items still pending
+- `uk/planner/`, `uk/productivity/` — same fixes as main app
 - Legal documents: Privacy Policy and T&Cs need UK GDPR addendum
 - Cookie consent banner for UK/EU (Google Analytics)
 - Stripe GBP/EUR pricing (create new Stripe price objects)
@@ -146,6 +171,8 @@ git push origin main
 3. **UK treatment info cards** — Aluen CAP and Bayvarol entries still exist in TREATMENTS object with ⚠️ "not registered" notes. This is correct — they show a warning if selected.
 
 4. **DACH expansion** — `de.js` config not yet started. Architecture ready.
+
+5. **UK Hygiene AI** — HANDOVER previously noted `uk/hygiene/` as "still to do" but the AI chat is in fact wired up (different system prompt referencing NBU/DAFM, VMD-registered treatments). On 25 April, `renderAIMarkdown` was hardened in both AU + UK hygiene to handle `###` headers and `*` bullets, and system prompts updated to instruct plain-prose responses. UK renderer was previously simpler than AU's — both now match.
 
 ---
 
@@ -192,6 +219,12 @@ supabase secrets set KEY=value --project-ref yadptqjsjqxqjxouqkll
 curl -s -H "Authorization: Bearer SERVICE_ROLE_KEY" \
   -H "apikey: ANON_KEY" \
   "https://yadptqjsjqxqjxouqkll.supabase.co/rest/v1/feedback?limit=5&order=id.desc"
+
+
+# Inspect day_plan_saves table
+curl -s -H "Authorization: Bearer SERVICE_ROLE_KEY" \
+  -H "apikey: ANON_KEY" \
+  "https://yadptqjsjqxqjxouqkll.supabase.co/rest/v1/day_plan_saves?limit=10&order=updated_at.desc"
 ```
 
 ---
@@ -201,6 +234,7 @@ curl -s -H "Authorization: Bearer SERVICE_ROLE_KEY" \
 Previous session transcripts in `/mnt/transcripts/`:
 - `2026-04-12-02-27-35-varroamate-dev-session.txt`
 - `2026-04-12-10-45-55-varroamate-dev-session-2.txt`
+- `2026-04-25-varroamate-dev-session.txt` (VMSP mobile font, dayplan card layout, VMHH AI markdown fix, Day Plan Save feature)
 - Current session transcript will be in journal after this chat ends
 
 ---
