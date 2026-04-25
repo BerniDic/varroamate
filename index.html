@@ -2928,22 +2928,28 @@ window.addEventListener('resize', ()=>{
       if(emailEl)   emailEl.value   = '';
       if(messageEl) messageEl.value = '';
       if(btn){ btn.disabled = false; btn.textContent = 'Send message'; }
-      // Stronger, longer-duration green confirmation
+      // Stronger, longer-duration green confirmation, positioned above modal overlay
       const t = document.getElementById('toast');
       if(t){
         t.textContent = '✓  Message sent — we\'ll be in touch within 24 hours.';
         t.style.background = '#1F7A3A';
         t.style.color = '#FFFFFF';
         t.style.fontWeight = '600';
+        t.style.position = 'fixed';
+        t.style.zIndex = '9999';
+        t.style.top = 'clamp(20px, 6vh, 60px)';
         t.classList.add('show');
         clearTimeout(window.__hpContactToastTimer);
         window.__hpContactToastTimer = setTimeout(function(){
           t.classList.remove('show');
-          // Restore default styling so other toasts aren't accidentally green
+          // Restore default styling so other toasts aren't affected
           setTimeout(function(){
             t.style.background = '';
             t.style.color = '';
             t.style.fontWeight = '';
+            t.style.position = '';
+            t.style.zIndex = '';
+            t.style.top = '';
           }, 400);
         }, 6000);
       } else {
