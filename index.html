@@ -1957,10 +1957,25 @@ const FRAME_CONTENT = {
   contact: {
     title: '✉️ Contact Us',
     body: `<p>We'd love to hear from you — whether it's a bug report, a feature idea, or just a question about your bees.</p>
-<h3>General enquiries</h3>
+<h3>Email us directly</h3>
 <p><a href="mailto:hello@varroamate.com">hello&#64;varroamate.com</a></p>
-<h3>Feedback &amp; feature requests</h3>
-<p>Use the Feedback tab inside any VarroaMate app, or email us directly. User feedback directly shapes what gets built next.</p>
+<h3>Or send us a message</h3>
+<p style="font-size:14px;color:#5A3800;margin-bottom:14px;">Use the form below — we'll reply to the email you provide.</p>
+<div style="display:grid;gap:12px;background:#FFFBF0;border:1.5px solid rgba(160,110,30,0.3);border-radius:10px;padding:16px;">
+  <div>
+    <label for="hp-contact-name" style="display:block;font-size:13px;font-weight:600;color:#5A3800;margin-bottom:6px;">Your name <span style="font-weight:400;color:#9A7030;">(optional)</span></label>
+    <input id="hp-contact-name" type="text" maxlength="80" autocomplete="name" style="width:100%;padding:10px 12px;border:1.5px solid rgba(160,110,30,0.3);border-radius:8px;font-family:inherit;font-size:15px;background:#FFFEFA;color:#5A3800;box-sizing:border-box;">
+  </div>
+  <div>
+    <label for="hp-contact-email" style="display:block;font-size:13px;font-weight:600;color:#5A3800;margin-bottom:6px;">Your email <span style="color:#C44;">*</span></label>
+    <input id="hp-contact-email" type="email" required maxlength="200" autocomplete="email" style="width:100%;padding:10px 12px;border:1.5px solid rgba(160,110,30,0.3);border-radius:8px;font-family:inherit;font-size:15px;background:#FFFEFA;color:#5A3800;box-sizing:border-box;">
+  </div>
+  <div>
+    <label for="hp-contact-message" style="display:block;font-size:13px;font-weight:600;color:#5A3800;margin-bottom:6px;">Message <span style="color:#C44;">*</span></label>
+    <textarea id="hp-contact-message" rows="5" maxlength="3000" required style="width:100%;padding:10px 12px;border:1.5px solid rgba(160,110,30,0.3);border-radius:8px;font-family:inherit;font-size:15px;background:#FFFEFA;color:#5A3800;box-sizing:border-box;resize:vertical;line-height:1.5;"></textarea>
+  </div>
+  <button id="hp-contact-submit" type="button" onclick="submitHomepageContact()" style="width:100%;padding:13px 16px;background:#5A3800;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#FFFBF0;cursor:pointer;">Send message</button>
+</div>
 <h3>Commercial &amp; partnership enquiries</h3>
 <p><a href="mailto:hello@varroamate.com">hello&#64;varroamate.com</a></p>
 <p style="margin-top:14px;font-size:13px;color:#9A7030;">Based in the Yarra Valley, Victoria, Australia 🐝</p>`
@@ -2869,6 +2884,60 @@ window.addEventListener('resize', ()=>{
       container.innerHTML = '<div style="padding:16px;font-size:13px;color:#888;">Unable to load. <a href="' + url + '" target="_blank" style="color:var(--amber-dark);">Open PDF ↗</a></div>';
     });
   }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── Supabase client for homepage Contact form ─────────────────────────────────
+(function(){
+  const SUPABASE_URL = 'https://yadptqjsjqxqjxouqkll.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3VxdWtsbCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzMwOTU0NDU0LCJleHAiOjIwNDY1MzA0NTR9.PLACEHOLDER_REPLACE_WITH_REAL_KEY';
+  let _hpsb = null;
+  function getClient(){
+    if(_hpsb) return _hpsb;
+    if(typeof supabase === 'undefined' || !supabase.createClient) return null;
+    _hpsb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    return _hpsb;
+  }
+  window.submitHomepageContact = async function(){
+    const nameEl    = document.getElementById('hp-contact-name');
+    const emailEl   = document.getElementById('hp-contact-email');
+    const messageEl = document.getElementById('hp-contact-message');
+    const btn       = document.getElementById('hp-contact-submit');
+    const name    = (nameEl?.value || '').trim();
+    const email   = (emailEl?.value || '').trim();
+    const message = (messageEl?.value || '').trim();
+    if(!email){ if(typeof showToast==='function') showToast('Please enter your email so we can reply.'); else alert('Please enter your email so we can reply.'); emailEl?.focus(); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ if(typeof showToast==='function') showToast('That email address looks off — please check.'); else alert('That email address looks off — please check.'); emailEl?.focus(); return; }
+    if(!message){ if(typeof showToast==='function') showToast('Please write a message before sending.'); else alert('Please write a message before sending.'); messageEl?.focus(); return; }
+    const sb = getClient();
+    if(!sb){ if(typeof showToast==='function') showToast('Could not reach our server — please email us at hello@varroamate.com'); else alert('Could not reach our server — please email us at hello@varroamate.com'); return; }
+    if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+    try {
+      const otherText = name ? ('From: ' + name + '\n\n' + message) : message;
+      const { error } = await sb.from('feedback').insert({
+        user_id: null,
+        working_well: null,
+        to_improve: null,
+        other: otherText,
+        email: email,
+        source: 'homepage',
+        submitted_at: new Date().toISOString()
+      });
+      if(error) throw error;
+      if(nameEl)    nameEl.value    = '';
+      if(emailEl)   emailEl.value   = '';
+      if(messageEl) messageEl.value = '';
+      if(btn){ btn.disabled = false; btn.textContent = 'Send message'; }
+      if(typeof showToast === 'function') showToast('Thank you — message sent! 🐝');
+      else alert('Thank you — message sent!');
+    } catch(e) {
+      console.error('Homepage contact error:', e);
+      if(btn){ btn.disabled = false; btn.textContent = 'Send message'; }
+      if(typeof showToast === 'function') showToast('Could not send — please try again or email hello@varroamate.com');
+      else alert('Could not send — please try again or email hello@varroamate.com');
+    }
+  };
+})();
 </script>
 </body>
 </html>
