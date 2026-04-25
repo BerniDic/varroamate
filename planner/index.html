@@ -5950,7 +5950,7 @@ function _initDpScope(){
 function dpSetScope(key){
   _dpScope = key;
   if(!key || key==='all')    _dpScopeName='All Apiaries';
-  else if(key.startsWith('apiary:')){ const a=APIARIES.find(x=>x.id===key.slice(7)); _dpScopeName=a?.name||key; }
+  else if(key.startsWith('apiary:')){ const a=APIARIES.find(x=>String(x.id)===String(key.slice(7))); _dpScopeName=a?.name||key; }
   else if(key.startsWith('hive:'))  { const h=HIVES.find(x=>String(x.id)===String(key.slice(5))); _dpScopeName=h?.name||key; }
   _dpUpdatePrintHeaders();
 }
