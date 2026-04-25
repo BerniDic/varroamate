@@ -3307,8 +3307,8 @@ function scorePlan(){
     seasonOk++;
   });
   let seasonScore = cap(scoreBase ? (seasonOk/scoreBase)*100 : 0);
-  const allMech = scoringEvents.length > 0 && scoringEvents.every(e => TREATMENTS[e.treatId]?.moa === 'Mechanical');
-  if(allMech && (pressure==='high' || pressure==='critical')){
+  const allBio  = scoringEvents.length > 0 && scoringEvents.every(e => TREATMENTS[e.treatId]?.moa === 'Mechanical');
+  if(allBio  && (pressure==='high' || pressure==='critical')){
     seasonScore = cap(seasonScore - pressurePenalty[pressure]);
   }
   scores.seasonality = seasonScore;
@@ -3400,12 +3400,12 @@ function scorePlan(){
     if(moa.includes('Amitraz'))    return 'amitraz';
     if(moa.includes('Pyrethroid')) return 'pyrethroid';
     if(moa === 'Heat')         return 'heat_phys';
-    if(moa === 'Mechanical')       return 'mechanical';
+    if(moa === 'Mechanical')       return 'biological';
     return 'other';
   }));
 
   const hasChem      = moaClassesUsed.has('organic') || moaClassesUsed.has('essential') || moaClassesUsed.has('amitraz') || moaClassesUsed.has('pyrethroid');
-  const hasMech      = moaClassesUsed.has('mechanical');
+  const hasBio       = moaClassesUsed.has('biological');
   const hasPhys      = moaClassesUsed.has('heat_phys');
   const allMoAs = new Set(planEvents.map(e => {
     const moa = TREATMENTS[e.treatId]?.moa || '';
@@ -3414,21 +3414,21 @@ function scorePlan(){
     if(moa.includes('Amitraz'))    return 'amitraz';
     if(moa.includes('Pyrethroid')) return 'pyrethroid';
     if(moa === 'Heat')         return 'heat_phys';
-    if(moa === 'Mechanical')       return 'mechanical';
+    if(moa === 'Mechanical')       return 'biological';
     return 'other';
   }));
   const planHasChem = allMoAs.has('organic') || allMoAs.has('essential') || allMoAs.has('amitraz') || allMoAs.has('pyrethroid');
   const planHasPhys = allMoAs.has('heat_phys');
-  const mechOnly     = scoringEvents.length > 0 && !planHasChem && !planHasPhys && hasMech;
-  const fullSpectrum = hasChem && (hasMech || hasPhys) && moaClassesUsed.size >= 3;
+  const bioOnly      = scoringEvents.length > 0 && !planHasChem && !planHasPhys && hasBio;
+  const fullSpectrum = hasChem && (hasBio  || hasPhys) && moaClassesUsed.size >= 3;
 
   const seasonBest = {};
   const seasonBestMech = {}; // track mechanical separately — don't let them drag down avgCeiling
   scoringEvents.forEach(ev => {
     const s = getSeason(ev.month);
     const c = getCeiling(ev.treatId);
-    const isMech = (TREATMENTS[ev.treatId]?.moa || '') === 'Mechanical';
-    if(isMech){
+    const isBio  = (TREATMENTS[ev.treatId]?.moa || '') === 'Mechanical';
+    if(isBio){
       if(!seasonBestMech[s] || c > seasonBestMech[s]) seasonBestMech[s] = c;
     } else {
       if(!seasonBest[s] || c > seasonBest[s]) seasonBest[s] = c;
@@ -3443,7 +3443,7 @@ function scorePlan(){
 
   let colonyScore = avgCeiling;
 
-  if(mechOnly) colonyScore = Math.min(colonyScore, 42);
+  if(bioOnly)  colonyScore = Math.min(colonyScore, 42);
   if(fullSpectrum) colonyScore = Math.min(100, colonyScore + 12);
   if(moaClassesUsed.size === 1 && seasonsUsed.size <= 1) colonyScore -= 15;
 
@@ -3457,7 +3457,7 @@ function scorePlan(){
     colonyScore -= Math.min(25, overduePenalties.reduce((a,b)=>a+b,0)); // max -25 not -45
   }
 
-  if(mechOnly){
+  if(bioOnly){
     colonyScore = cap(colonyScore - (pressurePenaltyMechOnly[pressure] ?? 0));
   } else if(pressure === 'high' || pressure === 'critical'){
     const absorbFactor = fullSpectrum ? 0.85 : planHasChem ? 0.55 : 0.25;
@@ -3480,7 +3480,7 @@ function scorePlan(){
   const safetyCapActive = overall < rawOverall;
 
   return {scores, overall, rawOverall, safetyCapActive, sorted, conflictCount,
-          latestCount, pressure, mechOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents, planHasChem};
+          latestCount, pressure, bioOnly, fullSpectrum, overdueEvents, executedEvents, scoringEvents, planHasChem};
 }
 
 function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
@@ -3514,7 +3514,7 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
     else if(pressure === 'high')
       reasons.push(`High mite pressure (${mites} mites/300 bees) — current treatments insufficient to protect the colony`);
 
-    if(result.mechOnly)
+    if(result.bioOnly)
       reasons.push('Mechanical-only plan — cannot bring down a high infestation without chemical or physical treatment');
     else if(!result.planHasChem && result.scores.colonyRisk < 60)
       reasons.push('No chemical or physical treatments fall within the current 12-month scoring window — treatments placed further ahead do not yet count toward colony survival score');
@@ -3631,7 +3631,7 @@ function renderRating(){
     <span style="font-size:13px;font-weight:700;color:${ratingColor(result.overall)}">${ratingWord(result.overall)}</span>
   </div>`;
 
-  const {latestCount, pressure, mechOnly: isMechOnly, overdueEvents: overdue, executedEvents: executed} = result;
+  const {latestCount, pressure, bioOnly: isBioOnly, overdueEvents: overdue, executedEvents: executed} = result;
   let notes = '';
   if(latestCount && (pressure === 'high' || pressure === 'critical')){
     const icon  = pressure === 'critical' ? '🚨' : '⚠️';
@@ -3639,7 +3639,7 @@ function renderRating(){
       ? {bg:'rgba(139,26,26,0.10)', bdr:'rgba(139,26,26,0.32)', txt:'#7A0A0A'}
       : {bg:'rgba(184,92,56,0.09)', bdr:'rgba(184,92,56,0.30)', txt:'#8B3A1A'};
     const plabel = pressure === 'critical' ? 'CRITICAL' : 'HIGH';
-    const extra  = isMechOnly
+    const extra  = isBioOnly
       ? ' Mechanical methods alone cannot bring down a high infestation — act now.'
       : ' Escalate your plan to address this infestation level urgently.';
     notes += `<div style="margin-top:10px;padding:9px 11px;background:${pc.bg};border:1px solid ${pc.bdr};border-radius:6px;font-size:12px;color:${pc.txt};display:flex;align-items:flex-start;gap:6px;">
@@ -4843,11 +4843,11 @@ function drawTimeline(){
     ctx.fillText(isPast?'🔒 Locked':'+ Drop here',(dx+dx2)/2,PAD_T+TH/2+4);
   }
 
-  const MECH_IDS = new Set(['drone-comb','brood-int']);
+  const BIO_IDS = new Set(['drone-comb','brood-int']);
   const PHYS_IDS = new Set(['heat','duplex']);
-  const isMech = id => MECH_IDS.has(id);
+  const isBio = id => BIO_IDS.has(id);
   const isPhys = id => PHYS_IDS.has(id);
-  const getBand = id => isPhys(id) ? 2 : isMech(id) ? 1 : 0; // 0=chemical, 1=mechanical, 2=physical plan
+  const getBand = id => isPhys(id) ? 2 : isBio(id) ? 1 : 0; // 0=chemical, 1=biological, 2=physical plan
 
   const conflicts=getConflicts();
   const dotR=windowSpan<=6?Math.min(rowH*0.22,8):windowSpan<=12?Math.min(rowH*0.20,7):Math.min(rowH*0.18,6);
