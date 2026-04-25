@@ -89,6 +89,41 @@ UI: 💾 Save plan button + 📁 Saved plans dropdown injected into both toolbar
 
 ---
 
+## TREATMENT CATEGORIES — 3-CATEGORY MODEL (refactored 25 April 2026)
+
+VarroaMate uses a 3-category classification for treatments, replacing the earlier 2-category "Chemical vs Mechanical" split:
+
+| Category | Treatments | `moa` value | `moaShort` |
+|---|---|---|---|
+| Chemical | OA (vap/dribble/spray), Apivar, Apitraz, Apistan, Bayvarol, Formic Pro, MAQS, Aluen CAP, Apiguard, ApiLife Var, Thymovar, VarroMed, Oxuvar, Api-Bioxal, Varroxal, Oxybee, Dany's BienenWohl | (existing labels: 'Organic', 'Synthetic', 'Thymol', 'Amitraz', 'Pyrethroid', 'Essential') | varies |
+| Biological | Drone Comb Removal, Brood Interruption (queen caging) | `'Biological'` | `'BIO'` |
+| Physical | Heat Treatment (Varroa Controller), Duplex-Framebox Plan | `'Heat'` | `'HT'` |
+
+**JS identifiers (planner/index.html, uk/planner/index.html):**
+- `BIO_IDS = new Set(['drone-comb','brood-int'])`
+- `PHYS_IDS = new Set(['heat','duplex'])`
+- `isBio(id)`, `isPhys(id)` — category predicates
+- `bioOnly` flag in scoring result — `true` when plan contains only biological treatments
+- `hasBio` / `hasPhys` / `hasChem` — used in `fullSpectrum` check (3+ MoA classes earns bonus)
+- `BAND_LABELS = ['Chemical','Biological','Physical']` — chart Y-axis labels
+- `moaClassesUsed` Set uses lowercase identifiers `'biological'`, `'heat_phys'`, `'organic'`, `'amitraz'`, etc.
+
+**Scoring rule:** `Biological-only` plans (drone+brood-int alone, no chemicals/physical) hard-capped at 42% colony score. Physical-only is NOT capped because heat/duplex are far more effective than biological methods alone.
+
+**Philosophy preferences (display names changed, ids preserved):**
+- `'Mechanical + Heat Strategy Only'` → `'Biological + Physical Strategy Only'` (id: `'mechanical'` — unchanged for Supabase compatibility)
+- `'Organic + Mechanical + Heat Strategy'` → `'Organic + Biological + Physical Strategy'` (id: `'mech-organic'` — unchanged)
+- `'Organic + Heat Treatment'` — unchanged (specific product reference)
+- `'Integrated Chemical & Non-Chemical'`, `'Organic-First with Emergency Synthetic'`, `'Organic-Only Strategy'` — unchanged
+
+**Data migration ran 25 April 2026** — Supabase `profiles.treatment_pref` updated for 10 legacy users with old display names ('Mechanical + Organic Strategy', 'Mechanical Strategy Only'). Values mapped to current display names in lockstep with the code rename.
+
+**Known structural fragility:** `profiles.treatment_pref` stores the literal display name string, not the id. This means future renames require a corresponding SQL migration. A future refactor should switch to storing the philosophy `id` and looking up the display name fresh from PREFS at render time.
+
+**Apiary lookup bug fix (25 April 2026):** `dpSetScope()` in planner/index.html line 5953 originally used `x.id===key.slice(7)` for apiary lookup, which failed when APIARIES[i].id is integer and key.slice(7) is string. Now uses `String(x.id)===String(key.slice(7))` matching the hive lookup pattern on line 5954. One stale `day_plan_saves` row backfilled (apiary:9 → "Heatherlie Yard 1").
+
+---
+
 ## DEPLOY WORKFLOW
 
 ```bash
@@ -234,7 +269,7 @@ curl -s -H "Authorization: Bearer SERVICE_ROLE_KEY" \
 Previous session transcripts in `/mnt/transcripts/`:
 - `2026-04-12-02-27-35-varroamate-dev-session.txt`
 - `2026-04-12-10-45-55-varroamate-dev-session-2.txt`
-- `2026-04-25-varroamate-dev-session.txt` (VMSP mobile font, dayplan card layout, VMHH AI markdown fix, Day Plan Save feature)
+- `2026-04-25-varroamate-dev-session.txt` (VMSP mobile font, dayplan card layout, VMHH AI markdown fix, Day Plan Save feature, 3-category treatment refactor Mechanical→Biological+Physical, apiary lookup bug fix)
 - Current session transcript will be in journal after this chat ends
 
 ---
