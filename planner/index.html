@@ -1068,6 +1068,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         <button class="dp-btn preview" id="dpPreviewBtn" onclick="dpPreview()" title="Animate the progress shading to see how the timeline looks as days pass">▶ Preview progress</button>
         <button class="dp-btn save" id="dpSaveBtn" onclick="dpSaveDayPlan()" title="Save this day plan to your account">💾 Save plan</button>
       </div>
+      <div class="dp-save-help" style="font-size:11px;color:var(--text3);font-style:italic;margin:4px 0 12px;text-align:right;">One saved plan per treatment + scope. Re-saving overwrites the previous one.</div>
 
       <!-- Sub-nav tabs -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
@@ -1811,6 +1812,7 @@ canvas.drop-blocked{cursor:not-allowed;}
         <button class="dp-btn cal"   onclick="dpExportCal()">📅 Add to calendar</button>
         <button class="dp-btn save" id="dpSaveBtn2" onclick="dpSaveDayPlan()" title="Save this day plan to your account">💾 Save plan</button>
       </div>
+      <div class="dp-save-help" style="font-size:11px;color:var(--text3);font-style:italic;margin:4px 0 12px;text-align:right;">One saved plan per treatment + scope. Re-saving overwrites the previous one.</div>
       <!-- The dp-pages render here via switchDayPlanDetail() -->
       <div id="dayplan-pages-wrap" style="margin-top:16px;"></div>
     </div>
@@ -2579,6 +2581,34 @@ async function dpSaveDayPlan(){
   if(!_sbUser){ try{ showToast('Sign in to save day plans'); }catch(e){} return; }
   const state = _dpReadCurrentDayPlanState();
   if(!state){ try{ showToast('Pick a treatment and start date first'); }catch(e){} return; }
+  // Check for existing plan with same treatment + scope (overwrite confirmation)
+  try {
+    const { data: existing } = await _sb.from('day_plan_saves')
+      .select('start_date')
+      .eq('user_id', _sbUser.id)
+      .eq('treatment', state.treatment)
+      .eq('scope_key', state.scope_key)
+      .maybeSingle();
+    if(existing){
+      const titleMap = {
+        'drone': 'Drone Comb Removal',
+        'brood-break': 'Brood Break — Cage Queen',
+        'split': 'Brood Break — Split',
+        'duplex': 'Duplex-Framebox'
+      };
+      const planLabel = titleMap[state.treatment] || state.treatment;
+      const ok = window.confirm(
+        'You already have a saved ' + planLabel + ' plan for ' + state.scope_name +
+        ' (start date: ' + existing.start_date + ').\n\n' +
+        'Saving will overwrite it with the new start date: ' + state.start_date + '.\n\n' +
+        'Continue?'
+      );
+      if(!ok) return;
+    }
+  } catch(e){
+    console.warn('Day plan existence check failed:', e);
+    // Fall through and attempt save anyway
+  }
   try {
     const { error } = await _sb.from('day_plan_saves').upsert({
       user_id: _sbUser.id,
