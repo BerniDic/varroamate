@@ -3326,7 +3326,7 @@ function scorePlan(){
 
   // Combine history + scoring plan events, sorted chronologically
   const chemSorted = [...histTx, ...scoringSorted]
-    .filter(e => TREATMENTS[e.treatId]?.moa !== 'Heat')
+    .filter(e => TREATMENTS[e.treatId]?.moa !== 'Heat' && TREATMENTS[e.treatId]?.moa !== 'Biological')
     .sort((a,b)=>(a.year*12+a.month)-(b.year*12+b.month));
 
   let rotPenalty = 0;
@@ -3760,7 +3760,7 @@ async function getAIAdvice(){
   const moaViolations = [];
   for(let i=1;i<allTxChronological.length;i++){
     const prev=allTxChronological[i-1], curr=allTxChronological[i];
-    if(prev.moa && curr.moa && prev.moa===curr.moa && !prev.moa.includes('Organic Acid')){
+    if(prev.moa && curr.moa && prev.moa===curr.moa && !prev.moa.includes('Organic Acid') && prev.moa !== 'Biological' && prev.moa !== 'Heat'){
       moaViolations.push(`${curr.name} (${MONTHS[curr.month]} ${curr.year}) repeats same MoA as ${prev.name} (${MONTHS[prev.month]} ${prev.year}): ${curr.moa}`);
     }
   }
@@ -3770,7 +3770,7 @@ async function getAIAdvice(){
 
   const conflictNote = result?.conflictCount>0
     ? `IMPORTANT: ${result.conflictCount} chemical treatment(s) have overlapping duration bars with the same MoA — this is a resistance risk. Penalty severity depends on MoA: synthetics (pyrethroids, amitraz) carry the highest resistance risk and largest penalty; essential oils (thymol) are medium; organic acids (OA, formic) are lowest risk and carry a smaller penalty.`
-    : 'No chemical MoA duration conflicts detected. Note: physical treatments (heat, Duplex-Framebox) carry no resistance risk and are excluded from MoA rotation scoring. Organic acid repetition (OA/formic) carries lower resistance risk than synthetic acaricide repetition.';
+    : 'No chemical MoA duration conflicts detected. Note: biological treatments (drone comb removal, brood interruption) and physical treatments (heat, Duplex-Framebox) carry no resistance risk and are excluded from MoA rotation scoring. Organic acid repetition (OA/formic) carries lower resistance risk than synthetic acaricide repetition.';
 
   const _adviceCounts = _filteredHistory().filter(e=>e.type==='count'&&e.count!=null)
     .sort((a,b)=>(b.year*12+b.month)-(a.year*12+a.month));
