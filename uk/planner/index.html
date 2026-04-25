@@ -859,7 +859,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           <div class="leg-item" style="gap:6px;"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="rgba(184,92,56,0.8)" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Colony loss threshold (seasonal)</div>
           <div class="leg-item"><div class="leg-dot" style="background:#5A9E60"></div>Organic [OA/EO]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#1C3829"></div>Synthetic [AMZ/PYR]</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#7B6FA0"></div>Mechanical [MCH]</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#7B6FA0"></div>Biological [BIO]</div>
           <div class="leg-item"><div class="leg-dot" style="background:#A0522D"></div>Heat [HT]</div>
           <div class="leg-item" style="gap:5px;"><span style="background:#B85C38;color:white;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;">!</span> Wrong season</div>
           <div class="leg-item"><div class="leg-dot" style="background:#D4820A"></div>⚠ MoA Rotation!</div>
@@ -1876,8 +1876,8 @@ const TREATMENTS = {
   'apitraz':     {name:'Apitraz',               abbrev:'APT',  color:'#3D6B52', moa:'Amitraz',       moaShort:'AMZ', synthetic:true,  tempRange:'>10°C',   supersOff:true,  notes:'Amitraz strips. Same MoA as Apivar — do not use in same season.',              duration:42, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'bayvarol':    {name:'Bayvarol',              abbrev:'BAY',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'Flumethrin strips. ⚠️ Pyrethroid resistance confirmed in UK bee populations. Monitor post-treatment efficacy with alcohol wash.',        duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
   'apistan':     {name:'Apistan',               abbrev:'API',  color:'#1C3829', moa:'Pyrethroid',    moaShort:'PYR', synthetic:true,  tempRange:'Wide',    supersOff:true,  notes:'⚠️ Pyrethroid resistance widespread in UK bee populations. Confirm efficacy with alcohol wash at day 14 post-treatment.',            duration:56, season:['spring','autumn','winter'], badSeasons:[], badSeasonNote:''},
-  'drone-comb':  {name:'Drone Comb Removal',    abbrev:'DCR',  color:'#7B6FA0', moa:'Biological',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Remove and freeze capped drone comb. Ongoing throughout drone-rearing season.', duration:0,  season:['spring','summer'],        badSeasons:['autumn','winter'], badSeasonNote:'⚠ Not effective in autumn — drone rearing has ceased by then'},
-  'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Biological',    moaShort:'MCH', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap. Best in late summer (Jul–Aug) when mite:brood ratio is highest and winter bee rearing has not yet begun. Avoid September–October — caging the queen disrupts critical winter bee production and weakens the colony heading into winter.',    duration:25, season:['spring','summer'],  badSeasons:['winter','autumn'], badSeasonNote:'⚠ Avoid in autumn (Sep–Oct) — disrupts winter bee rearing, weakening the colony heading into winter. Cannot perform in winter — brood already absent. Best timing: Jul–Aug (late summer)'},
+  'drone-comb':  {name:'Drone Comb Removal',    abbrev:'DCR',  color:'#7B6FA0', moa:'Biological',    moaShort:'BIO', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Remove and freeze capped drone comb. Ongoing throughout drone-rearing season.', duration:0,  season:['spring','summer'],        badSeasons:['autumn','winter'], badSeasonNote:'⚠ Not effective in autumn — drone rearing has ceased by then'},
+  'brood-int':   {name:'Brood Interruption',    abbrev:'BRI',  color:'#7B6FA0', moa:'Biological',    moaShort:'BIO', synthetic:false, tempRange:'Any',     supersOff:false, notes:'Queen isolation creates broodless period (~25 days). Combine with OA vap. Best in late summer (Jul–Aug) when mite:brood ratio is highest and winter bee rearing has not yet begun. Avoid September–October — caging the queen disrupts critical winter bee production and weakens the colony heading into winter.',    duration:25, season:['spring','summer'],  badSeasons:['winter','autumn'], badSeasonNote:'⚠ Avoid in autumn (Sep–Oct) — disrupts winter bee rearing, weakening the colony heading into winter. Cannot perform in winter — brood already absent. Best timing: Jul–Aug (late summer)'},
   'heat':        {name:'Heat Treatment (Varroa Controller)', abbrev:'HT', color:'#C17B2A', moa:'Heat', moaShort:'HT', synthetic:false, tempRange:'>18°C ambient', supersOff:false, notes:'Varroa Controller early-spring treatment — removes capped brood frames one by one, heat-treats at 40–42°C. Spring-only because brood nest is smallest (2–3 frames) maximising mite concentration per frame and minimising session time. For summer heat treatment, use the Duplex-Framebox plan (duplex) instead — it is specifically designed for the expanded summer brood nest.', duration:1, season:['spring'], badSeasons:['winter','summer','autumn'], badSeasonNote:'⚠ Best in spring (Mar–May, Northern Hemisphere) when the brood nest is smallest (2–3 frames), maximising mite concentration per frame. In summer the brood nest is fully expanded, making standard heat treatment less practical — consider the Duplex-Framebox plan instead, which is specifically designed for the expanded summer brood nest. In winter there is insufficient capped brood to treat effectively.'},
   'duplex':      {name:'Duplex-Framebox Plan',  abbrev:'DFB',  color:'#A0522D', moa:'Heat',      moaShort:'HT', synthetic:false, tempRange:'>18°C', supersOff:false,
     notes:'Varroa Controller Duplex-Framebox — 24-day queen-caging mite concentration plan. Day 0: cage queen with 1 brood frame + 1 foundation in aluminium Duplex-Framebox; place in centre of brood super. All external brood continues to emerge. Day 12: first capped frame from box → heat treat in Varroa Controller; replace with empty frame; reclip box. Day 24 (honey harvest day): all brood outside box has now emerged — mites have no option but to enter the 2 box frames to reproduce. Remove both box frames → heat treat. Colony is now effectively broodless. Treat adult bees (lactic acid or OA dribble). Release queen immediately; feed with sugar syrup. Result: near-complete mite removal at honey harvest, ~20% more honey (bees not rearing brood for 24 days), fresh wax foundations, heat-treated frames available for nuc reinforcement. Requires marked queen for efficiency. Best timing: around summer solstice (Jun–Jul, Northern Hemisphere).',
@@ -1913,8 +1913,8 @@ const TREAT_GROUPS = [
     { label:'Formamidines (Amitraz)',  ids:['apivar','apitraz'] },
     { label:'Pyrethroids',             ids:['bayvarol','apistan'] },
   ]},
-  { label:'Mechanical',             ids:['drone-comb','brood-int'] },
-  { label:'Heat',               ids:['heat','duplex'] },
+  { label:'Biological',             ids:['drone-comb','brood-int'] },
+  { label:'Physical',           ids:['heat','duplex'] },
 ];
 
 let currentPref = PREFS[0];
@@ -4868,7 +4868,7 @@ function drawTimeline(){
   const BAR_PAD = LANE_H * 0.14;     // inset within a lane
   const BAR_H = LANE_H - BAR_PAD*2;
 
-  const BAND_LABELS = ['Chemical','Mechanical','Heat Plan'];
+  const BAND_LABELS = ['Chemical','Biological','Physical'];
   const BAND_COLORS = ['#7A9E8A','#8A7FAA','#B87840'];
   ctx.font='500 10px DM Sans,sans-serif';
   ctx.textAlign='right';
