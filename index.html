@@ -2928,8 +2928,27 @@ window.addEventListener('resize', ()=>{
       if(emailEl)   emailEl.value   = '';
       if(messageEl) messageEl.value = '';
       if(btn){ btn.disabled = false; btn.textContent = 'Send message'; }
-      if(typeof showToast === 'function') showToast('Thank you — message sent! 🐝');
-      else alert('Thank you — message sent!');
+      // Stronger, longer-duration green confirmation
+      const t = document.getElementById('toast');
+      if(t){
+        t.textContent = '✓  Message sent — we\'ll be in touch within 24 hours.';
+        t.style.background = '#1F7A3A';
+        t.style.color = '#FFFFFF';
+        t.style.fontWeight = '600';
+        t.classList.add('show');
+        clearTimeout(window.__hpContactToastTimer);
+        window.__hpContactToastTimer = setTimeout(function(){
+          t.classList.remove('show');
+          // Restore default styling so other toasts aren't accidentally green
+          setTimeout(function(){
+            t.style.background = '';
+            t.style.color = '';
+            t.style.fontWeight = '';
+          }, 400);
+        }, 6000);
+      } else {
+        alert('Message sent — we\'ll be in touch within 24 hours.');
+      }
     } catch(e) {
       console.error('Homepage contact error:', e);
       if(btn){ btn.disabled = false; btn.textContent = 'Send message'; }
