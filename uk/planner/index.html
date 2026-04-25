@@ -600,7 +600,7 @@ canvas.drop-blocked{cursor:not-allowed;}
           <div class="htu-num">2</div>
           <div class="htu-body">
             <strong>Choose your treatment philosophy</strong>
-            <span>Select the approach that best matches your values — organic-only, integrated, mechanical, or a combination. This filters what treatments the planner can suggest and scores your plan accordingly.</span>
+            <span>Select the approach that best matches your values — organic-only, integrated, biological + physical, or a combination. This filters what treatments the planner can suggest and scores your plan accordingly.</span>
           </div>
         </div>
         <div class="htu-step">
@@ -781,7 +781,7 @@ canvas.drop-blocked{cursor:not-allowed;}
     <div class="pref-info">
       <div class="pref-label">Your treatment philosophy — <span id="prefSyncLabel">synced with VarroaMate</span></div>
       <div class="pref-name" id="prefName">Integrated Chemical & Non-Chemical</div>
-      <div class="pref-desc" id="prefDesc">Full spectrum: synthetic chemicals, organic acids, and mechanical/heat with rotation.</div>
+      <div class="pref-desc" id="prefDesc">Full spectrum: synthetic chemicals, organic acids, and biological + physical methods with rotation.</div>
       <div style="margin-top:4px;font-size:10px;color:rgba(255,255,255,0.45);">Changes here sync back to VarroaMate automatically</div>
     </div>
     <button class="pref-change" onclick="openPrefModal()">Change →</button>
@@ -940,7 +940,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                 <div style="font-size:12px;font-weight:700;color:#8B3A1A;margin-bottom:4px;">🟢🟡🔴 Colony Survival Chance</div>
                 <div style="font-size:12px;color:var(--text2);line-height:1.5;">Reflects how effectively your <em>actual</em> treatments protect the colony. Built from three factors:
                   <br><br><strong>Efficacy ceiling</strong> — the best real-world knockdown each treatment type can achieve: Amitraz ~92%, Organic acids ~88–90%, Physical heat ~80%, Thymol ~72%, Pyrethroids ~60% (resistance risk), Mechanical ~40% (adjunct only).
-                  <br><br><strong>Plan breadth</strong> — using 3+ MoA classes (chemical + mechanical + physical) earns a full-spectrum bonus. Mechanical-only is hard-capped at 42%.
+                  <br><br><strong>Plan breadth</strong> — using 3+ MoA classes (chemical + biological + physical) earns a full-spectrum bonus. Biological-only is hard-capped at 42%.
                   <br><br><strong>Mite pressure</strong> — your latest alcohol wash count raises or lowers the score. A strong multi-MoA plan absorbs most of the pressure penalty; a weak plan does not.
                   <br><br><strong>Overdue treatments</strong> — planned treatments whose month has passed without being logged in VarroaMate apply a gap penalty. The mite population was growing unchecked during that window.
                   <br><br>🚨 <em>If Colony Survival drops below 40%, the overall plan rating is capped — a high score elsewhere cannot mask a colony likely to collapse.</em></div>
@@ -956,7 +956,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                 </div>
                 <div style="padding:8px 10px;background:rgba(74,120,152,0.06);border-left:3px solid #4A7898;border-radius:0 5px 5px 0;">
                   <div style="font-size:12px;font-weight:600;color:#2A5068;">📅 Seasonality</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Scores seasonal and biological fit. Thymol in winter scores 0% (needs warmth). OA dribble outside winter scores 50% (most effective when broodless). Mechanical-only plans are penalised at high mite pressure. Overdue skipped treatments are excluded.</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4;">Scores seasonal and biological fit. Thymol in winter scores 0% (needs warmth). OA dribble outside winter scores 50% (most effective when broodless). Biological-only plans are penalised at high mite pressure. Overdue skipped treatments are excluded.</div>
                 </div>
                 <div style="padding:8px 10px;background:rgba(212,130,10,0.06);border-left:3px solid #D4820A;border-radius:0 5px 5px 0;">
                   <div style="font-size:12px;font-weight:600;color:#8A5200;">🔄 MoA Rotation</div>
@@ -1844,7 +1844,7 @@ canvas.drop-blocked{cursor:not-allowed;}
 
 const PREFS = [
   {id:'integrated',   icon:'⚖️',  name:'Integrated Chemical & Non-Chemical',
-   desc:'Full spectrum: synthetic chemicals, organic acids, and mechanical/heat with rotation.',
+   desc:'Full spectrum: synthetic chemicals, organic acids, and biological + physical methods with rotation.',
    allowed:['oxalic','oxalic-dribble','formic','maqs','apilife','apiguard','apivar','apitraz','bayvarol','apistan','drone-comb','brood-int','heat','duplex']},
   {id:'organic-first',icon:'🌿',  name:'Organic-First with Emergency Synthetic',
    desc:'Organic acids as primary; synthetics only if infestation becomes critical.',
@@ -1853,13 +1853,13 @@ const PREFS = [
    desc:'Organic acids and thymol combined with Varroa Controller heat treatment. No synthetic chemicals.',
    allowed:['oxalic','oxalic-dribble','formic','maqs','apilife','apiguard','heat','duplex']},
   {id:'organic',      icon:'🍃',  name:'Organic-Only Strategy',
-   desc:'Organic acids and thymol exclusively. No synthetics, no heat device, no mechanical methods.',
+   desc:'Organic acids and thymol exclusively. No synthetics, no heat device, no biological methods.',
    allowed:['oxalic','oxalic-dribble','formic','maqs','apilife','apiguard']},
   {id:'mech-organic', icon:'🔩',  name:'Organic + Biological + Physical Strategy',
-   desc:'Mechanical/heat combined with organic acids. No synthetics.',
+   desc:'Biological methods (queen caging, drone comb removal) and physical heat treatment combined with organic acids. No synthetics.',
    allowed:['oxalic','oxalic-dribble','formic','maqs','apilife','apiguard','drone-comb','brood-int','heat','duplex']},
   {id:'mechanical',   icon:'🔧',  name:'Biological + Physical Strategy Only',
-   desc:'Mechanical/heat only. Zero chemicals of any kind.',
+   desc:'Biological + physical methods only. Zero chemicals of any kind.',
    allowed:['drone-comb','brood-int','heat','duplex']},
 ];
 
@@ -3501,7 +3501,7 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
   const sub      = score >= 70 ? 'This plan provides meaningful protection against colony loss.'
                  : score >= 40 ? 'Some protection in place — consider strengthening your plan.'
                  : score >= 20 ? 'This plan is unlikely to prevent colony losses at current mite pressure.'
-                 :               'Immediate action required. Mechanical methods alone cannot save this colony.';
+                 :               'Immediate action required. Biological methods alone cannot save this colony.';
   let capNote = '';
   if(safetyCapActive && result){
     const reasons = [];
@@ -3515,7 +3515,7 @@ function renderSurvivalGauge(score, safetyCapActive, result, recentTx){
       reasons.push(`High mite pressure (${mites} mites/300 bees) — current treatments insufficient to protect the colony`);
 
     if(result.bioOnly)
-      reasons.push('Mechanical-only plan — cannot bring down a high infestation without chemical or physical treatment');
+      reasons.push('Biological-only plan — cannot bring down a high infestation without chemical or physical treatment');
     else if(!result.planHasChem && result.scores.colonyRisk < 60)
       reasons.push('No chemical or physical treatments fall within the current 12-month scoring window — treatments placed further ahead do not yet count toward colony survival score');
 
@@ -3640,7 +3640,7 @@ function renderRating(){
       : {bg:'rgba(184,92,56,0.09)', bdr:'rgba(184,92,56,0.30)', txt:'#8B3A1A'};
     const plabel = pressure === 'critical' ? 'CRITICAL' : 'HIGH';
     const extra  = isBioOnly
-      ? ' Mechanical methods alone cannot bring down a high infestation — act now.'
+      ? ' Biological methods alone cannot bring down a high infestation — act now.'
       : ' Escalate your plan to address this infestation level urgently.';
     notes += `<div style="margin-top:10px;padding:9px 11px;background:${pc.bg};border:1px solid ${pc.bdr};border-radius:6px;font-size:12px;color:${pc.txt};display:flex;align-items:flex-start;gap:6px;">
       <span style="flex-shrink:0;">${icon}</span>
@@ -4167,7 +4167,7 @@ Key rules:
 - Suggest a minimal, strategic 12-month plan starting from today's date (${todayLabel}) — favour fewer, well-timed treatments over a busy schedule
 - SPRING PRIORITY: If the plan includes any post-winter months (August onwards), the first treatment after winter MUST be in September (month index 8). September is the highest-priority treatment window — brood nest is at its smallest, mite concentration per frame is highest, and early intervention prevents exponential mite growth. Never place the first post-winter treatment in October or later.
 - 12-MONTH HARD LIMIT: NEVER suggest any treatment more than 12 months from today (${todayLabel}). Any treatment beyond this window is meaningless for current planning, will not be visible in the timeline, and will not count toward the plan score. If the plan spans a winter gap, the full 12 months from today is your planning horizon — stay within it.
-- Target approximately 2 chemical treatments + approximately 2 mechanical/heat treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
+- Target approximately 2 chemical treatments + approximately 2 biological/physical treatments for a full year plan. Only deviate from this if the beekeeper's philosophy or allowed treatments make it impossible
 - LIMIT CHEMICAL TREATMENTS (amitraz, synthetic pyrethroids, thymol, OA/formic) to a maximum of 2 per plan, and only include them when warranted by mite pressure
 - Heat treatments (heat, duplex) and mechanical (drone comb removal, brood break) carry no resistance risk and are preferred — always aim to include ~2 of these
 - If there is a RECENT treatment in the history (within 8 weeks), factor it into the plan as if it were the first treatment — do not suggest a duplicate or overlapping treatment, and count it toward the ~2 chemical or ~2 mechanical slots accordingly
@@ -4182,7 +4182,7 @@ PLAN QUALITY — your suggested plan will be scored on these dimensions. Aim for
 - Season coverage: cover at least 2 of the 3 active seasons (spring, summer, autumn)
 - Supers compatibility: do not place supersOff treatments during flow months (Apr–Sep)
 - Colony survival: include enough effective treatments to meaningfully reduce mite load, especially if pressure is elevated
-A plan with no treatments, only mechanical treatments when mite pressure is high, or treatments all in the same MoA will score poorly. Be honest if the situation is truly dire (e.g. critically high mite pressure with very few allowed treatments) — in that case explain clearly why the score may still be limited. But in most cases a well-constructed plan should score 70%+ and your goal is to produce one.
+A plan with no treatments, only biological treatments when mite pressure is high, or treatments all in the same MoA will score poorly. Be honest if the situation is truly dire (e.g. critically high mite pressure with very few allowed treatments) — in that case explain clearly why the score may still be limited. But in most cases a well-constructed plan should score 70%+ and your goal is to produce one.
 Respond ONLY with valid JSON in this exact shape, no markdown fences:
 {
   "rationale": "2-3 sentence explanation of the overall plan strategy",
@@ -4206,14 +4206,14 @@ month is 0-indexed (0=Jan, 1=Feb, … 11=Dec). All suggested dates must be >= ${
 CRITICAL — USER-SELECTED TREATMENTS ONLY: The beekeeper has specifically selected these treatments to consider: ${checkedNames}. You MUST ONLY suggest treatments from this list. Do NOT suggest any other treatment even if it is permitted by the philosophy. This is a hard constraint.
 The beekeeper's treatment history: ${historyContext}.
 Please suggest a plan for the next 12 months (from ${todayLabel}) using only their allowed treatments.
-Target approximately 2 chemical + 2 mechanical/heat treatments for a full year.
+Target approximately 2 chemical + 2 biological/physical treatments for a full year.
 If a recent treatment appears in the history (within last 8 weeks), count it toward the plan slots — do not re-suggest it.
 NEVER suggest starting a treatment without a mite count first. Space alcohol wash monitoring checks no more than 4 weeks apart.
 NEVER recommend an alcohol wash more than 4 weeks in the future during the active season (Sep–Apr). In winter (May–Aug) recommend 6–8 weekly intervals only.
 Do not recommend prophylactic chemical treatments — mite pressure must exceed threshold (≥3/300) to justify chemical treatment.
 Do not suggest anything before ${todayLabel}. Do not suggest treatments in winter (Dec–Feb). Do not suggest anything more than 12 months from today — the planning horizon ends at ${MONTHS[(todayMonth+12)%12]} ${todayMonth >= 0 ? todayYear + Math.floor((todayMonth+12)/12) : todayYear+1}. Any treatment beyond this will be rejected and will not appear in the timeline.
 Aim for a plan that covers at least 2 active seasons, rotates MoA, and would score 70%+ overall. If the situation genuinely limits this (e.g. critically high pressure, very restricted philosophy) explain why in the rationale honestly — do not suggest an ineffective plan and score it as good.
-ORGANIC-ONLY PHILOSOPHY: If the philosophy is Organic-Only Strategy, permitted treatments are OA Vaporisation, OA Dribble, Formicpro, MAQS, ApiLife Var, and Apiguard. No synthetics, no heat device, no mechanical methods. If mite pressure is so high that organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers upgrading to Organic + Heat Treatment or consulting the NBU or VMD.
+ORGANIC-ONLY PHILOSOPHY: If the philosophy is Organic-Only Strategy, permitted treatments are OA Vaporisation, OA Dribble, Formicpro, MAQS, ApiLife Var, and Apiguard. No synthetics, no heat device, no biological or physical methods. If mite pressure is so high that organic-only cannot realistically achieve colony survival, say so clearly and recommend the beekeeper considers upgrading to Organic + Heat Treatment or consulting the NBU or VMD.
 ORGANIC + HEAT PHILOSOPHY: If the philosophy is Organic + Heat Treatment, permitted treatments are OA Vaporisation, OA Dribble, Formicpro, MAQS, ApiLife Var, Apiguard, Heat Treatment (Varroa Controller), and Duplex-Framebox Plan. No synthetics, no drone comb removal, no brood interruption. Pair organic acids with heat treatment for comprehensive coverage — OA vap targets phoretic mites, heat treatment kills mites in capped brood. If mite pressure is so high that this strategy cannot realistically achieve colony survival, say so clearly but do not suggest synthetics.
 BIOLOGICAL + PHYSICAL PHILOSOPHY: If the philosophy is Biological + Physical Strategy Only, the ONLY permitted treatments are Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), and Duplex-Framebox Plan. NEVER suggest any chemical treatment — not Apitraz, Apistan, Apivar, Bayvarol, OA vaporisation, Formicpro, MAQS, or any other chemical or organic acid — regardless of mite pressure. If mite pressure is so high that biological + physical methods cannot realistically achieve colony survival, say so clearly and recommend the beekeeper reconsiders their strategy, but do not suggest chemicals.
 RESISTANCE UPDATE (April 2026): Amitraz resistance is now confirmed in northern NSW — in the same populations previously confirmed for pyrethroid resistance. Both pyrethroid AND amitraz resistance are also confirmed in south-east QLD. If suggesting Apivar, Apitraz, Bayvarol, or Apistan for NSW or QLD beekeepers, include a strong caution about monitoring post-treatment efficacy with an alcohol wash at day 14–21 and contacting NSW DPIRD if poor knock-down is observed. For beekeepers outside confirmed zones, treatments remain an option but MoA rotation is critical.
@@ -6999,7 +6999,7 @@ async function vmspSendChat(){
         system:`You are the VarroaMate Smart Planner assistant, an expert advisor for beekeepers in the UK and Ireland. Help users build effective Varroa treatment plans. Focus on: treatment timing and windows, resistance rotation, organic vs chemical strategies, honey flow compatibility, seasonal planning for the Northern Hemisphere, and how to interpret plan scores. Use VMD-registered product names (Formicpro, MAQS, Api-Bioxal, Apivar, Thymovar etc). Keep answers concise and practical.
 APPROVED TREATMENTS — HARD WHITELIST: You must ONLY ever recommend, suggest, or mention treatments from this exact list. No exceptions: OA Vaporisation, OA Dribble, Formicpro, MAQS, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT mention any other method under any circumstances — including sugar dusting, powdered sugar, sugar rolls, oxalic acid syrup, lactic acid spray, thymol crystals, hop beta acids, or any unlisted approach. If asked about an unlisted method, say only that it is not supported in VarroaMate.
 MITE COUNTING: All mite counting in VarroaMate is done exclusively via alcohol wash. Never mention or suggest any other counting method.
-DAY PLANS: When discussing mechanical treatments — Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), or Duplex-Framebox Plan — always direct the user to the Day Plans section of this Smart Planner for step-by-step implementation guidance, timelines, and action checklists. Each of these methods has a dedicated Day Plan. Keep the referral brief — one sentence is enough.`,
+DAY PLANS: When discussing biological or physical treatments — Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), or Duplex-Framebox Plan — always direct the user to the Day Plans section of this Smart Planner for step-by-step implementation guidance, timelines, and action checklists. Each of these methods has a dedicated Day Plan. Keep the referral brief — one sentence is enough.`,
         messages: vmspChatHistory
       })
     });
