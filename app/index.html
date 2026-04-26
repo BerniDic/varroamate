@@ -976,7 +976,24 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="chart-fs-footer" id="chart-fs-footer"></div>
 </div>
 
-<!-- FEEDBACK -->
+<!-- WEATHER -->
+<div id="s-weather" class="screen">
+  <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a><div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div><div style="flex-shrink:0;margin-left:auto;"><button class="nav-btn" onclick="toggleAppsDropdown(event)" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button></div></div></div>
+  <div class="page-body">
+    <h1 class="page-title">🌦 Weather</h1>
+    <p class="page-subtitle">Apiary-specific forecasts to support treatment decisions</p>
+    <div class="card" style="margin-bottom:16px;">
+      <label for="weather-apiary-select" style="display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;">Apiary</label>
+      <select id="weather-apiary-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;background:var(--white);" onchange="renderWeather()">
+        <option value="">— Select an apiary —</option>
+      </select>
+    </div>
+    <div class="card" id="weather-content" style="min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px;text-align:center;line-height:1.6;">
+      <span>Pick an apiary above to see its 14-day weather forecast.<br><span style="font-size:12px;opacity:0.7;">Forecast data coming in Stage 3 — Open-Meteo integration pending.</span></span>
+    </div>
+  </div>
+</div>
+
 <!-- SUBSCRIPTION -->
 <div id="s-subscription" class="screen">
   <div class="topnav"><div class="topnav-inner"><a href="/" title="Back to VarroaMate home" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;text-decoration:none;font-size:16px;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">🏠</a><div class="logo">Varroa<em>Mate</em><sup style="font-size:9px;vertical-align:super;font-family:Arial,sans-serif;">™</sup></div><div style="flex-shrink:0;margin-left:auto;"><button class="nav-btn" onclick="toggleAppsDropdown(event)" style="display:flex;align-items:center;gap:4px;">🐝 Apps ▾</button></div></div></div>
@@ -1805,6 +1822,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="tabbar-inner">
     <div class="tab-item active" id="tabnav-apiaries" onclick="goto('s-apiaries')"><div class="tab-icon">🏡</div><div>Apiaries</div></div>
     <div class="tab-item" id="tabnav-guidance" onclick="goto('s-guidance')"><div class="tab-icon">🧭</div><div>Guidance</div></div>
+    <div class="tab-item" id="tabnav-weather" onclick="goto('s-weather')"><div class="tab-icon">🌦</div><div>Weather</div></div>
     <div class="tab-item" id="tabnav-subscription" onclick="goto('s-subscription')"><div class="tab-icon">⭐</div><div>Plans</div></div>
     <div class="tab-item" id="tabnav-prefs" onclick="goto('s-prefs')"><div class="tab-icon">⚙️</div><div>Prefs</div></div>
     <div class="tab-item" id="tabnav-library" onclick="goto('s-library')"><div class="tab-icon">📖</div><div>Library</div></div>
@@ -2225,8 +2243,8 @@ let countsPage = 0, treatmentsPage = 0, notesPage = 0;
 const PAGE_SIZE = 5;
 
 // ══ NAVIGATION ══
-const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-prefs','s-subscription','s-library'];
-const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription','s-disclaimer':'tabnav-disclaimer','s-library':'tabnav-library'};
+const APP_SCREENS=['s-apiaries','s-hives','s-hive-detail','s-field','s-guidance','s-weather','s-prefs','s-subscription','s-library'];
+const TAB_MAP={'s-apiaries':'tabnav-apiaries','s-hives':'tabnav-apiaries','s-hive-detail':'tabnav-apiaries','s-field':'tabnav-apiaries','s-guidance':'tabnav-guidance','s-weather':'tabnav-weather','s-prefs':'tabnav-prefs','s-subscription':'tabnav-subscription','s-disclaimer':'tabnav-disclaimer','s-library':'tabnav-library'};
 
 
 // ── Treatment Library ─────────────────────────────────────────────────────────
@@ -2407,6 +2425,7 @@ function goto(id,param){
     setTimeout(initChart,120);
   }
   if(id==='s-guidance'){loadGuidance();}
+  if(id==='s-weather'){renderWeather();}
   if(id==='s-apiaries'){setTimeout(()=>{if(mapInstance)mapInstance.invalidateSize();},350);}
   if(id==='s-prefs'){restorePrefSelection();restoreStateSelection();}
   if(id==='s-signin'){
@@ -5765,6 +5784,47 @@ document.addEventListener('DOMContentLoaded', async function(){
     goto('s-welcome');
   }
 });
+
+// ══ WEATHER TAB ══
+function renderWeather(){
+  const sel = document.getElementById('weather-apiary-select');
+  const content = document.getElementById('weather-content');
+  if(!sel || !content) return;
+  // Populate dropdown from apiaries array (preserve current selection if possible)
+  const prevValue = sel.value;
+  // Keep first <option> as the placeholder
+  while(sel.options.length > 1) sel.remove(1);
+  if(!apiaries || apiaries.length === 0){
+    content.innerHTML = '<span>No apiaries set up yet. <a href="javascript:goto(\'s-apiaries\')" style="color:var(--amber-dark);text-decoration:underline;">Add an apiary</a> to see weather here.</span>';
+    return;
+  }
+  apiaries.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = String(a.id);
+    opt.textContent = a.name || ('Apiary ' + a.id);
+    sel.appendChild(opt);
+  });
+  // Restore previous selection or default to first apiary
+  if(prevValue && Array.from(sel.options).some(o => o.value === prevValue)){
+    sel.value = prevValue;
+  } else if(sel.options.length > 1) {
+    sel.selectedIndex = 1;
+  }
+  const selected = apiaries.find(a => String(a.id) === sel.value);
+  if(!selected){
+    content.innerHTML = '<span>Pick an apiary above to see its 14-day weather forecast.<br><span style="font-size:12px;opacity:0.7;">Forecast data coming in Stage 3 — Open-Meteo integration pending.</span></span>';
+    return;
+  }
+  // Stage 2 placeholder — show selected apiary metadata + status
+  const lat = selected.lat;
+  const lon = selected.lon;
+  const hasCoords = (lat != null && lon != null && !isNaN(lat) && !isNaN(lon));
+  content.innerHTML = '<div style="text-align:left;width:100%;"><div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;">' + (selected.name || 'Selected apiary') + '</div>' +
+    '<div style="font-size:13px;color:var(--text3);margin-bottom:4px;">' + (selected.address || '<em>No address set</em>') + '</div>' +
+    '<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">' + (hasCoords ? ('📍 ' + Number(lat).toFixed(4) + ', ' + Number(lon).toFixed(4)) : '<em>No coordinates set — geocoding will run when forecasts are enabled.</em>') + '</div>' +
+    '<div style="padding:14px;background:var(--bg2,rgba(212,130,10,0.06));border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">⏳ Weather forecast not yet available. <strong>Stage 3</strong> will fetch a 14-day forecast from Open-Meteo (temperature, precipitation, humidity, wind). <strong>Stage 4</strong> adds treatment-window overlays.</div></div>';
+}
+// ══ END WEATHER TAB ══
 
 // ══ PULL-TO-REFRESH (mobile) ══
 (function(){
