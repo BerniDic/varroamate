@@ -5839,6 +5839,318 @@ document.addEventListener('DOMContentLoaded', async function(){
 });
 
 
+
+// ══ TREATMENT WEATHER OVERLAY ══
+
+const WEATHER_THRESHOLDS_AU = {
+  'alcohol-wash': {
+    label: 'Alcohol Wash', emoji: '🔬',
+    temp: { optimalMin: 18, optimalMax: 28, marginalMin: 15, marginalMax: 32 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 15, marginalMax: 25 },
+    notes: 'Cold stresses cluster; hot evaporates alcohol; wind chills brood.'
+  },
+  'oxalic': {
+    label: 'OA Vaporisation', emoji: '💨',
+    temp: { optimalMin: 5, optimalMax: 18, marginalMin: 0, marginalMax: 25 },
+    precip: { optimalMax: 0, marginalMax: 5 },
+    wind: { optimalMax: 15, marginalMax: 25 },
+    notes: 'Best when broodless. Above 25°C vapour rises too fast.'
+  },
+  'oxalic-dribble': {
+    label: 'OA Dribble / Aluen CAP', emoji: '💧',
+    temp: { optimalMin: 3, optimalMax: 15, marginalMin: 0, marginalMax: 22 },
+    precip: { optimalMax: 0, marginalMax: 5 },
+    wind: { optimalMax: 20, marginalMax: 30 },
+    notes: 'Single application per season. Above 22°C bees too spread for full coverage.'
+  },
+  'apiguard': {
+    label: 'Apiguard (Thymol)', emoji: '🌿',
+    temp: { optimalMin: 20, optimalMax: 30, marginalMin: 15, marginalMax: 40 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: 'Min 15°C for bees to distribute gel. Avoid above 40°C — risk of absconding.'
+  },
+  'apilife': {
+    label: 'ApiLife Var (Thymol blend)', emoji: '🌿',
+    temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: 'Effective at lower temps than Apiguard. Above 30°C: vapour release too fast.'
+  },
+  'formic': {
+    label: 'Formic PRO', emoji: '🧪',
+    temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: 'Strict label max 29.5°C. Above 33°C in first 3 days = brood/queen loss risk.'
+  },
+  'apivar': {
+    label: 'Apivar (Amitraz)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'No temperature constraint per APVMA. Bees should be active for distribution.'
+  },
+  'apitraz': {
+    label: 'Apitraz (Amitraz)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'Same envelope as Apivar. No temperature constraint.'
+  },
+  'apistan': {
+    label: 'Apistan (Tau-fluvalinate)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'No temperature constraint. Resistance is the main concern, not weather.'
+  },
+  'bayvarol': {
+    label: 'Bayvarol (Flumethrin)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'No temperature constraint per manufacturer.'
+  }
+};
+
+const WEATHER_THRESHOLDS_UK = {
+  'alcohol-wash': {
+    label: 'Alcohol Wash', emoji: '🔬',
+    temp: { optimalMin: 18, optimalMax: 28, marginalMin: 15, marginalMax: 32 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 15, marginalMax: 25 },
+    notes: 'Cold stresses cluster; hot evaporates alcohol; wind chills brood.'
+  },
+  'oxalic-vap': {
+    label: 'OA Vaporisation (Api-Bioxal/Varroxal)', emoji: '💨',
+    temp: { optimalMin: 0, optimalMax: 12, marginalMin: -5, marginalMax: 20 },
+    precip: { optimalMax: 0, marginalMax: 5 },
+    wind: { optimalMax: 15, marginalMax: 25 },
+    notes: 'Best winter broodless period. Above 20°C bees too active. Single use per season.'
+  },
+  'oxalic-dribble': {
+    label: 'OA Dribble (Api-Bioxal/Oxuvar/Oxybee/Dany\'s)', emoji: '💧',
+    temp: { optimalMin: 3, optimalMax: 12, marginalMin: 0, marginalMax: 18 },
+    precip: { optimalMax: 0, marginalMax: 5 },
+    wind: { optimalMax: 20, marginalMax: 30 },
+    notes: 'Broodless winter cluster only. Single dose per season.'
+  },
+  'oxalic-spray': {
+    label: 'OA Spray (Oxuvar)', emoji: '💧',
+    temp: { optimalMin: 8, optimalMax: 18, marginalMin: 5, marginalMax: 22 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 15, marginalMax: 25 },
+    notes: 'Direct application on bees — frame removed. Mild conditions only.'
+  },
+  'maqs': {
+    label: 'MAQS (Formic, supers ON)', emoji: '🧪',
+    temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: '7-day fast treatment. Whole 7-day window must be in range. Above 29.5°C: brood/queen risk.'
+  },
+  'formicpro': {
+    label: 'Formicpro (Formic, supers OFF)', emoji: '🧪',
+    temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: '20-day treatment. Above 29.5°C label limit.'
+  },
+  'varromed': {
+    label: 'VarroMed (Formic + OA)', emoji: '🧪',
+    temp: { optimalMin: 5, optimalMax: 20, marginalMin: 0, marginalMax: 25 },
+    precip: { optimalMax: 0, marginalMax: 5 },
+    wind: { optimalMax: 20, marginalMax: 30 },
+    notes: 'Combined formic + OA. Trickle application — mild temps preferred.'
+  },
+  'apiguard': {
+    label: 'Apiguard (Thymol)', emoji: '🌿',
+    temp: { optimalMin: 20, optimalMax: 30, marginalMin: 15, marginalMax: 40 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: 'Min 15°C for bees to distribute gel. UK climate often constrains this to summer.'
+  },
+  'apilife': {
+    label: 'ApiLife Var (Thymol blend)', emoji: '🌿',
+    temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: 'Effective at lower temps than Apiguard.'
+  },
+  'thymovar': {
+    label: 'Thymovar (Thymol strips)', emoji: '🌿',
+    temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
+    precip: { optimalMax: 5, marginalMax: 10 },
+    wind: { optimalMax: 30, marginalMax: 40 },
+    notes: 'More aggressive vapour release than Apiguard. UK ceiling needs review.'
+  },
+  'apivar': {
+    label: 'Apivar (Amitraz)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'No temperature constraint per VMD. Bees should be active for distribution.'
+  },
+  'apitraz': {
+    label: 'Apitraz (Amitraz)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'Same envelope as Apivar.'
+  },
+  'apistan': {
+    label: 'Apistan (Tau-fluvalinate)', emoji: '🩹',
+    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
+    precip: { optimalMax: 100, marginalMax: 100 },
+    wind: { optimalMax: 100, marginalMax: 100 },
+    notes: 'No temperature constraint. Resistance is the main concern.'
+  }
+};
+
+// Region selector — set per-app file (overridden in UK build)
+const _WEATHER_THRESHOLDS = WEATHER_THRESHOLDS_UK;
+
+// CVD-safe verdict palette + icons (icon + colour + text — three redundant cues)
+const _VERDICT_STYLE = {
+  optimal: {
+    icon: '✓', label: 'Optimal',
+    fg: '#1F7A3A',  // dark teal-green — readable in deuteranopia
+    bg: 'rgba(31,122,58,0.10)', border: 'rgba(31,122,58,0.35)'
+  },
+  marginal: {
+    icon: '⚠', label: 'Marginal',
+    fg: '#A86A00',  // amber-dark — high luminance contrast
+    bg: 'rgba(212,130,10,0.12)', border: 'rgba(212,130,10,0.35)'
+  },
+  avoid: {
+    icon: '✕', label: 'Avoid',
+    fg: '#9A2A1A',  // dark red — distinct from green even in protanopia
+    bg: 'rgba(154,42,26,0.10)', border: 'rgba(154,42,26,0.35)'
+  }
+};
+
+const _TIER_RANK = { optimal: 0, marginal: 1, avoid: 2 };
+const _TIER_NAME = ['optimal', 'marginal', 'avoid'];
+
+// Score a single treatment on one day — returns {tier, reasons[]}
+function _scoreSingleTreatment(treatId, dayIdx, daily){
+  const t = _WEATHER_THRESHOLDS[treatId];
+  if(!t) return { tier: 'optimal', reasons: [] };
+  const tmax   = daily.temperature_2m_max[dayIdx];
+  const precip = daily.precipitation_sum[dayIdx];
+  const wind   = daily.wind_speed_10m_max[dayIdx];
+  let worst = 'optimal';
+  const reasons = [];
+  // Temperature
+  if(t.temp){
+    if(tmax > t.temp.marginalMax || tmax < t.temp.marginalMin){
+      worst = 'avoid';
+      reasons.push('Temp ' + Math.round(tmax) + '°C outside ' + t.temp.marginalMin + '–' + t.temp.marginalMax + '°C limit');
+    } else if(tmax > t.temp.optimalMax || tmax < t.temp.optimalMin){
+      if(_TIER_RANK[worst] < 1) worst = 'marginal';
+      reasons.push('Temp ' + Math.round(tmax) + '°C outside optimal ' + t.temp.optimalMin + '–' + t.temp.optimalMax + '°C');
+    }
+  }
+  // Precipitation
+  if(t.precip && precip != null){
+    if(precip > t.precip.marginalMax){
+      worst = 'avoid';
+      reasons.push('Rain ' + precip.toFixed(1) + ' mm exceeds ' + t.precip.marginalMax + ' mm limit');
+    } else if(precip > t.precip.optimalMax){
+      if(_TIER_RANK[worst] < 1) worst = 'marginal';
+      reasons.push('Rain ' + precip.toFixed(1) + ' mm above optimal ' + t.precip.optimalMax + ' mm');
+    }
+  }
+  // Wind
+  if(t.wind && wind != null){
+    if(wind > t.wind.marginalMax){
+      worst = 'avoid';
+      reasons.push('Wind ' + Math.round(wind) + ' km/h exceeds ' + t.wind.marginalMax + ' km/h limit');
+    } else if(wind > t.wind.optimalMax){
+      if(_TIER_RANK[worst] < 1) worst = 'marginal';
+      reasons.push('Wind ' + Math.round(wind) + ' km/h above optimal ' + t.wind.optimalMax + ' km/h');
+    }
+  }
+  return { tier: worst, reasons: reasons };
+}
+
+// Worst-of across multiple treatments
+function _treatmentVerdict(dayIdx, daily, treatmentIds){
+  if(!treatmentIds || treatmentIds.length === 0) return null;
+  let worstTier = 'optimal';
+  const allReasons = [];
+  for(const tid of treatmentIds){
+    const result = _scoreSingleTreatment(tid, dayIdx, daily);
+    if(_TIER_RANK[result.tier] > _TIER_RANK[worstTier]) worstTier = result.tier;
+    if(result.reasons.length > 0){
+      const tName = _WEATHER_THRESHOLDS[tid]?.label || tid;
+      allReasons.push(tName + ': ' + result.reasons.join('; '));
+    }
+  }
+  return { tier: worstTier, reasons: allReasons };
+}
+
+// Selected treatments — persisted across renders within the session
+let _weatherSelectedTreatments = ['alcohol-wash'];
+
+function _toggleTreatmentSelection(tid){
+  const idx = _weatherSelectedTreatments.indexOf(tid);
+  if(idx === -1) _weatherSelectedTreatments.push(tid);
+  else _weatherSelectedTreatments.splice(idx, 1);
+  renderWeather();
+}
+
+function _renderTreatmentPicker(){
+  const tids = Object.keys(_WEATHER_THRESHOLDS);
+  const selectedCount = _weatherSelectedTreatments.length;
+  const summaryText = selectedCount === 0
+    ? 'No treatments selected'
+    : selectedCount === 1
+      ? '1 treatment selected: ' + (_WEATHER_THRESHOLDS[_weatherSelectedTreatments[0]]?.label || _weatherSelectedTreatments[0])
+      : selectedCount + ' treatments selected';
+  let chips = '';
+  for(const tid of tids){
+    const t = _WEATHER_THRESHOLDS[tid];
+    const checked = _weatherSelectedTreatments.indexOf(tid) !== -1;
+    chips += '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:' + (checked ? 'rgba(212,130,10,0.10)' : 'transparent') + ';border:1px solid ' + (checked ? 'rgba(212,130,10,0.35)' : 'var(--border)') + ';border-radius:8px;cursor:pointer;font-size:13px;">'
+      + '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="_toggleTreatmentSelection(\'' + tid + '\')" style="margin:0;cursor:pointer;">'
+      + '<span style="flex:1;color:var(--text);">' + t.emoji + ' ' + t.label + '</span>'
+      + '</label>';
+  }
+  return '<details id="weather-treatment-picker" style="border:1px solid var(--border);border-radius:10px;padding:0;margin-bottom:14px;background:var(--white);">'
+    + '<summary style="padding:14px;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;">'
+    +   '<span style="font-size:14px;font-weight:600;color:var(--text);">🎯 Treatments — ' + summaryText + '</span>'
+    +   '<span style="font-size:11px;color:var(--text3);">tap to change ▾</span>'
+    + '</summary>'
+    + '<div style="padding:0 14px 14px;display:grid;grid-template-columns:1fr;gap:6px;">'
+    +   '<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Worst-of verdict shown when multiple selected.</div>'
+    +   chips
+    + '</div>'
+    + '</details>';
+}
+
+function _findBestWindow(daily, treatmentIds){
+  if(!treatmentIds || treatmentIds.length === 0) return null;
+  // Find the longest run of consecutive 'optimal' days
+  let bestStart = -1, bestLen = 0, currStart = -1, currLen = 0;
+  for(let i = 0; i < daily.time.length; i++){
+    const v = _treatmentVerdict(i, daily, treatmentIds);
+    if(v && v.tier === 'optimal'){
+      if(currLen === 0) currStart = i;
+      currLen++;
+      if(currLen > bestLen){ bestLen = currLen; bestStart = currStart; }
+    } else {
+      currLen = 0;
+    }
+  }
+  if(bestLen === 0) return null;
+  return { startIdx: bestStart, length: bestLen };
+}
+
+// ══ END TREATMENT WEATHER OVERLAY ══
+
 // ══ WEATHER TAB ══
 // WMO weather code → emoji icon. Reference: https://open-meteo.com/en/docs (weather_code)
 const _WMO_ICON = {
@@ -5941,25 +6253,35 @@ function _formatDayLabel(isoDate){
   if(d.getTime() === tomorrow.getTime()) return 'Tomorrow';
   return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }
-function _renderWeatherDays(daily){
+function _renderWeatherDays(daily, treatmentIds){
   const n = daily.time.length;
   let cardsHtml = '';
   let tableRows = '';
   for(let i = 0; i < n; i++){
-    const date = daily.time[i];
-    const tmin = daily.temperature_2m_min[i];
-    const tmax = daily.temperature_2m_max[i];
-    const precip = daily.precipitation_sum[i];
-    const wind = daily.wind_speed_10m_max[i];
-    const humid = daily.relative_humidity_2m_mean[i];
-    const code = daily.weather_code[i];
-    const icon = _WMO_ICON[code] || '·';
-    const label = _WMO_LABEL[code] || ('Code ' + code);
-    const dayLbl = _formatDayLabel(date);
-    cardsHtml += '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;background:var(--white);">'
-      + '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">'
-      +   '<div style="font-size:15px;font-weight:600;color:var(--text);">' + dayLbl + '</div>'
-      +   '<div style="font-size:18px;" title="' + label + '">' + icon + '</div>'
+    const date    = daily.time[i];
+    const tmin    = daily.temperature_2m_min[i];
+    const tmax    = daily.temperature_2m_max[i];
+    const precip  = daily.precipitation_sum[i];
+    const wind    = daily.wind_speed_10m_max[i];
+    const humid   = daily.relative_humidity_2m_mean[i];
+    const code    = daily.weather_code[i];
+    const icon    = _WMO_ICON[code] || '·';
+    const label   = _WMO_LABEL[code] || ('Code ' + code);
+    const dayLbl  = _formatDayLabel(date);
+    const verdict = _treatmentVerdict(i, daily, treatmentIds);
+    const vstyle  = verdict ? _VERDICT_STYLE[verdict.tier] : null;
+    const cardBg = vstyle ? vstyle.bg : 'var(--white)';
+    const cardBorder = vstyle ? vstyle.border : 'var(--border)';
+    const verdictBadge = vstyle
+      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;background:' + vstyle.bg + ';border:1px solid ' + vstyle.border + ';color:' + vstyle.fg + ';font-size:12px;font-weight:600;">' + vstyle.icon + ' ' + vstyle.label + '</span>'
+      : '';
+    const verdictReason = verdict && verdict.reasons.length > 0
+      ? '<div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;font-style:italic;">' + verdict.reasons.join(' · ') + '</div>'
+      : '';
+    cardsHtml += '<div style="border:1px solid ' + cardBorder + ';border-radius:10px;padding:12px;margin-bottom:8px;background:' + cardBg + ';">'
+      + '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;">'
+      +   '<div style="font-size:15px;font-weight:600;color:var(--text);">' + dayLbl + ' <span style="font-size:18px;font-weight:normal;" title="' + label + '">' + icon + '</span></div>'
+      +   verdictBadge
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:13px;color:var(--text2);">'
       +   '<div>🌡 ' + Math.round(tmin) + '–' + Math.round(tmax) + '°C</div>'
@@ -5967,10 +6289,12 @@ function _renderWeatherDays(daily){
       +   '<div>💧 ' + (humid != null ? Math.round(humid) : '—') + '%</div>'
       +   '<div>💨 ' + (wind != null ? Math.round(wind) : '—') + ' km/h</div>'
       + '</div>'
+      + verdictReason
       + '</div>';
-    tableRows += '<tr>'
+    tableRows += '<tr style="background:' + cardBg + ';">'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);font-weight:500;color:var(--text);white-space:nowrap;">' + dayLbl + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);text-align:center;font-size:18px;" title="' + label + '">' + icon + '</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);">' + verdictBadge + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + Math.round(tmin) + '–' + Math.round(tmax) + '°C</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (precip != null ? precip.toFixed(1) : '—') + ' mm</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (humid != null ? Math.round(humid) + '%' : '—') + '</td>'
@@ -5983,6 +6307,7 @@ function _renderWeatherDays(daily){
     +     '<thead><tr style="text-align:left;background:var(--bg2,rgba(212,130,10,0.06));">'
     +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Day</th>'
     +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);text-align:center;">Sky</th>'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Verdict</th>'
     +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Temp</th>'
     +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Rain</th>'
     +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Humidity</th>'
@@ -5990,7 +6315,7 @@ function _renderWeatherDays(daily){
     +     '</tr></thead><tbody>' + tableRows + '</tbody>'
     +   '</table>'
     + '</div>'
-    + '<style>@media (min-width: 720px){ .weather-mobile{display:none !important;} .weather-desktop{display:block !important;} }</style>';
+    + '<style>@media (min-width: 720px){ .weather-mobile{display:none !important;} .weather-desktop{display:block !important;} }</style>;';
 }
 async function renderWeather(){
   const sel = document.getElementById('weather-apiary-select');
@@ -6066,7 +6391,24 @@ async function renderWeather(){
     const footer = '<div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:right;">'
       + 'Data: <a href="https://open-meteo.com" target="_blank" rel="noopener" style="color:inherit;">Open-Meteo</a> &nbsp;·&nbsp; ' + tz + cacheNote + geocodeNote
       + '</div>';
-    content.innerHTML = headerHtml + _renderWeatherDays(data.daily) + footer + '</div>';
+    const pickerHtml = _renderTreatmentPicker();
+    const bestWindow = _findBestWindow(data.daily, _weatherSelectedTreatments);
+    let bestWindowHtml = '';
+    if(bestWindow){
+      const startLbl = _formatDayLabel(data.daily.time[bestWindow.startIdx]);
+      const endLbl   = _formatDayLabel(data.daily.time[bestWindow.startIdx + bestWindow.length - 1]);
+      const windowText = bestWindow.length === 1
+        ? startLbl
+        : startLbl + ' – ' + endLbl + ' (' + bestWindow.length + ' days)';
+      bestWindowHtml = '<div style="padding:12px 14px;background:rgba(31,122,58,0.08);border:1px solid rgba(31,122,58,0.25);border-radius:10px;margin-bottom:14px;font-size:13px;color:#1F4F2A;line-height:1.5;">'
+        + '<strong>✓ Best treatment window:</strong> ' + windowText
+        + '</div>';
+    } else if(_weatherSelectedTreatments.length > 0){
+      bestWindowHtml = '<div style="padding:12px 14px;background:rgba(154,42,26,0.06);border:1px solid rgba(154,42,26,0.20);border-radius:10px;margin-bottom:14px;font-size:13px;color:#7A2218;line-height:1.5;">'
+        + 'No optimal days for the selected treatments in the next 14 days. Check marginal days below.'
+        + '</div>';
+    }
+    content.innerHTML = headerHtml + pickerHtml + bestWindowHtml + _renderWeatherDays(data.daily, _weatherSelectedTreatments) + footer + '</div>';
   } catch(err) {
     console.error('Weather fetch error:', err);
     content.innerHTML = headerHtml
