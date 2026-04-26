@@ -5886,6 +5886,37 @@ function _writeWeatherCache(lat, lon, data){
     localStorage.setItem(_weatherCacheKey(lat, lon), JSON.stringify({ ts: Date.now(), data: data }));
   } catch(e){}
 }
+const _geocodeMemo = {}; // session-only cache: address → {lat, lon, name, country}
+
+async function _geocodeAddress(address){
+  if(!address || !address.trim()) return null;
+  const key = address.trim().toLowerCase();
+  if(_geocodeMemo[key]) return _geocodeMemo[key];
+  const url = 'https://geocoding-api.open-meteo.com/v1/search'
+    + '?name=' + encodeURIComponent(address)
+    + '&count=1&language=en&format=json';
+  try {
+    const resp = await fetch(url);
+    if(!resp.ok) throw new Error('Geocoding failed: ' + resp.status);
+    const data = await resp.json();
+    if(!data || !Array.isArray(data.results) || data.results.length === 0){
+      _geocodeMemo[key] = null;
+      return null;
+    }
+    const r = data.results[0];
+    const result = {
+      lat: r.latitude,
+      lon: r.longitude,
+      name: r.name,
+      country: r.country
+    };
+    _geocodeMemo[key] = result;
+    return result;
+  } catch(e){
+    console.warn('Geocode lookup failed for', address, e);
+    return null;
+  }
+}
 async function _fetchWeather(lat, lon){
   const cached = _readWeatherCache(lat, lon);
   if(cached) return { data: cached, fromCache: true };
@@ -5996,25 +6027,44 @@ async function renderWeather(){
     +   (selected.address ? selected.address + ' &nbsp;·&nbsp; ' : '')
     +   (hasCoords ? '📍 ' + Number(lat).toFixed(3) + ', ' + Number(lon).toFixed(3) : '<em>No coordinates set</em>')
     + '</div>';
+  let resolvedLat = lat;
+  let resolvedLon = lon;
+  let geocoded = false;
+
   if(!hasCoords){
+    if(!selected.address || !selected.address.trim()){
+      content.innerHTML = headerHtml
+        + '<div style="padding:14px;background:var(--bg2,rgba(212,130,10,0.06));border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">'
+        +   'This apiary has no address or coordinates set. '
+        +   'Edit the apiary on the <a href="javascript:goto(\'s-apiaries\')" style="color:var(--amber-dark);text-decoration:underline;">Apiaries</a> tab to add an address.'
+        + '</div></div>';
+      return;
+    }
     content.innerHTML = headerHtml
-      + '<div style="padding:14px;background:var(--bg2,rgba(212,130,10,0.06));border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">'
-      +   'This apiary has no coordinates set, so we can\'t fetch a forecast yet. '
-      +   'Edit the apiary on the <a href="javascript:goto(\'s-apiaries\')" style="color:var(--amber-dark);text-decoration:underline;">Apiaries</a> tab and add a precise address. '
-      +   'Automatic geocoding from address is coming in Stage 4.'
-      + '</div></div>';
-    return;
+      + '<div style="padding:24px 14px;text-align:center;color:var(--text3);font-size:14px;">📍 Looking up coordinates for the address…</div></div>';
+    const geo = await _geocodeAddress(selected.address);
+    if(!geo){
+      content.innerHTML = headerHtml
+        + '<div style="padding:14px;background:rgba(200,60,40,0.06);border:1px solid rgba(200,60,40,0.2);border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">'
+        +   '⚠️ Could not find this address on the map. Try editing the apiary on the <a href="javascript:goto(\'s-apiaries\')" style="color:var(--amber-dark);text-decoration:underline;">Apiaries</a> tab and using a more specific address (street + suburb + state).'
+        + '</div></div>';
+      return;
+    }
+    resolvedLat = geo.lat;
+    resolvedLon = geo.lon;
+    geocoded = true;
   }
   content.innerHTML = headerHtml
     + '<div style="padding:24px 14px;text-align:center;color:var(--text3);font-size:14px;">⏳ Loading forecast for ' + (selected.name || 'apiary') + '…</div></div>';
   try {
-    const result = await _fetchWeather(lat, lon);
+    const result = await _fetchWeather(resolvedLat, resolvedLon);
     const data = result.data;
     if(!data.daily) throw new Error('No daily data in response');
     const tz = data.timezone || 'local time';
     const cacheNote = result.fromCache ? ' &nbsp;·&nbsp; <span title="Cached up to 1 hour">cached</span>' : '';
+    const geocodeNote = geocoded ? ' &nbsp;·&nbsp; <span title="Coordinates detected from address (not stored)">📍 geocoded</span>' : '';
     const footer = '<div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:right;">'
-      + 'Data: <a href="https://open-meteo.com" target="_blank" rel="noopener" style="color:inherit;">Open-Meteo</a> &nbsp;·&nbsp; ' + tz + cacheNote
+      + 'Data: <a href="https://open-meteo.com" target="_blank" rel="noopener" style="color:inherit;">Open-Meteo</a> &nbsp;·&nbsp; ' + tz + cacheNote + geocodeNote
       + '</div>';
     content.innerHTML = headerHtml + _renderWeatherDays(data.daily) + footer + '</div>';
   } catch(err) {
