@@ -6289,7 +6289,7 @@ function _renderWeatherDays(daily, treatmentIds){
       +   verdictBadge
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:13px;color:var(--text2);">'
-      +   '<div>🌡 ' + Math.round(tmin) + '–' + Math.round(tmax) + '°C</div>'
+      +   '<div>🌡 High ' + Math.round(tmax) + '°C</div>'
       +   '<div>🌧 ' + (precip != null ? precip.toFixed(1) : '—') + ' mm</div>'
       +   '<div>💧 ' + (humid != null ? Math.round(humid) : '—') + '%</div>'
       +   '<div>💨 ' + (wind != null ? Math.round(wind) : '—') + ' km/h</div>'
@@ -6300,7 +6300,7 @@ function _renderWeatherDays(daily, treatmentIds){
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);font-weight:500;color:var(--text);white-space:nowrap;">' + dayLbl + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);text-align:center;font-size:18px;" title="' + label + '">' + icon + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);">' + verdictBadge + '</td>'
-      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + Math.round(tmin) + '–' + Math.round(tmax) + '°C</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + Math.round(tmax) + '°C</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (precip != null ? precip.toFixed(1) : '—') + ' mm</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (humid != null ? Math.round(humid) + '%' : '—') + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (wind != null ? Math.round(wind) + ' km/h' : '—') + '</td>'
