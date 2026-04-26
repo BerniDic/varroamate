@@ -6204,6 +6204,19 @@ function _formatDayLabel(isoDate){
   if(d.getTime() === tomorrow.getTime()) return 'Tomorrow';
   return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }
+function _renderTreatmentNotes(treatmentIds){
+  if(!treatmentIds || treatmentIds.length === 0) return '';
+  const blocks = [];
+  for(const tid of treatmentIds){
+    const t = _WEATHER_THRESHOLDS[tid];
+    if(t && t.notes){
+      blocks.push('<div style="font-size:13px;color:var(--text2);line-height:1.5;padding:10px 12px;margin-bottom:8px;background:var(--white);border:1px solid var(--border);border-radius:8px;"><strong>' + (t.emoji || '') + ' ' + (t.label || tid) + ':</strong> ' + t.notes + '</div>');
+    }
+  }
+  if(blocks.length === 0) return '';
+  return '<div style="margin-bottom:14px;">' + blocks.join('') + '</div>';
+}
+
 function _renderWeatherDays(daily, treatmentIds){
   const n = daily.time.length;
   let cardsHtml = '';
@@ -6229,17 +6242,7 @@ function _renderWeatherDays(daily, treatmentIds){
     const verdictReason = verdict && verdict.reasons.length > 0
       ? '<div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;font-style:italic;">' + verdict.reasons.join(' · ') + '</div>'
       : '';
-    let treatmentNotesHtml = '';
-    if(treatmentIds && treatmentIds.length > 0){
-      const noteBlocks = [];
-      for(const tid of treatmentIds){
-        const t = _WEATHER_THRESHOLDS[tid];
-        if(t && t.notes){
-          noteBlocks.push('<div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;padding:6px 8px;background:rgba(0,0,0,0.03);border-radius:4px;"><strong>' + (t.emoji || '') + ' ' + (t.label || tid) + ':</strong> ' + t.notes + '</div>');
-        }
-      }
-      if(noteBlocks.length > 0) treatmentNotesHtml = noteBlocks.join('');
-    }
+    // (per-card notes removed — notes now shown once above the day list, see _renderTreatmentNotes)
     cardsHtml += '<div style="border:1px solid ' + cardBorder + ';border-radius:10px;padding:12px;margin-bottom:8px;background:' + cardBg + ';">'
       + '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;">'
       +   '<div style="font-size:15px;font-weight:600;color:var(--text);">' + dayLbl + ' <span style="font-size:18px;font-weight:normal;" title="' + label + '">' + icon + '</span></div>'
@@ -6252,7 +6255,6 @@ function _renderWeatherDays(daily, treatmentIds){
       +   '<div>💨 ' + (wind != null ? Math.round(wind) : '—') + ' km/h</div>'
       + '</div>'
       + verdictReason
-      + treatmentNotesHtml
       + '</div>';
     tableRows += '<tr style="background:' + cardBg + ';">'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);font-weight:500;color:var(--text);white-space:nowrap;">' + dayLbl + '</td>'
@@ -6278,7 +6280,7 @@ function _renderWeatherDays(daily, treatmentIds){
     +     '</tr></thead><tbody>' + tableRows + '</tbody>'
     +   '</table>'
     + '</div>'
-    + '<style>@media (min-width: 720px){ .weather-mobile{display:none !important;} .weather-desktop{display:block !important;} }</style>;';
+    + '<style>@media (min-width: 720px){ .weather-mobile{display:none !important;} .weather-desktop{display:block !important;} }</style>';
 }
 async function renderWeather(){
   const sel = document.getElementById('weather-apiary-select');
@@ -6371,7 +6373,7 @@ async function renderWeather(){
         + 'No optimal days for the selected treatments in the next 14 days. Check marginal days below.'
         + '</div>';
     }
-    content.innerHTML = headerHtml + '<details style="margin-bottom:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);"><summary style="padding:14px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--text);">🐝 Why weather matters for varroa treatments <span style="float:right;font-size:11px;color:var(--text3);font-weight:normal;">tap to read ▾</span></summary><div style="padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.6;"><p style="margin:0 0 10px;">Effective varroa treatment depends on the right weather conditions for each product. Three things matter most:</p><ul style="margin:0 0 10px;padding-left:20px;"><li><strong>Temperature</strong> drives the chemistry — vapour pressure for organic acids and thymol; bee activity for contact miticides.</li><li><strong>Precipitation</strong> affects whether you can safely open the hive and handle frames.</li><li><strong>Wind</strong> matters most for vapour-based treatments and beekeeper safety during application.</li></ul><p style="margin:0 0 10px;">Many products have <strong>strict label limits</strong>. Formic acid above 30°C causes brood and queen loss. Thymol below 15°C does not distribute through the colony. Oxalic acid is most effective during a broodless period when bees are clustered and vapour penetrates evenly.</p><p style="margin:0 0 10px;">Synthetic strips like Apivar and Apistan have <strong>no temperature constraint</strong> — they work as contact miticides whenever bees are active in the hive. The verdict for these will mostly stay green; weather only flags days when you cannot comfortably work the hive.</p><p style="margin:0;"><em>Always check the manufacturer label for your specific product. These are guidance values, not legal substitutes for label conditions in your jurisdiction.</em></p></div></details>' + pickerHtml + bestWindowHtml + _renderWeatherDays(data.daily, _weatherSelectedTreatments) + '<details style="margin-top:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);"><summary style="padding:14px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--text);">📖 How to read this forecast <span style="float:right;font-size:11px;color:var(--text3);font-weight:normal;">tap to read ▾</span></summary><div style="padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.6;"><p style="margin:0 0 10px;"><span style="color:#1F7A3A;font-weight:600;">✓ Optimal</span> — temperature, rain, and wind all within the manufacturer recommended range. Best day to apply.</p><p style="margin:0 0 10px;"><span style="color:#A86A00;font-weight:600;">⚠ Marginal</span> — one or more conditions outside optimal but still within label-permitted range. Treatment will work but may be less effective or stress the colony.</p><p style="margin:0 0 10px;"><span style="color:#9A2A1A;font-weight:600;">✕ Avoid</span> — at least one condition outside the manufacturer safe limits. Treatment may fail, harm bees, or violate label conditions.</p><p style="margin:10px 0;">When you select multiple treatments, the <strong>worst verdict</strong> across them sets the day overall colour. The verdict considers only the daily <strong>maximum</strong> temperature, not the minimum.</p><p style="margin:0;padding:10px;background:rgba(212,130,10,0.08);border-radius:6px;color:var(--text);"><strong>⚠ Reliability:</strong> Forecasts beyond 7 days lose accuracy quickly. Always recheck the weather closer to your planned treatment date.</p></div></details>' + footer + '</div>';
+    content.innerHTML = headerHtml + '<details style="margin-bottom:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);"><summary style="padding:14px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--text);">🐝 Why weather matters for varroa treatments <span style="float:right;font-size:11px;color:var(--text3);font-weight:normal;">tap to read ▾</span></summary><div style="padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.6;"><p style="margin:0 0 10px;">Effective varroa treatment depends on the right weather conditions for each product. Three things matter most:</p><ul style="margin:0 0 10px;padding-left:20px;"><li><strong>Temperature</strong> drives the chemistry — vapour pressure for organic acids and thymol; bee activity for contact miticides.</li><li><strong>Precipitation</strong> affects whether you can safely open the hive and handle frames.</li><li><strong>Wind</strong> matters most for vapour-based treatments and beekeeper safety during application.</li></ul><p style="margin:0 0 10px;">Many products have <strong>strict label limits</strong>. Formic acid above 30°C causes brood and queen loss. Thymol below 15°C does not distribute through the colony. Oxalic acid is most effective during a broodless period when bees are clustered and vapour penetrates evenly.</p><p style="margin:0 0 10px;">Synthetic strips like Apivar and Apistan have <strong>no temperature constraint</strong> — they work as contact miticides whenever bees are active in the hive. The verdict for these will mostly stay green; weather only flags days when you cannot comfortably work the hive.</p><p style="margin:0;"><em>Always check the manufacturer label for your specific product. These are guidance values, not legal substitutes for label conditions in your jurisdiction.</em></p></div></details>' + pickerHtml + bestWindowHtml + _renderTreatmentNotes(_weatherSelectedTreatments) + _renderWeatherDays(data.daily, _weatherSelectedTreatments) + '<details style="margin-top:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);"><summary style="padding:14px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--text);">📖 How to read this forecast <span style="float:right;font-size:11px;color:var(--text3);font-weight:normal;">tap to read ▾</span></summary><div style="padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.6;"><p style="margin:0 0 10px;"><span style="color:#1F7A3A;font-weight:600;">✓ Optimal</span> — temperature, rain, and wind all within the manufacturer recommended range. Best day to apply.</p><p style="margin:0 0 10px;"><span style="color:#A86A00;font-weight:600;">⚠ Marginal</span> — one or more conditions outside optimal but still within label-permitted range. Treatment will work but may be less effective or stress the colony.</p><p style="margin:0 0 10px;"><span style="color:#9A2A1A;font-weight:600;">✕ Avoid</span> — at least one condition outside the manufacturer safe limits. Treatment may fail, harm bees, or violate label conditions.</p><p style="margin:10px 0;">When you select multiple treatments, the <strong>worst verdict</strong> across them sets the day overall colour. The verdict considers only the daily <strong>maximum</strong> temperature, not the minimum.</p><p style="margin:0;padding:10px;background:rgba(212,130,10,0.08);border-radius:6px;color:var(--text);"><strong>⚠ Reliability:</strong> Forecasts beyond 7 days lose accuracy quickly. Always recheck the weather closer to your planned treatment date.</p></div></details>' + footer + '</div>';
   } catch(err) {
     console.error('Weather fetch error:', err);
     content.innerHTML = headerHtml
