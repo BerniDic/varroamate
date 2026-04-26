@@ -5786,13 +5786,132 @@ document.addEventListener('DOMContentLoaded', async function(){
 });
 
 // ══ WEATHER TAB ══
-function renderWeather(){
+// WMO weather code → emoji icon. Reference: https://open-meteo.com/en/docs (weather_code)
+const _WMO_ICON = {
+  0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+  45:'🌫️', 48:'🌫️',
+  51:'🌦️', 53:'🌦️', 55:'🌦️',
+  56:'🌧️', 57:'🌧️',
+  61:'🌧️', 63:'🌧️', 65:'🌧️',
+  66:'🌧️', 67:'🌧️',
+  71:'🌨️', 73:'🌨️', 75:'🌨️',
+  77:'🌨️',
+  80:'🌦️', 81:'🌧️', 82:'⛈️',
+  85:'🌨️', 86:'🌨️',
+  95:'⛈️', 96:'⛈️', 99:'⛈️'
+};
+const _WMO_LABEL = {
+  0:'Clear', 1:'Mostly clear', 2:'Partly cloudy', 3:'Overcast',
+  45:'Fog', 48:'Rime fog',
+  51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+  56:'Freezing drizzle', 57:'Freezing drizzle',
+  61:'Light rain', 63:'Rain', 65:'Heavy rain',
+  66:'Freezing rain', 67:'Freezing rain',
+  71:'Light snow', 73:'Snow', 75:'Heavy snow',
+  77:'Snow grains',
+  80:'Rain showers', 81:'Rain showers', 82:'Heavy rain showers',
+  85:'Snow showers', 86:'Heavy snow showers',
+  95:'Thunderstorm', 96:'Thunderstorm with hail', 99:'Severe thunderstorm'
+};
+const _WEATHER_CACHE_TTL_MS = 60 * 60 * 1000;
+
+function _weatherCacheKey(lat, lon){
+  return 'vmweather:' + Number(lat).toFixed(2) + ',' + Number(lon).toFixed(2);
+}
+function _readWeatherCache(lat, lon){
+  try {
+    const raw = localStorage.getItem(_weatherCacheKey(lat, lon));
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if(!obj || !obj.ts || (Date.now() - obj.ts) > _WEATHER_CACHE_TTL_MS) return null;
+    return obj.data;
+  } catch(e){ return null; }
+}
+function _writeWeatherCache(lat, lon, data){
+  try {
+    localStorage.setItem(_weatherCacheKey(lat, lon), JSON.stringify({ ts: Date.now(), data: data }));
+  } catch(e){}
+}
+async function _fetchWeather(lat, lon){
+  const cached = _readWeatherCache(lat, lon);
+  if(cached) return { data: cached, fromCache: true };
+  const url = 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=' + encodeURIComponent(lat)
+    + '&longitude=' + encodeURIComponent(lon)
+    + '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,relative_humidity_2m_mean,weather_code'
+    + '&forecast_days=14&timezone=auto&wind_speed_unit=kmh&temperature_unit=celsius&precipitation_unit=mm';
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error('Forecast fetch failed: ' + resp.status);
+  const data = await resp.json();
+  if(!data || !data.daily || !Array.isArray(data.daily.time)) throw new Error('Forecast response missing daily data');
+  _writeWeatherCache(lat, lon, data);
+  return { data: data, fromCache: false };
+}
+function _formatDayLabel(isoDate){
+  const d = new Date(isoDate + 'T00:00:00');
+  if(isNaN(d.getTime())) return isoDate;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+  if(d.getTime() === today.getTime()) return 'Today';
+  if(d.getTime() === tomorrow.getTime()) return 'Tomorrow';
+  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function _renderWeatherDays(daily){
+  const n = daily.time.length;
+  let cardsHtml = '';
+  let tableRows = '';
+  for(let i = 0; i < n; i++){
+    const date = daily.time[i];
+    const tmin = daily.temperature_2m_min[i];
+    const tmax = daily.temperature_2m_max[i];
+    const precip = daily.precipitation_sum[i];
+    const wind = daily.wind_speed_10m_max[i];
+    const humid = daily.relative_humidity_2m_mean[i];
+    const code = daily.weather_code[i];
+    const icon = _WMO_ICON[code] || '·';
+    const label = _WMO_LABEL[code] || ('Code ' + code);
+    const dayLbl = _formatDayLabel(date);
+    cardsHtml += '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;background:var(--white);">'
+      + '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">'
+      +   '<div style="font-size:15px;font-weight:600;color:var(--text);">' + dayLbl + '</div>'
+      +   '<div style="font-size:18px;" title="' + label + '">' + icon + '</div>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:13px;color:var(--text2);">'
+      +   '<div>🌡 ' + Math.round(tmin) + '–' + Math.round(tmax) + '°C</div>'
+      +   '<div>🌧 ' + (precip != null ? precip.toFixed(1) : '—') + ' mm</div>'
+      +   '<div>💧 ' + (humid != null ? Math.round(humid) : '—') + '%</div>'
+      +   '<div>💨 ' + (wind != null ? Math.round(wind) : '—') + ' km/h</div>'
+      + '</div>'
+      + '</div>';
+    tableRows += '<tr>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);font-weight:500;color:var(--text);white-space:nowrap;">' + dayLbl + '</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);text-align:center;font-size:18px;" title="' + label + '">' + icon + '</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + Math.round(tmin) + '–' + Math.round(tmax) + '°C</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (precip != null ? precip.toFixed(1) : '—') + ' mm</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (humid != null ? Math.round(humid) + '%' : '—') + '</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (wind != null ? Math.round(wind) + ' km/h' : '—') + '</td>'
+      + '</tr>';
+  }
+  return '<div class="weather-mobile" style="display:block;">' + cardsHtml + '</div>'
+    + '<div class="weather-desktop" style="display:none;overflow-x:auto;">'
+    +   '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+    +     '<thead><tr style="text-align:left;background:var(--bg2,rgba(212,130,10,0.06));">'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Day</th>'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);text-align:center;">Sky</th>'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Temp</th>'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Rain</th>'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Humidity</th>'
+    +       '<th style="padding:10px 8px;font-weight:600;color:var(--text2);">Wind</th>'
+    +     '</tr></thead><tbody>' + tableRows + '</tbody>'
+    +   '</table>'
+    + '</div>'
+    + '<style>@media (min-width: 720px){ .weather-mobile{display:none !important;} .weather-desktop{display:block !important;} }</style>';
+}
+async function renderWeather(){
   const sel = document.getElementById('weather-apiary-select');
   const content = document.getElementById('weather-content');
   if(!sel || !content) return;
-  // Populate dropdown from apiaries array (preserve current selection if possible)
   const prevValue = sel.value;
-  // Keep first <option> as the placeholder
   while(sel.options.length > 1) sel.remove(1);
   if(!apiaries || apiaries.length === 0){
     content.innerHTML = '<span>No apiaries set up yet. <a href="javascript:goto(\'s-apiaries\')" style="color:var(--amber-dark);text-decoration:underline;">Add an apiary</a> to see weather here.</span>';
@@ -5804,7 +5923,6 @@ function renderWeather(){
     opt.textContent = a.name || ('Apiary ' + a.id);
     sel.appendChild(opt);
   });
-  // Restore previous selection or default to first apiary
   if(prevValue && Array.from(sel.options).some(o => o.value === prevValue)){
     sel.value = prevValue;
   } else if(sel.options.length > 1) {
@@ -5812,17 +5930,47 @@ function renderWeather(){
   }
   const selected = apiaries.find(a => String(a.id) === sel.value);
   if(!selected){
-    content.innerHTML = '<span>Pick an apiary above to see its 14-day weather forecast.<br><span style="font-size:12px;opacity:0.7;">Forecast data coming in Stage 3 — Open-Meteo integration pending.</span></span>';
+    content.innerHTML = '<span>Pick an apiary above to see its 14-day weather forecast.</span>';
     return;
   }
-  // Stage 2 placeholder — show selected apiary metadata + status
   const lat = selected.lat;
   const lon = selected.lon;
   const hasCoords = (lat != null && lon != null && !isNaN(lat) && !isNaN(lon));
-  content.innerHTML = '<div style="text-align:left;width:100%;"><div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;">' + (selected.name || 'Selected apiary') + '</div>' +
-    '<div style="font-size:13px;color:var(--text3);margin-bottom:4px;">' + (selected.address || '<em>No address set</em>') + '</div>' +
-    '<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">' + (hasCoords ? ('📍 ' + Number(lat).toFixed(4) + ', ' + Number(lon).toFixed(4)) : '<em>No coordinates set — geocoding will run when forecasts are enabled.</em>') + '</div>' +
-    '<div style="padding:14px;background:var(--bg2,rgba(212,130,10,0.06));border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">⏳ Weather forecast not yet available. <strong>Stage 3</strong> will fetch a 14-day forecast from Open-Meteo (temperature, precipitation, humidity, wind). <strong>Stage 4</strong> adds treatment-window overlays.</div></div>';
+  const headerHtml = '<div style="text-align:left;width:100%;">'
+    + '<div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;">' + (selected.name || 'Selected apiary') + '</div>'
+    + '<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">'
+    +   (selected.address ? selected.address + ' &nbsp;·&nbsp; ' : '')
+    +   (hasCoords ? '📍 ' + Number(lat).toFixed(3) + ', ' + Number(lon).toFixed(3) : '<em>No coordinates set</em>')
+    + '</div>';
+  if(!hasCoords){
+    content.innerHTML = headerHtml
+      + '<div style="padding:14px;background:var(--bg2,rgba(212,130,10,0.06));border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">'
+      +   'This apiary has no coordinates set, so we can\'t fetch a forecast yet. '
+      +   'Edit the apiary on the <a href="javascript:goto(\'s-apiaries\')" style="color:var(--amber-dark);text-decoration:underline;">Apiaries</a> tab and add a precise address. '
+      +   'Automatic geocoding from address is coming in Stage 4.'
+      + '</div></div>';
+    return;
+  }
+  content.innerHTML = headerHtml
+    + '<div style="padding:24px 14px;text-align:center;color:var(--text3);font-size:14px;">⏳ Loading forecast for ' + (selected.name || 'apiary') + '…</div></div>';
+  try {
+    const result = await _fetchWeather(lat, lon);
+    const data = result.data;
+    if(!data.daily) throw new Error('No daily data in response');
+    const tz = data.timezone || 'local time';
+    const cacheNote = result.fromCache ? ' &nbsp;·&nbsp; <span title="Cached up to 1 hour">cached</span>' : '';
+    const footer = '<div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:right;">'
+      + 'Data: <a href="https://open-meteo.com" target="_blank" rel="noopener" style="color:inherit;">Open-Meteo</a> &nbsp;·&nbsp; ' + tz + cacheNote
+      + '</div>';
+    content.innerHTML = headerHtml + _renderWeatherDays(data.daily) + footer + '</div>';
+  } catch(err) {
+    console.error('Weather fetch error:', err);
+    content.innerHTML = headerHtml
+      + '<div style="padding:14px;background:rgba(200,60,40,0.06);border:1px solid rgba(200,60,40,0.2);border-radius:8px;font-size:13px;color:var(--text2);line-height:1.5;">'
+      +   '⚠️ Could not load the forecast right now. Check your internet connection and try again.'
+      +   '<div style="margin-top:8px;"><button onclick="renderWeather()" style="padding:8px 14px;background:var(--amber-dark);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Retry</button></div>'
+      + '</div></div>';
+  }
 }
 // ══ END WEATHER TAB ══
 
