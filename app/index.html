@@ -6045,8 +6045,13 @@ function _toggleTreatmentSelection(tid){
   const idx = _weatherSelectedTreatments.indexOf(tid);
   if(idx === -1) _weatherSelectedTreatments.push(tid);
   else _weatherSelectedTreatments.splice(idx, 1);
+  // Remember picker open state so it doesn't snap closed on every tick
+  const picker = document.getElementById('weather-treatment-picker');
+  _weatherPickerWasOpen = picker ? picker.open : true;
   renderWeather();
 }
+
+let _weatherPickerWasOpen = true;
 
 function _renderTreatmentPicker(){
   const tids = Object.keys(_WEATHER_THRESHOLDS);
@@ -6065,7 +6070,7 @@ function _renderTreatmentPicker(){
       + '<span style="flex:1;color:var(--text);">' + t.emoji + ' ' + t.label + '</span>'
       + '</label>';
   }
-  return '<details id="weather-treatment-picker" style="border:1px solid var(--border);border-radius:10px;padding:0;margin-bottom:14px;background:var(--white);">'
+  return '<details id="weather-treatment-picker" ' + (_weatherPickerWasOpen ? 'open' : '') + ' style="border:1px solid var(--border);border-radius:10px;padding:0;margin-bottom:14px;background:var(--white);">'
     + '<summary style="padding:14px;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;">'
     +   '<span style="font-size:14px;font-weight:600;color:var(--text);">🎯 Treatments — ' + summaryText + '</span>'
     +   '<span style="font-size:11px;color:var(--text3);">tap to change ▾</span>'
