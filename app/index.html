@@ -5810,57 +5810,57 @@ const WEATHER_THRESHOLDS_AU = {
   'oxalic-dribble': {
     label: 'OA Dribble / Aluen CAP', emoji: '💧',
     temp: { optimalMin: 3, optimalMax: 15, marginalMin: 0, marginalMax: 22 },
-    precip: { optimalMax: 0, marginalMax: 5 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 20, marginalMax: 30 },
     notes: 'Oxalic acid in sugar solution, trickled onto bees between frames. Best applied during winter broodless cluster — single application per season because acid damages bee gut tissue if repeated. Above 22°C bees are too spread out for full coverage. Cold conditions help by keeping the cluster tight, ensuring every bee contacts the dribble.'
   },
   'apiguard': {
     label: 'Apiguard (Thymol)', emoji: '🌿',
     temp: { optimalMin: 20, optimalMax: 30, marginalMin: 15, marginalMax: 40 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Thymol gel slowly releases vapour over weeks. Below 15°C, bees cluster and do not actively distribute the gel; thymol concentration never reaches lethal levels for mites. Above 40°C, vapour release accelerates and can trigger absconding or queen disruption. Best timed late summer or autumn after honey harvest, when bees are still active but brood is reducing.'
   },
   'apilife': {
     label: 'ApiLife Var (Thymol blend)', emoji: '🌿',
     temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Thymol blend (with eucalyptol, menthol, camphor) in vermiculite wafers. The additional essential oils make ApiLife Var more effective than pure thymol at lower temperatures (down to 12°C) — bees are irritated enough to distribute the product even when only moderately active. Above 30°C vapour release is too rapid and risks brood damage.'
   },
   'formic': {
     label: 'Formic PRO', emoji: '🧪',
     temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Formic acid is one of only two treatments that kill mites under capped brood — formic by penetrating cell cappings as vapour, and heat treatment (Varroa Controller) by raising hive temperature to ~42°C, lethal to mites but tolerated by bees. The formic vapour is corrosive and weather-sensitive: above 29.5°C label limit, vapour release in the first 3 days can cause brood mortality and queen loss. Below 10°C vapour pressure is too low for efficacy.'
   },
   'apivar': {
     label: 'Apivar (Amitraz)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Amitraz on plastic strips — a contact miticide. No label temperature constraint per APVMA. Bees pick up the active ingredient by touching the strip and distribute it through the colony. Cold weather (clustered bees) reduces distribution but does not damage efficacy. The bigger concern is amitraz resistance, now widespread — rotate with non-amitraz products to preserve effectiveness.'
   },
   'apitraz': {
     label: 'Apitraz (Amitraz)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Same active ingredient as Apivar (amitraz), same envelope. Contact miticide via strips, no temperature constraint. APVMA permit treats Apivar and Apitraz as interchangeable for resistance management — only one amitraz product per season. Rotate with thymol or organic acids in alternating seasons.'
   },
   'apistan': {
     label: 'Apistan (Tau-fluvalinate)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Tau-fluvalinate strips — synthetic pyrethroid contact miticide. No temperature constraint, works whenever bees are active. The defining issue is resistance: Apistan resistance is now globally widespread because it was the dominant treatment for decades. Use only as part of a strict rotation strategy, and confirm efficacy with a post-treatment alcohol wash.'
   },
   'bayvarol': {
     label: 'Bayvarol (Flumethrin)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Flumethrin strips — synthetic pyrethroid contact miticide, similar mechanism to Apistan. No temperature constraint. Cross-resistance with Apistan is documented because both are pyrethroids targeting the same mite ion channel. Treat as one slot in your rotation, not two.'
   }
 };
@@ -5870,7 +5870,7 @@ const WEATHER_THRESHOLDS_UK = {
     label: 'Alcohol Wash', emoji: '🔬',
     temp: { optimalMin: 18, optimalMax: 28, marginalMin: 15, marginalMax: 32 },
     precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 25, marginalMax: 35 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'A monitoring tool, not a treatment — accurate mite counts via dislodging phoretic mites from a 300-bee sample. Below 18°C, opening the hive disrupts the bee cluster, costs the colony significant energy, and chills exposed brood. The wash itself works in any weather chemically; the temperature restriction is to protect the colony, not the procedure.'
   },
   'oxalic-vap': {
@@ -5883,7 +5883,7 @@ const WEATHER_THRESHOLDS_UK = {
   'oxalic-dribble': {
     label: 'OA Dribble (Api-Bioxal/Oxuvar/Oxybee/Dany\'s)', emoji: '💧',
     temp: { optimalMin: 3, optimalMax: 12, marginalMin: 0, marginalMax: 18 },
-    precip: { optimalMax: 0, marginalMax: 5 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 20, marginalMax: 30 },
     notes: 'Oxalic acid in sugar solution, trickled onto bees between frames. Best applied during winter broodless cluster — single application per season because acid damages bee gut tissue if repeated. Above 22°C bees are too spread out for full coverage. Cold conditions help by keeping the cluster tight, ensuring every bee contacts the dribble.'
   },
@@ -5897,64 +5897,64 @@ const WEATHER_THRESHOLDS_UK = {
   'maqs': {
     label: 'MAQS (Formic, supers ON)', emoji: '🧪',
     temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Mite Away Quick Strips — formic acid in a 7-day fast treatment that can be applied with honey supers ON. The whole 7-day window must stay below 29.5°C; even one hot day in the first 3 days risks excessive brood mortality and queen loss. The trade-off for the supers-on convenience is the strict weather window — only summer applications work in UK climate.'
   },
   'formicpro': {
     label: 'Formicpro (Formic, supers OFF)', emoji: '🧪',
     temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Formic acid in a 20-day slower-release treatment, supers OFF. Same active ingredient as MAQS but gentler release profile, so the temperature limit (29.5°C) applies but the queen and brood risk is lower. Useful when a 7-day MAQS window cannot be guaranteed. Apply in autumn after honey harvest, leave 14–20 days.'
   },
   'varromed': {
     label: 'VarroMed (Formic + OA)', emoji: '🧪',
     temp: { optimalMin: 5, optimalMax: 20, marginalMin: 0, marginalMax: 25 },
-    precip: { optimalMax: 0, marginalMax: 5 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 20, marginalMax: 30 },
     notes: 'Combined formic + oxalic acid trickle solution. Mild conditions preferred (5–20°C) — formic component limits the upper bound, oxalic component prefers cool. Multiple applications across the brood cycle to catch successive emerging mites. UK-only registration.'
   },
   'apiguard': {
     label: 'Apiguard (Thymol)', emoji: '🌿',
     temp: { optimalMin: 20, optimalMax: 30, marginalMin: 15, marginalMax: 40 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Thymol gel slowly releases vapour over weeks. Below 15°C, bees cluster and do not actively distribute the gel; thymol concentration never reaches lethal levels for mites. Above 40°C, vapour release accelerates and can trigger absconding or queen disruption. Best timed late summer or autumn after honey harvest, when bees are still active but brood is reducing.'
   },
   'apilife': {
     label: 'ApiLife Var (Thymol blend)', emoji: '🌿',
     temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Thymol blend (with eucalyptol, menthol, camphor) in vermiculite wafers. The additional essential oils make ApiLife Var more effective than pure thymol at lower temperatures (down to 12°C) — bees are irritated enough to distribute the product even when only moderately active. Above 30°C vapour release is too rapid and risks brood damage.'
   },
   'thymovar': {
     label: 'Thymovar (Thymol strips)', emoji: '🌿',
     temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
-    precip: { optimalMax: 5, marginalMax: 10 },
+    precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Thymol on cellulose strips — releases vapour faster than Apiguard gel formulation, so works at slightly lower temps (15–25°C optimal) but more aggressive on bees in hot weather. Bees may avoid the strip area initially. Two applications, 3–4 weeks apart. Place strips on top of brood frames with an eke for spacing.'
   },
   'apivar': {
     label: 'Apivar (Amitraz)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Amitraz on plastic strips — a contact miticide. No label temperature constraint per APVMA. Bees pick up the active ingredient by touching the strip and distribute it through the colony. Cold weather (clustered bees) reduces distribution but does not damage efficacy. The bigger concern is amitraz resistance, now widespread — rotate with non-amitraz products to preserve effectiveness.'
   },
   'apitraz': {
     label: 'Apitraz (Amitraz)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Same active ingredient as Apivar (amitraz), same envelope. Contact miticide via strips, no temperature constraint. APVMA permit treats Apivar and Apitraz as interchangeable for resistance management — only one amitraz product per season. Rotate with thymol or organic acids in alternating seasons.'
   },
   'apistan': {
     label: 'Apistan (Tau-fluvalinate)', emoji: '🩹',
     temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 100, marginalMax: 100 },
-    wind: { optimalMax: 100, marginalMax: 100 },
+    precip: { optimalMax: 0, marginalMax: 2 },
+    wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Tau-fluvalinate strips — synthetic pyrethroid contact miticide. No temperature constraint, works whenever bees are active. The defining issue is resistance: Apistan resistance is now globally widespread because it was the dominant treatment for decades. Use only as part of a strict rotation strategy, and confirm efficacy with a post-treatment alcohol wash.'
   }
 };
@@ -6374,7 +6374,7 @@ async function renderWeather(){
         + '</div>';
     } else if(_weatherSelectedTreatments.length > 0){
       bestWindowHtml = '<div style="padding:12px 14px;background:rgba(154,42,26,0.06);border:1px solid rgba(154,42,26,0.20);border-radius:10px;margin-bottom:14px;font-size:13px;color:#7A2218;line-height:1.5;">'
-        + 'No optimal days for the selected treatments in the next 14 days. Check marginal days below.'
+        + '<strong>⚠ No optimal days in the next 14 days.</strong> Marginal days are still acceptable when timing matters — they are outside ideal but within label limits. If you can wait a few days for better conditions, do so. If treatment is urgent (high mite count, brood emerging, end of treatment window), proceed on the best marginal day available.'
         + '</div>';
     }
     content.innerHTML = headerHtml + '<details style="margin-bottom:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);"><summary style="padding:14px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--text);">🐝 Why weather matters for varroa treatments <span style="float:right;font-size:11px;color:var(--text3);font-weight:normal;">tap to read ▾</span></summary><div style="padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.6;"><p style="margin:0 0 10px;">Effective varroa treatment depends on the right weather conditions for each product. Three things matter most:</p><ul style="margin:0 0 10px;padding-left:20px;"><li><strong>Temperature</strong> drives the chemistry — vapour pressure for organic acids and thymol; bee activity for contact miticides.</li><li><strong>Precipitation</strong> affects whether you can safely open the hive and handle frames.</li><li><strong>Wind</strong> mostly matters for wind chill — when temperatures are pushed below the limits to safely open a hive without disturbing the cluster.</li></ul><p style="margin:0 0 10px;">Many products have <strong>strict label limits</strong>. Formic acid above 30°C causes brood and queen loss. Thymol below 15°C does not distribute through the colony. Oxalic acid is most effective during a broodless period when bees are clustered and vapour penetrates evenly.</p><p style="margin:0 0 10px;">Synthetic strips like Apivar and Apistan have <strong>no temperature constraint</strong> — they work as contact miticides whenever bees are active in the hive. The verdict for these will mostly stay green; weather only flags days when you cannot comfortably work the hive.</p><p style="margin:0;"><em>Always check the manufacturer label for your specific product. These are guidance values, not legal substitutes for label conditions in your jurisdiction.</em></p></div></details>' + pickerHtml + bestWindowHtml + _renderTreatmentNotes(_weatherSelectedTreatments) + _renderWeatherDays(data.daily, _weatherSelectedTreatments) + '<details style="margin-top:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);"><summary style="padding:14px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--text);">📖 How to read this forecast <span style="float:right;font-size:11px;color:var(--text3);font-weight:normal;">tap to read ▾</span></summary><div style="padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.6;"><p style="margin:0 0 10px;"><span style="color:#1F7A3A;font-weight:600;">✓ Optimal</span> — temperature, rain, and wind all within the manufacturer recommended range. Best day to apply.</p><p style="margin:0 0 10px;"><span style="color:#A86A00;font-weight:600;">⚠ Marginal</span> — one or more conditions outside optimal but still within label-permitted range. Treatment will work but may be less effective or stress the colony.</p><p style="margin:0 0 10px;"><span style="color:#9A2A1A;font-weight:600;">✕ Avoid</span> — at least one condition outside the manufacturer safe limits. Treatment may fail, harm bees, or violate label conditions.</p><p style="margin:10px 0;">When you select multiple treatments, the <strong>worst verdict</strong> across them sets the day overall colour. The verdict considers only the daily <strong>maximum</strong> temperature, not the minimum.</p><p style="margin:0;padding:10px;background:rgba(212,130,10,0.08);border-radius:6px;color:var(--text);"><strong>⚠ Reliability:</strong> Forecasts beyond 7 days lose accuracy quickly. Always recheck the weather closer to your planned treatment date.</p></div></details>' + footer + '</div>';
