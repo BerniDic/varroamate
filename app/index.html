@@ -6267,7 +6267,7 @@ function _renderWeatherDays(daily, treatmentIds){
     tableRows += '<tr style="background:' + cardBg + ';">'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);font-weight:500;color:var(--text);white-space:nowrap;">' + dayLbl + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);text-align:center;font-size:18px;" title="' + label + '">' + icon + '</td>'
-      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);">' + verdictBadge + '</td>'
+      + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);">' + verdictBadge + (verdict && verdict.reasons.length > 0 ? '<div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;font-style:italic;">' + verdict.reasons.join(' · ') + '</div>' : '') + '</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + Math.round(tmax) + '°C</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (precip != null ? precip.toFixed(1) : '—') + ' mm</td>'
       + '<td style="padding:10px 8px;border-bottom:1px solid var(--border);color:var(--text2);">' + (humid != null ? Math.round(humid) + '%' : '—') + '</td>'
