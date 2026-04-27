@@ -5988,22 +5988,26 @@ const _TIER_NAME = ['optimal', 'marginal', 'avoid'];
 function _scoreSingleTreatment(treatId, dayIdx, daily){
   const t = _WEATHER_THRESHOLDS[treatId];
   if(!t) return { tier: 'optimal', reasons: [] };
-  const tmax   = daily.temperature_2m_max[dayIdx];
-  const precip = daily.precipitation_sum[dayIdx];
-  const wind   = daily.wind_speed_10m_max[dayIdx];
+  // Round to integers (and 0.1mm for precip) so scoring matches what the user sees on the card.
+  const rawTmax = daily.temperature_2m_max[dayIdx];
+  const rawPrecip = daily.precipitation_sum[dayIdx];
+  const rawWind = daily.wind_speed_10m_max[dayIdx];
+  const tmax   = (rawTmax != null) ? Math.round(rawTmax) : null;
+  const precip = (rawPrecip != null) ? Math.round(rawPrecip * 10) / 10 : null;
+  const wind   = (rawWind != null) ? Math.round(rawWind) : null;
   let worst = 'optimal';
   const reasons = [];
-  // Temperature
-  if(t.temp){
+  // Temperature — use < and > so boundary values are OPTIMAL (e.g. 20°C with optimalMin 20 = optimal)
+  if(t.temp && tmax != null){
     if(tmax > t.temp.marginalMax || tmax < t.temp.marginalMin){
       worst = 'avoid';
-      reasons.push('Temp ' + Math.round(tmax) + '°C outside ' + t.temp.marginalMin + '–' + t.temp.marginalMax + '°C limit');
+      reasons.push('Temp ' + tmax + '°C outside ' + t.temp.marginalMin + '–' + t.temp.marginalMax + '°C limit');
     } else if(tmax > t.temp.optimalMax || tmax < t.temp.optimalMin){
       if(_TIER_RANK[worst] < 1) worst = 'marginal';
-      reasons.push('Temp ' + Math.round(tmax) + '°C outside optimal ' + t.temp.optimalMin + '–' + t.temp.optimalMax + '°C');
+      reasons.push('Temp ' + tmax + '°C outside optimal ' + t.temp.optimalMin + '–' + t.temp.optimalMax + '°C');
     }
   }
-  // Precipitation
+  // Precipitation — boundary value is OPTIMAL (e.g. 0 mm with optimalMax 0 = optimal)
   if(t.precip && precip != null){
     if(precip > t.precip.marginalMax){
       worst = 'avoid';
@@ -6013,14 +6017,14 @@ function _scoreSingleTreatment(treatId, dayIdx, daily){
       reasons.push('Rain ' + precip.toFixed(1) + ' mm above optimal ' + t.precip.optimalMax + ' mm');
     }
   }
-  // Wind
+  // Wind — boundary value is OPTIMAL (e.g. 25 km/h with optimalMax 25 = optimal)
   if(t.wind && wind != null){
     if(wind > t.wind.marginalMax){
       worst = 'avoid';
-      reasons.push('Wind ' + Math.round(wind) + ' km/h exceeds ' + t.wind.marginalMax + ' km/h limit');
+      reasons.push('Wind ' + wind + ' km/h exceeds ' + t.wind.marginalMax + ' km/h limit');
     } else if(wind > t.wind.optimalMax){
       if(_TIER_RANK[worst] < 1) worst = 'marginal';
-      reasons.push('Wind ' + Math.round(wind) + ' km/h above optimal ' + t.wind.optimalMax + ' km/h');
+      reasons.push('Wind ' + wind + ' km/h above optimal ' + t.wind.optimalMax + ' km/h');
     }
   }
   return { tier: worst, reasons: reasons };
