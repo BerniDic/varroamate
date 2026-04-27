@@ -673,7 +673,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   <div class="nav-overflow-menu" id="nav-overflow-menu">
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportBeeMAX()">🐝 BeeMAX Export</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();printAllQR()">📱 Print All QR Codes</div>
-    <div class="nav-overflow-item" onclick="closeNavOverflow();pendingApiary=null;openModal('modal-add-apiary');setTimeout(initMiniMap,100)">🏡 Add Apiary</div>
+    <div class="nav-overflow-item" onclick="closeNavOverflow();openAddApiaryWithPrivacyCheck()">🏡 Add Apiary</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportAllCSV()">📥 Export CSV</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();exportCalendar()">📅 Calendar Reminders</div>
     <div class="nav-overflow-item" onclick="closeNavOverflow();backupData()">💾 Backup Data</div>
@@ -1853,6 +1853,26 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
   </div>
 </div>
 
+<!-- MODAL: Apiary Privacy Note (first-visit only) -->
+<div class="modal-overlay" id="modal-apiary-privacy" onclick="closeModalOutside(event,'modal-apiary-privacy')">
+  <div class="modal-box">
+    <div class="modal-title">🔒 Keeping Your Apiary Private <button class="modal-close" onclick="dismissApiaryPrivacy()">✕</button></div>
+    <div style="font-size:15px;color:var(--text2);line-height:1.55;margin-bottom:14px;">
+      We know beekeepers are <em>(rightly)</em> protective of where their hives sit — apiary theft and vandalism are a real concern. 🐝
+    </div>
+    <div style="font-size:15px;color:var(--text2);line-height:1.55;margin-bottom:14px;">
+      The good news: VarroaMate works perfectly well without your <strong>exact</strong> coordinates. Postcode or suburb-level accuracy is plenty for flowering calendars, weather data, and seasonal recommendations.
+    </div>
+    <div style="background:var(--amber-pale);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:18px;">
+      💡 <strong>Tip:</strong> Feel free to drop the pin in the <strong>vicinity</strong> of your apiary rather than directly on it — a nearby intersection, park, or a few hundred metres away works fine. Your hives stay yours, and the app still gives you accurate regional guidance.
+    </div>
+    <div style="font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:18px;">
+      Your location data is stored only on your account and is never shared with other users at finer than postcode resolution.
+    </div>
+    <button class="btn btn-primary btn-full" onclick="dismissApiaryPrivacy()">Got it — let's add an apiary</button>
+  </div>
+</div>
+
 <!-- MODAL: Add Apiary -->
 <div class="modal-overlay" id="modal-add-apiary" onclick="closeModalOutside(event,'modal-add-apiary')">
   <div class="modal-box">
@@ -1864,7 +1884,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <div id="address-suggestions" style="border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:4px;background:#fff;display:none;max-height:160px;overflow-y:auto;z-index:9999;position:relative;"></div>
     </div>
     <div class="field" style="margin-bottom:4px;">
-      <label>Drop a Pin <span style="font-weight:400;color:var(--text3);font-size:13px;">— tap or drag the marker to set location</span></label>
+      <label>Drop a Pin <span style="font-weight:400;color:var(--text3);font-size:13px;">— for privacy, drop near (not on) your apiary</span></label>
       <div id="apiary-mini-map"></div>
     </div>
     <div class="field">
@@ -2569,6 +2589,25 @@ function acceptDisclaimer(){
 }
 function hasAcceptedDisclaimer(){
   try{return localStorage.getItem('varroamate_disclaimer_accepted')==='1';}catch(e){return false;}
+}
+// First-visit privacy note for the Add Apiary flow — mirrors the disclaimer pattern.
+function hasSeenApiaryPrivacy(){
+  try{return localStorage.getItem('varroamate_apiary_privacy_seen')==='1';}catch(e){return false;}
+}
+function dismissApiaryPrivacy(){
+  try{localStorage.setItem('varroamate_apiary_privacy_seen','1');}catch(e){}
+  closeModal('modal-apiary-privacy');
+  openModal('modal-add-apiary');
+  setTimeout(initMiniMap,100);
+}
+function openAddApiaryWithPrivacyCheck(){
+  pendingApiary=null;
+  if(hasSeenApiaryPrivacy()){
+    openModal('modal-add-apiary');
+    setTimeout(initMiniMap,100);
+  } else {
+    openModal('modal-apiary-privacy');
+  }
 }
 // Hide accept row on load if already accepted
 (function(){
