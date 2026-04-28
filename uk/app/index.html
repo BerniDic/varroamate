@@ -5724,7 +5724,22 @@ async function exportAllCSV(){
   }
   const esc = v => `"${String(v||'').replace(/"/g,"'")}"`;
 
-  let csv='Apiary,Apiary Address,Hive,Date,Type,Value / Product,Notes\n';
+  const today=localDateStr();
+  let csv='';
+  csv+=`"VarroaMate Treatment & Hive Records"\n`;
+  csv+=`"Compliance: UK Veterinary Medicines Regulations 2013 (Schedule 3) — 5-year mandatory retention for food-producing animals (incl. honey bees)"\n`;
+  csv+=`"Generated: ${today} by VarroaMate (varroamate.com)"\n`;
+  csv+=`\n`;
+  csv+='Apiary,Apiary Address,Hive,Date,Type,Value / Product,Notes\n';
+  // Treatment product cell — append dose info if present
+  const tProd = t => {
+    const name = TREATMENTS[t.product]?.name || t.product;
+    const a = t.dose_amount, u = t.dose_unit;
+    if(a!=null && u) return `${name} | ${a} ${u}`;
+    if(a!=null)      return `${name} | ${a}`;
+    if(u)            return `${name} | ${u}`;
+    return name;
+  };
 
   // ── VM data ──
   for(const a of apiaries){
@@ -5740,7 +5755,7 @@ async function exportAllCSV(){
       for(const c of counts)
         csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${c.date},Mite Count,${c.value},\n`;
       for(const t of trmts)
-        csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${t.date},Treatment,${esc(TREATMENTS[t.product]?.name||t.product)},${esc(t.notes)}\n`;
+        csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${t.date},Treatment,${esc(tProd(t))},${esc(t.notes)}\n`;
       for(const n of notes)
         csv+=`${esc(a.name)},${esc(a.address)},${esc(h.name)},${n.date},Note,,${esc(n.text)}\n`;
     }
