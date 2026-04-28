@@ -5488,7 +5488,7 @@ function toggleDetectionCard(){
   body.style.display=isOpen?'none':'';
   if(chev)chev.textContent=isOpen?'▶':'▼';
 }
-function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),5000);}
 // ══ CALENDAR EXPORT ══
 function icsDate(d){
   // Returns YYYYMMDD format for all-day events
