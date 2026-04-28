@@ -1438,6 +1438,12 @@ canvas.drop-blocked{cursor:not-allowed;}
       <!-- ─── SPLIT BROOD BREAK ─── -->
       <div class="dp-page" id="dppage-split">
         <div class="dp-print-header" id="dp-print-header-split"></div>
+
+        <!-- Opening warning: virgin queen mating timeline cannot be calendared -->
+        <div style="background:#FEF6E0;border:1.5px solid #C8820A;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:13.5px;color:#5A3F00;line-height:1.6;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px;">⚠️ Combining splits with varroa treatment requires close attention</div>
+          There is no tight timeline. The schedule is set by the new virgin queen — her emergence, her mating flights, and her return. Weather can delay mating by days or weeks. Sometimes she does not return; sometimes she returns unmated. Treatment windows in this approach must follow what the colony is actually doing, not a fixed calendar. Inspect, observe, and adjust — splits reward attention.
+        </div>
         <div id="split-season-warn" style="margin-bottom:14px;"></div>
 
         <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;" class="dp-two-col">
@@ -1462,10 +1468,10 @@ canvas.drop-blocked{cursor:not-allowed;}
                     </button>
                   </div>
                   <div id="split-desc-wa" style="font-size:12px;color:var(--text3);line-height:1.7;">
-                    <strong style="color:var(--forest);">Walk-away split</strong> — divide the colony in two. The queenright half carries on; the queenless half raises a new queen from existing young larvae. The queenless half has a <strong>natural brood break</strong> lasting ~24 days (no new eggs until the new queen mates and begins laying). This window is ideal for OA treatment and drone frame insertion. Both halves benefit from reduced mite population growth during the split.
+                    <strong style="color:var(--forest);">Walk-away split</strong> — divide the colony in two. The queenright half carries on; the queenless half raises a new queen from existing young larvae. The queenless half goes through a <strong>natural broodless window</strong> after the original brood emerges and before the new queen begins laying — a strong opportunity for OA treatment. Timing is biology-driven (see warning above): virgin emergence around day 7–9, mating over the following 5–21+ days (weather-dependent), and laying resumes 3–7 days after mating. Confirm broodlessness by inspection rather than counting days.
                   </div>
                   <div id="split-desc-pg" style="font-size:12px;color:var(--text3);line-height:1.7;display:none;">
-                    <strong style="color:var(--forest);">Artificial swarm (Pagden method)</strong> — move the <em>original hive</em> (with the queen and all bees) to a new location. Put a new box with frames on the original stand. Flying bees return to the original stand, boosting the queenright half. The <em>split on the old stand</em> raises a new queen from open brood frames left behind. The queenless split has a ~24 day brood break — ideal for OA treatment. The Pagden method is the most effective swarm-prevention split and gives you a strong queenright colony for the honey flow.
+                    <strong style="color:var(--forest);">Artificial swarm (Pagden method)</strong> — primarily a <strong>swarm management</strong> technique for a colony already preparing to swarm. The core intervention is <em>separating the queen from her brood and queen cells</em>, mimicking what would naturally happen if the colony swarmed. Swarm management is part of the biological toolbox for varroa control: once the manipulation is in place, valuable opportunities emerge for integrated mite management — drone brood trapping in the queenright artificial swarm, and an oxalic acid treatment window in the parent colony as it transitions through broodlessness.
                   </div>
                 </div>
               </div>
@@ -1473,7 +1479,7 @@ canvas.drop-blocked{cursor:not-allowed;}
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                 <div style="padding:9px 11px;background:rgba(90,158,96,0.08);border-left:3px solid #5A9E60;border-radius:0 5px 5px 0;">
                   <div style="font-size:11px;font-weight:700;color:var(--forest);">🧬 Varroa control</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Brood break in queenless half stops mite reproduction ~24 days. OA at peak efficacy.</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Inspection-confirmed broodless window in queenless half opens an OA treatment opportunity. All mites phoretic.</div>
                 </div>
                 <div style="padding:9px 11px;background:rgba(74,122,152,0.08);border-left:3px solid #4A7898;border-radius:0 5px 5px 0;">
                   <div style="font-size:11px;font-weight:700;color:#2A5878;">🐝 Colony increase</div>
@@ -1481,7 +1487,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                 </div>
                 <div style="padding:9px 11px;background:rgba(184,92,56,0.08);border-left:3px solid #B85C38;border-radius:0 5px 5px 0;">
                   <div style="font-size:11px;font-weight:700;color:#7A3018;">🚫 Swarm prevention</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Relieves congestion. Artificial swarm (Pagden) is the gold standard for swarm prevention.</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Relieves swarming pressure by separating queen from brood. Opens windows for drone trapping and OA treatment.</div>
                 </div>
                 <div style="padding:9px 11px;background:rgba(155,107,138,0.08);border-left:3px solid #9B6B8A;border-radius:0 5px 5px 0;">
                   <div style="font-size:11px;font-weight:700;color:#5A2A4A;">🎯 Drone frame bonus</div>
@@ -1645,7 +1651,7 @@ canvas.drop-blocked{cursor:not-allowed;}
                   </div>
                 </div>
                 <div style="padding:10px 12px;background:rgba(155,107,138,0.07);border-radius:7px;font-size:11px;color:var(--text3);line-height:1.6;">
-                  <strong>Pagden recipe:</strong> Move the entire original hive 2m+ away (or rotate entrance 180°). Place a new brood box on the original stand with: 1 frame of young eggs/larvae from the original hive, the original hive's drawn comb frames (or foundation), food stores. All foraging bees fly back to the original stand, giving the queenless split a strong workforce to raise the new queen. Check at day 10 for queen cells.
+                  <strong>Pagden recipe:</strong> Move the original brood box (containing all the brood, nurse bees, and developing queen cells) to one side, ~2 metres from the original stand. Place a <strong>new</strong> brood box with foundation or drawn comb on the original stand. Take <strong>one frame of unsealed brood</strong> from the original box — check carefully, no queen cells on this frame — and place it in the centre of the new box. Find the queen and place her on that frame. Close up both boxes. Flying bees return to the original stand and join the queen — this is the <strong>artificial swarm</strong>. The original box, now in its new position, retains brood, nurse bees, and queen cells — this is the <strong>parent colony</strong>, which will raise the new queen. After 5 days, inspect the parent colony for queen cells and reduce to 1–2 of the best.
                 </div>
               </div>
 
