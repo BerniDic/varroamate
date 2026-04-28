@@ -1467,7 +1467,11 @@ canvas.drop-blocked{cursor:not-allowed;}
                     </button>
                   </div>
                   <div id="split-desc-wa" style="font-size:12px;color:var(--text3);line-height:1.7;">
-                    <strong style="color:var(--forest);">Walk-away split</strong> — divide the colony in two. The queenright half carries on; the queenless half raises a new queen from existing young larvae. The queenless half goes through a <strong>natural broodless window</strong> after the original brood emerges and before the new queen begins laying — a strong opportunity for OA treatment. Timing is biology-driven (see warning above): virgin emergence around day 7–9, mating over the following 5–21+ days (weather-dependent), and laying resumes 3–7 days after mating. Confirm broodlessness by inspection rather than counting days.
+                    <strong style="color:var(--forest);">Walk-away split</strong> — primarily a method to <strong>easily multiply colonies</strong>. Divide a strong colony in two; the queenless half raises a new queen from existing young larvae. Simple and beginner-friendly: no need to find the queen.
+                    <p style="margin:8px 0;">Once the moved half is in its new position, its flying foragers will return to the original stand. <strong>This weakens whichever half is moved</strong> — usually the queenless half, by convention. Beekeepers accept this in exchange for not needing to find the queen, and compensate by ensuring <strong>an even distribution of nurse bees and capped brood</strong> between the two halves so the queenless half can still raise and feed a queen cell properly.</p>
+                    <p style="margin:8px 0;">The queenless half experiences a natural broodless window after the original brood emerges, before the new queen begins laying — a useful opportunity for OA treatment, but treated as a secondary benefit rather than the primary purpose.</p>
+                    <p style="margin:8px 0;"><strong>Trade-offs vs Pagden:</strong> walk-away is <em>easier and faster</em> but <em>less effective for active swarm control</em> and produces a weaker queenless colony for queen rearing. Use walk-away when the goal is <strong>colony increase</strong> from a healthy, strong colony that is <strong>not yet showing swarm cells</strong>. Use Pagden when the colony is actively preparing to swarm.</p>
+                    <p style="margin:8px 0 0;">Timing is biology-driven (see warning above): virgin emergence around day 7–9, mating over the following 5–21+ days (weather-dependent), laying resumes 3–7 days after mating. Confirm broodlessness by inspection rather than counting days.</p>
                   </div>
                   <div id="split-desc-pg" style="font-size:12px;color:var(--text3);line-height:1.7;display:none;">
                     <strong style="color:var(--forest);">Artificial swarm (Pagden method)</strong> — primarily a <strong>swarm management</strong> technique for a colony already preparing to swarm. The core intervention is <em>separating the queen from her brood and queen cells</em>, mimicking what would naturally happen if the colony swarmed. Swarm management is part of the biological toolbox for varroa control: once the manipulation is in place, valuable opportunities emerge for integrated mite management — drone brood trapping in the queenright artificial swarm, and an oxalic acid treatment window in the parent colony as it transitions through broodlessness.
@@ -1522,59 +1526,57 @@ canvas.drop-blocked{cursor:not-allowed;}
               <!-- Walk-away diagram -->
               <div id="split-diag-wa">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                  <!-- Original hive -->
+
+                  <!-- LEFT: Queenright half (stays) — drone trapping opportunity -->
                   <div style="border:1.5px solid #5A9E60;border-radius:8px;overflow:hidden;">
                     <div style="background:#5A9E60;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Queenright half (stays)</div>
                     <div style="padding:10px;">
                       <svg viewBox="0 0 160 145" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Box -->
                         <rect x="10" y="10" width="140" height="110" rx="3" fill="#F5F0E8" stroke="#5A9E60" stroke-width="2"/>
-                        <!-- Frames -->
                         <rect x="20" y="20" width="28" height="90" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
-                        <rect x="52" y="20" width="28" height="90" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
+                        <rect x="52" y="20" width="28" height="90" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
                         <rect x="84" y="20" width="28" height="90" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
-                        <rect x="116" y="20" width="28" height="90" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
-                        <!-- Queen marker -->
+                        <rect x="116" y="20" width="28" height="90" rx="2" fill="#B8C8E0" stroke="#6090B0" stroke-width="1"/>
                         <circle cx="98" cy="65" r="7" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
                         <text x="98" y="69" text-anchor="middle" font-size="9" font-family="sans-serif" fill="#5A3A00">♛</text>
-                        <!-- Labels -->
-                        <text x="80" y="136" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Keep queen here</text>
-                        <text x="36" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
-                        <text x="66" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
-                        <text x="130" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">honey</text>
+                        <text x="130" y="58" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">drone</text>
+                        <text x="130" y="68" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">frame</text>
+                        <text x="130" y="80" text-anchor="middle" font-size="9" font-family="sans-serif">🐝</text>
+                        <text x="130" y="92" text-anchor="middle" font-size="6" fill="#3A5A7A" font-family="sans-serif">mite trap</text>
+                        <text x="36" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">stores</text>
+                        <text x="66" y="70" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">brood</text>
+                        <text x="80" y="128" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Keep queen here</text>
+                        <text x="80" y="138" text-anchor="middle" font-size="7" fill="#3A6A3A" font-family="sans-serif">Drone trapping opportunity</text>
                       </svg>
                     </div>
                   </div>
-                  <!-- Queenless split -->
+
+                  <!-- RIGHT: Queenless half (split) -->
                   <div style="border:1.5px solid #9B6B8A;border-radius:8px;overflow:hidden;">
                     <div style="background:#9B6B8A;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Queenless half (split)</div>
                     <div style="padding:10px;">
                       <svg viewBox="0 0 160 145" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Box -->
                         <rect x="10" y="10" width="140" height="110" rx="3" fill="#F5F0E8" stroke="#9B6B8A" stroke-width="2"/>
-                        <!-- Frames -->
                         <rect x="20" y="20" width="28" height="90" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
                         <rect x="52" y="20" width="28" height="90" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
-                        <rect x="84" y="20" width="28" height="90" rx="2" fill="#B8C8E0" stroke="#6090B0" stroke-width="1"/>
-                        <rect x="116" y="20" width="28" height="90" rx="2" fill="#D4C0D8" stroke="#9070A0" stroke-width="1"/>
-                        <!-- Queen cell indicator -->
-                        <ellipse cx="66" cy="55" rx="6" ry="10" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
-                        <text x="66" y="59" text-anchor="middle" font-size="7" fill="#5A3A00" font-family="sans-serif">QC</text>
-                        <!-- Drone frame indicator -->
-                        <text x="98" y="65" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">DRONE</text>
-                        <text x="98" y="74" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif">frame</text>
-                        <!-- Labels -->
-                        <text x="80" y="136" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">Raises new queen</text>
-                        <text x="36" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
-                        <text x="130" y="60" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">OA treat</text>
-                        <text x="130" y="70" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">all bees</text>
-                        <text x="130" y="80" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">day 18–24</text>
+                        <rect x="84" y="20" width="28" height="90" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
+                        <rect x="116" y="20" width="28" height="90" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
+                        <ellipse cx="62" cy="55" rx="3" ry="6" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                        <ellipse cx="68" cy="62" rx="3" ry="6" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                        <ellipse cx="74" cy="55" rx="3" ry="6" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                        <text x="68" y="80" text-anchor="middle" font-size="6" fill="#5A3A00" font-family="sans-serif" font-weight="bold">queen cells</text>
+                        <text x="36" y="70" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">stores</text>
+                        <text x="102" y="70" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">brood</text>
+                        <text x="134" y="70" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">brood</text>
+                        <text x="80" y="128" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">Raises new queen</text>
+                        <text x="80" y="138" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">OA opportunity once broodless</text>
                       </svg>
                     </div>
                   </div>
+
                 </div>
                 <div style="padding:10px 12px;background:rgba(90,158,96,0.07);border-radius:7px;font-size:11px;color:var(--text3);line-height:1.6;">
-                  <strong>Split recipe:</strong> Give the queenless box at least 1 frame of young eggs/larvae (≤3 days old) so bees can raise emergency queen cells. Include 2–3 frames of capped brood for emerging nurse bees, food stores, and a drone frame. Move to a new location or rotate 90° to reduce bee drift. Check at day 10 for queen cells — remove all but 1–2 of the best.
+                  <strong>Split recipe:</strong> Divide a strong colony into two roughly equal halves. Give the queenless box at least 1 frame of young eggs/larvae (≤3 days old) so the bees can raise emergency queen cells, plus 2–3 frames of capped brood for emerging nurse bees, and food stores. Distribute nurse bees and capped brood evenly between the halves to compensate for the foragers that will return to whichever half stays on the original stand. The drone frame for mite trapping goes in the <em>queenright</em> half (where the laying queen is) — a queenless half cannot raise drone brood. Move the queenless half to a new location (or rotate entrance 90°) to reduce bee drift. After about 5 days, inspect the queenless half for queen cells and reduce to 1–2 of the best to prevent after-swarms.
                 </div>
               </div>
 
@@ -6121,19 +6123,8 @@ function dpExportCal(){
       { day:29, summary:`📋 Post-treatment check — ${scope}`,  desc:'Confirm queen laying normally. Count mite drop on sticky board.' },
     ];
   } else if(key==='split'){
-    if(_splitMethod === 'pagden'){
-      alert('Pagden timing is inspection-driven. Virgin queen mating is weather-dependent and the schedule cannot be put on a calendar with confidence — calendar export is therefore not offered for this method. Use the action cards on the right as inspection prompts and observe the colony directly.');
-      return;
-    }
-    events = [
-      { day:0,  summary:`✂️ Make split — Walk-Away Split — ${scope}`,     desc:'Divide colony in two. Queenless half: 1 frame young eggs, 2–3 frames capped brood, stores, drone frame. Move to new location.' },
-      { day:0,  summary:`🎯 Insert drone frame into queenless half — ${scope}`, desc:'Place a drone-comb frame in the queenless box. Mites concentrate here during the broodless window. Remove at day 19–24.' },
-      { day:9,  summary:`🔍 Day 10 — Queen cell check — ${scope}`,   desc:'Inspect queenless half for queen cells. Keep 1–2 best cells. Remove all others to prevent after-swarms.', alarm:true },
-      { day:19, summary:`✂️ Remove drone frame (ideal) — ${scope}`,  desc:'All drone brood fully capped — mites trapped. Remove and freeze/heat-treat. Day 19–23 is the removal window.', alarm:true },
-      { day:18, summary:`💨 OA treatment window opens — ${scope}`,   desc:'Queenless half is broodless. All Varroa mites are phoretic. Apply OAV, OA dribble, or Aluen CAP for maximum efficacy — use whichever is registered in your state. Window: day 18–24.', alarm:true },
-      { day:15, summary:`👸 Virgin queen should emerge — ${scope}`,  desc:'Virgin queen emerges around day 15–17. Do not disturb the hive for 7–10 days to allow mating flights.' },
-      { day:25, summary:`🎉 New queen laying — check — ${scope}`,    desc:'Inspect for eggs in a regular laying pattern. A mated, laying queen confirms success. Record mite counts in VarroaMate.', alarm:true },
-    ];
+    alert('Split timing is inspection-driven. Virgin queen mating is weather-dependent and the schedule cannot be put on a calendar with confidence — calendar export is therefore not offered for splits (Pagden or walk-away). Use the action cards on the right as inspection prompts and observe the colony directly.');
+    return;
   } else if(key==='heat'){
     events = [
       { day:0,  summary:`🌡️ Heat treatment — Session 1 — ${scope}`, desc:'Remove all capped brood frames. Heat each to 42°C for 120 min in the Varroa Controller. Return frames to hive.', alarm:true },
@@ -6424,27 +6415,30 @@ function renderSplitPlanner(){
   let cards;
   if(_splitMethod === 'walkaway'){
     cards = [
-      [0,  'amber', '✂️ Make the split',
+      [0,  'amber', '✂️ Make the walk-away split',
         start ? dpFmt(start) : '—',
-        'Divide the colony. Queenright half: keep the old queen with 4–5 frames of brood, bees, and stores. Queenless half: at least 1 frame of eggs ≤3 days old, 2–3 frames of capped brood, food stores, and a drone frame. Move queenless half to a new location (or rotate entrance 90°) to reduce bee drift.'],
-      [2,  '',      '🎯 Insert drone frame into queenless half',
-        start ? dpFmt(dpAddDays(start,0)) : '—',
-        'Place a drone-comb frame at the edge of the queenless box brood nest. Without a queen, foragers and nurse bees will cluster around it. Mites entering the frame have nowhere else to breed during the broodless window — a very effective double strategy.'],
-      [10, '',      '🔍 Day 10 — Queen cell check',
-        start ? dpFmt(dpAddDays(start,9)) : '—',
-        'Inspect queenless half for queen cells. You should see 1–3 well-formed capped cells. Remove all but 1–2 of the best (largest, straightest) to prevent after-swarms. Do not disturb the cells you keep — virgin queens are fragile.'],
-      [20, 'teal',  '✂️ Day 20 — Remove drone frame',
-        start ? dpFmt(dpAddDays(start,19)) : '—',
-        'All drone brood should be fully capped. Remove the frame — all mites that entered the cells are trapped. Freeze 48h or heat-treat in a Varroa Controller. Day 20–24 is the removal window; don\'t leave it past day 24 or drones start emerging.'],
-      [21, 'teal',  '💨 Days 18–24 — OA treatment window',
-        start ? `${dpFmt(dpAddDays(start,18))} → ${dpFmt(dpAddDays(start,24))}` : '—',
-        'The queenless half is completely broodless in this window — all Varroa mites are phoretic on adult bees. Apply OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). Maximum possible efficacy. Treat both halves if mite pressure is elevated in the queenright half too.'],
-      [17, '',      '🔍 Day 16 — Virgin queen emerges',
-        start ? dpFmt(dpAddDays(start,15)) : '—',
-        'The virgin queen should be emerging around now (day 15–17). Do not disturb the hive for 7–10 days to allow undisturbed mating flights. Queens typically mate over 5–10 days with multiple drones.'],
-      [26, 'amber', '🎉 Day 25–28 — New queen laying',
-        start ? dpFmt(dpAddDays(start,25)) : '—',
-        'Inspect gently for eggs in a regular laying pattern. A mated, laying queen confirms success. The split is now an independent, mite-depleted colony. Check the queenright half\'s mite levels and record counts in VarroaMate.'],
+        'Divide a strong colony into two roughly equal halves. Each half needs: at least 1 frame of young eggs/larvae (≤3 days old), 2–3 frames of capped brood for emerging nurse bees, food stores, and adequate space. The drone frame for mite trapping goes in the queenright half. Move one half to a new location (or rotate entrance 90°) to reduce drift. Foragers from the moved half will return to the original stand, weakening that half — distribute nurse bees and capped brood evenly to compensate.'],
+      [5,  'amber', '🔍 Day 5 — Reduce queen cells in queenless half',
+        start ? dpFmt(dpAddDays(start,5)) : '—',
+        'Open the queenless half and inspect the brood frames. Identify the developing emergency queen cells and reduce to the 1–2 best (largest, straightest, on open brood). Remove all others — leaving multiple cells risks after-swarms when the first virgin emerges. Mark the frames carrying the kept cells.'],
+      ['~7–9', '', '⏳ Virgin queen emerges in queenless half',
+        start ? `≈ ${dpFmt(dpAddDays(start,7))} – ${dpFmt(dpAddDays(start,9))}` : '—',
+        'Virgin queen typically emerges from one of the kept queen cells around day 7–9. Approximate — don\'t open the queenless half to check. Once she has emerged, the colony will not raise more queen cells.'],
+      ['1–4 weeks', '', '⏳ Do not disturb queenless half',
+        start ? `${dpFmt(dpAddDays(start,7))} → ${dpFmt(dpAddDays(start,28))}` : '—',
+        'Leave the queenless half alone for 3–4 weeks if you can. The virgin queen needs quiet for orientation flights, mating flights, and her return. Disturbance can cost you the queen — she may not return after a mating flight if the colony has been opened. The queenright half can be inspected normally during this time.'],
+      ['~Week 3+', '', '⏳ OA treatment opportunity in queenless half',
+        start ? `from ≈ ${dpFmt(dpAddDays(start,21))}` : '—',
+        'Once the original brood emerges (~3 weeks from the split) and before the new queen begins laying, the queenless half enters a broodless window. All mites are phoretic. This is a useful opportunity for OA treatment — OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). The exact day depends on when mating completes; confirm broodlessness by inspection rather than counting days. Window may extend several weeks if mating is delayed.'],
+      ['flexible', '', '⏳ Drone trapping opportunity in queenright half',
+        start ? '—' : '—',
+        'The queenright half has the laying queen and will draw out and lay drone eggs into a drone foundation frame. The drawn-out drone comb becomes a mite trap. Timing for insertion and removal follows the standard drone brood removal procedure — see the dedicated Day Planner card for that method. This is one of several varroa control opportunities; not a prescription.'],
+      ['~5–6 weeks', '', '⏳ Confirm laying queen in queenless half',
+        start ? `≈ ${dpFmt(dpAddDays(start,35))} – ${dpFmt(dpAddDays(start,42))}` : '—',
+        'By week 5–6 the new queen should be laying. Inspect gently for eggs in a regular pattern. If no eggs and no laying queen visible, donate a frame of young eggs or open brood from another colony — if the queenless half is queenless, they will start emergency cells; if the queen is fine but slow, they will ignore them. Wait another 3–4 weeks before the next check.'],
+      ['anytime', '', '⏳ Contingency — if mating fails',
+        start ? '—' : '—',
+        'Sometimes the virgin queen does not return from a mating flight, or returns unmated. If by week 6–7 there are no eggs and the egg-frame test confirms queenlessness, options include: combining the queenless half back with the queenright half (newspaper unite), introducing a mated queen, or accepting the loss and combining with another colony. Do not leave a queenless colony unaddressed — it will dwindle.'],
     ];
   } else {
     cards = [
