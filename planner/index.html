@@ -1578,76 +1578,82 @@ canvas.drop-blocked{cursor:not-allowed;}
                 </div>
               </div>
 
-              <!-- Pagden / Artificial swarm diagram -->
+              <!-- Pagden / Artificial swarm diagram (corrected topology) -->
               <div id="split-diag-pg" style="display:none;">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                  <!-- Step 1: move hive -->
+
+                  <!-- LEFT: Original stand — Artificial swarm (queenright, green) -->
                   <div style="border:1.5px solid #5A9E60;border-radius:8px;overflow:hidden;">
-                    <div style="background:#5A9E60;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Original hive → new position</div>
+                    <div style="background:#5A9E60;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Original stand — Artificial swarm</div>
                     <div style="padding:10px;">
                       <svg viewBox="0 0 160 130" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
-                        <!-- New position box -->
+                        <!-- New brood box on original stand -->
                         <rect x="10" y="10" width="140" height="90" rx="3" fill="#F5F0E8" stroke="#5A9E60" stroke-width="2"/>
-                        <rect x="20" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
+                        <!-- Frame 1: drawn comb / foundation (left) -->
+                        <rect x="20" y="18" width="28" height="74" rx="2" fill="#EEE8DC" stroke="#C0B890" stroke-width="1" stroke-dasharray="3,2"/>
+                        <!-- Frame 2: unsealed brood + queen (centre) -->
                         <rect x="52" y="18" width="28" height="74" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
-                        <rect x="84" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
-                        <rect x="116" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
+                        <!-- Frame 3: drawn comb (right of centre) -->
+                        <rect x="84" y="18" width="28" height="74" rx="2" fill="#EEE8DC" stroke="#C0B890" stroke-width="1" stroke-dasharray="3,2"/>
+                        <!-- Frame 4: drone foundation (right) -->
+                        <rect x="116" y="18" width="28" height="74" rx="2" fill="#B8C8E0" stroke="#6090B0" stroke-width="1"/>
                         <!-- Frame labels -->
-                        <text x="34" y="34" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">brood</text>
-                        <text x="34" y="80" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">stores</text>
-                        <text x="98" y="34" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">brood</text>
-                        <text x="98" y="80" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">stores</text>
-                        <text x="130" y="34" text-anchor="middle" font-size="7" fill="#5A6A3A" font-family="sans-serif" font-weight="bold">honey</text>
-                        <text x="130" y="80" text-anchor="middle" font-size="7" fill="#5A6A3A" font-family="sans-serif">stores</text>
-                        <!-- Queen -->
-                        <circle cx="66" cy="55" r="6" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
-                        <text x="66" y="59" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#5A3A00">♛</text>
-                        <text x="66" y="34" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif" font-weight="bold">brood</text>
-                        <text x="66" y="80" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">+ queen</text>
-                        <!-- Move arrow -->
-                        <text x="80" y="108" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Moved 2m+ away</text>
-                        <text x="80" y="118" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif">with queen + all bees</text>
-                        <text x="80" y="128" text-anchor="middle" font-size="7" fill="#3A6A3A" font-family="sans-serif">Flying bees return to orig. stand</text>
+                        <text x="34" y="30" text-anchor="middle" font-size="6" fill="#8A7A50" font-family="sans-serif" font-style="italic">drawn /</text>
+                        <text x="34" y="38" text-anchor="middle" font-size="6" fill="#8A7A50" font-family="sans-serif" font-style="italic">foundation</text>
+                        <text x="66" y="30" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif" font-weight="bold">unsealed</text>
+                        <text x="66" y="38" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="98" y="30" text-anchor="middle" font-size="6" fill="#8A7A50" font-family="sans-serif" font-style="italic">drawn /</text>
+                        <text x="98" y="38" text-anchor="middle" font-size="6" fill="#8A7A50" font-family="sans-serif" font-style="italic">foundation</text>
+                        <text x="130" y="30" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">drone</text>
+                        <text x="130" y="38" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">frame</text>
+                        <!-- Queen on the unsealed brood frame -->
+                        <circle cx="66" cy="62" r="6" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                        <text x="66" y="65" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#5A3A00">♛</text>
+                        <text x="66" y="84" text-anchor="middle" font-size="6" fill="#3A5A1A" font-family="sans-serif">+ queen</text>
+                        <!-- Drone frame mite-trap indicator -->
+                        <text x="130" y="64" text-anchor="middle" font-size="9" font-family="sans-serif">🐝</text>
+                        <text x="130" y="84" text-anchor="middle" font-size="6" fill="#3A5A7A" font-family="sans-serif">mite trap</text>
+                        <!-- Captions below -->
+                        <text x="80" y="108" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif" font-weight="bold">Queen + 1 unsealed brood frame</text>
+                        <text x="80" y="118" text-anchor="middle" font-size="8" fill="#3A6A3A" font-family="sans-serif">Flying bees return → join queen</text>
+                        <text x="80" y="128" text-anchor="middle" font-size="7" fill="#3A6A3A" font-family="sans-serif">Queen lays immediately on drawn comb</text>
                       </svg>
                     </div>
                   </div>
-                  <!-- Old stand: split -->
+
+                  <!-- RIGHT: Moved aside ~2m — Parent colony (queenless, mauve) -->
                   <div style="border:1.5px solid #9B6B8A;border-radius:8px;overflow:hidden;">
-                    <div style="background:#9B6B8A;padding:5px 10px;font-size:11px;font-weight:700;color:white;">New box on original stand</div>
+                    <div style="background:#9B6B8A;padding:5px 10px;font-size:11px;font-weight:700;color:white;">Moved aside ~2m — Parent colony</div>
                     <div style="padding:10px;">
                       <svg viewBox="0 0 160 130" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Original stand box with new frames -->
-                        <rect x="10" y="10" width="140" height="90" rx="3" fill="#F5F0E8" stroke="#9B6B8A" stroke-width="2"/>
-                        <!-- New frames: 1 frame of young brood from original, rest empty/foundation -->
-                        <rect x="20" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
-                        <rect x="52" y="18" width="28" height="74" rx="2" fill="#B8C8E0" stroke="#6090B0" stroke-width="1"/>
-                        <rect x="84" y="18" width="28" height="74" rx="2" fill="#D4C0D8" stroke="#9070A0" stroke-width="1"/>
-                        <rect x="116" y="18" width="28" height="74" rx="2" fill="#EEE8DC" stroke="#C0B890" stroke-width="1" stroke-dasharray="3,2"/>
+                        <!-- Original brood box, slightly offset to suggest "moved" -->
+                        <rect x="14" y="10" width="140" height="90" rx="3" fill="#F5F0E8" stroke="#9B6B8A" stroke-width="2"/>
+                        <!-- Brood frames (all original) -->
+                        <rect x="24" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
+                        <rect x="56" y="18" width="28" height="74" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
+                        <rect x="88" y="18" width="28" height="74" rx="2" fill="#90C060" stroke="#5A9040" stroke-width="1"/>
+                        <rect x="120" y="18" width="28" height="74" rx="2" fill="#E8D890" stroke="#C0A840" stroke-width="1"/>
                         <!-- Frame labels -->
-                        <text x="36" y="28" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">young</text>
-                        <text x="36" y="37" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif">brood</text>
-                        <text x="66" y="28" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">drone</text>
-                        <text x="66" y="37" text-anchor="middle" font-size="7" fill="#3A5A7A" font-family="sans-serif">frame</text>
-                        <text x="98" y="28" text-anchor="middle" font-size="6" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">OA treat</text>
-                        <text x="98" y="36" text-anchor="middle" font-size="6" fill="#5A2A4A" font-family="sans-serif">day 18–24</text>
-                        <text x="130" y="28" text-anchor="middle" font-size="6" fill="#8A7A50" font-family="sans-serif" font-weight="bold">found.</text>
-                        <text x="130" y="36" text-anchor="middle" font-size="6" fill="#8A7A50" font-family="sans-serif">drawn comb</text>
-                        <!-- Queen cell -->
-                        <ellipse cx="36" cy="62" rx="5" ry="9" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
-                        <text x="36" y="66" text-anchor="middle" font-size="6" fill="#5A3A00" font-family="sans-serif">QC</text>
-                        <!-- Drone frame indicator -->
-                        <text x="66" y="58" text-anchor="middle" font-size="8" fill="#3A5A7A" font-family="sans-serif" font-weight="bold">🐝</text>
-                        <!-- OA window label -->
-                        <text x="98" y="60" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">💨</text>
-                        <!-- Foundation label -->
-                        <text x="130" y="58" text-anchor="middle" font-size="7" fill="#8A7A50" font-family="sans-serif" font-style="italic">empty</text>
-                        <!-- Flying bees arrow -->
-                        <path d="M 155 55 Q 170 30 155 10" stroke="#5A9E60" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
-                        <text x="80" y="108" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">Flying bees return here</text>
-                        <text x="80" y="118" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">Raises new queen</text>
+                        <text x="38" y="30" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">stores /</text>
+                        <text x="38" y="38" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="70" y="30" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="70" y="38" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">+ QCs</text>
+                        <text x="102" y="30" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif" font-weight="bold">brood</text>
+                        <text x="102" y="38" text-anchor="middle" font-size="7" fill="#3A5A1A" font-family="sans-serif">nurse bees</text>
+                        <text x="134" y="30" text-anchor="middle" font-size="7" fill="#6A4A00" font-family="sans-serif" font-weight="bold">stores</text>
+                        <!-- Queen cells on the second-from-left brood frame -->
+                        <ellipse cx="64" cy="58" rx="3" ry="6" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                        <ellipse cx="70" cy="64" rx="3" ry="6" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                        <ellipse cx="76" cy="58" rx="3" ry="6" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                        <text x="70" y="82" text-anchor="middle" font-size="6" fill="#5A3A00" font-family="sans-serif" font-weight="bold">queen cells</text>
+                        <!-- Captions below -->
+                        <text x="84" y="108" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif" font-weight="bold">All brood + nurse bees + queen cells</text>
+                        <text x="84" y="118" text-anchor="middle" font-size="8" fill="#5A2A4A" font-family="sans-serif">No flying bees (returned to swarm)</text>
+                        <text x="84" y="128" text-anchor="middle" font-size="7" fill="#5A2A4A" font-family="sans-serif">Day 5: reduce to 1–2 best queen cells</text>
                       </svg>
                     </div>
                   </div>
+
                 </div>
                 <div style="padding:10px 12px;background:rgba(155,107,138,0.07);border-radius:7px;font-size:11px;color:var(--text3);line-height:1.6;">
                   <strong>Pagden recipe:</strong> Move the original brood box (containing all the brood, nurse bees, and developing queen cells) to one side, ~2 metres from the original stand. Place a <strong>new</strong> brood box with foundation or drawn comb on the original stand. Take <strong>one frame of unsealed brood</strong> from the original box — check carefully, no queen cells on this frame — and place it in the centre of the new box. Find the queen and place her on that frame. Close up both boxes. Flying bees return to the original stand and join the queen — this is the <strong>artificial swarm</strong>. The original box, now in its new position, retains brood, nurse bees, and queen cells — this is the <strong>parent colony</strong>, which will raise the new queen. After 5 days, inspect the parent colony for queen cells and reduce to 1–2 of the best.
