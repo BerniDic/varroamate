@@ -1489,8 +1489,8 @@ canvas.drop-blocked{cursor:not-allowed;}
                   <div style="font-size:11px;color:var(--text3);margin-top:2px;">Relieves swarming pressure by separating queen from brood. Opens windows for drone trapping and OA treatment.</div>
                 </div>
                 <div style="padding:9px 11px;background:rgba(155,107,138,0.08);border-left:3px solid #9B6B8A;border-radius:0 5px 5px 0;">
-                  <div style="font-size:11px;font-weight:700;color:#5A2A4A;">🎯 Drone frame bonus</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">Insert a drone frame into the queenless half — mites concentrate there with no queen competition. Remove at day 21.</div>
+                  <div style="font-size:11px;font-weight:700;color:#5A2A4A;">🎯 Drone trapping bonus</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">A drone frame inserted into the queenright side becomes a mite trap once the queen draws it out and lays drone eggs. Follow the standard drone brood removal procedure for timing.</div>
                 </div>
               </div>
             </div>
@@ -1679,6 +1679,11 @@ canvas.drop-blocked{cursor:not-allowed;}
                 <a href="https://www.varroa.org.au/ipm" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
                   <span style="font-size:15px;">🇦🇺</span>
                   <div><div>varroa.org.au — IPM guide</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Brood interruption &amp; splitting strategies for varroa</div></div>
+                  <span style="margin-left:auto;opacity:0.5;">↗</span>
+                </a>
+                <a href="https://www.barkstonashbees.com/pagden-method-1" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
+                  <span style="font-size:15px;">🇬🇧</span>
+                  <div><div>Barkston Ash Beekeepers — The Pagden Method</div><div style="font-weight:400;color:var(--text3);font-size:10px;">Step-by-step illustrated guide to artificial swarm</div></div>
                   <span style="margin-left:auto;opacity:0.5;">↗</span>
                 </a>
                 <a href="https://extensionaus.com.au/professionalbeekeepers/chemical-free-management-of-varroa-brood-breaks-and-drone-trapping/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--cream);border-radius:6px;text-decoration:none;color:var(--forest);font-size:11px;font-weight:600;border:1px solid var(--border);">
@@ -5912,8 +5917,9 @@ function dpFmt(date){ return `${DP_DAYS[date.getDay()]} ${date.getDate()} ${DP_M
 function dpShort(date){ return `${date.getDate()} ${DP_MONTHS[date.getMonth()]}`; }
 
 function dpActionCard(dayLabel, colorClass, title, dateStr, desc){
+  const showDayWord = /^\d+$/.test(String(dayLabel));
   return `<div class="dp-action-card">
-    <div class="dp-day-badge ${colorClass}"><span class="dn">${dayLabel}</span>DAY</div>
+    <div class="dp-day-badge ${colorClass}"><span class="dn">${dayLabel}</span>${showDayWord ? 'DAY' : ''}</div>
     <div>
       <div style="font-size:13px;font-weight:600;color:var(--text1);margin-bottom:2px;">${title}</div>
       <div style="font-size:11px;color:var(--sage);font-family:'DM Mono',monospace;margin-bottom:4px;">${dateStr}</div>
@@ -6442,28 +6448,28 @@ function renderSplitPlanner(){
     ];
   } else {
     cards = [
-      [0,  'amber', '🏠 Day 0 — Make the artificial swarm',
+      [0,  'amber', '🏠 Make the artificial swarm',
         start ? dpFmt(start) : '—',
         'Place a new brood box on the original stand with foundation or drawn comb. Take one frame of unsealed brood from the original box (no queen cells on this frame) and put it in the centre. Find the queen and place her on that frame. Move the original brood box — with all the brood, nurse bees, and developing queen cells — to one side, ~2 metres from the original stand. Flying bees return to the original stand and join the queen: this is the artificial swarm. The original box, in its new position, is now the parent colony that will raise a new queen.'],
-      [5,  'amber', '🔍 Day 5 — Reduce queen cells in parent colony',
+      [5,  'amber', '🔍 Reduce queen cells in parent colony',
         start ? dpFmt(dpAddDays(start,5)) : '—',
         'Open the parent colony and inspect the brood frames. Identify the developing queen cells and reduce to the 1–2 best (largest, straightest, on open brood). Remove all others — leaving multiple cells risks after-swarms when the first virgin emerges. Mark the frames carrying the kept cells so you can find them again without re-opening the colony unnecessarily.'],
-      ['~7–9', '', '⏳ Around Day 7–9 — Virgin queen emerges',
+      ['~7–9', '', '⏳ Virgin queen emerges in parent colony',
         start ? `≈ ${dpFmt(dpAddDays(start,7))} – ${dpFmt(dpAddDays(start,9))}` : '—',
         'Virgin queen typically emerges from one of the kept queen cells around day 7–9. Approximate — don\'t open the parent colony to check. Once she has emerged, the colony will not raise more queen cells.'],
-      ['1–4 weeks', '', '⏳ Weeks 1–4 — Do not disturb parent colony',
+      ['1–4 weeks', '', '⏳ Do not disturb parent colony',
         start ? `${dpFmt(dpAddDays(start,7))} → ${dpFmt(dpAddDays(start,28))}` : '—',
         'Leave the parent colony alone for 3–4 weeks if you can. The virgin queen needs quiet for orientation flights, mating flights, and her return. Disturbance can cost you the queen — she may not return after a mating flight if the colony has been opened. The artificial swarm on the original stand can be inspected normally during this time.'],
-      ['~Week 3+', '', '⏳ Week 3 onwards — OA treatment opportunity in parent colony',
+      ['~Week 3+', '', '⏳ OA treatment opportunity in parent colony',
         start ? `from ≈ ${dpFmt(dpAddDays(start,21))}` : '—',
         'Once the original brood emerges (~3 weeks from the manipulation) and before the new queen begins laying, the parent colony enters a broodless window. All mites are phoretic. This is a strong opportunity for OA treatment — OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). The exact day depends on when mating completes; confirm broodlessness by inspection rather than counting days. Window may extend several weeks if mating is delayed.'],
-      ['flexible', '', '⏳ Drone trapping opportunity — artificial swarm',
+      ['flexible', '', '⏳ Drone trapping opportunity in artificial swarm',
         start ? '—' : '—',
         'The artificial swarm is queenright and the old queen lays immediately on drawn comb. A drone foundation frame inserted here becomes a mite trap once drawn out and laid into. Timing for insertion and removal follows the standard drone brood removal procedure — see the dedicated Day Planner card for that method. This is one of several varroa control opportunities; not a prescription.'],
-      ['~5–6 weeks', '', '⏳ Week 5–6 — Confirm laying queen in parent colony',
+      ['~5–6 weeks', '', '⏳ Confirm laying queen in parent colony',
         start ? `≈ ${dpFmt(dpAddDays(start,35))} – ${dpFmt(dpAddDays(start,42))}` : '—',
         'By week 5–6 the new queen should be laying. Inspect gently for eggs in a regular pattern. If no eggs and no laying queen visible, donate a frame of young eggs or open brood from another colony — if the parent is queenless, they will start emergency cells; if the queen is fine but slow, they will ignore them. Wait another 3–4 weeks before the next check.'],
-      ['anytime', '', '⏳ If mating fails — contingency',
+      ['anytime', '', '⏳ Contingency — if mating fails',
         start ? '—' : '—',
         'Sometimes the virgin queen does not return from a mating flight, or returns unmated. If by week 6–7 there are no eggs and the egg-frame test confirms queenlessness, options include: combining the parent colony back with the artificial swarm (newspaper unite), introducing a mated queen, or accepting the loss and combining with another colony. Do not leave a queenless colony unaddressed — it will dwindle.'],
     ];
