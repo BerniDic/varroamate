@@ -1969,6 +1969,26 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
     </div>
     <div id="modal-treatment-preview" style="display:none;background:var(--amber-pale);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:14px;color:var(--text2);"></div>
     <div class="field"><label>Start Date</label><input type="date" id="treatment-date"></div>
+    <div class="field">
+      <label>Dose / amount applied <span style="font-weight:400;color:var(--text3);font-size:13px;">— record-keeping requirement</span></label>
+      <div style="display:flex;gap:8px;">
+        <input type="number" step="any" min="0" id="treatment-dose-amount" placeholder="e.g. 2" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;">
+        <select id="treatment-dose-unit" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;">
+          <option value="">— unit —</option>
+          <option value="strips">strips</option>
+          <option value="caps">caps</option>
+          <option value="sachets">sachets</option>
+          <option value="tablets">tablets</option>
+          <option value="trays">trays</option>
+          <option value="frames">frames</option>
+          <option value="mL">mL</option>
+          <option value="g">g</option>
+          <option value="cycles">cycles</option>
+          <option value="other">other</option>
+        </select>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;line-height:1.4;">Per hive (e.g. 2 strips, 1 g OA, 5 mL dribble). Required by VMD/AHBIC for treatment record-keeping.</div>
+    </div>
     <div class="field"><label>Notes</label><input type="text" id="treatment-notes" placeholder="e.g. honey supers removed"></div>
     <input type="hidden" id="treatment-edit-id">
     <div style="margin-bottom:14px;"><a href="https://honeybee.org.au/wp-content/uploads/2026/01/AHBIC-Varroa-Chemical-Treatment-Table-28-01-26.pdf" target="_blank" style="font-size:14px;color:var(--amber);text-decoration:none;font-weight:600;">📄 Full AHBIC Treatment Regulatory Table →</a></div>
@@ -2244,7 +2264,7 @@ async function loadDataFromSupabase(){
       }
     } catch(e){ console.warn('inspection disease merge failed', e); }
     treatmentsByHive={};
-    trtRes.data.forEach(t=>{if(!treatmentsByHive[t.hive_id])treatmentsByHive[t.hive_id]=[];treatmentsByHive[t.hive_id].push({id:String(t.id),date:t.date,product:t.product,notes:t.notes||''});});
+    trtRes.data.forEach(t=>{if(!treatmentsByHive[t.hive_id])treatmentsByHive[t.hive_id]=[];treatmentsByHive[t.hive_id].push({id:String(t.id),date:t.date,product:t.product,notes:t.notes||'',dose_amount:t.dose_amount,dose_unit:t.dose_unit});});
     notesByHive={};
     noteRes.data.forEach(n=>{if(!notesByHive[n.hive_id])notesByHive[n.hive_id]=[];notesByHive[n.hive_id].push({id:String(n.id),date:n.date,text:n.text});});
     _dataLoaded=true;
@@ -3371,24 +3391,40 @@ async function saveTreatment(){
   const product=document.getElementById('treatment-select').value;
   const date=document.getElementById('treatment-date').value;
   const notes=document.getElementById('treatment-notes').value;
+  const doseAmtRaw=document.getElementById('treatment-dose-amount').value;
+  const doseUnitRaw=document.getElementById('treatment-dose-unit').value;
+  const dose_amount=doseAmtRaw===''?null:parseFloat(doseAmtRaw);
+  const dose_unit=doseUnitRaw||null;
   const editId=document.getElementById('treatment-edit-id').value;
   if(!product||!date){showToast('Please select a product and date');return;}
+  if(dose_amount!==null&&isNaN(dose_amount)){showToast('Dose amount must be a number');return;}
   showSaveSpinner(true);
   const arr=treatmentsByHive[currentHiveId]||(treatmentsByHive[currentHiveId]=[]);
   if(editId){
-    const {error}=await _sb.from('treatments').update({product,date,notes}).eq('id',parseInt(editId)).eq('user_id',_sbUser.id);
+    const {error}=await _sb.from('treatments').update({product,date,notes,dose_amount,dose_unit}).eq('id',parseInt(editId)).eq('user_id',_sbUser.id);
     if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
     const i=arr.findIndex(t=>t.id===editId);
-    if(i>=0)arr[i]={...arr[i],product,date,notes};
+    if(i>=0)arr[i]={...arr[i],product,date,notes,dose_amount,dose_unit};
   } else {
-    const {data,error}=await _sb.from('treatments').insert({user_id:_sbUser.id,hive_id:currentHiveId,product,date,notes}).select().single();
+    const {data,error}=await _sb.from('treatments').insert({user_id:_sbUser.id,hive_id:currentHiveId,product,date,notes,dose_amount,dose_unit}).select().single();
     if(error){showToast('Save failed: '+error.message);showSaveSpinner(false);return;}
-    arr.unshift({id:String(data.id),product,date,notes});
+    arr.unshift({id:String(data.id),product,date,notes,dose_amount,dose_unit});
   }
   arr.sort((a,b)=>b.date.localeCompare(a.date));
   showSaveSpinner(false);
   closeModal('modal-add-treatment');resetTreatmentModal();
-  showToast(editId?'Treatment updated!':'Treatment saved! 💊');
+  // Choose toast based on dose completeness
+  let toastMsg;
+  if(dose_amount!==null&&dose_unit){
+    toastMsg = editId?'Treatment updated! 💊':'Treatment saved! 💊';
+  } else if(dose_amount===null&&dose_unit===null){
+    toastMsg = '⚠️ Treatment saved — dose record is a legal requirement. Edit to add amount & unit.';
+  } else if(dose_amount!==null&&!dose_unit){
+    toastMsg = '⚠️ Treatment saved — please edit to add the unit.';
+  } else {
+    toastMsg = '⚠️ Treatment saved — please edit to add the amount.';
+  }
+  showToast(toastMsg);
   renderTreatmentsList();renderHiveDetail();setTimeout(initChart,120);
 }
 function editTreatment(id){
@@ -3397,6 +3433,8 @@ function editTreatment(id){
   document.getElementById('treatment-select').value=t.product;
   document.getElementById('treatment-date').value=t.date;
   document.getElementById('treatment-notes').value=t.notes||'';
+  document.getElementById('treatment-dose-amount').value=(t.dose_amount!=null)?t.dose_amount:'';
+  document.getElementById('treatment-dose-unit').value=t.dose_unit||'';
   document.getElementById('treatment-edit-id').value=t.id;
   updateTreatmentInfo();
   document.getElementById('treatment-edit-id').value=t.id; // ensure set before openModal clears it
@@ -3407,6 +3445,8 @@ function resetTreatmentModal(){
   document.getElementById('treatment-select').value='';
   document.getElementById('treatment-date').value=localDateStr();
   document.getElementById('treatment-notes').value='';
+  document.getElementById('treatment-dose-amount').value='';
+  document.getElementById('treatment-dose-unit').value='';
   document.getElementById('treatment-edit-id').value='';
   document.getElementById('modal-treatment-preview').style.display='none';
   document.getElementById('modal-info-btn').style.display='none';
@@ -5545,7 +5585,7 @@ function restoreData(event){
           for(const c of (d.miteCountsByHive||{})[h.id]||[])
             await _sb.from('mite_counts').insert({user_id:uid,hive_id:hv.id,date:c.date,value:c.value,hive_strength:c.hiveStrength||'Good',diseases:c.diseases||[]});
           for(const t of (d.treatmentsByHive||{})[h.id]||[])
-            await _sb.from('treatments').insert({user_id:uid,hive_id:hv.id,product:t.product,date:t.date,notes:t.notes||''});
+            await _sb.from('treatments').insert({user_id:uid,hive_id:hv.id,product:t.product,date:t.date,notes:t.notes||'',dose_amount:(t.dose_amount!=null)?t.dose_amount:null,dose_unit:t.dose_unit||null});
           for(const n of (d.notesByHive||{})[h.id]||[])
             await _sb.from('notes').insert({user_id:uid,hive_id:hv.id,date:n.date,text:n.text});
         }
