@@ -6115,11 +6115,13 @@ function dpExportCal(){
       { day:29, summary:`📋 Post-treatment check — ${scope}`,  desc:'Confirm queen laying normally. Count mite drop on sticky board.' },
     ];
   } else if(key==='split'){
-    const method = _splitMethod === 'pagden' ? 'Artificial Swarm (Pagden)' : 'Walk-Away Split';
+    if(_splitMethod === 'pagden'){
+      alert('Pagden timing is inspection-driven. Virgin queen mating is weather-dependent and the schedule cannot be put on a calendar with confidence — calendar export is therefore not offered for this method. Use the action cards on the right as inspection prompts and observe the colony directly.');
+      return;
+    }
     events = [
-      { day:0,  summary:`✂️ Make split — ${method} — ${scope}`,     desc:_splitMethod==='pagden' ? 'Move original hive 2m+ away. Place new queenless box on original stand with 1 frame young eggs/larvae + drawn comb/foundation.' : 'Divide colony in two. Queenless half: 1 frame young eggs, 2–3 frames capped brood, stores, drone frame. Move to new location.' },
+      { day:0,  summary:`✂️ Make split — Walk-Away Split — ${scope}`,     desc:'Divide colony in two. Queenless half: 1 frame young eggs, 2–3 frames capped brood, stores, drone frame. Move to new location.' },
       { day:0,  summary:`🎯 Insert drone frame into queenless half — ${scope}`, desc:'Place a drone-comb frame in the queenless box. Mites concentrate here during the broodless window. Remove at day 19–24.' },
-      ..._splitMethod==='pagden' ? [{ day:1, summary:`🐝 Foragers return to original stand — ${scope}`, desc:'All foraging bees return to the original stand, boosting the queenless box with a strong adult bee population for queen rearing.' }] : [],
       { day:9,  summary:`🔍 Day 10 — Queen cell check — ${scope}`,   desc:'Inspect queenless half for queen cells. Keep 1–2 best cells. Remove all others to prevent after-swarms.', alarm:true },
       { day:19, summary:`✂️ Remove drone frame (ideal) — ${scope}`,  desc:'All drone brood fully capped — mites trapped. Remove and freeze/heat-treat. Day 19–23 is the removal window.', alarm:true },
       { day:18, summary:`💨 OA treatment window opens — ${scope}`,   desc:'Queenless half is broodless. All Varroa mites are phoretic. Apply OAV, OA dribble, or Aluen CAP for maximum efficacy — use whichever is registered in your state. Window: day 18–24.', alarm:true },
@@ -6440,27 +6442,30 @@ function renderSplitPlanner(){
     ];
   } else {
     cards = [
-      [0,  'amber', '🏠 Day 0 — Move original hive',
+      [0,  'amber', '🏠 Day 0 — Make the artificial swarm',
         start ? dpFmt(start) : '—',
-        'Move the entire original hive (with queen, all brood, all bees) at least 2 metres away from its original position — or rotate the entrance 180°. Place a new brood box on the original stand containing: 1 frame of young eggs/larvae from the original hive, the original hive\'s drawn-comb frames (or clean foundation), and food stores. This is the queenless split that will raise the new queen.'],
-      [1,  '',      '🐝 Day 1 — Foragers return to original stand',
-        start ? dpFmt(dpAddDays(start,1)) : '—',
-        'All foraging bees fly back to the original stand and join the queenless box. This gives the queenless split a very strong adult bee population — essential for raising high-quality queen cells and defending the colony. The original hive (now in a new position) retains house bees and nurse bees.'],
-      [1,  '',      '🎯 Day 0–1 — Insert drone frame into queenless box',
-        start ? dpFmt(dpAddDays(start,0)) : '—',
-        'Add a drone-comb frame to the queenless box on the original stand. The returning foragers and nurse bees will cluster around it. With no laying queen, mites have nowhere to breed except this frame. Remove at day 19–24 to trap them.'],
-      [10, '',      '🔍 Day 10 — Queen cell check in queenless box',
-        start ? dpFmt(dpAddDays(start,9)) : '—',
-        'Inspect the queenless box for queen cells. The returning forager boost means the colony is well-resourced for raising multiple cells. Remove all but 1–2 of the best. Do not open the original hive unnecessarily — it has a healthy queen and is building up.'],
-      [20, 'teal',  '✂️ Day 20 — Remove drone frame',
-        start ? dpFmt(dpAddDays(start,19)) : '—',
-        'Remove and freeze/heat-treat the drone frame. All mites that entered the capped cells are trapped. Day 20–24 is your window — do not leave it past day 24.'],
-      [21, 'teal',  '💨 Days 18–24 — OA treatment window (queenless box)',
-        start ? `${dpFmt(dpAddDays(start,18))} → ${dpFmt(dpAddDays(start,24))}` : '—',
-        'The queenless box on the original stand is broodless in this window. All Varroa mites are phoretic. Apply OA vaporisation, OA dribble, or Aluen CAP (where registered in your state) for maximum efficacy. The original hive (queenright, moved) continues normally — treat it separately when its mite counts warrant.'],
-      [26, 'amber', '🎉 Day 25–28 — New queen laying in queenless box',
-        start ? dpFmt(dpAddDays(start,25)) : '—',
-        'Check the queenless box for a laying queen. You now have two colonies: the original (queenright, strong, in a new position) and a new mite-depleted colony with a fresh young queen on the original stand. Record mite counts in VarroaMate.'],
+        'Place a new brood box on the original stand with foundation or drawn comb. Take one frame of unsealed brood from the original box (no queen cells on this frame) and put it in the centre. Find the queen and place her on that frame. Move the original brood box — with all the brood, nurse bees, and developing queen cells — to one side, ~2 metres from the original stand. Flying bees return to the original stand and join the queen: this is the artificial swarm. The original box, in its new position, is now the parent colony that will raise a new queen.'],
+      [5,  'amber', '🔍 Day 5 — Reduce queen cells in parent colony',
+        start ? dpFmt(dpAddDays(start,5)) : '—',
+        'Open the parent colony and inspect the brood frames. Identify the developing queen cells and reduce to the 1–2 best (largest, straightest, on open brood). Remove all others — leaving multiple cells risks after-swarms when the first virgin emerges. Mark the frames carrying the kept cells so you can find them again without re-opening the colony unnecessarily.'],
+      ['~7–9', '', '⏳ Around Day 7–9 — Virgin queen emerges',
+        start ? `≈ ${dpFmt(dpAddDays(start,7))} – ${dpFmt(dpAddDays(start,9))}` : '—',
+        'Virgin queen typically emerges from one of the kept queen cells around day 7–9. Approximate — don\'t open the parent colony to check. Once she has emerged, the colony will not raise more queen cells.'],
+      ['1–4 weeks', '', '⏳ Weeks 1–4 — Do not disturb parent colony',
+        start ? `${dpFmt(dpAddDays(start,7))} → ${dpFmt(dpAddDays(start,28))}` : '—',
+        'Leave the parent colony alone for 3–4 weeks if you can. The virgin queen needs quiet for orientation flights, mating flights, and her return. Disturbance can cost you the queen — she may not return after a mating flight if the colony has been opened. The artificial swarm on the original stand can be inspected normally during this time.'],
+      ['~Week 3+', '', '⏳ Week 3 onwards — OA treatment opportunity in parent colony',
+        start ? `from ≈ ${dpFmt(dpAddDays(start,21))}` : '—',
+        'Once the original brood emerges (~3 weeks from the manipulation) and before the new queen begins laying, the parent colony enters a broodless window. All mites are phoretic. This is a strong opportunity for OA treatment — OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). The exact day depends on when mating completes; confirm broodlessness by inspection rather than counting days. Window may extend several weeks if mating is delayed.'],
+      ['flexible', '', '⏳ Drone trapping opportunity — artificial swarm',
+        start ? '—' : '—',
+        'The artificial swarm is queenright and the old queen lays immediately on drawn comb. A drone foundation frame inserted here becomes a mite trap once drawn out and laid into. Timing for insertion and removal follows the standard drone brood removal procedure — see the dedicated Day Planner card for that method. This is one of several varroa control opportunities; not a prescription.'],
+      ['~5–6 weeks', '', '⏳ Week 5–6 — Confirm laying queen in parent colony',
+        start ? `≈ ${dpFmt(dpAddDays(start,35))} – ${dpFmt(dpAddDays(start,42))}` : '—',
+        'By week 5–6 the new queen should be laying. Inspect gently for eggs in a regular pattern. If no eggs and no laying queen visible, donate a frame of young eggs or open brood from another colony — if the parent is queenless, they will start emergency cells; if the queen is fine but slow, they will ignore them. Wait another 3–4 weeks before the next check.'],
+      ['anytime', '', '⏳ If mating fails — contingency',
+        start ? '—' : '—',
+        'Sometimes the virgin queen does not return from a mating flight, or returns unmated. If by week 6–7 there are no eggs and the egg-frame test confirms queenlessness, options include: combining the parent colony back with the artificial swarm (newspaper unite), introducing a mated queen, or accepting the loss and combining with another colony. Do not leave a queenless colony unaddressed — it will dwindle.'],
     ];
   }
 
