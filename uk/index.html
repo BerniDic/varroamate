@@ -1630,7 +1630,7 @@ function dismissTrialBanner(){
 
     <!-- Hive 4: Bee Health (coming soon) — smallest, slightly leaning -->
     <div class="hive-wrapper coming-soon" id="hive-health" data-app="health" role="button" tabindex="0"
-         aria-label="VarroaMate Beekeeper Academy — coming soon">
+         aria-label="VarroaMate — next hive coming soon">
       <div class="hive-glow"></div>
       <div class="hive-svg-wrap" style="transform: rotate(1.2deg);">
         <svg width="82" height="112" viewBox="0 0 82 112" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1660,11 +1660,13 @@ function dismissTrialBanner(){
           <!-- Entrance -->
           <rect x="22" y="87" width="38" height="7" rx="2" fill="#120E08"/>
           <rect class="entrance-shine" x="22" y="87" width="38" height="7" rx="2" fill="rgba(255,150,20,0.6)" style="transition:opacity 0.5s;"/>
+          <!-- Mystery question mark -->
+          <text x="41" y="80" text-anchor="middle" font-size="34" font-weight="bold" fill="#E8B800" stroke="#201608" stroke-width="0.8" font-family="Georgia, serif">?</text>
         </svg>
       </div>
       <div class="hive-label">
-        <div class="hive-label-name">Academy</div>
-        <div class="hive-label-sub">structured learning pathway</div>
+        <div class="hive-label-name">?</div>
+        <div class="hive-label-sub">coming soon — something new</div>
         <div class="status-badge soon"><span class="dot"></span>coming soon</div>
       </div>
     </div>
@@ -2265,7 +2267,7 @@ const APP_TOASTS = {
   vm:     '🐝 Opening VarroaMate…',
   vmsp:   '🧠 Opening Smart Planner…',
   prod:   '📋 Opening Productivity…',
-  health: '🎓 Beekeeper Academy — coming soon! 🐝',
+  health: '🌸 Something new is brewing… 🐝',
   hygiene: '🧹 Opening Hive Hygiene…',
 };
 
@@ -2732,7 +2734,7 @@ const APP_INFO = {
   vm:     { title: 'Varroa<em>Mate</em>', sub: 'mite tracking & treatments',  badge: 'release', badgeText: '', url: '/uk/app/' },
   vmsp:   { title: 'Smart Planner',       sub: 'seasonal treatment planning', badge: 'release', badgeText: '',             url: '/uk/planner/' },
   prod:   { title: 'Productivity',        sub: 'inspections, harvests & queens', badge: 'release', badgeText: '',            url: '/uk/productivity/' },
-  health:   { title: 'Beekeeper Academy',   sub: 'structured learning pathway',  badge: 'soon', badgeText: 'coming soon', url: null },
+  health:   { title: '?',                   sub: 'coming soon — stay tuned',  badge: 'soon', badgeText: 'coming soon', url: null },
   hygiene:  { title: 'Hive Hygiene',           sub: 'apiary health & sanitation',   badge: 'release', badgeText: '', url: '/uk/hygiene/' },
 };
 let _popupApp = null;
