@@ -1,5 +1,5 @@
 # VarroaMate Development Handover
-## Session date: 25 April 2026
+## Session date: 29 April 2026
 ## Use this document to start a new Claude chat with full context
 
 ---
@@ -24,6 +24,86 @@ VarroaMate is an Australian beekeeping SaaS platform at varroamate.com — 4 sta
 - Service role key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZHB0cWpzanF4cWp4b3Vxa2xsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjQ3ODgyMSwiZXhwIjoyMDg4MDU0ODIxfQ.l6qToicMkH7oVkasu08Q-wthXrStH-89TmCCXtEKMbU`
 - AI model: Claude Opus 4.6 (main app), Claude Haiku (voice)
 - Resend API key: `re_ZFADqL9V_EXyTcexk3Tx14gBBZ4AWxY5Z` (varroamate.com domain verified)
+
+---
+
+## RECENT WORK — 26–29 APRIL 2026
+
+Major work over the last four days. Listed roughly in order shipped.
+
+### Pagden + Walk-Away topology rewrite (commits 0e4527c → cfc49f5 + 10267ec)
+
+The VMSP Split Brood Break tab had inverted topology for both methods. Pagden's recipe text and SVG had the queen on the moved hive (wrong); walk-away put the drone frame in the queenless half (logically impossible — no laying queen). Both methods were also framed primarily as varroa interventions when they're really colony management methods with varroa as a secondary opportunity.
+
+Four-stage rewrite:
+- **Stages 1–3 (Pagden)**: opening warning about virgin-queen mating uncertainty, reframed purpose (primary = swarm control, not varroa), corrected recipe text + SVG diagram, 8 biology-driven action cards using fixed days for known biology and range labels (`~7–9`, `1–4 weeks`, `~Week 3+`, `flexible`, `anytime`) for inspection-driven events. iCal export blocked for Pagden because virgin queen mating timing is weather-dependent.
+- **Polish**: drone-trap quick card reworded for queenright side, `dpActionCard()` updated to suppress the literal `DAY` suffix on non-numeric pill labels, broken NBU link replaced with Barkston Ash Beekeepers' Pagden guide (also added to AU resources — method is not region-specific).
+- **Stage 4 (walk-away)**: same pattern. Description reframed as primarily colony-increase (not varroa control). Forager-return trade-off explained (when one half moves, foragers return to original stand, weakening the moved half; beekeepers compensate via even nurse-bee/brood distribution). Trade-offs vs Pagden documented (easier/faster but weaker queenless half, less effective for active swarm control). SVG corrected (drone frame moved to queenright). 8 corrected action cards. iCal export blocked here too.
+
+Branch `fix/pagden-topology` used for Pagden Stages 1–3 then merged; walk-away Stage 4 went direct to main.
+
+### Treatment dose tracking — compliance feature (commits 449624c, 2d65553, 92754ec)
+
+Beekeepers are required to keep treatment records for compliance (UK VMR 2013 = 5 years; AU AHBIC = state-dependent, 2–6 years). Previously VarroaMate captured product + date + free-text notes only. Missing: dose/amount, which is part of the legal record.
+
+**Schema**: two new nullable columns on `treatments` table.
+- `dose_amount NUMERIC` (e.g. 2, 1.5, 5)
+- `dose_unit TEXT` with CHECK constraint allowing: `strips, sachets, tablets, trays, caps, frames, mL, g, cycles, other` (NULL allowed for legacy rows + treatments without a meaningful dose)
+
+Migration applied to Supabase first, then the app code follow-up. Existing rows unaffected.
+
+**Modal**: new Dose section above Notes — numeric input + unit dropdown + help text noting the record-keeping rationale (region-specific: AU mentions AHBIC; UK mentions VMD with 5-year retention).
+
+**Validation**: soft warnings, not hard rejects. The record always saves so partial data is captured; warning toasts nudge the user to return and complete the entry. Cases:
+- both filled → success toast `Treatment saved! 💊`
+- both empty → ⚠️ warning, dose record is a legal requirement
+- amount only → ⚠️ please add unit
+- unit only → ⚠️ please add amount
+- non-numeric amount → hard reject
+
+Toast duration doubled globally from 2.5s to 5s (warning text was too long to read).
+
+**Whitelist for non-dosed treatments**: heat treatment, drone comb removal, brood interruption skip the warning entirely — these are physical/biological methods with no meaningful dose.
+
+**CSV export**: extended with regulatory header (3 quoted lines + blank, then the existing column header row). AU header: `Compliance: AHBIC Honey Bee Industry Biosecurity Code of Practice` (no retention number — varies by state). UK header: `Compliance: UK Veterinary Medicines Regulations 2013 (Schedule 3) — 5-year mandatory retention for food-producing animals (incl. honey bees)`. Treatment row product cell appends dose with pipe separator: `Apivar (Amitraz strips) | 2 strips`.
+
+**Auto-populate of dose unit from selected treatment**: intentionally NOT included. The TREATMENTS metadata objects differ between AU and UK in keys and structure (UK has `formicpro` instead of AU's `formic`, plus `varroxal`/`oxybee`/`danys`/`maqs`/`oxalic-vap`; AU has `aluen-cap` which UK doesn't) and the per-region structure complications need a dedicated patch. Users currently pick the unit manually from the dropdown — small extra click. Parked.
+
+### Brood interruption protocol corrected (commit 07bb0ef)
+
+Previously the entry described a 25-day broodless-window protocol conflated with drone-trap timing. User flagged the actual 14-day caging protocol:
+- Day 0: cage queen
+- Day 9: last worker egg laid pre-caging is now capped
+- Day 14: release queen (begins laying again)
+- Day 20–23: phoretic window. Original capped brood emerged (12 days from capping); new post-release eggs not yet capped (~9 days from laying). Therefore: no capped brood = all mites phoretic = OA window.
+- Day 23+: new brood gets capped, window closes.
+
+Updated `brood-int` metadata to reflect this. Added clarifying note that this is different from drone comb removal (which uses drone foundation as a passive trap over 19–23 days, unchanged).
+
+### Weather tab improvements (commit fb5a89b + part of f5ea00a)
+
+Font bumps in the header section, expandable details, best-window box (apiary name 16→18, address 13→15, summaries 14→16, body 13→15, 'tap to read' affordance 11→13). Day cards left at current sizes — separate cleanup if needed.
+
+Optimal/Marginal/Avoid wording corrected (commit f5ea00a) to distinguish manufacturer label limits (temperature) from beekeeper judgement (rain and wind for working the hive). Manufacturers don't specify wind speeds.
+
+### Mystery hive (commit f0084c1)
+
+Pivoting away from the Beekeeper Academy concept toward something new (plants & flowering, not yet started). Landing page hive 4 became a teaser: big amber `?` glyph (Georgia serif, bold, 34px) on the front face. Label `?`, sub `coming soon — something new`. Toast on click: `🌸 Something new is brewing… 🐝`. Same on UK landing.
+
+### Pagden canvas redesign (commit 8d9ec52)
+
+The timeline canvas at the top of the Pagden view had been parked as separate work — broken topology (mislabeled rows, walk-away cell logic applied to Pagden), warm-tan `emerged` colour blending with several other warm tones for CVD users, OA window timing not matching the corrected biology.
+
+Redesigned to 5 rows in this order: `👑 Queenright` | `🎯 Drone frame` | `🚫 Queenless` | `👸 Queen cell` | `💨 OA window`. Foragers row removed. Drone frame placed adjacent to Queenright (since drone trapping happens in queenright half); OA window adjacent to Queen cell (both queenless-side events).
+
+Cell logic simplified to make the broodless window unambiguous: Queenless row shows egg colour days 0–2, capped days 3–20, **empty grey gap days 21–27** (the only sustained empty stretch in the canvas), capped from day 28 (new queen laying). OA window cells (yellow) sit visibly inside this gap on days 21–26 with a one-day buffer to day 27 before brood resumes. Queenright simplified to uniform capped throughout.
+
+`DP_COL.remove` colour changed from teal `rgba(64,184,184,0.78)` to orange `rgba(232,140,40,0.88)` for CVD-friendly contrast. Affects walk-away drone-frame, Pagden drone-frame, and the standalone Drone Comb Removal day plan timeline (all four use 'remove' with the same semantics). Creates natural yellow (OA) → orange (REMOVE) → red (LATE) progression mapping to urgency.
+
+### Smaller fixes (commit f5ea00a)
+
+- Drone Comb Removal `removal` field now includes both options: (1) Freeze 48h, (2) Heat in Varroa Controller at 42°C for 2 hours — with note that heat affects drone viability and fertility. AU and UK identical.
+- Walk-away `🚫 Swarm prevention` quick card description: `by separating queen from brood` (Pagden's mechanism) → `by reducing colony size` (walk-away's actual mechanism).
 
 ---
 
@@ -194,6 +274,16 @@ git push origin main
 
 ## KNOWN ISSUES / PENDING FIXES
 
+### Parked from this session
+
+1. **Auto-populate dose unit from selected treatment**: TREATMENTS metadata objects differ between AU and UK in keys, structure, whitespace formatting (UK has `formicpro`, `varroxal`, `oxybee`, `danys`, `maqs`, `oxalic-vap`; AU has `aluen-cap` which UK doesn't; UK uses ` ` after `:`, AU doesn't). Need per-region TREATMENT_UNITS dictionaries. Users currently pick the unit manually — small UX cost, defer until other treatment-metadata cleanup.
+
+2. **Walk-away timeline canvas**: Pagden canvas was redesigned (commit 8d9ec52). Walk-away canvas left as-is. Has same false-precision issue (hardcoded milestone column positions implying fixed days for biology that's actually weather-dependent). Worth a dedicated session to bring it in line with Pagden.
+
+3. **Long sessions slowing down**: this session got long because of the volume of biology and design work. For the next 2–3 sessions a fresh chat per major topic is probably better than one long session.
+
+### Older items still pending
+
 1. **AU app `au.js` tag** — was lost during migration, manually restored. Monitor that `<script src="/config/au.js">` stays in `app/index.html`.
 
 2. **UK fix_uk_ai_issues.py** — ran successfully but 2 skips:
@@ -270,6 +360,8 @@ Previous session transcripts in `/mnt/transcripts/`:
 - `2026-04-12-02-27-35-varroamate-dev-session.txt`
 - `2026-04-12-10-45-55-varroamate-dev-session-2.txt`
 - `2026-04-25-varroamate-dev-session.txt` (VMSP mobile font, dayplan card layout, VMHH AI markdown fix, Day Plan Save feature, 3-category treatment refactor Mechanical→Biological+Physical, apiary lookup bug fix)
+- `2026-04-27` and `2026-04-28` sessions (Pagden Stages 1–3, walk-away Stage 4, dose tracking schema + UI, CSV regulatory header)
+- `2026-04-29` session (weather font bumps, region-specific dose wording, brood-int 14-day protocol, mystery hive, Pagden canvas redesign + CVD contrast fix, drone-comb heat alternative)
 - Current session transcript will be in journal after this chat ends
 
 ---
