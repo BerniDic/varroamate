@@ -1363,7 +1363,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
       <div class="lib-card-header" onclick="toggleLib('thymol')">
         <div>
           <div class="lib-card-title">Thymol</div>
-          <div class="lib-card-meta">Registered products: Apiguard · ApiLife Var</div>
+          <div class="lib-card-meta">Registered product: Apiguard</div>
         </div>
         <div class="lib-chevron" id="lib-chev-thymol">▾</div>
       </div>
@@ -1382,7 +1382,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         </div>
         <div class="lib-section">
           <div class="lib-section-title">How it affects bees</div>
-          <p>Bees are significantly more tolerant of thymol than mites, but at treatment concentrations the compound is irritating. Increased entrance bearding, reduced foraging, and temporary disruption of colony behaviour are common. Brood mortality can occur at higher temperatures when vapour concentrations spike. Both Apiguard and ApiLife Var require honey super removal, as thymol taints honey at detectable levels.</p>
+          <p>Bees are significantly more tolerant of thymol than mites, but at treatment concentrations the compound is irritating. Increased entrance bearding, reduced foraging, and temporary disruption of colony behaviour are common. Brood mortality can occur at higher temperatures when vapour concentrations spike. Apiguard requires honey super removal, as thymol taints honey at detectable levels.</p>
         </div>
         <div class="lib-section">
           <div class="lib-section-title">Impact on honey and frames</div>
@@ -1960,7 +1960,7 @@ h1,h2,h3{font-family:'Playfair Display',serif;}
         <select id="treatment-select" style="flex:1;padding:12px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:16px;background:var(--bg);color:var(--text);" onchange="updateTreatmentInfo()">
           <option value="">— Select treatment —</option>
           <optgroup label="Organic Acids"><option value="oxalic">Oxalic Acid Vaporisation</option><option value="oxalic-dribble">Oxalic Acid Dribble</option><option value="formic">Formic PRO (Formic Acid)</option><option value="aluen-cap">Aluen CAP (Oxalic + Lactic acid)</option></optgroup>
-          <optgroup label="Thymol-based"><option value="apilife">ApiLife Var (Thymol)</option><option value="apiguard">Apiguard (Thymol gel)</option></optgroup>
+          <optgroup label="Thymol-based"><option value="apiguard">Apiguard (Thymol gel)</option></optgroup>
           <optgroup label="Synthetic Acaricides"><option value="apivar">Apivar (Amitraz)</option><option value="apitraz">Apitraz (Amitraz)</option><option value="bayvarol">Bayvarol (Flumethrin)</option><option value="apistan">Apistan (Tau-fluvalinate)</option></optgroup>
           <optgroup label="Biological &amp; Physical"><option value="drone-comb">Drone comb removal</option><option value="brood-int">Brood interruption</option><option value="heat">Heat treatment</option></optgroup>
         </select>
@@ -2049,8 +2049,8 @@ const SEED = {
     2003:[{id:'c12',date:'2026-02-10',value:2}],2004:[],2005:[],2006:[{id:'c13',date:'2026-02-15',value:2}],2007:[]
   },
   treatmentsByHive:{
-    2000:[{id:'t1',date:'2026-01-20',product:'oxalic',notes:'3 × weekly. Broodless period.'},{id:'t2',date:'2025-11-15',product:'apivar',notes:'2 strips. 8 weeks. Supers removed.'},{id:'t3',date:'2025-09-10',product:'apilife',notes:'3 × 10 days. Temp 15–30°C.'}],
-    2001:[{id:'t10',date:'2026-01-15',product:'apilife',notes:''}],2002:[{id:'t11',date:'2026-01-01',product:'apivar',notes:''}],
+    2000:[{id:'t1',date:'2026-01-20',product:'oxalic',notes:'3 × weekly. Broodless period.'},{id:'t2',date:'2025-11-15',product:'apivar',notes:'2 strips. 8 weeks. Supers removed.'}],
+    2001:[],2002:[{id:'t11',date:'2026-01-01',product:'apivar',notes:''}],
     2003:[],2004:[],2005:[],2006:[],2007:[]
   },
   notesByHive:{
@@ -3801,8 +3801,8 @@ async function loadGuidance(){
   const stateNotAvailableWarning=!varroaPresent?`CRITICAL: This beekeeper is in ${state}, which is currently VARROA-FREE. Do NOT recommend any chemical varroa treatments — they are not required or permitted. Focus guidance on surveillance, biosecurity, and preparation.`:'';
   const sections=[
     {id:'guidance-summary-body',prompt:`Varroa status: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} 2–3 sentences. Specific about count, trend, season, and state context. IMPORTANT: Do NOT suggest or mention any treatments — no treatment names, no treatment recommendations, no hints toward any treatment approach. Describe the mite situation only. Treatment recommendations are handled exclusively in the Next Steps panel.`},
-    {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". Only recommend treatments from the approved VarroaMate list — do not suggest any method not in: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment (Varroa Controller), Duplex-Framebox Plan. ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
-    {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic PRO (Formic Acid) also allows supers on. Supers must be removed for: Apivar, Apitraz, Apistan, ApiLife Var, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
+    {id:'guidance-nextsteps-body',prompt:`Next steps: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Strictly respect the preferenceProfile — only recommend treatments consistent with "${pref}". Only recommend treatments from the approved VarroaMate list — do not suggest any method not in: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption, Heat Treatment (Varroa Controller), Duplex-Framebox Plan. ${state&&varroaPresent?`Only recommend treatments that are currently approved/permitted in ${state} (${sd?.treatmentNote||''}).`:''} ${pyrethreidWarning} 3–4 specific actionable sentences.`},
+    {id:'guidance-cautions-body',prompt:`Cautions: ${JSON.stringify(hd)}. ${stateNotAvailableWarning} Address: 1) treatment rotation given ${prevT} was used previously, 2) honey super rules — IMPORTANT: Oxalic Acid Vaporisation, Oxalic Acid Dribble, Aluen CAP, and Bayvarol (Flumethrin) are all APPROVED for use WITH honey supers on under APVMA label — do NOT say supers must be removed for these. Formic PRO (Formic Acid) also allows supers on. Supers must be removed for: Apivar, Apitraz, Apistan, Apiguard. Only state super removal is required if the beekeeper is specifically using one of those products, 3) any cautions specific to "${pref}" approach${state&&varroaPresent?`, 4) state-specific regulatory cautions for ${state} including reporting requirements`:''}. ${pyrethreidWarning} Concise bullet points.`}
   ];
   if(!_planLimits.ai){
     // Free user — show upgrade prompt in each section
@@ -3889,9 +3889,9 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
         // Treatment threshold lines — full names, no abbreviations
         const thresholds=[
           {val:40,color:'rgba(192,57,43,0.7)',label:'40°C — Aluen CAP upper limit'},
-          {val:30,color:'rgba(192,57,43,0.8)',label:'30°C — Thymol (ApiLife/Apiguard) upper limit & Formic PRO upper limit (29°C)'},
+          {val:30,color:'rgba(192,57,43,0.8)',label:'30°C — Thymol (Apiguard) upper limit & Formic PRO upper limit (29°C)'},
           {val:25,color:'rgba(243,156,18,0.8)',label:'25°C — OA Vaporisation upper limit'},
-          {val:15,color:'rgba(39,174,96,0.6)',label:'15°C — Thymol (ApiLife/Apiguard) minimum'},
+          {val:15,color:'rgba(39,174,96,0.6)',label:'15°C — Thymol (Apiguard) minimum'},
           {val:10,color:'rgba(41,128,185,0.6)',label:'10°C — Formic PRO minimum & Apivar/Bayvarol preferred minimum'},
           {val:5, color:'rgba(100,140,200,0.5)',label:'5°C — Aluen CAP & OA Dribble minimum'},
           {val:3, color:'rgba(100,140,200,0.4)',label:'3°C — OA Vaporisation minimum'},
@@ -3927,7 +3927,7 @@ async function loadTempChart(ap, isExpanded=false, targetCanvas=null){
             <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 OA Vap / Dribble: 3–25°C</span>
             <span style="background:rgba(100,140,200,0.15);padding:2px 8px;border-radius:4px;">🔵 Aluen CAP: 5–40°C</span>
             <span style="background:rgba(41,128,185,0.15);padding:2px 8px;border-radius:4px;">🔵 Formic PRO: 10–29°C</span>
-            <span style="background:rgba(39,174,96,0.15);padding:2px 8px;border-radius:4px;">🟢 ApiLife Var / Apiguard: 15–30°C</span>
+            <span style="background:rgba(39,174,96,0.15);padding:2px 8px;border-radius:4px;">🟢 Apiguard: 15–30°C</span>
             <span style="background:rgba(180,180,180,0.15);padding:2px 8px;border-radius:4px;">⚪ Apivar / Apitraz / Bayvarol / Apistan: &gt;10°C preferred, no upper limit</span>
           </div>`;
       }
@@ -3950,26 +3950,25 @@ APPROVED TREATMENTS — HARD WHITELIST: You must ONLY ever recommend, suggest, m
 2. OA Dribble
 3. Formic PRO
 4. Aluen CAP
-5. ApiLife Var
-6. Apiguard
-7. Apivar
-8. Apitraz
-9. Bayvarol
-10. Apistan
-11. Drone Comb Removal
-12. Brood Interruption (queen caging)
-13. Heat Treatment (Varroa Controller)
-14. Duplex-Framebox Plan
+5. Apiguard
+6. Apivar
+7. Apitraz
+8. Bayvarol
+9. Apistan
+10. Drone Comb Removal
+11. Brood Interruption (queen caging)
+12. Heat Treatment (Varroa Controller)
+13. Duplex-Framebox Plan
 If any treatment is not on this list, do NOT mention it, suggest it, or reference it in any context — not even to say it exists. This includes but is not limited to: sugar dusting, powdered sugar, icing sugar, sugar rolls, oxalic acid syrup, lactic acid spray, thymol crystals, hop beta acids, formic acid pads, or any other method. If asked directly about an unlisted method, say only that it is not supported in VarroaMate and offer to help with the approved list.
 MITE COUNTING: All mite counting in VarroaMate is done exclusively via alcohol wash. Do NOT mention sugar rolls, sugar dusting, CO2 wash, sticky boards, or any other counting method under any circumstances.
 PHILOSOPHY RESTRICTIONS — apply strictly based on the beekeeper's preference:
-- "Integrated Chemical & Non-Chemical": all 14 treatments permitted.
-- "Organic-First with Emergency Synthetic": prefer items 1–6 and 11–14; items 7–10 (synthetics) only if mite load is critical and organic options have failed or are insufficient.
-- "Organic-Only Strategy": ONLY items 1–6 (OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard). NEVER suggest items 7–14 — no synthetics, no heat device, no Brood Interruption, no Drone Comb Removal.
-- "Organic + Heat Treatment": ONLY items 1–6 plus items 13–14 (Heat Treatment, Duplex-Framebox). NEVER suggest items 7–12 — no synthetics, no Brood Interruption, no Drone Comb Removal.
-- "Organic + Biological + Physical Strategy": ONLY items 1–6 and 11–14. NEVER suggest items 7–10 (synthetics).
-- "Biological + Physical Strategy Only": ONLY items 11–14 (Drone Comb Removal, Brood Interruption, Heat Treatment, Duplex-Framebox). NEVER suggest any chemical or organic acid — items 1–10 are all forbidden.
-The beekeeper's current preference is "${prefProfile||'Integrated Chemical & Non-Chemical'}". You MUST apply the matching rule above without exception — this is a hard constraint. Never override or ignore the preference regardless of mite levels, urgency, or any other reason. If no preference matches the list above, default to "Integrated Chemical & Non-Chemical" (all 14 treatments permitted).
+- "Integrated Chemical & Non-Chemical": all 13 treatments permitted.
+- "Organic-First with Emergency Synthetic": prefer items 1–5 and 10–13; items 6–9 (synthetics) only if mite load is critical and organic options have failed or are insufficient.
+- "Organic-Only Strategy": ONLY items 1–5 (OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, Apiguard). NEVER suggest items 6–13 — no synthetics, no heat device, no Brood Interruption, no Drone Comb Removal.
+- "Organic + Heat Treatment": ONLY items 1–5 plus items 12–13 (Heat Treatment, Duplex-Framebox). NEVER suggest items 6–11 — no synthetics, no Brood Interruption, no Drone Comb Removal.
+- "Organic + Biological + Physical Strategy": ONLY items 1–5 and 10–13. NEVER suggest items 6–9 (synthetics).
+- "Biological + Physical Strategy Only": ONLY items 10–13 (Drone Comb Removal, Brood Interruption, Heat Treatment, Duplex-Framebox). NEVER suggest any chemical or organic acid — items 1–9 are all forbidden.
+The beekeeper's current preference is "${prefProfile||'Integrated Chemical & Non-Chemical'}". You MUST apply the matching rule above without exception — this is a hard constraint. Never override or ignore the preference regardless of mite levels, urgency, or any other reason. If no preference matches the list above, default to "Integrated Chemical & Non-Chemical" (all 13 treatments permitted).
 HEAT TREATMENT ACCURACY: Heat treatment (Varroa Controller) kills mites in sealed capped brood cells only. It does NOT kill phoretic mites — adult bees must be shaken off frames before loading into the device, so any mites riding on adult bees return to the hive and survive. Never describe heat treatment as addressing phoretic mites. This is the opposite of OA vaporisation, which kills only phoretic mites and cannot reach mites in sealed cells. When recommending heat treatment for Biological + Physical Strategy Only preference, make this distinction clear — heat treatment targets reproductive mites in capped brood; if phoretic mite kill is also needed, Brood Interruption (queen caging) followed by OA vaporisation in the broodless window is the biologically-compatible approach.
 SMART PLANNER REFERRAL: Whenever biological or physical treatments are relevant to this beekeeper's situation — whether their preference includes biological/physical options or you are recommending Drone Comb Removal, Brood Interruption, Heat Treatment, or Duplex-Framebox — always suggest they use the VarroaMate Smart Planner app to build and schedule their treatment plan. Where the treatment has a day-level planner (Brood Interruption, Heat Treatment, Duplex-Framebox, and Drone Comb Removal all have dedicated Day Plans in the Smart Planner), specifically mention that the Day Plans section provides step-by-step implementation guidance, timelines, and action checklists for that method. Keep the referral brief and natural — one sentence is enough.
 PRODUCT NAMES: Always use "Formic PRO" — never use the outdated name "MAQS". Formic PRO is the current registered product name for formic acid strips in Australia.
@@ -4009,7 +4008,7 @@ async function sendChat(){
   if(!storedApiKey){loading.textContent='AI guidance is unavailable — please try again later.';return;}
   try{
     const {data}=await _anthropicFetch({model:CLAUDE_MODEL,max_tokens:1000,
-      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa. APPROVED TREATMENTS ONLY: Only recommend or discuss treatments from this list — no others: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, ApiLife Var, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, thymol crystals, hop beta acids, or any other unlisted method. MITE COUNTING: All mite counting in VarroaMate uses alcohol wash exclusively — do not suggest sugar rolls, sugar dusting, sticky boards, or CO2 wash as counting methods.',
+      system:'You are VarroaMate, a friendly expert assistant for Australian beekeepers managing Varroa mite. Help with varroa treatments, mite counting, resistance management, treatment rotation, organic vs chemical approaches, Victorian biosecurity reporting via BeeMAX. Keep answers concise and practical. Always use "Formic PRO" — never use the outdated name "MAQS". CRITICAL: DWV (deformed wing virus) has NOT been confirmed in Australia — never mention it as a symptom or concern. Only reference diseases established in Australia: AFB, EFB, Chalkbrood, Sacbrood, Nosema, Small Hive Beetle, Braula fly, Varroa. APPROVED TREATMENTS ONLY: Only recommend or discuss treatments from this list — no others: OA Vaporisation, OA Dribble, Formic PRO, Aluen CAP, Apiguard, Apivar, Apitraz, Bayvarol, Apistan, Drone Comb Removal, Brood Interruption (queen caging), Heat Treatment (Varroa Controller), Duplex-Framebox Plan. Do NOT suggest sugar dusting, powdered sugar, icing sugar, lactic acid spray, thymol crystals, hop beta acids, or any other unlisted method. MITE COUNTING: All mite counting in VarroaMate uses alcohol wash exclusively — do not suggest sugar rolls, sugar dusting, sticky boards, or CO2 wash as counting methods.',
       messages:chatHistory});
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, could not respond.';
     chatHistory.push({role:'assistant',content:reply});loading.innerHTML=renderAIMarkdown(reply);
@@ -4199,16 +4198,6 @@ const TREATMENT_STATE_NOTES = {
     TAS: {ok:false, note:'Varroa not detected in Tasmania — not currently required or permitted.'},
     NT:  {ok:false, note:'Varroa not detected in NT — not currently required or permitted.'},
   },
-  'apilife': {
-    NSW: {ok:true,  note:'ApiLife Var is not separately listed in the current AHBIC treatment table. Verify current APVMA registration status before use.'},
-    ACT: {ok:true,  note:'Verify current APVMA registration status with ACT authority.'},
-    VIC: {ok:true,  note:'Verify current APVMA status. Report positive detections via BeeMAX.'},
-    QLD: {ok:true,  note:'Verify current APVMA registration status before use.'},
-    SA:  {ok:true,  note:'Verify current APVMA status. Contact PIRSA for confirmation.'},
-    WA:  {ok:false, note:'Varroa not detected in WA — not currently required or permitted.'},
-    TAS: {ok:false, note:'Varroa not detected in Tasmania — not currently required or permitted.'},
-    NT:  {ok:false, note:'Varroa not detected in NT — not currently required or permitted.'},
-  },
   'apiguard': {
     NSW: {ok:true,  note:'Registered in Australia (APVMA reg. 65570). Available OTC from beekeeping suppliers.'},
     ACT: {ok:true,  note:'Registered (APVMA 65570). Available OTC.'},
@@ -4353,7 +4342,6 @@ const TREATMENTS={
   'oxuvar-dribble':{name:'Api-Bioxal (OA Dribble)',moa:'Organic Acid',active:'Oxalic acid in sugar syrup',tempRange:'Above 5°C',tempSensitive:true,honeySupers:'Honey supers CAN remain on',withBrood:'Best broodless.',resistance:'Low risk.',dosage:'5 mL of 3.2% solution per seam of bees',duration:'Single application',durationDays:1,removal:'Single application — no materials to remove.',regulatory:'Registered Australia. APVMA approved.',notes:'Same active ingredient as Oxuvar. Best used during broodless periods.'},
   'aluen-cap':{name:'Aluen CAP',moa:'Organic Acid — Slow Release',active:'Oxalic acid dihydrate + Lactic acid (slow-release polymer cap)',tempRange:'5°C–40°C. Effective across a wide range — no vapour temperature sensitivity.',tempSensitive:false,honeySupers:'Honey supers CAN remain on — approved for use with supers present at label dose. Remove only if retreatment is needed.',withBrood:'Effective with brood present — slow release reaches mites under capped cells over time.',resistance:'Low risk. Organic acid mechanism — no resistance reported.',dosage:'1 cap per hive, placed centrally on top of frames in the brood box.',duration:'Up to 6 weeks (42 days maximum)',durationDays:42,removal:'Remove Aluen CAP after 6 weeks (maximum 42 days). Do not exceed 42 days. Discard used cap — do not reuse.',regulatory:'Registered in Australia. APVMA approved. No PPE required for placement (unlike OA vaporisation). Check APVMA label for current withholding period.',notes:'Key advantages: effective with brood present, honey supers can stay on, and no heat/PPE equipment needed for placement. Slow-release matrix means a single cap replaces multiple vaporisations. Ideal for beekeepers who cannot vaporise regularly. Maximum treatment duration is 42 days — do not leave longer.'},
   'formic':{name:'Formic PRO (Formic Acid)',moa:'Organic Acid',active:'Formic acid',tempRange:'10°C–29°C. Do NOT use above 29°C.',tempSensitive:true,honeySupers:'Honey supers CAN remain on (unique advantage)',withBrood:'Effective against mites under capped brood.',resistance:'Low risk.',dosage:'2 strips per hive on bottom bars.',duration:'7 days',durationDays:7,removal:'⚠ Remove Formic PRO strips after exactly 7 days. Do not leave longer — prolonged exposure harms bees and queens.',regulatory:'Registered Australia. APVMA. Temperature limits critical for bee safety.',notes:'One of few treatments effective against brood mites. Honey supers can stay. Temperature must be strictly followed.'},
-  'apilife':{name:'ApiLife Var (Thymol)',moa:'Essential oil / Thymol',active:'Thymol, eucalyptol, menthol, camphor',tempRange:'15°C–30°C. Ineffective outside this range.',tempSensitive:true,honeySupers:'Must be removed during and 2 weeks after',withBrood:'Moderate efficacy with brood.',resistance:'Low risk.',dosage:'Half a tablet on top bars at two corners of brood box.',duration:'3 applications × 10 days (30 days total)',durationDays:30,removal:'Replace tablet every 10 days for 3 rounds. Remove final tablet and any residue after day 30. Honey supers must stay off for a further 2 weeks after removal.',regulatory:'Registered Australia. Store below 25°C.',notes:'Temperature critical. Below 15°C thymol does not volatilise. Above 30°C causes brood/queen damage. Check 14-day forecast first.'},
   'apiguard':{name:'Apiguard (Thymol gel)',moa:'Essential oil / Thymol',active:'Thymol slow-release gel',tempRange:'Above 15°C for efficacy',tempSensitive:true,honeySupers:'Must be removed',withBrood:'Best in low-brood periods.',resistance:'Low risk.',dosage:'50 g tray on top frames. Replace after 10–14 days.',duration:'2 trays 10–14 days apart (3–6 weeks)',durationDays:42,removal:'Replace first tray after 10–14 days with a fresh 50 g tray. Remove second tray after a further 10–14 days. Remove all residue. Honey supers can return 2 weeks after final removal.',regulatory:'Registered Australia.',notes:'Temperature dependent. Most effective in warm conditions.'},
   'apivar':{name:'Apivar (Amitraz strips)',moa:'Synthetic — Amitraz (Formamidine)',active:'Amitraz',tempRange:'Wide range (above 10°C preferred)',tempSensitive:false,honeySupers:'Must be removed for entire treatment',withBrood:'Does not penetrate capped cells directly. Mites carry residues into cells and are exposed on emergence. Full 6–10 week treatment essential to cover brood cycle.',resistance:'Resistance reported in some regions. Rotate MoA.',dosage:'2 strips per brood box between brood frames.',duration:'6–8 weeks',durationDays:56,removal:'⚠ Remove Apivar strips after 6–8 weeks (no later than 56 days). Leaving strips in longer encourages amitraz resistance and increases wax residue accumulation. Record removal date.',regulatory:'Registered Australia. Prescription in some states. Residues accumulate in wax.',notes:'Highly effective. Wax residue concern with repeated use. Rotate MoA after each course.'},
   'apitraz':{name:'Apitraz (Amitraz strips)',moa:'Synthetic — Amitraz (Formamidine)',active:'Amitraz',tempRange:'Wide range (above 10°C preferred)',tempSensitive:false,honeySupers:'Must be removed for entire treatment. Do not have supers on when strips are in.',withBrood:'Does not penetrate capped cells directly. Mites carry residues into cells and are exposed on emergence. Full 6 week treatment essential to cover brood cycle.',resistance:'Resistance reported in some regions. Rotate MoA after each course.',dosage:'2 strips per brood box between brood frames.',duration:'6 weeks',durationDays:42,removal:'⚠ Remove Apitraz strips after 6 weeks (42 days maximum). Do not exceed 42 days — leaving strips longer encourages amitraz resistance and increases wax residue. Record removal date.',regulatory:'Emergency use permit PER95905 active. Listed on AHBIC Varroa Chemical Treatment Table (28 Jan 2026). Label P88615. Full registration progressing. Supers must be removed. Use once per year only.',notes:'Same active ingredient (amitraz) as Apivar — do not use Apitraz and Apivar in the same season. Wax residue concern with repeated use. Rotate MoA after each course. Emergency permit — check AHBIC table for current status.'},
@@ -5919,13 +5907,6 @@ const WEATHER_THRESHOLDS_AU = {
     wind: { optimalMax: 30, marginalMax: 40 },
     notes: 'Thymol gel slowly releases vapour over weeks. Below 15°C, bees cluster and do not actively distribute the gel; thymol concentration never reaches lethal levels for mites. Above 40°C, vapour release accelerates and can trigger absconding or queen disruption. Best timed late summer or autumn after honey harvest, when bees are still active but brood is reducing.'
   },
-  'apilife': {
-    label: 'ApiLife Var (Thymol blend)', emoji: '🌿',
-    temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 30, marginalMax: 40 },
-    notes: 'Thymol blend (with eucalyptol, menthol, camphor) in vermiculite wafers. The additional essential oils make ApiLife Var more effective than pure thymol at lower temperatures (down to 12°C) — bees are irritated enough to distribute the product even when only moderately active. Above 30°C vapour release is too rapid and risks brood damage.'
-  },
   'formic': {
     label: 'Formic PRO', emoji: '🧪',
     temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
@@ -5960,100 +5941,6 @@ const WEATHER_THRESHOLDS_AU = {
     precip: { optimalMax: 0, marginalMax: 2 },
     wind: { optimalMax: 35, marginalMax: 50 },
     notes: 'Flumethrin strips — synthetic pyrethroid contact miticide, similar mechanism to Apistan. No temperature constraint. Cross-resistance with Apistan is documented because both are pyrethroids targeting the same mite ion channel. Treat as one slot in your rotation, not two.'
-  }
-};
-
-const WEATHER_THRESHOLDS_UK = {
-  'alcohol-wash': {
-    label: 'Alcohol Wash', emoji: '🔬',
-    temp: { optimalMin: 18, optimalMax: 28, marginalMin: 15, marginalMax: 32 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 35, marginalMax: 50 },
-    notes: 'A monitoring tool, not a treatment — accurate mite counts via dislodging phoretic mites from a 300-bee sample. Below 18°C, opening the hive disrupts the bee cluster, costs the colony significant energy, and chills exposed brood. The wash itself works in any weather chemically; the temperature restriction is to protect the colony, not the procedure.'
-  },
-  'oxalic-vap': {
-    label: 'OA Vaporisation (Api-Bioxal/Varroxal)', emoji: '💨',
-    temp: { optimalMin: 0, optimalMax: 12, marginalMin: -5, marginalMax: 20 },
-    precip: { optimalMax: 0, marginalMax: 5 },
-    wind: { optimalMax: 15, marginalMax: 25 },
-    notes: 'Oxalic acid sublimated into vapour kills phoretic mites with very high efficacy (~97%) when applied to a broodless winter cluster. Vapour cannot penetrate capped brood — mites under cappings escape, so when brood is present the treatment must be repeated to cover an entire brood cycle (per manufacturer’s instructions) to achieve high efficacy as successive cohorts of mites emerge. UK climate makes the November–January broodless window ideal. The treatment can be applied year-round at higher temperatures too. Best at 3°C or above with a loose cluster: below 3°C the cluster tightens and vapour cannot penetrate efficiently.'
-  },
-  'oxalic-dribble': {
-    label: 'OA Dribble (Api-Bioxal/Oxuvar/Oxybee/Dany\'s)', emoji: '💧',
-    temp: { optimalMin: 3, optimalMax: 12, marginalMin: 0, marginalMax: 18 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 20, marginalMax: 30 },
-    notes: 'Oxalic acid in sugar solution, trickled onto bees between frames. Best applied during winter broodless cluster — single application per season because acid damages bee gut tissue if repeated. Above 22°C bees are too spread out for full coverage. Cold conditions help by keeping the cluster tight, ensuring every bee contacts the dribble.'
-  },
-  'oxalic-spray': {
-    label: 'OA Spray (Oxuvar)', emoji: '💧',
-    temp: { optimalMin: 8, optimalMax: 18, marginalMin: 5, marginalMax: 22 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 15, marginalMax: 25 },
-    notes: 'Oxalic acid in solution, sprayed directly onto exposed bees on individual frames. Each frame is removed, sprayed both sides, returned. Highly disruptive to the colony — only used in mild weather (8–18°C) when bees can recover quickly. Must be applied to a broodless or near-broodless colony for efficacy.'
-  },
-  'maqs': {
-    label: 'MAQS (Formic, supers ON)', emoji: '🧪',
-    temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 30, marginalMax: 40 },
-    notes: 'Mite Away Quick Strips — formic acid in a 7-day fast treatment that can be applied with honey supers ON. The whole 7-day window must stay below 29.5°C; even one hot day in the first 3 days risks excessive brood mortality and queen loss. The trade-off for the supers-on convenience is the strict weather window — only summer applications work in UK climate.'
-  },
-  'formicpro': {
-    label: 'Formicpro (Formic, supers OFF)', emoji: '🧪',
-    temp: { optimalMin: 10, optimalMax: 25, marginalMin: 10, marginalMax: 29.5 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 30, marginalMax: 40 },
-    notes: 'Formic acid in a 20-day slower-release treatment, supers OFF. Same active ingredient as MAQS but gentler release profile, so the temperature limit (29.5°C) applies but the queen and brood risk is lower. Useful when a 7-day MAQS window cannot be guaranteed. Apply in autumn after honey harvest, leave 14–20 days.'
-  },
-  'varromed': {
-    label: 'VarroMed (Formic + OA)', emoji: '🧪',
-    temp: { optimalMin: 5, optimalMax: 20, marginalMin: 0, marginalMax: 25 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 20, marginalMax: 30 },
-    notes: 'Combined formic + oxalic acid trickle solution. Mild conditions preferred (5–20°C) — formic component limits the upper bound, oxalic component prefers cool. Multiple applications across the brood cycle to catch successive emerging mites. UK-only registration.'
-  },
-  'apiguard': {
-    label: 'Apiguard (Thymol)', emoji: '🌿',
-    temp: { optimalMin: 20, optimalMax: 30, marginalMin: 15, marginalMax: 40 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 30, marginalMax: 40 },
-    notes: 'Thymol gel slowly releases vapour over weeks. Below 15°C, bees cluster and do not actively distribute the gel; thymol concentration never reaches lethal levels for mites. Above 40°C, vapour release accelerates and can trigger absconding or queen disruption. Best timed late summer or autumn after honey harvest, when bees are still active but brood is reducing.'
-  },
-  'apilife': {
-    label: 'ApiLife Var (Thymol blend)', emoji: '🌿',
-    temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 30, marginalMax: 40 },
-    notes: 'Thymol blend (with eucalyptol, menthol, camphor) in vermiculite wafers. The additional essential oils make ApiLife Var more effective than pure thymol at lower temperatures (down to 12°C) — bees are irritated enough to distribute the product even when only moderately active. Above 30°C vapour release is too rapid and risks brood damage.'
-  },
-  'thymovar': {
-    label: 'Thymovar (Thymol strips)', emoji: '🌿',
-    temp: { optimalMin: 15, optimalMax: 25, marginalMin: 12, marginalMax: 30 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 30, marginalMax: 40 },
-    notes: 'Thymol on cellulose strips — releases vapour faster than Apiguard gel formulation, so works at slightly lower temps (15–25°C optimal) but more aggressive on bees in hot weather. Bees may avoid the strip area initially. Two applications, 3–4 weeks apart. Place strips on top of brood frames with an eke for spacing.'
-  },
-  'apivar': {
-    label: 'Apivar (Amitraz)', emoji: '🩹',
-    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 35, marginalMax: 50 },
-    notes: 'Amitraz on plastic strips — a contact miticide. No label temperature constraint per APVMA. Bees pick up the active ingredient by touching the strip and distribute it through the colony. Cold weather (clustered bees) reduces distribution but does not damage efficacy. The bigger concern is amitraz resistance, now widespread — rotate with non-amitraz products to preserve effectiveness.'
-  },
-  'apitraz': {
-    label: 'Apitraz (Amitraz)', emoji: '🩹',
-    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 35, marginalMax: 50 },
-    notes: 'Same active ingredient as Apivar (amitraz), same envelope. Contact miticide via strips, no temperature constraint. APVMA permit treats Apivar and Apitraz as interchangeable for resistance management — only one amitraz product per season. Rotate with thymol or organic acids in alternating seasons.'
-  },
-  'apistan': {
-    label: 'Apistan (Tau-fluvalinate)', emoji: '🩹',
-    temp: { optimalMin: -50, optimalMax: 50, marginalMin: -50, marginalMax: 50 },
-    precip: { optimalMax: 0, marginalMax: 2 },
-    wind: { optimalMax: 35, marginalMax: 50 },
-    notes: 'Tau-fluvalinate strips — synthetic pyrethroid contact miticide. No temperature constraint, works whenever bees are active. The defining issue is resistance: Apistan resistance is now globally widespread because it was the dominant treatment for decades. Use only as part of a strict rotation strategy, and confirm efficacy with a post-treatment alcohol wash.'
   }
 };
 
