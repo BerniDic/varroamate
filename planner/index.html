@@ -6667,14 +6667,14 @@ function renderDronePlanner(){
   const ac = document.getElementById('drone-actions');
   const cards = [
     [0,   'amber', '🖼 Place drone frame',          dpFmt(dpAddDays(start,0)),  'Insert a drone-cell-sized frame at the edge of the brood nest. Queens preferentially lay drones at the nest periphery. Mark the hive with the date.'],
-    [10,  '',      '🔍 Check frame is capping',     dpFmt(dpAddDays(start,9)),  'Larval stage should be complete. Look for the colony beginning to cap drone cells. Confirm the queen is using the frame well.'],
-    [20,  'teal',  '✂️ Cycle 1 — Remove & replace (ideal)',  dpFmt(dpAddDays(start,19)), 'Frame fully capped — all mites trapped inside. Remove and freeze 48h or heat-treat in the Varroa Controller. Replace immediately with a fresh drone frame to start Cycle 2.'],
-    [24,  'teal',  '✂️ Cycle 1 — Last safe removal day',      dpFmt(dpAddDays(start,23)), 'Last safe day for Cycle 1. Brood still fully capped. Remove now and replace with fresh frame. Any later and drones begin emerging, releasing mites.'],
-    [25,  'red',   '⚠️ Cycle 1 — Emergency removal',          dpFmt(dpAddDays(start,24)), 'Drones may begin emerging. Remove and freeze immediately — some mites will already have escaped.'],
-    [39,  'teal',  '✂️ Cycle 2 — Remove & treat (ideal)',     dpFmt(dpAddDays(start,38)), 'Cycle 2 frame fully capped — all mites trapped. Remove and freeze 48h or heat-treat. This completes the two-cycle protocol.'],
-    [43,  'teal',  '✂️ Cycle 2 — Last safe removal day',      dpFmt(dpAddDays(start,42)), 'Last safe day for Cycle 2. Remove now — any later and drones begin emerging.'],
-    [44,  'red',   '⚠️ Cycle 2 — Emergency removal',          dpFmt(dpAddDays(start,43)), 'Drones may begin emerging from Cycle 2 frame. Remove and freeze immediately.'],
-    [45,  '',      '🔍 Post-treatment check',                  dpFmt(dpAddDays(start,44)), 'Two full cycles complete. Perform an alcohol wash to assess mite reduction. Record results in VarroaMate.'],
+    [9,   '',      '🔍 Check frame is capping',     dpFmt(dpAddDays(start,9)),  'Larval stage should be complete. Look for the colony beginning to cap drone cells. Confirm the queen is using the frame well.'],
+    [19,  'teal',  '✂️ Cycle 1 — Remove & replace (ideal)',  dpFmt(dpAddDays(start,19)), 'Frame fully capped — all mites trapped inside. Remove and freeze 48h or heat-treat in the Varroa Controller. Replace immediately with a fresh drone frame to start Cycle 2.'],
+    [23,  'teal',  '✂️ Cycle 1 — Last safe removal day',      dpFmt(dpAddDays(start,23)), 'Last safe day for Cycle 1. Brood still fully capped. Remove now and replace with fresh frame. Any later and drones begin emerging, releasing mites.'],
+    [24,  'red',   '⚠️ Cycle 1 — Emergency removal',          dpFmt(dpAddDays(start,24)), 'Drones may begin emerging. Remove and freeze immediately — some mites will already have escaped.'],
+    [38,  'teal',  '✂️ Cycle 2 — Remove & treat (ideal)',     dpFmt(dpAddDays(start,38)), 'Cycle 2 frame fully capped — all mites trapped. Remove and freeze 48h or heat-treat. This completes the two-cycle protocol.'],
+    [42,  'teal',  '✂️ Cycle 2 — Last safe removal day',      dpFmt(dpAddDays(start,42)), 'Last safe day for Cycle 2. Remove now — any later and drones begin emerging.'],
+    [43,  'red',   '⚠️ Cycle 2 — Emergency removal',          dpFmt(dpAddDays(start,43)), 'Drones may begin emerging from Cycle 2 frame. Remove and freeze immediately.'],
+    [44,  '',      '🔍 Post-treatment check',                  dpFmt(dpAddDays(start,44)), 'Two full cycles complete. Perform an alcohol wash to assess mite reduction. Record results in VarroaMate.'],
   ];
   ac.innerHTML = cards.map(([d,c,t,ds,desc])=>dpActionCard(d,c,t,ds,desc)).join('');
 }
@@ -6741,13 +6741,13 @@ function renderBBPlanner(){
   const ac = document.getElementById('bb-actions');
   const cards = [
     [0,  'amber', '🔒 Cage the queen',         dpFmt(start),                    'Find and cage your queen. No new eggs can be laid. All existing brood will progressively hatch over the next 21 days. Ensure adequate stores.'],
-    [7,  '',      '🔍 Mid-point check',         dpFmt(dpAddDays(start,6)),       'Check queen is secure and colony is calm. Increased nurse bees is normal — more adult bees available when brood finishes hatching.'],
-    [15, 'amber', '🔓 Release the queen',       dpFmt(dpAddDays(start,14)),      'Release the queen. She resumes laying immediately. Eggs she lays today won\'t be capped until ~day 24, so OA treatment at days 21–22 remains in the clear broodless window.'],
-    [21, 'teal',  '💨 OAV — Application 1',    dpFmt(dpAddDays(start,20)),      'Colony is broodless. All Varroa mites are phoretic (on adult bees, not in cells). Apply first OA treatment: OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). Maximum possible efficacy. Use manufacturer\'s recommended dose per hive body.'],
-    [22, 'teal',  '💨 OAV — Application 2',    dpFmt(dpAddDays(start,21)),      '24h after first application (OAV protocol). Many protocols use 2–3 consecutive days. Alternatively: days 21, 28 and 35 for a 3-week protocol. Not applicable if using Aluen CAP or OA dribble (single application).'],
-    [22, 'teal',  '💧 OA Dribble (optional)',   dpFmt(dpAddDays(start,21)),      '<strong>Aluen CAP or OA dribble</strong> — a single application when broodless is highly effective. Aluen CAP: place caps on top bars per label. OA dribble: 5ml per seam of bees. Both are highly effective in the broodless window and can be used as an alternative to OAV. Do not repeat.'],
-    [28, 'teal',  '💨 OAV — Application 3',    dpFmt(dpAddDays(start,27)),      'Optional third OA application (consecutive-day protocol). After this, monitor mite drop on a sticky board for 3 days to confirm efficacy.'],
-    [30, '',      '📋 Post-treatment check',    dpFmt(dpAddDays(start,29)),      'Confirm queen is laying normally. Count mite drop on sticky board. If still elevated, consider a repeat OAV cycle. Record results in VarroaMate.'],
+    [6,  '',      '🔍 Mid-point check',         dpFmt(dpAddDays(start,6)),       'Check queen is secure and colony is calm. Increased nurse bees is normal — more adult bees available when brood finishes hatching.'],
+    [14, 'amber', '🔓 Release the queen',       dpFmt(dpAddDays(start,14)),      'Release the queen. She resumes laying immediately. Eggs she lays today won\'t be capped until ~day 23, so OA treatment at days 20–21 remains in the clear broodless window.'],
+    [20, 'teal',  '💨 OAV — Application 1',    dpFmt(dpAddDays(start,20)),      'Colony is broodless. All Varroa mites are phoretic (on adult bees, not in cells). Apply first OA treatment: OA vaporisation, OA dribble, or Aluen CAP (where registered in your state). Maximum possible efficacy. Use manufacturer\'s recommended dose per hive body.'],
+    [21, 'teal',  '💨 OAV — Application 2',    dpFmt(dpAddDays(start,21)),      '24h after first application (OAV protocol). Many protocols use 2–3 consecutive days. Alternatively: days 20, 27 and 34 for a 3-week protocol. Not applicable if using Aluen CAP or OA dribble (single application).'],
+    [21, 'teal',  '💧 OA Dribble (optional)',   dpFmt(dpAddDays(start,21)),      '<strong>Aluen CAP or OA dribble</strong> — a single application when broodless is highly effective. Aluen CAP: place caps on top bars per label. OA dribble: 5ml per seam of bees. Both are highly effective in the broodless window and can be used as an alternative to OAV. Do not repeat.'],
+    [27, 'teal',  '💨 OAV — Application 3',    dpFmt(dpAddDays(start,27)),      'Optional third OA application (consecutive-day protocol). After this, monitor mite drop on a sticky board for 3 days to confirm efficacy.'],
+    [29, '',      '📋 Post-treatment check',    dpFmt(dpAddDays(start,29)),      'Confirm queen is laying normally. Count mite drop on sticky board. If still elevated, consider a repeat OAV cycle. Record results in VarroaMate.'],
   ];
   ac.innerHTML = cards.map(([d,c,t,ds,desc])=>dpActionCard(d,c,t,ds,desc)).join('');
 }
