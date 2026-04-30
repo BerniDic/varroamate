@@ -6244,20 +6244,77 @@ function _renderTreatmentPicker(){
 
 function _findBestWindow(daily, treatmentIds){
   if(!treatmentIds || treatmentIds.length === 0) return null;
-  // Find the longest run of consecutive 'optimal' days
-  let bestStart = -1, bestLen = 0, currStart = -1, currLen = 0;
-  for(let i = 0; i < daily.time.length; i++){
-    const v = _treatmentVerdict(i, daily, treatmentIds);
-    if(v && v.tier === 'optimal'){
-      if(currLen === 0) currStart = i;
-      currLen++;
-      if(currLen > bestLen){ bestLen = currLen; bestStart = currStart; }
-    } else {
-      currLen = 0;
+  // Forecast reliability: days 0–6 reliable, days 7–13 extended (lower accuracy).
+  // Strategy: prefer a reliable recommendation over a tentative extended one,
+  // even if 'reliable' means marginal and 'extended' means optimal — because
+  // acting on known-marginal weather typically beats waiting for forecast-only
+  // optimal weather that may not materialise.
+  //
+  // Returns one of:
+  //   { kind:'reliable-optimal',  startIdx, length, straddles }
+  //   { kind:'reliable-marginal', startIdx, length, alternativeOptimal? }
+  //   { kind:'extended-optimal',  startIdx, length }
+  //   null
+  const RELIABLE_END = 6; // last reliable index
+  const N = daily.time.length;
+
+  // Helper: find the longest consecutive run of days matching a tier predicate.
+  // Returns { startIdx, length } or null.
+  function longestRun(predicate, fromIdx, toIdx){
+    let bestStart = -1, bestLen = 0, currStart = -1, currLen = 0;
+    for(let i = fromIdx; i <= toIdx && i < N; i++){
+      const v = _treatmentVerdict(i, daily, treatmentIds);
+      if(v && predicate(v.tier)){
+        if(currLen === 0) currStart = i;
+        currLen++;
+        if(currLen > bestLen){ bestLen = currLen; bestStart = currStart; }
+      } else {
+        currLen = 0;
+      }
     }
+    return bestLen === 0 ? null : { startIdx: bestStart, length: bestLen };
   }
-  if(bestLen === 0) return null;
-  return { startIdx: bestStart, length: bestLen };
+
+  // 1. Reliable optimal? (longest optimal run starting in days 0–6)
+  //    Allow it to extend past day 6 — we'll flag the 'straddles' case.
+  const reliableOptimal = longestRun(t => t === 'optimal', 0, N - 1);
+  if(reliableOptimal && reliableOptimal.startIdx <= RELIABLE_END){
+    const endIdx = reliableOptimal.startIdx + reliableOptimal.length - 1;
+    return {
+      kind: 'reliable-optimal',
+      startIdx: reliableOptimal.startIdx,
+      length: reliableOptimal.length,
+      straddles: endIdx > RELIABLE_END
+    };
+  }
+
+  // 2. No reliable optimal. Look for reliable marginal-or-better in days 0–6.
+  const reliableUseable = longestRun(t => t === 'optimal' || t === 'marginal', 0, RELIABLE_END);
+
+  // 3. Look for an extended-only optimal window (starts at index 7+).
+  let extendedOptimal = null;
+  if(!reliableOptimal || reliableOptimal.startIdx > RELIABLE_END){
+    extendedOptimal = longestRun(t => t === 'optimal', RELIABLE_END + 1, N - 1);
+  }
+
+  if(reliableUseable){
+    return {
+      kind: 'reliable-marginal',
+      startIdx: reliableUseable.startIdx,
+      length: reliableUseable.length,
+      alternativeOptimal: extendedOptimal
+    };
+  }
+
+  if(extendedOptimal){
+    return {
+      kind: 'extended-optimal',
+      startIdx: extendedOptimal.startIdx,
+      length: extendedOptimal.length
+    };
+  }
+
+  return null;
 }
 
 // ══ END TREATMENT WEATHER OVERLAY ══
@@ -6520,14 +6577,41 @@ async function renderWeather(){
     const bestWindow = _findBestWindow(data.daily, _weatherSelectedTreatments);
     let bestWindowHtml = '';
     if(bestWindow){
-      const startLbl = _formatDayLabel(data.daily.time[bestWindow.startIdx]);
-      const endLbl   = _formatDayLabel(data.daily.time[bestWindow.startIdx + bestWindow.length - 1]);
-      const windowText = bestWindow.length === 1
-        ? startLbl
-        : startLbl + ' – ' + endLbl + ' (' + bestWindow.length + ' days)';
-      bestWindowHtml = '<div style="padding:12px 14px;background:rgba(31,122,58,0.08);border:1px solid rgba(31,122,58,0.25);border-radius:10px;margin-bottom:14px;font-size:15px;color:#1F4F2A;line-height:1.5;">'
-        + '<strong>✓ Best treatment window:</strong> ' + windowText
-        + '</div>';
+      const fmtRange = (start, length) => {
+        const startLbl = _formatDayLabel(data.daily.time[start]);
+        const endLbl   = _formatDayLabel(data.daily.time[start + length - 1]);
+        return length === 1 ? startLbl : startLbl + ' – ' + endLbl + ' (' + length + ' days)';
+      };
+      const windowText = fmtRange(bestWindow.startIdx, bestWindow.length);
+
+      if(bestWindow.kind === 'reliable-optimal'){
+        // Optimal window in the reliable forecast (days 0–6). May extend past day 6.
+        bestWindowHtml = '<div style="padding:12px 14px;background:rgba(31,122,58,0.08);border:1px solid rgba(31,122,58,0.25);border-radius:10px;margin-bottom:14px;font-size:15px;color:#1F4F2A;line-height:1.5;">'
+          + '<strong>✓ Best treatment window:</strong> ' + windowText
+          + (bestWindow.straddles
+              ? '<div style="font-size:13px;margin-top:6px;color:#5A6A4A;">Window extends past the 7-day reliable forecast — recheck nearer the later dates.</div>'
+              : '')
+          + '</div>';
+      } else if(bestWindow.kind === 'reliable-marginal'){
+        // No reliable optimal; surface the best reliable marginal as the headline.
+        // Mention any extended-optimal alternative as a footnote, not a headline.
+        const altText = bestWindow.alternativeOptimal
+          ? fmtRange(bestWindow.alternativeOptimal.startIdx, bestWindow.alternativeOptimal.length)
+          : null;
+        bestWindowHtml = '<div style="padding:12px 14px;background:rgba(212,130,10,0.08);border:1px solid rgba(212,130,10,0.30);border-radius:10px;margin-bottom:14px;font-size:15px;color:#7A4F00;line-height:1.5;">'
+          + '<strong>✓ Best available window (marginal):</strong> ' + windowText
+          + '<div style="font-size:13px;margin-top:6px;color:#7A4F00;">No optimal days in the reliable 7-day forecast. Marginal is within label limits — treatment will work but may be less effective or stress the colony.</div>'
+          + (altText
+              ? '<div style="font-size:13px;margin-top:6px;color:#7A4F00;">📅 A tentative optimal window appears in the extended forecast (' + altText + '). Days 8–14 are less reliable, so acting on a marginal day soon is usually preferable to waiting for a forecast-only optimal day — unless conditions are not urgent and you can recheck before then.</div>'
+              : '')
+          + '</div>';
+      } else if(bestWindow.kind === 'extended-optimal'){
+        // No reliable optimal or marginal; only an extended-forecast optimal window.
+        bestWindowHtml = '<div style="padding:12px 14px;background:rgba(212,130,10,0.08);border:1px solid rgba(212,130,10,0.30);border-radius:10px;margin-bottom:14px;font-size:15px;color:#7A4F00;line-height:1.5;">'
+          + '<strong>📅 Tentative planning window:</strong> ' + windowText
+          + '<div style="font-size:13px;margin-top:6px;color:#7A4F00;">Based on the extended forecast (days 8–14) which has lower accuracy. No suitable window found in the next 7 days. Recheck a few days before treatment.</div>'
+          + '</div>';
+      }
     } else if(_weatherSelectedTreatments.length > 0){
       bestWindowHtml = '<div style="padding:12px 14px;background:rgba(154,42,26,0.06);border:1px solid rgba(154,42,26,0.20);border-radius:10px;margin-bottom:14px;font-size:15px;color:#7A2218;line-height:1.5;">'
         + '<strong>⚠ No optimal days in the next 14 days.</strong> Marginal days are still acceptable when timing matters — they are outside ideal but within label limits. If you can wait a few days for better conditions, do so. If treatment is urgent (high mite count, brood emerging, end of treatment window), proceed on the best marginal day available.'
